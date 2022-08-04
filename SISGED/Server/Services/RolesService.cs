@@ -1,0 +1,29 @@
+﻿using MongoDB.Driver;
+using SISGED.Shared.Entities;
+
+namespace SISGED.Server.Services
+{
+    public class RolesService
+    {
+        private readonly IMongoCollection<Rol> _roles;
+
+        public RolesService(ISysgedDatabaseSettings settings)
+        {
+            var client = new MongoClient(settings.ConnectionString);
+            var database = client.GetDatabase(settings.DatabaseName);
+            _roles = database.GetCollection<Rol>("roles");
+        }
+
+        public List<Rol> Get()
+        {
+            return _roles.Find<Rol>(x => true).ToList();
+        }
+
+        public Rol GetById(string id)
+        {
+            Rol rol = new Rol();
+            rol = _roles.Find(rol => rol.id == id).FirstOrDefault();
+            return rol;
+        }
+    }
+}
