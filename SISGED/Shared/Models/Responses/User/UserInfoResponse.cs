@@ -1,0 +1,16 @@
+﻿using SISGED.Shared.Entities;
+
+namespace SISGED.Shared.Models.Responses.User
+{
+    public class UserInfoResponse
+    {
+        public string Id { get; set; } = default!;
+        public string Type { get; set; } = default!;
+        public string UserName { get; set; } = default!;
+        public string Password { get; set; } = default!;
+        public UserInfo Data { get; set; } = new UserInfo();
+        public string State { get; set; } = default!;
+        public string Rol { get; set; } = default!;
+
+    }
+}
