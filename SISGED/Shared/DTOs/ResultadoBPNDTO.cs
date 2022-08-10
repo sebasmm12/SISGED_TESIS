@@ -4,7 +4,7 @@ using SISGED.Shared.Entities;
 
 namespace SISGED.Shared.DTOs
 {
-    public class ResultadoBPNDTO : Documento
+    public class ResultadoBPNDTO : Document
     {
         public ContenidoResultadoBPNDTO contenidoDTO { get; set; } = new ContenidoResultadoBPNDTO();
     }

@@ -15,7 +15,7 @@ namespace SISGED.Shared.Entities
         [BsonElement("listaherramientas")]
         public List<string> Tools { get; set; } = new List<string>();
         [BsonElement("listainterfaces")]
-        public List<String> Interfaces { get; set; } = new List<string>();
+        public List<string> Interfaces { get; set; } = new List<string>();
         [BsonElement("descripcion")]
         public string Description { get; set; } = default!;
     }

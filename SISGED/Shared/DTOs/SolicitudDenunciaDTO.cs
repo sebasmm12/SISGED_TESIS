@@ -13,7 +13,7 @@ namespace SISGED.Shared.DTOs
         public List<string> Urlanexo { get; set; } = new List<string>();
 
     }
-    public class SolicitudDenunciaDTO : Documento
+    public class SolicitudDenunciaDTO : Document
     {
         public string nombrecliente { get; set; }
         public string tipodocumento { get; set; }

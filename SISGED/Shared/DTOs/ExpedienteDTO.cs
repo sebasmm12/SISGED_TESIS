@@ -13,9 +13,9 @@ namespace SISGED.Shared.DTOs
         public Cliente cliente { get; set; }
         public DateTime fechainicio { get; set; }
         public DateTime? fechafin { get; set; }
-        public List<DocumentoExpediente> documentos { get; set; } = new List<DocumentoExpediente>();
-        public List<Documento> documentosobj { get; set; } = new List<Documento>();
-        public List<Derivacion> derivaciones { get; set; } = new List<Derivacion>();
+        public List<DossierDocument> documentos { get; set; } = new List<DossierDocument>();
+        public List<Document> documentosobj { get; set; } = new List<Document>();
+        public List<Derivation> derivaciones { get; set; } = new List<Derivation>();
         public string estado { get; set; }
     }
 
@@ -28,8 +28,8 @@ namespace SISGED.Shared.DTOs
         public Cliente cliente { get; set; }
         public DateTime fechainicio { get; set; }
         public DateTime? fechafin { get; set; }
-        public DocumentoExpediente documentos { get; set; }
-        public List<Derivacion> derivaciones { get; set; } = new List<Derivacion>();
+        public DossierDocument documentos { get; set; }
+        public List<Derivation> derivaciones { get; set; } = new List<Derivation>();
         public string estado { get; set; }
     }
 
@@ -42,9 +42,9 @@ namespace SISGED.Shared.DTOs
         public Cliente cliente { get; set; }
         public DateTime fechainicio { get; set; }
         public DateTime? fechafin { get; set; }
-        public List<DocumentoExpediente> documentos { get; set; } = new List<DocumentoExpediente>();
-        public List<Documento> documentosobj { get; set; } = new List<Documento>();
-        public List<Derivacion> derivaciones { get; set; } = new List<Derivacion>();
+        public List<DossierDocument> documentos { get; set; } = new List<DossierDocument>();
+        public List<Document> documentosobj { get; set; } = new List<Document>();
+        public List<Derivation> derivaciones { get; set; } = new List<Derivation>();
         public string estado { get; set; }
     }
 
@@ -58,8 +58,8 @@ namespace SISGED.Shared.DTOs
         public Cliente cliente { get; set; }
         public DateTime fechainicio { get; set; }
         public DateTime? fechafin { get; set; }
-        public DocumentoExpediente documentos { get; set; }
-        public List<Derivacion> derivaciones { get; set; }
+        public DossierDocument documentos { get; set; }
+        public List<Derivation> derivaciones { get; set; }
         public string estado { get; set; }
     }
     public class ExpedienteDTO_look_up
@@ -71,10 +71,10 @@ namespace SISGED.Shared.DTOs
         public Cliente cliente { get; set; }
         public DateTime fechainicio { get; set; }
         public DateTime? fechafin { get; set; }
-        public DocumentoExpediente documentos { get; set; }
-        public List<Derivacion> derivaciones { get; set; }
+        public DossierDocument documentos { get; set; }
+        public List<Derivation> derivaciones { get; set; }
         public string estado { get; set; }
-        public List<Documento> documentoobj { get; set; }
+        public List<Document> documentoobj { get; set; }
     }
     public class ExpedienteDTO_ur2
     {
@@ -85,10 +85,10 @@ namespace SISGED.Shared.DTOs
         public Cliente cliente { get; set; }
         public DateTime fechainicio { get; set; }
         public DateTime? fechafin { get; set; }
-        public DocumentoExpediente documentos { get; set; }
-        public List<Derivacion> derivaciones { get; set; }
+        public DossierDocument documentos { get; set; }
+        public List<Derivation> derivaciones { get; set; }
         public string estado { get; set; }
-        public Documento documentoobj { get; set; }
+        public Document documentoobj { get; set; }
     }
     public class ExpedienteWrapper
     {
@@ -105,8 +105,8 @@ namespace SISGED.Shared.DTOs
         public string id { get; set; }
         public string tipo { get; set; }
         public Cliente cliente { get; set; }
-        public Documento documento { get; set; } = new Documento();
-        public List<Documento> documentosobj { get; set; } = new List<Documento>();
+        public Document documento { get; set; } = new Document();
+        public List<Document> documentosobj { get; set; } = new List<Document>();
     }
 
     public class Expedientedoc
@@ -118,8 +118,8 @@ namespace SISGED.Shared.DTOs
         public Cliente cliente { get; set; }
         public DateTime fechainicio { get; set; }
         public DateTime? fechafin { get; set; }
-        public DocumentoExpediente documentos { get; set; } = new DocumentoExpediente();
-        public List<Derivacion> derivaciones { get; set; }
+        public DossierDocument documentos { get; set; } = new DossierDocument();
+        public List<Derivation> derivaciones { get; set; }
         public string estado { get; set; }
     }
 
@@ -132,8 +132,8 @@ namespace SISGED.Shared.DTOs
         public Cliente cliente { get; set; }
         public DateTime fechainicio { get; set; }
         public DateTime? fechafin { get; set; }
-        public DocumentoExpediente documentos { get; set; } = new DocumentoExpediente();
-        public List<Derivacion> derivaciones { get; set; }
+        public DossierDocument documentos { get; set; } = new DossierDocument();
+        public List<Derivation> derivaciones { get; set; }
         public List<DocumentoDTO> documentosobj { get; set; } = new List<DocumentoDTO>();
         public string estado { get; set; }
     }
@@ -147,8 +147,8 @@ namespace SISGED.Shared.DTOs
         public Cliente cliente { get; set; }
         public DateTime fechainicio { get; set; }
         public DateTime? fechafin { get; set; }
-        public DocumentoExpediente documentos { get; set; } = new DocumentoExpediente();
-        public List<Derivacion> derivaciones { get; set; }
+        public DossierDocument documentos { get; set; } = new DossierDocument();
+        public List<Derivation> derivaciones { get; set; }
         public DocumentoDTO documentosobj { get; set; } = new DocumentoDTO();
         public string estado { get; set; }
     }
@@ -166,24 +166,24 @@ namespace SISGED.Shared.DTOs
 
     public class ExpedienteDocumentoBPNDTO
     {
-        public Expediente expediente { get; set; }
+        public Dossier expediente { get; set; }
         public SolicitudBPN solicitduBPN { get; set; }
     }
 
     public class ExpedienteDocumentoEFDTO
     {
-        public Expediente expediente { get; set; }
+        public Dossier expediente { get; set; }
         public SolicitudExpedicionFirma solicitudEF { get; set; }
     }
 
     public class ExpedienteDocumentoSDDTO
     {
-        public Expediente expediente { get; set; }
+        public Dossier expediente { get; set; }
         public SolicitudDenuncia solicitudD { get; set; }
     }
     public class ExpedienteDocumentoSIDTO
     {
-        public Expediente expediente { get; set; }
+        public Dossier expediente { get; set; }
         public SolicitudInicial solicitudI { get; set; }
     }
     //Clases DTO del diagrama GANTT
@@ -195,8 +195,8 @@ namespace SISGED.Shared.DTOs
         public Cliente cliente { get; set; }
         public DateTime fechainicio { get; set; }
         public DateTime? fechafin { get; set; }
-        public DocumentoExpediente documentos { get; set; } = new DocumentoExpediente();
-        public List<Derivacion> derivaciones { get; set; }
+        public DossierDocument documentos { get; set; } = new DossierDocument();
+        public List<Derivation> derivaciones { get; set; }
         public string estado { get; set; }
     }
     public class ExpedineteDTO_lookup1g
@@ -207,9 +207,9 @@ namespace SISGED.Shared.DTOs
         public Cliente cliente { get; set; }
         public DateTime fechainicio { get; set; }
         public DateTime? fechafin { get; set; }
-        public DocumentoExpediente documentos { get; set; } = new DocumentoExpediente();
-        public List<Derivacion> derivaciones { get; set; }
-        public List<Documento> documentoobj { get; set; }
+        public DossierDocument documentos { get; set; } = new DossierDocument();
+        public List<Derivation> derivaciones { get; set; }
+        public List<Document> documentoobj { get; set; }
         public string estado { get; set; }
     }
     public class ExpedineteDTO_unwind2g
@@ -220,9 +220,9 @@ namespace SISGED.Shared.DTOs
         public Cliente cliente { get; set; }
         public DateTime fechainicio { get; set; }
         public DateTime? fechafin { get; set; }
-        public DocumentoExpediente documentos { get; set; } = new DocumentoExpediente();
-        public List<Derivacion> derivaciones { get; set; }
-        public Documento documentoobj { get; set; }
+        public DossierDocument documentos { get; set; } = new DossierDocument();
+        public List<Derivation> derivaciones { get; set; }
+        public Document documentoobj { get; set; }
         public string estado { get; set; }
     }
     public class ExpedienteDTO_lookup
@@ -233,8 +233,8 @@ namespace SISGED.Shared.DTOs
         public Cliente cliente { get; set; }
         public DateTime fechainicio { get; set; }
         public DateTime? fechafin { get; set; }
-        public DocumentoExpediente documentos { get; set; } = new DocumentoExpediente();
-        public List<Derivacion> derivaciones { get; set; }
+        public DossierDocument documentos { get; set; } = new DossierDocument();
+        public List<Derivation> derivaciones { get; set; }
         public List<DocumentoDTO> documentosobj { get; set; } = new List<DocumentoDTO>();
         public string estado { get; set; }
     }
@@ -246,8 +246,8 @@ namespace SISGED.Shared.DTOs
         public Cliente cliente { get; set; }
         public DateTime fechainicio { get; set; }
         public DateTime? fechafin { get; set; }
-        public DocumentoExpediente documentos { get; set; } = new DocumentoExpediente();
-        public List<Derivacion> derivaciones { get; set; }
+        public DossierDocument documentos { get; set; } = new DossierDocument();
+        public List<Derivation> derivaciones { get; set; }
         public DocumentoDTO documentosobj { get; set; } = new DocumentoDTO();
         public string estado { get; set; }
     }
@@ -260,8 +260,8 @@ namespace SISGED.Shared.DTOs
         public Cliente cliente { get; set; }
         public DateTime fechainicio { get; set; }
         public DateTime? fechafin { get; set; }
-        public List<DocumentoExpediente> documentos { get; set; } = new List<DocumentoExpediente>();
-        public List<Derivacion> derivaciones { get; set; }
+        public List<DossierDocument> documentos { get; set; } = new List<DossierDocument>();
+        public List<Derivation> derivaciones { get; set; }
         public List<DocumentoDTO> documentosobj { get; set; } = new List<DocumentoDTO>();
         public string estado { get; set; }
     }

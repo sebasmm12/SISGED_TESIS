@@ -8,19 +8,19 @@ namespace SISGED.Server.Services
 {
     public class ExpedienteService
     {
-        private readonly IMongoCollection<Expediente> _expedientes;
+        private readonly IMongoCollection<Dossier> _expedientes;
         private readonly IMongoCollection<Bandeja> _bandejas;
-        private readonly IMongoCollection<Documento> _documentos;
+        private readonly IMongoCollection<Document> _documentos;
         public ExpedienteService(ISysgedDatabaseSettings settings)
         {
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.DatabaseName);
-            _expedientes = database.GetCollection<Expediente>("expedientes");
+            _expedientes = database.GetCollection<Dossier>("expedientes");
             _bandejas = database.GetCollection<Bandeja>("bandejas");
-            _documentos = database.GetCollection<Documento>("documentos");
+            _documentos = database.GetCollection<Document>("documentos");
 
         }
-        public Expediente saveExpediente(Expediente expediente)
+        public Dossier saveExpediente(Dossier expediente)
         {
             _expedientes.InsertOne(expediente);
             return expediente;
@@ -43,7 +43,7 @@ namespace SISGED.Server.Services
                 Add("as", "documentoobj"));
             List<ExpedienteDTO2> listaexpedientesdto = new List<ExpedienteDTO2>();
             listaexpedientesdto = await _expedientes.Aggregate()
-                .Unwind<Expediente, ExpedienteDTO_ur1>(e => e.documentos)
+                .Unwind<Dossier, ExpedienteDTO_ur1>(e => e.Documents)
                 .AppendStage<ExpedienteDTO_look_up>(lookup)
                 .Unwind<ExpedienteDTO_look_up, ExpedienteDTO_ur2>(p => p.documentoobj)
                 .Group<ExpedienteDTO2>(new BsonDocument
@@ -66,48 +66,48 @@ namespace SISGED.Server.Services
             return listaexpedientesdto;
         }
 
-        public List<Expediente> getAllExpediente()
+        public List<Dossier> getAllExpediente()
         {
-            List<Expediente> expedientes = new List<Expediente>();
+            List<Dossier> expedientes = new List<Dossier>();
             expedientes = _expedientes.Find(expediente => true).ToList();
             return expedientes;
         }
-        public ExpedienteBandejaDTO registrarDerivacion(Expediente expediente, string userId)
+        public ExpedienteBandejaDTO registrarDerivacion(Dossier expediente, string userId)
         {
 
-            Derivacion derivacion = new Derivacion();
-            derivacion = expediente.derivaciones.FirstOrDefault();
-            derivacion.usuarioreceptor = userId;
+            Derivation derivacion = new Derivation();
+            derivacion = expediente.Derivations.FirstOrDefault();
+            derivacion.ReceiverUser = userId;
 
-            var filter = Builders<Expediente>.Filter.Eq(exp => exp.id, expediente.id);
-            var update = Builders<Expediente>.Update.Push("derivaciones", derivacion);
+            var filter = Builders<Dossier>.Filter.Eq(exp => exp.Id, expediente.Id);
+            var update = Builders<Dossier>.Update.Push("derivaciones", derivacion);
             _expedientes.UpdateOne(filter, update);
 
             BandejaDocumento bandejaDocumento = new BandejaDocumento();
-            bandejaDocumento.idexpediente = expediente.id;
-            bandejaDocumento.iddocumento = expediente.documentos.Last().iddocumento;
+            bandejaDocumento.idexpediente = expediente.Id;
+            bandejaDocumento.iddocumento = expediente.Documents.Last().DocumentId;
 
             UpdateDefinition<Bandeja> updateBandeja = Builders<Bandeja>.Update.Push("bandejaentrada", bandejaDocumento);
             _bandejas.UpdateOne(band => band.usuario == userId, updateBandeja);
 
             UpdateDefinition<Bandeja> updateBandejaS = Builders<Bandeja>.Update.Pull("bandejasalida", bandejaDocumento);
-            _bandejas.UpdateOne(band => band.usuario == derivacion.usuarioemisor, updateBandejaS);
+            _bandejas.UpdateOne(band => band.usuario == derivacion.SenderUser, updateBandejaS);
 
             UpdateDefinition<Bandeja> updateBandejaE = Builders<Bandeja>.Update.Pull("bandejaentrada", bandejaDocumento);
-            _bandejas.UpdateOne(band => band.usuario == derivacion.usuarioemisor, updateBandejaE);
-
+            _bandejas.UpdateOne(band => band.usuario == derivacion.SenderUser, updateBandejaE);
+            
             Proceso proceso = new Proceso();
-            proceso.area = derivacion.areaprocedencia;
+            proceso.area = derivacion.OriginArea;
             proceso.fechaemision = DateTime.Now;
             proceso.fecharecepcion = DateTime.Now;
-            proceso.idemisor = derivacion.usuarioemisor;
+            proceso.idemisor = derivacion.ReceiverUser;
             proceso.idreceptor = userId;
 
-            UpdateDefinition<Documento> updateDocumento = Builders<Documento>.Update.Push("historialproceso", proceso);
+            UpdateDefinition<Document> updateDocumento = Builders<Document>.Update.Push("historialproceso", proceso);
             _documentos.UpdateOne(doc => doc.id == bandejaDocumento.iddocumento, updateDocumento);
 
             ExpedienteBandejaDTO ex = new ExpedienteBandejaDTO();
-            ex = obtenerExpedienteBandeja(expediente.id);
+            ex = obtenerExpedienteBandeja(expediente.Id);
 
 
 
@@ -168,8 +168,8 @@ namespace SISGED.Server.Services
 
             ExpedienteBandejaDTO listaexpedientesdto = new ExpedienteBandejaDTO();
             listaexpedientesdto = _expedientes.Aggregate()
-                .AppendStage<Expediente>(match)
-                .Unwind<Expediente, Expedientedoc>(x => x.documentos)
+                .AppendStage<Dossier>(match)
+                .Unwind<Dossier, Expedientedoc>(x => x.Documents)
                 .AppendStage<Expedientedoc_lookup>(lookup)
                 .Unwind<Expedientedoc_lookup, Expedientedoc_lookup_ur>(x => x.documentosobj)
                 .AppendStage<Expedientedoc_group>(group)
@@ -185,34 +185,34 @@ namespace SISGED.Server.Services
 
         public ExpedienteDTO getbynestediddoc(string iddoc)
         {
-            Expediente expediente = _expedientes.Find(exp => exp.documentos.Any(doc => doc.iddocumento == iddoc)).FirstOrDefault();
+            Dossier expediente = _expedientes.Find(exp => exp.Documents.Any(doc => doc.DocumentId == iddoc)).FirstOrDefault();
             ExpedienteDTO dTO = new ExpedienteDTO
             {
-                cliente = expediente.cliente,
-                derivaciones = expediente.derivaciones,
-                documentos = expediente.documentos,
-                estado = expediente.estado,
-                fechafin = expediente.fechafin,
-                fechainicio = expediente.fechainicio,
-                id = expediente.id,
-                tipo = expediente.tipo
+                cliente = expediente.Client,
+                derivaciones = expediente.Derivations,
+                documentos = expediente.Documents,
+                estado = expediente.State,
+                fechafin = expediente.EndDate,
+                fechainicio = expediente.StartDate,
+                id = expediente.Id,
+                tipo = expediente.Type
             };
             return dTO;
         }
 
         public ExpedienteDTO getById(string iddoc)
         {
-            Expediente expediente = _expedientes.Find(exp => exp.id == iddoc).FirstOrDefault();
+            Dossier expediente = _expedientes.Find(exp => exp.Id == iddoc).FirstOrDefault();
             ExpedienteDTO dTO = new ExpedienteDTO
             {
-                cliente = expediente.cliente,
-                derivaciones = expediente.derivaciones,
-                documentos = expediente.documentos,
-                estado = expediente.estado,
-                fechafin = expediente.fechafin,
-                fechainicio = expediente.fechainicio,
-                id = expediente.id,
-                tipo = expediente.tipo
+                cliente = expediente.Client,
+                derivaciones = expediente.Derivations,
+                documentos = expediente.Documents,
+                estado = expediente.State,
+                fechafin = expediente.EndDate,
+                fechainicio = expediente.StartDate,
+                id = expediente.Id,
+                tipo = expediente.Type
             };
             return dTO;
         }
@@ -257,7 +257,7 @@ namespace SISGED.Server.Services
 
             List<ExpedienteDTO> expedientes = new List<ExpedienteDTO>();
             expedientes = await _expedientes.Aggregate()
-                .Unwind<Expediente, ExpedienteDTO_ur1>(e => e.documentos)
+                .Unwind<Dossier, ExpedienteDTO_ur1>(e => e.Documents)
                 .AppendStage<ExpedienteDTO_look_up>(lookup)
                 .Unwind<ExpedienteDTO_look_up, ExpedienteDTO_ur2>(p => p.documentoobj)
                 .Group<ExpedienteDTO>(new BsonDocument
@@ -282,16 +282,16 @@ namespace SISGED.Server.Services
             return expedientes;
         }
 
-        public Expediente updateExpedientBySolicitudInitial(Expediente expediente)
+        public Dossier updateExpedientBySolicitudInitial(Dossier expediente)
         {
 
-            var updateExpediente = Builders<Expediente>.Update
-                                                            .Set("tipo", expediente.tipo)
-                                                            .Push("documentos", expediente.documentos.ElementAt(0));
+            var updateExpediente = Builders<Dossier>.Update
+                                                            .Set("tipo", expediente.Type)
+                                                            .Push("documentos", expediente.Documents.ElementAt(0));
 
-            var queryExpediente = Builders<Expediente>.Filter.Eq("id", expediente.id);
+            var queryExpediente = Builders<Dossier>.Filter.Eq("id", expediente.Id);
 
-            return _expedientes.FindOneAndUpdate(queryExpediente, updateExpediente, new FindOneAndUpdateOptions<Expediente>
+            return _expedientes.FindOneAndUpdate(queryExpediente, updateExpediente, new FindOneAndUpdateOptions<Dossier>
             {
                 ReturnDocument = ReturnDocument.After
             });
@@ -340,8 +340,8 @@ namespace SISGED.Server.Services
 
             List<Expediente_group> estadisticas = new List<Expediente_group>();
             estadisticas = await _expedientes.Aggregate()
-                .AppendStage<Expediente>(match1)
-                .Unwind<Expediente, Expediente_unwind1>(x => x.documentos)
+                .AppendStage<Dossier>(match1)
+                .Unwind<Dossier, Expediente_unwind1>(x => x.Documents)
                 .AppendStage<Expediente_lookup>(lookup)
                 .Unwind<Expediente_lookup, Expediente_unwind2>(x => x.documentoobj)
                 .AppendStage<Expediente_group>(group)
@@ -398,8 +398,8 @@ namespace SISGED.Server.Services
 
             List<ExpedienteDTO_group1> listaexpediente = new List<ExpedienteDTO_group1>();
             listaexpediente = _expedientes.Aggregate()
-                                    .AppendStage<Expediente>(match1)
-                                    .Unwind<Expediente, ExpedineteDTO_unwind1>(x => x.documentos)
+                                    .AppendStage<Dossier>(match1)
+                                    .Unwind<Dossier, ExpedineteDTO_unwind1>(x => x.Documents)
                                     .AppendStage<ExpedienteDTO_lookup>(lookup)
                                     .Unwind<ExpedienteDTO_lookup, ExpedienteDTO_unwind2>(x => x.documentosobj)
                                     .AppendStage<ExpedienteDTO_group1>(group).ToList();
@@ -544,18 +544,18 @@ namespace SISGED.Server.Services
 
             List<expediente_project> listaexpediente = new List<expediente_project>();
             listaexpediente = await _expedientes.Aggregate()
-                                   .AppendStage<Expediente>(match1)
-                                   .Unwind<Expediente, ExpedineteDTO_unwind1>(x => x.documentos)
+                                   .AppendStage<Dossier>(match1)
+                                   .Unwind<Dossier, ExpedineteDTO_unwind1>(x => x.Documents)
                                    .AppendStage<ExpedineteDTO_lookup1g>(lookup)
                                    .Unwind<ExpedineteDTO_lookup1g, ExpedineteDTO_unwind2g>(x => x.documentoobj)
                                    .AppendStage<expediente_project>(project).ToListAsync();
             return listaexpediente;
         }
 
-        public Expediente GetById(string id)
+        public Dossier GetById(string id)
         {
-            Expediente expe = new Expediente();
-            expe = _expedientes.Find(exped => exped.id == id).FirstOrDefault();
+            Dossier expe = new Dossier();
+            expe = _expedientes.Find(exped => exped.Id == id).FirstOrDefault();
             return expe;
         }
 

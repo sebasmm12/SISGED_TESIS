@@ -2,7 +2,7 @@
 
 namespace SISGED.Shared.DTOs
 {
-    public class DictamenDTO : Documento
+    public class DictamenDTO : Document
     {
 
         public string estado { get; set; }

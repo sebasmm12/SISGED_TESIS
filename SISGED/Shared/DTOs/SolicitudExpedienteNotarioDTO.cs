@@ -4,7 +4,7 @@ using SISGED.Shared.Entities;
 
 namespace SISGED.Shared.DTOs
 {
-    public class SolicitudExpedienteNotarioDTO : Documento
+    public class SolicitudExpedienteNotarioDTO : Document
     {
         public ContenidoSolicitudExpedienteNotarioDTO contenidoDTO { get; set; } = new ContenidoSolicitudExpedienteNotarioDTO();
     }

@@ -35,7 +35,7 @@ namespace SISGED.Server.Controllers
             this.asistenteService = asistenteService;
         }
         [HttpGet("tododoc")]
-        public ActionResult<List<Documento>> Get()
+        public ActionResult<List<Document>> Get()
         {
             return _documentoservice.obtenerDocumentos();
         }
@@ -232,30 +232,30 @@ namespace SISGED.Server.Controllers
                 tipodocumento = doc.tipodocumento,
                 numerodocumento = doc.numerodocumento
             };
-            Expediente expediente = new Expediente();
-            expediente.tipo = "Solicitud";
-            expediente.cliente = cliente;
-            expediente.fechainicio = DateTime.UtcNow.AddHours(-5);
-            expediente.fechafin = null;
-            expediente.documentos = new List<DocumentoExpediente>()
+            Dossier expediente = new Dossier();
+            expediente.Type = "Solicitud";
+            expediente.Client = cliente;
+            expediente.StartDate = DateTime.UtcNow.AddHours(-5);
+            expediente.EndDate = null;
+            expediente.Documents = new List<DossierDocument>()
             {
-                new DocumentoExpediente(){
-                    indice = 1,
-                    iddocumento = soliInicial.id,
-                    tipo  = "SolicitudInicial",
-                    fechacreacion = DateTime.UtcNow.AddHours(-5),
-                    fechaexceso= DateTime.UtcNow.AddHours(-5).AddDays(10),
-                    fechademora = null
+                new DossierDocument(){
+                    Index = 1,
+                    DocumentId = soliInicial.id,
+                    Type  = "SolicitudInicial",
+                    CreationDate = DateTime.UtcNow.AddHours(-5),
+                    ExcessDate= DateTime.UtcNow.AddHours(-5).AddDays(10),
+                    DelayDate = null
                 }
             };
-            expediente.derivaciones = new List<Derivacion>();
-            expediente.estado = "solicitado";
+            expediente.Derivations = new List<Derivation>();
+            expediente.State = "solicitado";
             expediente = _expedienteservice.saveExpediente(expediente);
 
-            _bandejaService.InsertarBandejaEntradaUsuario(expediente.id, soliInicial.id, "josue");
+            _bandejaService.InsertarBandejaEntradaUsuario(expediente.Id, soliInicial.id, "josue");
 
             Asistente asistente = new Asistente();
-            asistente.idexpediente = expediente.id;
+            asistente.idexpediente = expediente.Id;
             asistente.pasos = new PasoAsistente();
             asistente.pasos.nombreexpediente = "Solicitud";
 
@@ -288,10 +288,10 @@ namespace SISGED.Server.Controllers
             }
 
             ExpedienteDTO expedientePorConsultar = _expedienteservice.getById(expediente.idexpediente);
-            DocumentoExpediente documentosolicitud = expedientePorConsultar.documentos.Find(x => x.tipo == "SolicitudInicial");
+            DossierDocument documentosolicitud = expedientePorConsultar.documentos.Find(x => x.Type == "SolicitudInicial");
 
             ConclusionFirma documentoCF = new ConclusionFirma();
-            documentoCF = _documentoservice.registrarConclusionFirmaE(expediente, url2, documentosolicitud.iddocumento);
+            documentoCF = _documentoservice.registrarConclusionFirmaE(expediente, url2, documentosolicitud.DocumentId);
             _escrituraspublicasservice.updateEscrituraPublicaporConclusionFirma(conclusionfirmaDTO.contenidoDTO.idescriturapublica);
             return documentoCF;
         }
@@ -425,9 +425,9 @@ namespace SISGED.Server.Controllers
             }
 
             ExpedienteDTO expedientePorConsultar = _expedienteservice.getById(expedientewrapper.idexpediente);
-            DocumentoExpediente documentosolicitud = expedientePorConsultar.documentos.Find(x => x.tipo == "SolicitudInicial");
+            DossierDocument documentosolicitud = expedientePorConsultar.documentos.Find(x => x.Type == "SolicitudInicial");
 
-            return _documentoservice.registrarResolucion(resolucionDTO, urlData, url2, expedientewrapper.idusuarioactual, expedientewrapper.idexpediente, expedientewrapper.documentoentrada, documentosolicitud.iddocumento);
+            return _documentoservice.registrarResolucion(resolucionDTO, urlData, url2, expedientewrapper.idusuarioactual, expedientewrapper.idexpediente, expedientewrapper.documentoentrada, documentosolicitud.DocumentId);
         }
 
         [HttpPost("documentoResultadoBPN")]
@@ -450,9 +450,9 @@ namespace SISGED.Server.Controllers
             }
 
             ExpedienteDTO expedientePorConsultar = _expedienteservice.getById(expedientewrapper.idexpediente);
-            DocumentoExpediente documentosolicitud = expedientePorConsultar.documentos.Find(x => x.tipo == "SolicitudInicial");
+            DossierDocument documentosolicitud = expedientePorConsultar.documentos.Find(x => x.Type == "SolicitudInicial");
 
-            return _documentoservice.registrarResultadoBPN(resultadoBPNDTO, url2, expedientewrapper.idusuarioactual, expedientewrapper.idexpediente, expedientewrapper.documentoentrada, documentosolicitud.iddocumento);
+            return _documentoservice.registrarResultadoBPN(resultadoBPNDTO, url2, expedientewrapper.idusuarioactual, expedientewrapper.idexpediente, expedientewrapper.documentoentrada, documentosolicitud.DocumentId);
         }
 
         [HttpPost("documentoEntregaExpedienteNotario")]
@@ -479,12 +479,12 @@ namespace SISGED.Server.Controllers
         #endregion
 
         [HttpPut("cambiarestado")]
-        public ActionResult<Documento> ModificarEstado(Evaluacion documento, [FromQuery] string docId)
+        public ActionResult<Document> ModificarEstado(Evaluacion documento, [FromQuery] string docId)
         {
             return _documentoservice.modificarEstado(documento, docId);
         }
         [HttpPut("generardocumento")]
-        public async Task<ActionResult<Documento>> GenerarEstado(DocumentoGenerarDTO documento)
+        public async Task<ActionResult<Document>> GenerarEstado(DocumentoGenerarDTO documento)
         {
             if (!string.IsNullOrWhiteSpace(documento.firma))
             {
@@ -501,7 +501,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPut("cambiarestadodocumento")]
-        public ActionResult<Documento> ModificarEstado(DocumentoDTO documento)
+        public ActionResult<Document> ModificarEstado(DocumentoDTO documento)
         {
             return _documentoservice.modificarEstadoDocumento(documento);
         }

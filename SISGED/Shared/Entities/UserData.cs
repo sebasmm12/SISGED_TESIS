@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SISGED.Shared.Entities
 {
-    public class UserInfo
+    public class UserData
     {
         [BsonElement("nombre")]
         public string Name { get; set; } = default!;

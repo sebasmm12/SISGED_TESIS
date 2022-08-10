@@ -27,7 +27,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<Expediente>> getExpedientes()
+        public ActionResult<List<Dossier>> getExpedientes()
         {
             return _expedienteService.getAllExpediente();
         }
@@ -49,7 +49,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPost("derivacion")]
-        public ActionResult<ExpedienteBandejaDTO> registrarDerivacion(Expediente expediente, [FromQuery] string userId)
+        public ActionResult<ExpedienteBandejaDTO> registrarDerivacion(Dossier expediente, [FromQuery] string userId)
         {
 
             return _expedienteService.registrarDerivacion(expediente, userId);
@@ -61,9 +61,9 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpGet("id")]
-        public ActionResult<Expediente> GetById([FromQuery] string id)
+        public ActionResult<Dossier> GetById([FromQuery] string id)
         {
-            Expediente expe = new Expediente();
+            Dossier expe = new Dossier();
             expe = _expedienteService.GetById(id);
             return expe;
         }

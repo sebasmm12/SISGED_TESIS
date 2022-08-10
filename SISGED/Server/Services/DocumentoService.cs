@@ -8,8 +8,8 @@ namespace SISGED.Server.Services
 {
     public class DocumentoService
     {
-        private readonly IMongoCollection<Documento> _documentos;
-        private readonly IMongoCollection<Expediente> _expedientes;
+        private readonly IMongoCollection<Document> _documentos;
+        private readonly IMongoCollection<Dossier> _expedientes;
         private readonly IMongoCollection<Bandeja> _bandejas;
         private readonly ExpedienteService _expedienteservice;
         private readonly DocumentoService _documentoservice;
@@ -17,12 +17,12 @@ namespace SISGED.Server.Services
         {
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.DatabaseName);
-            _documentos = database.GetCollection<Documento>("documentos");
-            _expedientes = database.GetCollection<Expediente>("expedientes");
+            _documentos = database.GetCollection<Document>("documentos");
+            _expedientes = database.GetCollection<Dossier>("expedientes");
             _bandejas = database.GetCollection<Bandeja>("bandejas");
             _expedienteservice = expedienteService;
         }
-        public List<Documento> obtenerDocumentos()
+        public List<Document> obtenerDocumentos()
         {
             return _documentos.Find(documento => true).ToList();
         }
@@ -62,15 +62,15 @@ namespace SISGED.Server.Services
             _documentos.InsertOne(documentoODN);
 
             //Actualizacion del expediente
-            DocumentoExpediente documentoExpediente = new DocumentoExpediente();
-            documentoExpediente.indice = 2;
-            documentoExpediente.iddocumento = documentoODN.id;
-            documentoExpediente.tipo = "OficioDesignacionNotario";
-            documentoExpediente.fechacreacion = DateTime.UtcNow.AddHours(-5);
-            documentoExpediente.fechaexceso = DateTime.UtcNow.AddHours(-5).AddDays(5);
-            documentoExpediente.fechademora = null;
-            UpdateDefinition<Expediente> updateExpediente = Builders<Expediente>.Update.Push("documentos", documentoExpediente);
-            Expediente expediente = _expedientes.FindOneAndUpdate(x => x.id == expedienteWrapper.idexpediente, updateExpediente);
+            DossierDocument documentoExpediente = new DossierDocument();
+            documentoExpediente.Index = 2;
+            documentoExpediente.DocumentId = documentoODN.id;
+            documentoExpediente.Type = "OficioDesignacionNotario";
+            documentoExpediente.CreationDate = DateTime.UtcNow.AddHours(-5);
+            documentoExpediente.ExcessDate = DateTime.UtcNow.AddHours(-5).AddDays(5);
+            documentoExpediente.DelayDate = null;
+            UpdateDefinition<Dossier> updateExpediente = Builders<Dossier>.Update.Push("documentos", documentoExpediente);
+            Dossier expediente = _expedientes.FindOneAndUpdate(x => x.Id == expedienteWrapper.idexpediente, updateExpediente);
 
 
             //actualizacion bandeja salida del usuario
@@ -87,8 +87,8 @@ namespace SISGED.Server.Services
             _bandejas.UpdateOne(band => band.usuario == expedienteWrapper.idusuarioactual, updateBandejaEntrada);*/
 
             //Actulizar el documento anterior a revisado
-            var filter = Builders<Documento>.Filter.Eq("id", expedienteWrapper.documentoentrada);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", expedienteWrapper.documentoentrada);
+            var update = Builders<Document>.Update
                 .Set("estado", "revisado");
             _documentos.UpdateOne(filter, update);
             return documentoODN;
@@ -133,29 +133,29 @@ namespace SISGED.Server.Services
                 historialproceso = new List<Proceso>()
             };
 
-            Expediente expediente = new Expediente();
-            expediente.id = expedienteWrapper.idexpediente;
-            expediente.tipo = "Busqueda Protocolo Notarial";
+            Dossier expediente = new Dossier();
+            expediente.Id = expedienteWrapper.idexpediente;
+            expediente.Type = "Busqueda Protocolo Notarial";
 
 
             _documentos.InsertOne(solicitudBPN);
 
-            expediente.documentos = new List<DocumentoExpediente>()
+            expediente.Documents = new List<DossierDocument>()
             {
-                new DocumentoExpediente(){
-                    indice = 2,
-                    iddocumento = solicitudBPN.id,
-                    tipo="SolicitudBPN",
-                    fechacreacion = solicitudBPN.contenido.fecharealizacion,
-                    fechaexceso=solicitudBPN.contenido.fecharealizacion.AddDays(10),
-                    fechademora = null
+                new DossierDocument(){
+                    Index = 2,
+                    DocumentId = solicitudBPN.id,
+                    Type="SolicitudBPN",
+                    CreationDate = solicitudBPN.contenido.fecharealizacion,
+                    ExcessDate=solicitudBPN.contenido.fecharealizacion.AddDays(10),
+                    DelayDate = null
                 }
             };
 
             _expedienteservice.updateExpedientBySolicitudInitial(expediente);
 
-            var filter = Builders<Documento>.Filter.Eq("id", expedienteWrapper.documentoentrada);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", expedienteWrapper.documentoentrada);
+            var update = Builders<Document>.Update
                 .Set("estado", "revisado");
             _documentos.UpdateOne(filter, update);
 
@@ -208,20 +208,20 @@ namespace SISGED.Server.Services
             _documentos.InsertOne(documentoBPN);
 
             //Actualizamos el expediente y agregamos el documento a sus documentos contenidos
-            DocumentoExpediente documentoExpediente = new DocumentoExpediente();
-            documentoExpediente.indice = 2;
-            documentoExpediente.iddocumento = documentoBPN.id;
-            documentoExpediente.tipo = "OficioBPN";
-            documentoExpediente.fechacreacion = DateTime.UtcNow.AddHours(-5);
-            documentoExpediente.fechaexceso = DateTime.UtcNow.AddHours(-5).AddDays(5);
-            documentoExpediente.fechademora = null;
+            DossierDocument documentoExpediente = new DossierDocument();
+            documentoExpediente.Index = 2;
+            documentoExpediente.DocumentId = documentoBPN.id;
+            documentoExpediente.Type = "OficioBPN";
+            documentoExpediente.CreationDate = DateTime.UtcNow.AddHours(-5);
+            documentoExpediente.ExcessDate = DateTime.UtcNow.AddHours(-5).AddDays(5);
+            documentoExpediente.DelayDate = null;
 
-            UpdateDefinition<Expediente> updateExpediente = Builders<Expediente>.Update.Push("documentos", documentoExpediente);
-            Expediente expediente = _expedientes.FindOneAndUpdate(x => x.id == expedienteWrapper.idexpediente, updateExpediente);
+            UpdateDefinition<Dossier> updateExpediente = Builders<Dossier>.Update.Push("documentos", documentoExpediente);
+            Dossier expediente = _expedientes.FindOneAndUpdate(x => x.Id == expedienteWrapper.idexpediente, updateExpediente);
 
             //Actulizar el documento anterior a revisado
-            var filter = Builders<Documento>.Filter.Eq("id", expedienteWrapper.documentoentrada);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", expedienteWrapper.documentoentrada);
+            var update = Builders<Document>.Update
                 .Set("estado", "revisado");
             _documentos.UpdateOne(filter, update);
             return documentoBPN;
@@ -254,31 +254,31 @@ namespace SISGED.Server.Services
             };
 
             //Creacion del objeto Expediente y registro en la coleccion Expedientes
-            Expediente expediente = new Expediente();
-            expediente.id = expedientewrapper.idexpediente;
-            expediente.tipo = "Expedicion de Firmas";
+            Dossier expediente = new Dossier();
+            expediente.Id = expedientewrapper.idexpediente;
+            expediente.Type = "Expedicion de Firmas";
 
-            expediente.derivaciones = new List<Derivacion>();
-            expediente.estado = "solicitado";
+            expediente.Derivations = new List<Derivation>();
+            expediente.State = "solicitado";
 
             _documentos.InsertOne(documentoSEF);
 
-            expediente.documentos = new List<DocumentoExpediente>()
+            expediente.Documents = new List<DossierDocument>()
             {
-                new DocumentoExpediente(){
-                    indice = 1,
-                    iddocumento = documentoSEF.id,
-                    tipo="SolicitudExpedicionFirma",
-                    fechacreacion = documentoSEF.contenido.fecharealizacion,
-                    fechaexceso = documentoSEF.contenido.fecharealizacion.AddDays(10),
-                    fechademora = null
+                new DossierDocument(){
+                    Index = 1,
+                    DocumentId = documentoSEF.id,
+                    Type="SolicitudExpedicionFirma",
+                    CreationDate = documentoSEF.contenido.fecharealizacion,
+                    ExcessDate = documentoSEF.contenido.fecharealizacion.AddDays(10),
+                    DelayDate = null
                 }
             };
 
             _expedienteservice.updateExpedientBySolicitudInitial(expediente);
 
-            var filter = Builders<Documento>.Filter.Eq("id", expedientewrapper.documentoentrada);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", expedientewrapper.documentoentrada);
+            var update = Builders<Document>.Update
                 .Set("estado", "revisado");
             _documentos.UpdateOne(filter, update);
 
@@ -322,31 +322,31 @@ namespace SISGED.Server.Services
                 historialproceso = new List<Proceso>(),
             };
 
-            Expediente expediente = new Expediente();
-            expediente.id = expedientewrapper.idexpediente;
-            expediente.tipo = "Denuncia";
+            Dossier expediente = new Dossier();
+            expediente.Id = expedientewrapper.idexpediente;
+            expediente.Type = "Denuncia";
 
-            expediente.derivaciones = new List<Derivacion>();
-            expediente.estado = "solicitado";
+            expediente.Derivations = new List<Derivation>();
+            expediente.State = "solicitado";
 
             _documentos.InsertOne(solicitudDenuncia);
 
-            expediente.documentos = new List<DocumentoExpediente>()
+            expediente.Documents = new List<DossierDocument>()
             {
-                new DocumentoExpediente(){
-                    indice = 1,
-                    iddocumento = solicitudDenuncia.id,
-                    tipo="SolicitudDenuncia",
-                    fechacreacion = solicitudDenuncia.contenido.fechaentrega,
-                    fechaexceso=solicitudDenuncia.contenido.fechaentrega.AddDays(10),
-                    fechademora = null
+                new DossierDocument(){
+                    Index = 1,
+                    DocumentId = solicitudDenuncia.id,
+                    Type="SolicitudDenuncia",
+                    CreationDate = solicitudDenuncia.contenido.fechaentrega,
+                    ExcessDate=solicitudDenuncia.contenido.fechaentrega.AddDays(10),
+                    DelayDate = null
                 }
             };
 
             _expedienteservice.updateExpedientBySolicitudInitial(expediente);
 
-            var filter = Builders<Documento>.Filter.Eq("id", expedientewrapper.documentoentrada);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", expedientewrapper.documentoentrada);
+            var update = Builders<Document>.Update
                 .Set("estado", "revisado");
             _documentos.UpdateOne(filter, update);
 
@@ -389,28 +389,28 @@ namespace SISGED.Server.Services
             _documentos.InsertOne(documentoDF);
 
             //Actualizamos el expediente y agregamos el documento a sus documentos contenidos
-            DocumentoExpediente documentoExpediente = new DocumentoExpediente();
-            documentoExpediente.indice = 8;
-            documentoExpediente.iddocumento = documentoDF.id;
-            documentoExpediente.tipo = "ConclusionFirma";
-            documentoExpediente.fechacreacion = DateTime.UtcNow.AddHours(-5);
-            documentoExpediente.fechaexceso = DateTime.UtcNow.AddHours(-5).AddDays(5);
-            documentoExpediente.fechademora = null;
+            DossierDocument documentoExpediente = new DossierDocument();
+            documentoExpediente.Index = 8;
+            documentoExpediente.DocumentId = documentoDF.id;
+            documentoExpediente.Type = "ConclusionFirma";
+            documentoExpediente.CreationDate = DateTime.UtcNow.AddHours(-5);
+            documentoExpediente.ExcessDate = DateTime.UtcNow.AddHours(-5).AddDays(5);
+            documentoExpediente.DelayDate = null;
 
-            UpdateDefinition<Expediente> updateExpediente = Builders<Expediente>.Update.Push("documentos", documentoExpediente);
-            Expediente expediente = _expedientes.FindOneAndUpdate(x => x.id == expedienteWrapper.idexpediente, updateExpediente);
+            UpdateDefinition<Dossier> updateExpediente = Builders<Dossier>.Update.Push("documentos", documentoExpediente);
+            Dossier expediente = _expedientes.FindOneAndUpdate(x => x.Id == expedienteWrapper.idexpediente, updateExpediente);
 
             //Actulizar el documento anterior a revisado
-            var filter = Builders<Documento>.Filter.Eq("id", expedienteWrapper.documentoentrada);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", expedienteWrapper.documentoentrada);
+            var update = Builders<Document>.Update
                 .Set("estado", "revisado");
             _documentos.UpdateOne(filter, update);
 
             //Actualizar el documento de solicitud a emitido, obtener el id de la solicitudBPN
             if (!string.IsNullOrEmpty(iddocumentoSolicitud))
             {
-                var filterS = Builders<Documento>.Filter.Eq("id", iddocumentoSolicitud);
-                var updateS = Builders<Documento>.Update
+                var filterS = Builders<Document>.Filter.Eq("id", iddocumentoSolicitud);
+                var updateS = Builders<Document>.Update
                     .Set("estado", "emitido");
                 _documentos.UpdateOne(filterS, updateS);
             }
@@ -424,13 +424,13 @@ namespace SISGED.Server.Services
             return documentoCF;
         }*/
 
-        public Documento modificarEstado(Evaluacion documento, string docId)
+        public Document modificarEstado(Evaluacion documento, string docId)
         {
-            var filter = Builders<Documento>.Filter.Eq("id", docId);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", docId);
+            var update = Builders<Document>.Update
                 .Set("evaluacion.resultado", documento.resultado)
                 .Set("evaluacion.evaluaciones", documento.evaluaciones);
-            return _documentos.FindOneAndUpdate<Documento>(filter, update);
+            return _documentos.FindOneAndUpdate<Document>(filter, update);
             //BandejaDocumento bandejaDocumento = new BandejaDocumento();
             //bandejaDocumento.idexpediente = documento.idexpediente;
             //bandejaDocumento.iddocumento = documento.id;
@@ -441,9 +441,9 @@ namespace SISGED.Server.Services
             //UpdateDefinition<Bandeja> updateBandejaI = Builders<Bandeja>.Update.Push("bandejasalida", bandejaDocumento);
             //_bandejas.UpdateOne(band => band.usuario == documento.idusuario, updateBandejaI);
         }
-        public Documento generarDocumento(DocumentoGenerarDTO documento)
+        public Document generarDocumento(DocumentoGenerarDTO documento)
         {
-            Documento doc = new Documento();
+            Document doc = new Document();
             BandejaDocumento bandejaDocumento = new BandejaDocumento();
             bandejaDocumento.idexpediente = documento.idexpediente;
             //bandejaDocumento.iddocumento = documento.iddocumento;
@@ -462,26 +462,26 @@ namespace SISGED.Server.Services
             contenidoVersion.version = 1;
             contenidoVersion.url = DateTime.UtcNow.AddHours(-5).ToString();
 
-            var UpdateFilter = Builders<Documento>.Update
+            var UpdateFilter = Builders<Document>.Update
                                                        .Set("contenido.codigo", documento.codigo)
                                                        .Set("contenido.firma", documento.firma)
                                                        .Set("contenido.urlGenerado", documento.urlDeGenerado)
                                                        .Push("historialcontenido", contenidoVersion);
 
-            var UpdateQuery = Builders<Documento>.Filter.Eq("id", documento.iddocumento);
+            var UpdateQuery = Builders<Document>.Filter.Eq("id", documento.iddocumento);
 
             _documentos.UpdateOne(UpdateQuery, UpdateFilter);
 
             return doc;
         }
 
-        public Documento modificarEstadoDocumento(DocumentoDTO documento)
+        public Document modificarEstadoDocumento(DocumentoDTO documento)
         {
-            var filter = Builders<Documento>.Filter.Eq("id", documento.id);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", documento.id);
+            var update = Builders<Document>.Update
                 .Set("estado", documento.estado);
 
-            return _documentos.FindOneAndUpdate<Documento>(filter, update);
+            return _documentos.FindOneAndUpdate<Document>(filter, update);
         }
 
         public AperturamientoDisciplinario registrarAperturamientoDisciplinario(AperturamientoDisciplinarioDTO aperturamientoDisciplinarioDTO,
@@ -516,19 +516,19 @@ namespace SISGED.Server.Services
             _documentos.InsertOne(aperturamientodisciplinario);
 
             //Actualizacion del expediente
-            Expediente expediente = new Expediente();
-            DocumentoExpediente documentoExpediente = new DocumentoExpediente();
-            documentoExpediente.indice = 8;
-            documentoExpediente.iddocumento = aperturamientodisciplinario.id;
-            documentoExpediente.tipo = "AperturamientoDisciplinario";
-            documentoExpediente.fechacreacion = DateTime.UtcNow.AddHours(-5);
-            documentoExpediente.fechaexceso = DateTime.UtcNow.AddHours(-5).AddDays(5);
-            documentoExpediente.fechademora = null;
+            Dossier expediente = new Dossier();
+            DossierDocument documentoExpediente = new DossierDocument();
+            documentoExpediente.Index = 8;
+            documentoExpediente.DocumentId = aperturamientodisciplinario.id;
+            documentoExpediente.Type = "AperturamientoDisciplinario";
+            documentoExpediente.CreationDate = DateTime.UtcNow.AddHours(-5);
+            documentoExpediente.ExcessDate = DateTime.UtcNow.AddHours(-5).AddDays(5);
+            documentoExpediente.DelayDate = null;
             expediente = actualizarExpediente(documentoExpediente, idexpediente);
 
             //Actulizar el documento anterior a revisado
-            var filter = Builders<Documento>.Filter.Eq("id", iddocentrada);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", iddocentrada);
+            var update = Builders<Document>.Update
                 .Set("estado", "revisado");
             _documentos.UpdateOne(filter, update);
             return aperturamientodisciplinario;
@@ -566,14 +566,14 @@ namespace SISGED.Server.Services
             _documentos.InsertOne(dictamen);
 
             //actualizacion de expediente
-            Expediente expediente = new Expediente();
-            DocumentoExpediente documentoExpediente = new DocumentoExpediente();
-            documentoExpediente.indice = 8;
-            documentoExpediente.iddocumento = dictamen.id;
-            documentoExpediente.tipo = "Dictamen";
-            documentoExpediente.fechacreacion = DateTime.UtcNow.AddHours(-5);
-            documentoExpediente.fechaexceso = DateTime.UtcNow.AddHours(-5).AddDays(5);
-            documentoExpediente.fechademora = null;
+            Dossier expediente = new Dossier();
+            DossierDocument documentoExpediente = new DossierDocument();
+            documentoExpediente.Index = 8;
+            documentoExpediente.DocumentId = dictamen.id;
+            documentoExpediente.Type = "Dictamen";
+            documentoExpediente.CreationDate = DateTime.UtcNow.AddHours(-5);
+            documentoExpediente.ExcessDate = DateTime.UtcNow.AddHours(-5).AddDays(5);
+            documentoExpediente.DelayDate = null;
             expediente = actualizarExpediente(documentoExpediente, expedientewrapper.idexpediente);
 
             //actualizando Bandeja salida
@@ -590,8 +590,8 @@ namespace SISGED.Server.Services
             _bandejas.UpdateOne(band => band.usuario == expedientewrapper.idusuarioactual, updateBandejaEntrada);*/
 
             //Actulizar el documento anterior a revisado
-            var filter = Builders<Documento>.Filter.Eq("id", expedientewrapper.documentoentrada);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", expedientewrapper.documentoentrada);
+            var update = Builders<Document>.Update
                 .Set("estado", "revisado");
             _documentos.UpdateOne(filter, update);
             return dictamen;
@@ -630,27 +630,27 @@ namespace SISGED.Server.Services
             _documentos.InsertOne(resolucion);
 
             //Actualizacion del expediente
-            Expediente expediente = new Expediente();
-            DocumentoExpediente documentoExpediente = new DocumentoExpediente();
-            documentoExpediente.indice = 8;
-            documentoExpediente.iddocumento = resolucion.id;
-            documentoExpediente.tipo = "Resolucion";
-            documentoExpediente.fechacreacion = DateTime.UtcNow.AddHours(-5);
-            documentoExpediente.fechaexceso = DateTime.UtcNow.AddHours(-5).AddDays(5);
-            documentoExpediente.fechademora = null;
+            Dossier expediente = new Dossier();
+            DossierDocument documentoExpediente = new DossierDocument();
+            documentoExpediente.Index = 8;
+            documentoExpediente.DocumentId = resolucion.id;
+            documentoExpediente.Type = "Resolucion";
+            documentoExpediente.CreationDate = DateTime.UtcNow.AddHours(-5);
+            documentoExpediente.ExcessDate = DateTime.UtcNow.AddHours(-5).AddDays(5);
+            documentoExpediente.DelayDate = null;
             expediente = actualizarExpediente(documentoExpediente, idexpediente);
 
             //Actulizar el documento anterior a revisado
-            var filter = Builders<Documento>.Filter.Eq("id", iddocentrada);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", iddocentrada);
+            var update = Builders<Document>.Update
                 .Set("estado", "revisado");
             _documentos.UpdateOne(filter, update);
 
             //Actualizar el documento de solicitud inicial a finalizado
             if (!String.IsNullOrEmpty(iddocumentoSolicitud))
             {
-                var filterS = Builders<Documento>.Filter.Eq("id", iddocumentoSolicitud);
-                var updateS = Builders<Documento>.Update
+                var filterS = Builders<Document>.Filter.Eq("id", iddocumentoSolicitud);
+                var updateS = Builders<Document>.Update
                        .Set("estado", "finalizado");
 
                 _documentos.UpdateOne(filterS, updateS);
@@ -683,27 +683,27 @@ namespace SISGED.Server.Services
             _documentos.InsertOne(resultadoBPN);
 
             //Actualizacion del expediente
-            Expediente expediente = new Expediente();
-            DocumentoExpediente documentoExpediente = new DocumentoExpediente();
-            documentoExpediente.indice = 8;
-            documentoExpediente.iddocumento = resultadoBPN.id;
-            documentoExpediente.tipo = "ResultadoBPN";
-            documentoExpediente.fechacreacion = DateTime.UtcNow.AddHours(-5);
-            documentoExpediente.fechaexceso = DateTime.UtcNow.AddHours(-5).AddDays(5);
-            documentoExpediente.fechademora = null;
+            Dossier expediente = new Dossier();
+            DossierDocument documentoExpediente = new DossierDocument();
+            documentoExpediente.Index = 8;
+            documentoExpediente.DocumentId = resultadoBPN.id;
+            documentoExpediente.Type = "ResultadoBPN";
+            documentoExpediente.CreationDate = DateTime.UtcNow.AddHours(-5);
+            documentoExpediente.ExcessDate = DateTime.UtcNow.AddHours(-5).AddDays(5);
+            documentoExpediente.DelayDate = null;
             expediente = actualizarExpediente(documentoExpediente, idexpediente);
 
             //Actulizar el documento anterior a revisado
-            var filter = Builders<Documento>.Filter.Eq("id", iddocentrada);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", iddocentrada);
+            var update = Builders<Document>.Update
                 .Set("estado", "revisado");
             _documentos.UpdateOne(filter, update);
 
             //Actualizar el documento de solicitud a emitido, obtener el id de la solicitudBPN
             if (!string.IsNullOrEmpty(iddocumentoSolicitud))
             {
-                var filterS = Builders<Documento>.Filter.Eq("id", iddocumentoSolicitud);
-                var updateS = Builders<Documento>.Update
+                var filterS = Builders<Document>.Filter.Eq("id", iddocumentoSolicitud);
+                var updateS = Builders<Document>.Update
                     .Set("estado", "emitido");
                 _documentos.UpdateOne(filterS, updateS);
             }
@@ -738,29 +738,29 @@ namespace SISGED.Server.Services
             _documentos.InsertOne(entregaExpedienteNotario);
 
             //actualizacion de expediente
-            Expediente expediente = new Expediente();
-            DocumentoExpediente documentoExpediente = new DocumentoExpediente();
-            documentoExpediente.indice = 7;
-            documentoExpediente.iddocumento = entregaExpedienteNotario.id;
-            documentoExpediente.tipo = "EntregaExpedienteNotario";
-            documentoExpediente.fechacreacion = DateTime.UtcNow.AddHours(-5);
-            documentoExpediente.fechaexceso = DateTime.UtcNow.AddHours(-5).AddDays(5);
-            documentoExpediente.fechademora = null;
+            Dossier expediente = new Dossier();
+            DossierDocument documentoExpediente = new DossierDocument();
+            documentoExpediente.Index = 7;
+            documentoExpediente.DocumentId = entregaExpedienteNotario.id;
+            documentoExpediente.Type = "EntregaExpedienteNotario";
+            documentoExpediente.CreationDate = DateTime.UtcNow.AddHours(-5);
+            documentoExpediente.ExcessDate = DateTime.UtcNow.AddHours(-5).AddDays(5);
+            documentoExpediente.DelayDate = null;
             expediente = actualizarExpediente(documentoExpediente, expedientewrapper.idexpediente);
 
             //Actulizar el documento anterior a revisado
-            var filter = Builders<Documento>.Filter.Eq("id", expedientewrapper.documentoentrada);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", expedientewrapper.documentoentrada);
+            var update = Builders<Document>.Update
                 .Set("estado", "revisado");
             _documentos.UpdateOne(filter, update);
 
             return entregaExpedienteNotario;
         }
 
-        public Expediente actualizarExpediente(DocumentoExpediente documentoExpediente, string idexpediente)
+        public Dossier actualizarExpediente(DossierDocument documentoExpediente, string idexpediente)
         {
-            UpdateDefinition<Expediente> updateExpediente = Builders<Expediente>.Update.Push("documentos", documentoExpediente);
-            Expediente expediente = _expedientes.FindOneAndUpdate(x => x.id == idexpediente, updateExpediente);
+            UpdateDefinition<Dossier> updateExpediente = Builders<Dossier>.Update.Push("documentos", documentoExpediente);
+            Dossier expediente = _expedientes.FindOneAndUpdate(x => x.Id == idexpediente, updateExpediente);
             return expediente;
         }
 
@@ -794,19 +794,19 @@ namespace SISGED.Server.Services
             _documentos.InsertOne(apelacion);
 
             //Actualizacion del expediente
-            Expediente expediente = new Expediente();
-            DocumentoExpediente documentoExpediente = new DocumentoExpediente();
-            documentoExpediente.indice = 9;
-            documentoExpediente.iddocumento = apelacion.id;
-            documentoExpediente.tipo = "Apelacion";
-            documentoExpediente.fechacreacion = DateTime.UtcNow.AddHours(-5);
-            documentoExpediente.fechaexceso = DateTime.UtcNow.AddHours(-5).AddDays(5);
-            documentoExpediente.fechademora = null;
+            Dossier expediente = new Dossier();
+            DossierDocument documentoExpediente = new DossierDocument();
+            documentoExpediente.Index = 9;
+            documentoExpediente.DocumentId = apelacion.id;
+            documentoExpediente.Type = "Apelacion";
+            documentoExpediente.CreationDate = DateTime.UtcNow.AddHours(-5);
+            documentoExpediente.ExcessDate = DateTime.UtcNow.AddHours(-5).AddDays(5);
+            documentoExpediente.DelayDate = null;
             expediente = actualizarExpediente(documentoExpediente, idexpediente);
 
             //Actulizar el documento anterior a revisado
-            var filter = Builders<Documento>.Filter.Eq("id", iddocentrada);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", iddocentrada);
+            var update = Builders<Document>.Update
                 .Set("estado", "revisado");
             _documentos.UpdateOne(filter, update);
             return apelacion;
@@ -838,19 +838,19 @@ namespace SISGED.Server.Services
             _documentos.InsertOne(solicitudExpedienteNotarioAct);
 
             //Actualizacion del expediente
-            Expediente expediente = new Expediente();
-            DocumentoExpediente documentoExpediente = new DocumentoExpediente();
-            documentoExpediente.indice = 10;
-            documentoExpediente.iddocumento = solicitudExpedienteNotarioAct.id;
-            documentoExpediente.tipo = "SolicitudExpedienteNotario";
-            documentoExpediente.fechacreacion = DateTime.UtcNow.AddHours(-5);
-            documentoExpediente.fechaexceso = DateTime.UtcNow.AddHours(-5).AddDays(5);
-            documentoExpediente.fechademora = null;
+            Dossier expediente = new Dossier();
+            DossierDocument documentoExpediente = new DossierDocument();
+            documentoExpediente.Index = 10;
+            documentoExpediente.DocumentId = solicitudExpedienteNotarioAct.id;
+            documentoExpediente.Type = "SolicitudExpedienteNotario";
+            documentoExpediente.CreationDate = DateTime.UtcNow.AddHours(-5);
+            documentoExpediente.ExcessDate = DateTime.UtcNow.AddHours(-5).AddDays(5);
+            documentoExpediente.DelayDate = null;
             expediente = actualizarExpediente(documentoExpediente, idexpediente);
 
             //Actulizar el documento anterior a revisado
-            var filter = Builders<Documento>.Filter.Eq("id", iddocentrada);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", iddocentrada);
+            var update = Builders<Document>.Update
                 .Set("estado", "revisado");
             _documentos.UpdateOne(filter, update);
             return solicitudExpedienteNotarioAct;
@@ -904,12 +904,12 @@ namespace SISGED.Server.Services
 
         }
 
-        public List<Documento> obtenerSolicitudes()
+        public List<Document> obtenerSolicitudes()
         {
             IEnumerable<string> tipos = new[] { "SolicitudExpedicionFirma", "SolicitudDenuncia", "SolicitudBPN" };
-            var filter = Builders<Documento>.Filter.In(x => x.tipo, tipos);
+            var filter = Builders<Document>.Filter.In(x => x.tipo, tipos);
 
-            List<Documento> values = _documentos.Find(filter).ToList();
+            List<Document> values = _documentos.Find(filter).ToList();
             return values;
         }
 
@@ -1508,8 +1508,8 @@ namespace SISGED.Server.Services
                 idnotario = oficioDesignacionNotarioDTO.contenidoDTO.idnotario.id,
             };
             OficioDesignacionNotario oficioDesignacionNotario = new OficioDesignacionNotario();
-            var filter = Builders<Documento>.Filter.Eq("id", oficioDesignacionNotarioDTO.id);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", oficioDesignacionNotarioDTO.id);
+            var update = Builders<Document>.Update
                 .Set("contenido.titulo", contenidoODN.titulo)
                 .Set("contenido.descripcion", contenidoODN.descripcion)
                 .Set("contenido.lugaroficionotarial", contenidoODN.lugaroficionotarial)
@@ -1536,8 +1536,8 @@ namespace SISGED.Server.Services
             };
             Apelacion apelacion = new Apelacion();
 
-            var filter = Builders<Documento>.Filter.Eq("id", apelacionDTO.id);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", apelacionDTO.id);
+            var update = Builders<Document>.Update
                 .Set("contenido.titulo", contenidoAPE.titulo)
                 .Set("contenido.descripcion", contenidoAPE.descripcion)
                 .Set("contenido.url", contenidoAPE.url)
@@ -1583,8 +1583,8 @@ namespace SISGED.Server.Services
                 fechafinaudiencia = aperturamientoDisciplinarioDTO.contenidoDTO.fechafinaudiencia
             };
             AperturamientoDisciplinario aperturamientoDisciplinario = new AperturamientoDisciplinario();
-            var filter = Builders<Documento>.Filter.Eq("id", aperturamientoDisciplinarioDTO.id);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", aperturamientoDisciplinarioDTO.id);
+            var update = Builders<Document>.Update
                 .Set("contenido.titulo", contenidoAD.titulo)
                 .Set("contenido.descripcion", contenidoAD.descripcion)
                 .Set("contenido.nombredenunciante", contenidoAD.nombredenunciante)
@@ -1618,8 +1618,8 @@ namespace SISGED.Server.Services
                 precio = conclusionFirmaDTO.contenidoDTO.cantidadfoja * 30
             };
             ConclusionFirma conclusionFirma = new ConclusionFirma();
-            var filter = Builders<Documento>.Filter.Eq("id", conclusionFirmaDTO.id);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", conclusionFirmaDTO.id);
+            var update = Builders<Document>.Update
                 .Set("contenido.idescriturapublica", contenidoCF.idescriturapublica)
                 .Set("contenido.idnotario", contenidoCF.idnotario)
                 .Set("contenido.idcliente", contenidoCF.idcliente)
@@ -1664,8 +1664,8 @@ namespace SISGED.Server.Services
             };
             Dictamen dictamen = new Dictamen();
 
-            var filter = Builders<Documento>.Filter.Eq("id", dictamenDTO.id);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", dictamenDTO.id);
+            var update = Builders<Document>.Update
                 .Set("contenido.titulo", contenidoD.titulo)
                 .Set("contenido.descripcion", contenidoD.descripcion)
                 .Set("contenido.nombredenunciante", contenidoD.nombredenunciante)
@@ -1704,8 +1704,8 @@ namespace SISGED.Server.Services
                 otorgantes = listaOtorgantes
             };
             OficioBPN oficioBPN = new OficioBPN();
-            var filter = Builders<Documento>.Filter.Eq("id", oficioBPNDTO.id);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", oficioBPNDTO.id);
+            var update = Builders<Document>.Update
                 .Set("contenido.titulo", contenidoOficioBPN.titulo)
                 .Set("contenido.descripcion", contenidoOficioBPN.descripcion)
                 .Set("contenido.idcliente", contenidoOficioBPN.idcliente)
@@ -1746,8 +1746,8 @@ namespace SISGED.Server.Services
 
             };
             Resolucion resolucion = new Resolucion();
-            var filter = Builders<Documento>.Filter.Eq("id", resolucionDTO.id);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", resolucionDTO.id);
+            var update = Builders<Document>.Update
                 .Set("contenido.titulo", contenidoResolucion.titulo)
                 .Set("contenido.descripcion", contenidoResolucion.descripcion)
                 .Set("contenido.sancion", contenidoResolucion.sancion)
@@ -1775,8 +1775,8 @@ namespace SISGED.Server.Services
                 idnotario = solicitudExpedienteNotarioDTO.contenidoDTO.idnotario.id
             };
 
-            var filter = Builders<Documento>.Filter.Eq("id", solicitudExpedienteNotarioDTO.id);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", solicitudExpedienteNotarioDTO.id);
+            var update = Builders<Document>.Update
                 .Set("contenido.titulo", contenidoSolicitudExpedienteNotario.titulo)
                 .Set("contenido.descripcion", contenidoSolicitudExpedienteNotario.descripcion)
                 .Set("contenido.idnotario", contenidoSolicitudExpedienteNotario.idnotario);
@@ -1799,8 +1799,8 @@ namespace SISGED.Server.Services
             };
             ResultadoBPN resultadoBPN = new ResultadoBPN();
 
-            var filter = Builders<Documento>.Filter.Eq("id", resultadoBPNDTO.id);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", resultadoBPNDTO.id);
+            var update = Builders<Document>.Update
                 .Set("contenido.cantidadfoja", contenidoResultadoBPN.cantidadfoja)
                 .Set("contenido.costo", contenidoResultadoBPN.costo)
                 .Set("contenido.idescriturapublica", contenidoResultadoBPN.idescriturapublica)
@@ -1811,7 +1811,7 @@ namespace SISGED.Server.Services
         public async Task<List<DocumentoADTO2>> ObtenerSolicitudesUsuario(string numerodocumento)
         {
 
-            var filtroNumeroDocumento = Builders<Expediente>.Filter.Eq("cliente.numerodocumento", numerodocumento);
+            var filtroNumeroDocumento = Builders<Dossier>.Filter.Eq("cliente.numerodocumento", numerodocumento);
 
             var proyeccionInicial = new BsonDocument("$project",
                                                new BsonDocument("_id", 0)
@@ -1859,7 +1859,7 @@ namespace SISGED.Server.Services
         public async Task<List<DocumentoADTO2>> ObtenerSolicitudesUsuario2(string numerodocumento)
         {
 
-            var filtroNumeroDocumento = Builders<Expediente>.Filter.Eq("cliente.numerodocumento", numerodocumento);
+            var filtroNumeroDocumento = Builders<Dossier>.Filter.Eq("cliente.numerodocumento", numerodocumento);
 
             var proyeccionInicial = new BsonDocument("$project",
                                         new BsonDocument
@@ -1930,7 +1930,7 @@ namespace SISGED.Server.Services
         public async Task<List<DocumentoADTO2>> ObtenerSolicitudesUsuario3(string numerodocumento)
         {
 
-            var filtroNumeroDocumento = Builders<Expediente>.Filter.Eq("cliente.numerodocumento", numerodocumento);
+            var filtroNumeroDocumento = Builders<Dossier>.Filter.Eq("cliente.numerodocumento", numerodocumento);
 
             var proyeccionInicial = new BsonDocument("$project",
                                         new BsonDocument
@@ -2098,7 +2098,7 @@ namespace SISGED.Server.Services
 
             List<StatisticsDTOR> estadisticas = new List<StatisticsDTOR>();
             estadisticas = await _documentos.Aggregate()
-                .AppendStage<Documento>(match1)
+                .AppendStage<Document>(match1)
                 .AppendStage<StatisticsDTO>(project)
                 .AppendStage<StatisticsDTO>(match2)
                 .AppendStage<StatisticsDTOR>(group)
@@ -2191,7 +2191,7 @@ namespace SISGED.Server.Services
                             new BsonDocument("mes", mes));
             List<StatisticsDTO4R> estadisticas = new List<StatisticsDTO4R>();
             estadisticas = await _documentos.Aggregate()
-                .AppendStage<Documento>(match1)
+                .AppendStage<Document>(match1)
                 .AppendStage<StatisticsDTO4_project1>(project)
                 .AppendStage<StatisticsDTO4_project1>(match2)
                 .AppendStage<StatisticsDTO4R>(group)
@@ -2221,7 +2221,7 @@ namespace SISGED.Server.Services
                                     });
             List<StatisticsDTO3_group> estadisticas = new List<StatisticsDTO3_group>();
             estadisticas = await _documentos.Aggregate()
-                .AppendStage<Documento>(match1)
+                .AppendStage<Document>(match1)
                 .AppendStage<StatisticsDTO3_project>(project)
                 .AppendStage<StatisticsDTO3_project>(match2)
                 .AppendStage<StatisticsDTO3_group>(group)
@@ -2243,8 +2243,8 @@ namespace SISGED.Server.Services
                 descripcion = SIDTO.contenidoDTO.descripcion
             };
 
-            var filter = Builders<Documento>.Filter.Eq("id", SIDTO.id);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", SIDTO.id);
+            var update = Builders<Document>.Update
                 .Set("estado", "modificado")
                 .Set("contenido.titulo", SIDTO.contenidoDTO.titulo)
                 .Set("contenido.descripcion", SIDTO.contenidoDTO.descripcion);
@@ -2258,8 +2258,8 @@ namespace SISGED.Server.Services
             var json = JsonConvert.SerializeObject(expedienteWrapper.documento);
             EENDTO = JsonConvert.DeserializeObject<EntregaExpedienteNotarioDTO>(json);
 
-            var filter = Builders<Documento>.Filter.Eq("id", EENDTO.id);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", EENDTO.id);
+            var update = Builders<Document>.Update
                 .Set("estado", "modificado")
                 .Set("contenido.titulo", EENDTO.contenidoDTO.titulo)
                 .Set("contenido.descripcion", EENDTO.contenidoDTO.descripcion)
@@ -2279,8 +2279,8 @@ namespace SISGED.Server.Services
                 estado = SIDTO.estado
             };
 
-            var filter = Builders<Documento>.Filter.Eq("id", SIDTO.id);
-            var update = Builders<Documento>.Update
+            var filter = Builders<Document>.Filter.Eq("id", SIDTO.id);
+            var update = Builders<Document>.Update
                 .Set("estado", SIDTO.estado);
             _documentos.UpdateOne(filter, update);
         }
@@ -2426,7 +2426,7 @@ namespace SISGED.Server.Services
 
             List<estadistica1_group> estadistica1 = new List<estadistica1_group>();
             estadistica1 = _documentos.Aggregate()
-                                        .AppendStage<Documento>(match1)
+                                        .AppendStage<Document>(match1)
                                         .AppendStage<estadistica1_proyect1>(project1)
                                         .AppendStage<estadistica1_proyect1>(match2)
                                         .AppendStage<estadistica1_group>(group)
@@ -2579,7 +2579,7 @@ namespace SISGED.Server.Services
         });
             List<estadistica1_group> estadistica1 = new List<estadistica1_group>();
             estadistica1 = _documentos.Aggregate()
-                                        .AppendStage<Documento>(match1)
+                                        .AppendStage<Document>(match1)
                                         .AppendStage<estadistica1_proyect1>(project1)
                                         .AppendStage<estadistica1_proyect1>(match2)
                                         .AppendStage<estadistica1_group>(group)
@@ -2732,7 +2732,7 @@ namespace SISGED.Server.Services
 
             List<estadistica1_group> estadistica1 = new List<estadistica1_group>();
             estadistica1 = _documentos.Aggregate()
-                                        .AppendStage<Documento>(match1)
+                                        .AppendStage<Document>(match1)
                                         .AppendStage<estadistica1_proyect1>(project1)
                                         .AppendStage<estadistica1_proyect1>(match2)
                                         .AppendStage<estadistica1_group>(group)
