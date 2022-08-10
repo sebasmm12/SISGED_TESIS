@@ -6,6 +6,8 @@ namespace SISGED.Server.Services.Contracts
     public interface IUserService : IGenericService
     {
         Task CreateUserAsync(User user);
+        Task<IEnumerable<AutocompletedUserResponse>> GetAutocompletedUsersAsync(string userName);
+        Task<IEnumerable<ClientUserInfoResponse>> GetClientUsersAsync(string userName);
         Task<IEnumerable<ProsecutorUserInfoResponse>> GetProsecutorUsersAsync();
         Task<User> GetUserByIdAsync(string userId);
         Task<User> GetUserByNameAsync(string userName);

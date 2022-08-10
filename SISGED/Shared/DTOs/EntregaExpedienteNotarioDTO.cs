@@ -12,7 +12,7 @@ namespace SISGED.Shared.DTOs
 
         public List<string> urlanexo { get; set; } = new List<string>();
     }
-    public class EntregaExpedienteNotarioDTO : Documento
+    public class EntregaExpedienteNotarioDTO : Document
     {
         public ContenidoEntregaExpedienteNotarioDTO contenidoDTO { get; set; } = new ContenidoEntregaExpedienteNotarioDTO();
     }

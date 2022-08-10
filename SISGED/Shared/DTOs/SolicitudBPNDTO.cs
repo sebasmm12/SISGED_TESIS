@@ -15,7 +15,7 @@ namespace SISGED.Shared.DTOs
         public List<string> Urlanexo { get; set; } = new List<string>();
 
     }
-    public class SolicitudBPNDTO : Documento
+    public class SolicitudBPNDTO : Document
     {
         public string nombrecliente { get; set; }
         public string tipodocumento { get; set; }

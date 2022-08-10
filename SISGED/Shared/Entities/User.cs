@@ -25,7 +25,7 @@ namespace SISGED.Shared.Entities
         public string Password { get; set; } = default!;
 
         [BsonElement("datos")]
-        public UserInfo Data { get; set; } = new UserInfo();
+        public UserData Data { get; set; } = new UserData();
 
         [BsonElement("estado")]
         public string State { get; set; } = default!;

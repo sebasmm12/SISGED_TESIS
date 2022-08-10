@@ -2,7 +2,7 @@
 
 namespace SISGED.Shared.DTOs
 {
-    public class SolicitudInicialDTO : Documento
+    public class SolicitudInicialDTO : Document
     {
         public string nombrecliente { get; set; }
         public string tipodocumento { get; set; }

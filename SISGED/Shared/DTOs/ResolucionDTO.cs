@@ -2,7 +2,7 @@
 
 namespace SISGED.Shared.DTOs
 {
-    public class ResolucionDTO : Documento
+    public class ResolucionDTO : Document
     {
 
         public Evaluacion evaluacion { get; set; } = new Evaluacion();

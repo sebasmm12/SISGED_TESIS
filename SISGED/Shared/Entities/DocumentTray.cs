@@ -5,7 +5,7 @@ namespace SISGED.Shared.Entities
     public class DocumentTray
     {
         [BsonElement("idexpediente")]
-        public string ReportId { get; set; } = default!;
+        public string DossierId { get; set; } = default!;
         [BsonElement("iddocumento")]
         public string DocumentId { get; set; } = default!;
     }

@@ -19,7 +19,7 @@ namespace SISGED.Shared.DTOs
         public List<string> Urlanexo { get; set; } = new List<string>();
 
     }
-    public class OficioBPNDTO : Documento
+    public class OficioBPNDTO : Document
     {
         public Evaluacion evaluacion { get; set; } = new Evaluacion();
         public ContenidoOficioBPNDTO contenidoDTO { get; set; } = new ContenidoOficioBPNDTO();

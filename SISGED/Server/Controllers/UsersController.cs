@@ -38,7 +38,6 @@ namespace SISGED.Server.Controllers
             }
             catch (Exception ex)
             {
-
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
 
@@ -58,7 +57,7 @@ namespace SISGED.Server.Controllers
                 await _userService.CreateUserAsync(user);
 
                 if (user.Type != "cliente") await _trayService.RegisterUserTrayAsync(user.Type, user.Id);
-
+                
                 return NoContent();
             }
             catch (Exception ex)
@@ -187,10 +186,40 @@ namespace SISGED.Server.Controllers
             }
             catch (Exception ex)
             {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet("clients/{userName}")]
+        public async Task<ActionResult<IEnumerable<ClientUserInfoResponse>>> GetClientUsersAsync([FromRoute] string userName)
+        {
+            try
+            {
+                var clientUsers = await _userService.GetClientUsersAsync(userName);
+
+                return Ok(clientUsers);
+            }
+            catch (Exception ex)
+            {
 
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
 
+        [HttpGet("autocomplete/{userName}")]
+        public async Task<ActionResult<IEnumerable<AutocompletedUserResponse>>> GetAutocompletedUsersAsync([FromRoute] string userName)
+        {
+            try
+            {
+                var autocompletedUsers = await _userService.GetAutocompletedUsersAsync(userName);
+
+                return Ok(autocompletedUsers);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
     }
 }

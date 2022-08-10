@@ -50,15 +50,15 @@ namespace SISGED.Shared.DTOs
         [BsonRepresentation(BsonType.ObjectId)]
         public string id { get; set; }
         public string tipo { get; set; }
-        public DocumentoExpediente documento { get; set; }
+        public DossierDocument documento { get; set; }
     }
     public class DocumentoUsuarioDTO2
     {
         [BsonRepresentation(BsonType.ObjectId)]
         public string id { get; set; }
         public string tipo { get; set; }
-        public DocumentoExpediente documentoinicial { get; set; }
-        public DocumentoExpediente documentofinal { get; set; }
+        public DossierDocument documentoinicial { get; set; }
+        public DossierDocument documentofinal { get; set; }
     }
 
     public class DocumentoUsuarioDTO2_lk1
@@ -66,48 +66,48 @@ namespace SISGED.Shared.DTOs
         [BsonRepresentation(BsonType.ObjectId)]
         public string id { get; set; }
         public string tipo { get; set; }
-        public DocumentoExpediente documentoinicial { get; set; }
-        public DocumentoExpediente documentofinal { get; set; }
-        public List<Documento> documentoInicialOriginal { get; set; }
+        public DossierDocument documentoinicial { get; set; }
+        public DossierDocument documentofinal { get; set; }
+        public List<Document> documentoInicialOriginal { get; set; }
     }
     public class DocumentoUsuarioDTO2_uw1
     {
         [BsonRepresentation(BsonType.ObjectId)]
         public string id { get; set; }
         public string tipo { get; set; }
-        public DocumentoExpediente documentoinicial { get; set; }
-        public DocumentoExpediente documentofinal { get; set; }
-        public Documento documentoInicialOriginal { get; set; }
+        public DossierDocument documentoinicial { get; set; }
+        public DossierDocument documentofinal { get; set; }
+        public Document documentoInicialOriginal { get; set; }
     }
     public class DocumentoUsuarioDTO2_lk2
     {
         [BsonRepresentation(BsonType.ObjectId)]
         public string id { get; set; }
         public string tipo { get; set; }
-        public DocumentoExpediente documentoinicial { get; set; }
-        public DocumentoExpediente documentofinal { get; set; }
-        public Documento documentoInicialOriginal { get; set; }
-        public List<Documento> documentoFinalOriginal { get; set; }
+        public DossierDocument documentoinicial { get; set; }
+        public DossierDocument documentofinal { get; set; }
+        public Document documentoInicialOriginal { get; set; }
+        public List<Document> documentoFinalOriginal { get; set; }
     }
     public class DocumentoUsuarioDTO2_uw2
     {
         [BsonRepresentation(BsonType.ObjectId)]
         public string id { get; set; }
         public string tipo { get; set; }
-        public DocumentoExpediente documentoinicial { get; set; }
-        public DocumentoExpediente documentofinal { get; set; }
-        public Documento documentoInicialOriginal { get; set; }
-        public Documento documentoFinalOriginal { get; set; }
+        public DossierDocument documentoinicial { get; set; }
+        public DossierDocument documentofinal { get; set; }
+        public Document documentoInicialOriginal { get; set; }
+        public Document documentoFinalOriginal { get; set; }
     }
     public class DocumentoUsuarioDTO2_lk3
     {
         [BsonRepresentation(BsonType.ObjectId)]
         public string id { get; set; }
         public string tipo { get; set; }
-        public DocumentoExpediente documentoinicial { get; set; }
-        public DocumentoExpediente documentofinal { get; set; }
-        public Documento documentoInicialOriginal { get; set; }
-        public Documento documentoFinalOriginal { get; set; }
+        public DossierDocument documentoinicial { get; set; }
+        public DossierDocument documentofinal { get; set; }
+        public Document documentoInicialOriginal { get; set; }
+        public Document documentoFinalOriginal { get; set; }
         public EscrituraPublica escriturapublica { get; set; }
     }
     public class DocumentoUsuarioLUDTO
@@ -115,16 +115,16 @@ namespace SISGED.Shared.DTOs
         [BsonRepresentation(BsonType.ObjectId)]
         public string id { get; set; }
         public string tipo { get; set; }
-        public DocumentoExpediente documento { get; set; }
-        public List<Documento> documentoOriginal { get; set; }
+        public DossierDocument documento { get; set; }
+        public List<Document> documentoOriginal { get; set; }
     }
     public class DocumentoUsuarioUDTO
     {
         [BsonRepresentation(BsonType.ObjectId)]
         public string id { get; set; }
         public string tipo { get; set; }
-        public DocumentoExpediente documento { get; set; }
-        public Documento documentoOriginal { get; set; }
+        public DossierDocument documento { get; set; }
+        public Document documentoOriginal { get; set; }
     }
     public class DocumentoADTO
     {

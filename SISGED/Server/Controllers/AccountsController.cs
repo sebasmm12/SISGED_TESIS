@@ -31,7 +31,7 @@ namespace SISGED.Server.Controllers
         [HttpPost("crear")]
         [AllowAnonymous]
         public async Task<ActionResult<UserToken>> CreateUser(
-            /*[FromBody]*/ UserInfo model)
+            /*[FromBody]*/ Shared.DTOs.UserInfo model)
         {
             //creando Usuario con el Identity
             Console.WriteLine("Hey Llegue!");
@@ -96,7 +96,7 @@ namespace SISGED.Server.Controllers
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<ActionResult<UserToken>> Login(/*[FromBody]*/ UserInfo userInfo)
+        public async Task<ActionResult<UserToken>> Login(/*[FromBody]*/ Shared.DTOs.UserInfo userInfo)
         {
             var result = _usuarioservice.GetByUserNameAndPass(userInfo);
             if (result != null)
@@ -112,7 +112,7 @@ namespace SISGED.Server.Controllers
                 return BadRequest("Invalid login attempt");
             }
         }
-        private UserToken BuildToken(UserInfo userInfo, String rol)//IList<string> roles
+        private UserToken BuildToken(Shared.DTOs.UserInfo userInfo, String rol)//IList<string> roles
         {
             var claims = new List<Claim>()
             {

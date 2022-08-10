@@ -22,7 +22,7 @@ namespace SISGED.Server.Helpers.Infrastructure
             return new BsonDocument("$match", bsonElements);
         }
 
-        public static BsonDocument Match(Dictionary<string, string> elements)
+        public static BsonDocument Match(Dictionary<string, BsonValue> elements)
         {
             return new BsonDocument("$match", new BsonDocument().AddRange(elements));
         }
@@ -57,6 +57,57 @@ namespace SISGED.Server.Helpers.Infrastructure
         public static BsonDocument Project(Dictionary<string, BsonValue> elements)
         {
             return new BsonDocument("$project", new BsonDocument().AddRange(elements));
+        }
+
+        public static BsonDocument ObjectId(string id)
+        {
+            return new BsonDocument("$toObjectId", id);
+        }
+
+        public static BsonDocument Concat(IEnumerable<BsonValue> valuesToConcat)
+        {
+            return new BsonDocument("$concat", new BsonArray().AddRange(valuesToConcat));
+        }
+
+        public static BsonDocument Regex(string regexPatter, string? options)
+        {
+            var regexAggregation = new BsonDocument
+            {
+                { "regex", regexPatter }
+            };
+
+            if (!string.IsNullOrEmpty(options)) regexAggregation.Add("options", options);
+
+            return regexAggregation;
+        }
+
+        public static BsonDocument Group(Dictionary<string, BsonValue> valuesToGroup)
+        {
+            return new BsonDocument("$group", new BsonDocument().AddRange(valuesToGroup));
+        }
+        public static BsonDocument Sum(BsonValue value)
+        {
+            return new BsonDocument("$sum", value);
+        }
+
+        public static BsonDocument Month(BsonValue date)
+        {
+            return new BsonDocument("$month", date);
+        }
+
+        public static BsonDocument Cond(BsonValue condition, BsonValue trueValue, BsonValue falseValue)
+        {
+            return new BsonDocument("$cond", new BsonArray().Add(condition).Add(trueValue).Add(falseValue));
+        }
+
+        public static BsonDocument In(BsonValue value, BsonArray values)
+        {
+            return new BsonDocument("$in", new BsonArray().Add(value).Add(values));
+        }
+
+        public static BsonDocument NotIn(IEnumerable<BsonValue> valuesToExclude)
+        {
+            return new BsonDocument("$nin", new BsonArray().AddRange(valuesToExclude));
         }
     }
 }

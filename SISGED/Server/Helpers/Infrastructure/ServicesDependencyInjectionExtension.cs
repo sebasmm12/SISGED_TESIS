@@ -12,6 +12,11 @@ namespace SISGED.Server.Helpers.Infrastructure
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITrayService, TrayService>();
+            services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<ISolicitorService, SolicitorService>();
+            services.AddScoped<IDocumentService, DocumentService>();
+            services.AddScoped<IDossierService, DossierService>();
+            services.AddScoped<IStatisticService, StatisticService>();
 
             return services;
         }

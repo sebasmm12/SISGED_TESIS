@@ -21,7 +21,7 @@ namespace SISGED.Shared.Entities
         typeof(Resolucion),
         typeof(Apelacion),
         typeof(SolicitudInicial))]
-    public class Documento
+    public class Document
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
@@ -67,7 +67,7 @@ namespace SISGED.Shared.Entities
 
 
 
-    public class SolicitudDenuncia : Documento
+    public class SolicitudDenuncia : Document
     {
 
         public ContenidoSolicitudDenuncia contenido { get; set; } = new ContenidoSolicitudDenuncia();
@@ -91,7 +91,7 @@ namespace SISGED.Shared.Entities
         public string urlGenerado { get; set; }
 
     }
-    public class OficioBPN : Documento
+    public class OficioBPN : Document
     {
         [BsonElement("evaluacion")]
         public Evaluacion evaluacion { get; set; }
@@ -114,7 +114,7 @@ namespace SISGED.Shared.Entities
 
     }
 
-    public class SolicitudBPN : Documento
+    public class SolicitudBPN : Document
     {
         public ContenidoSolicitudBPN contenido { get; set; } = new ContenidoSolicitudBPN();
 
@@ -131,7 +131,7 @@ namespace SISGED.Shared.Entities
 
     }
 
-    public class ResultadoBPN : Documento
+    public class ResultadoBPN : Document
     {
         public ContenidoResultadoBPN contenido { get; set; }
 
@@ -150,7 +150,7 @@ namespace SISGED.Shared.Entities
 
     }
 
-    public class SolicitudExpedicionFirma : Documento
+    public class SolicitudExpedicionFirma : Document
     {
         public ContenidoSolicitudExpedicionFirma contenido { get; set; }
 
@@ -168,13 +168,13 @@ namespace SISGED.Shared.Entities
         public string urlGenerado { get; set; }
 
     }
-    public class ConclusionFirma : Documento
+    public class ConclusionFirma : Document
     {
         public ContenidoConclusionFirma contenido { get; set; }
     }
 
 
-    public class OficioDesignacionNotario : Documento
+    public class OficioDesignacionNotario : Document
     {
         [BsonElement("evaluacion")]
         public Evaluacion evaluacion { get; set; }
@@ -211,7 +211,7 @@ namespace SISGED.Shared.Entities
         public string firma { get; set; }
         public string urlGenerado { get; set; }
     }
-    public class AperturamientoDisciplinario : Documento
+    public class AperturamientoDisciplinario : Document
     {
         public ContenidoAperturamientoDisciplinario contenido { get; set; }
     }
@@ -226,7 +226,7 @@ namespace SISGED.Shared.Entities
         public string firma { get; set; }
         public string urlGenerado { get; set; }
     }
-    public class SolicitudExpedienteNotario : Documento
+    public class SolicitudExpedienteNotario : Document
     {
         public ContenidoSolicitudExpedienteNotario contenido { get; set; }
     }
@@ -244,7 +244,7 @@ namespace SISGED.Shared.Entities
         public string urlGenerado { get; set; }
     }
 
-    public class Dictamen : Documento
+    public class Dictamen : Document
     {
         public ContenidoDictamen contenido { get; set; }
     }
@@ -262,7 +262,7 @@ namespace SISGED.Shared.Entities
         public string firma { get; set; }
         public string urlGenerado { get; set; }
     }
-    public class Resolucion : Documento
+    public class Resolucion : Document
     {
         [BsonElement("evaluacion")]
         public Evaluacion evaluacion { get; set; }
@@ -279,7 +279,7 @@ namespace SISGED.Shared.Entities
         public string urlGenerado { get; set; }
 
     }
-    public class Apelacion : Documento
+    public class Apelacion : Document
     {
         [BsonElement("evaluacion")]
         public Evaluacion evaluacion { get; set; }
@@ -293,7 +293,7 @@ namespace SISGED.Shared.Entities
 
     }
 
-    public class SolicitudInicial : Documento
+    public class SolicitudInicial : Document
     {
         public ContenidoSolicitudInicial contenido { get; set; }
     }
@@ -308,7 +308,7 @@ namespace SISGED.Shared.Entities
         public string urlGenerado { get; set; }
     }
 
-    public class EntregaExpedienteNotario : Documento
+    public class EntregaExpedienteNotario : Document
     {
         public ContenidoEntregaExpedienteNotario contenido { get; set; }
     }

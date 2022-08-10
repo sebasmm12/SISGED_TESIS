@@ -17,7 +17,7 @@ namespace SISGED.Shared.Models.Requests.User
 
         public string Password { get; set; } = default!;
 
-        public UserInfo Data { get; set; } = new UserInfo();
+        public UserData Data { get; set; } = new UserData();
 
         public string State { get; set; } = default!;
 

@@ -4,7 +4,7 @@ using SISGED.Shared.Entities;
 
 namespace SISGED.Shared.DTOs
 {
-    public class AperturamientoDisciplinarioDTO : Documento
+    public class AperturamientoDisciplinarioDTO : Document
     {
 
         public string estado { get; set; }

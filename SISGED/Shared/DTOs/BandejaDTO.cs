@@ -23,7 +23,7 @@ namespace SISGED.Shared.DTOs
         public List<BandejaDocumento> bandejaentrada { get; set; }
         public BandejaDocumento bandejasalida { get; set; }
 
-        public List<Expediente> bandejadocumento { get; set; }
+        public List<Dossier> bandejadocumento { get; set; }
 
     }
 
@@ -36,7 +36,7 @@ namespace SISGED.Shared.DTOs
         public List<BandejaDocumento> bandejaentrada { get; set; }
         public BandejaDocumento bandejasalida { get; set; }
 
-        public Expediente bandejadocumento { get; set; }
+        public Dossier bandejadocumento { get; set; }
     }
 
     public class BandejaExpedienteDTO
@@ -62,7 +62,7 @@ namespace SISGED.Shared.DTOs
 
         public ExpedienteDocumentoDTO bandejadocumento { get; set; }
 
-        public List<Documento> documentosobj { get; set; }
+        public List<Document> documentosobj { get; set; }
     }
 
     public class BandejaExpDocUndDTO
@@ -76,7 +76,7 @@ namespace SISGED.Shared.DTOs
 
         public ExpedienteDocumentoDTO bandejadocumento { get; set; }
 
-        public Documento documentosobj { get; set; }
+        public Document documentosobj { get; set; }
     }
 
     public class BandejaExpDocGroupDTO
@@ -86,7 +86,7 @@ namespace SISGED.Shared.DTOs
         public string id { get; set; }
         public string tipo { get; set; }
         public Cliente cliente { get; set; }
-        public List<Documento> documentosobj { get; set; } = new List<Documento>();
+        public List<Document> documentosobj { get; set; } = new List<Document>();
         public BandejaDocumento bandejasalida { get; set; }
         public List<BandejaDocumento> bandejaentrada { get; set; }
         [BsonRepresentation(BsonType.ObjectId)]
@@ -100,8 +100,8 @@ namespace SISGED.Shared.DTOs
         public string id { get; set; }
         public string tipo { get; set; }
         public Cliente cliente { get; set; }
-        public Documento documento { get; set; } = new Documento();
-        public List<Documento> documentosobj { get; set; } = new List<Documento>();
+        public Document documento { get; set; } = new Document();
+        public List<Document> documentosobj { get; set; } = new List<Document>();
         public List<BandejaDocumento> bandejaentrada { get; set; } = new List<BandejaDocumento>();
         [BsonRepresentation(BsonType.ObjectId)]
         public string idbandeja { get; set; }
@@ -153,7 +153,7 @@ namespace SISGED.Shared.DTOs
         public string id { get; set; }
         public BandejaDocumento bandejaentrada { get; set; }
         public List<ExpedienteBandejaDTO> expedientesalida { get; set; } = new List<ExpedienteBandejaDTO>();
-        public List<Expediente> bandejadocumento { get; set; }
+        public List<Dossier> bandejadocumento { get; set; }
     }
 
     public class BandejaDTOEDocumentoExpediente
@@ -165,7 +165,7 @@ namespace SISGED.Shared.DTOs
         public List<ExpedienteBandejaDTO> expedientesalida { get; set; }
             = new List<ExpedienteBandejaDTO>();
 
-        public Expediente bandejadocumento { get; set; }
+        public Dossier bandejadocumento { get; set; }
     }
 
     public class BandejaExpedienteDTOE
@@ -191,7 +191,7 @@ namespace SISGED.Shared.DTOs
 
         public ExpedienteDocumentoDTO bandejadocumento { get; set; }
 
-        public List<Documento> documentosobj { get; set; }
+        public List<Document> documentosobj { get; set; }
     }
 
     public class BandejaExpDocUndDTOE
@@ -205,7 +205,7 @@ namespace SISGED.Shared.DTOs
 
         public ExpedienteDocumentoDTO bandejadocumento { get; set; }
 
-        public Documento documentosobj { get; set; }
+        public Document documentosobj { get; set; }
     }
 
     public class BandejaExpDocGroupDTOE
@@ -218,7 +218,7 @@ namespace SISGED.Shared.DTOs
 
         public Cliente cliente { get; set; }
 
-        public List<Documento> documentosobj { get; set; }
+        public List<Document> documentosobj { get; set; }
 
         [BsonRepresentation(BsonType.ObjectId)]
         public string idbandeja { get; set; }
@@ -239,10 +239,10 @@ namespace SISGED.Shared.DTOs
         public BandejaDocumento bandejaentrada { get; set; }
         [BsonRepresentation(BsonType.ObjectId)]
         public string idbandeja { get; set; }
-        public List<Documento> documentosobj { get; set; }
+        public List<Document> documentosobj { get; set; }
         public string tipo { get; set; }
         public Cliente cliente { get; set; }
-        public Documento documento { get; set; }
+        public Document documento { get; set; }
     }
 
     public class BandejaESDTOP
@@ -285,7 +285,7 @@ namespace SISGED.Shared.DTOs
         public string usuario { get; set; }
         public BandejaDocumento bandejaentrada { get; set; }
         public List<BandejaDocumento> bandejasalida { get; set; }
-        public List<Expediente> bandejadocumento { get; set; }
+        public List<Dossier> bandejadocumento { get; set; }
 
     }
 
@@ -298,7 +298,7 @@ namespace SISGED.Shared.DTOs
         public BandejaDocumento bandejaentrada { get; set; }
         public List<BandejaDocumento> bandejasalida { get; set; }
 
-        public Expediente bandejadocumento { get; set; }
+        public Dossier bandejadocumento { get; set; }
     }
 
     public class BandejaEntradaDTOR
@@ -306,7 +306,7 @@ namespace SISGED.Shared.DTOs
         [BsonRepresentation(BsonType.ObjectId)]
         public string id { get; set; }
         public BandejaDocumento bandejaentrada { get; set; } = new BandejaDocumento();
-        public DocumentoExpediente documento { get; set; } = new DocumentoExpediente();
+        public DossierDocument documento { get; set; } = new DossierDocument();
         public string tipoexpediente { get; set; }
         public Cliente cliente { get; set; } = new Cliente();
     }
