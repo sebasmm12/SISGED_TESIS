@@ -7,6 +7,7 @@ namespace SISGED.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [ApiConventionType(typeof(DefaultApiConventions))]
     public class AsistenteController : ControllerBase
     {
         private readonly AsistenteService asistenteService;

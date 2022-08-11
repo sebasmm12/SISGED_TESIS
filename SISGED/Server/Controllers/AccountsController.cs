@@ -1,10 +1,14 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using SISGED.Server.Services;
+using SISGED.Server.Services.Contracts;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models;
+using SISGED.Shared.Models.Requests.Account;
+using SISGED.Shared.Models.Requests.User;
+using SISGED.Shared.Models.Responses.Account;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -13,121 +17,140 @@ namespace SISGED.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [ApiConventionType(typeof(DefaultApiConventions))]
     public class AccountsController : ControllerBase
     {
-        private readonly UsuarioService _usuarioservice;
-        private readonly RolesService _rolservice;
-        private readonly PermisosService _permisoservice;
+        private readonly IUserService _userService;
+        private readonly IRoleService _roleService;
+        private readonly IPermissionService _permissionService;
+        private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
-        public AccountsController(UsuarioService usuarioservice, RolesService rolservice,
-            PermisosService permisoservice,
-            IConfiguration configuration)
+
+        public AccountsController(IUserService userService, IRoleService roleService, IPermissionService permissionService, IMapper mapper, IConfiguration configuration)
         {
-            _rolservice = rolservice;
-            _usuarioservice = usuarioservice;
-            _permisoservice = permisoservice;
+            _userService = userService;
+            _mapper = mapper;
+            _roleService = roleService;
+            _permissionService = permissionService;
             _configuration = configuration;
         }
-        [HttpPost("crear")]
-        [AllowAnonymous]
-        public async Task<ActionResult<UserToken>> CreateUser(
-            /*[FromBody]*/ Shared.DTOs.UserInfo model)
+
+        [HttpPost]
+        public async Task<ActionResult<UserToken>> CreateUserAsync(UserRegisterRequest userRegisterRequest)
         {
-            //creando Usuario con el Identity
-            Console.WriteLine("Hey Llegue!");
-            var user = new Usuario()
-            { usuario = model.usuario, clave = model.clave };
-            var result = _usuarioservice.Post(user);
-            if (result != null)
+            try
             {
-                return BuildToken(model, "");
+                var user = _mapper.Map<User>(userRegisterRequest);
+
+                await _userService.CreateUserAsync(user);
+
+                var usertoken = BuildToken(user, "");
+
+                return Ok(usertoken);
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest("Username or password invalid");
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
 
-        [HttpGet("GetUserData")]
-        [AllowAnonymous]
-        public ActionResult<Sesion> GetDatosUsuario([FromQuery] string user)
+        [HttpGet("name/{username}")]
+        public async Task<ActionResult<SessionAccountResponse>> GetUserDataAsync([FromRoute] string username)
         {
-            Sesion temp = new Sesion();
-            List<Permiso> permisosInterfaces = new List<Permiso>();
-            List<Permiso> permisosHerramientas = new List<Permiso>();
-
-            Usuario usuario = new Usuario();
-            usuario = _usuarioservice.GetByUsername(user);
-
-            Rol rolusu = new Rol();
-            rolusu = _rolservice.GetById(usuario.rol);
-
-            foreach (string idPerm in rolusu.listainterfaces)
+            try
             {
-                //Obtener el bjeto permiso y añadirlo
-                Permiso perm1 = new Permiso();
-                perm1 = _permisoservice.GetById(idPerm);
-                permisosInterfaces.Add(perm1);
-            }
+                SessionAccountResponse sessionAccount = new SessionAccountResponse();
+                List<Permission> permisosInterfaces = new List<Permission>();
+                List<Permission> toolsPermissions = new List<Permission>();
 
-            foreach (string idPerm in rolusu.listaherramientas)
+                User user = new User();
+                user = await _userService.GetUserByNameAsync(username);
+
+                Role userrole = new Role();
+                userrole = await _roleService.GetRoleByIdAsync(user.Rol);
+
+                foreach (string permissionId in userrole.Interfaces)
+                {
+                    //Obtener el objeto permiso y añadirlo
+                    Permission permission = new Permission();
+                    permission = await _permissionService.GetPermissionByIdAsync(permissionId);
+                    permisosInterfaces.Add(permission);
+                }
+
+                foreach (string permissionId in userrole.Tools)
+                {
+                    //Obtener el bjeto permiso y añadirlo
+                    Permission permission = new Permission();
+                    permission = await _permissionService.GetPermissionByIdAsync(permissionId);
+                    toolsPermissions.Add(permission);
+                }
+
+                sessionAccount.User = user;
+                sessionAccount.Role = userrole.Name;
+                sessionAccount.ToolPermissions = toolsPermissions;
+                sessionAccount.InterfacePermissions = permisosInterfaces;
+
+                return Ok(sessionAccount);
+            } catch (Exception ex)
             {
-                //Obtener el bjeto permiso y añadirlo
-                Permiso perm2 = new Permiso();
-                perm2 = _permisoservice.GetById(idPerm);
-                permisosHerramientas.Add(perm2);
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
-
-            temp.usuario = usuario;
-            temp.rol = rolusu.nombre;
-            temp.permisosHerram = permisosHerramientas;
-            temp.permisosInterfaz = permisosInterfaces;
-            return temp;
         }
 
-        [HttpGet("GetRolByID")]
-        [AllowAnonymous]
-        public ActionResult<Rol> GetRolByID([FromQuery] string id)
+        [HttpGet("role/{roleId}")]
+        public async Task<ActionResult<Role>> GetRoleByIdAsync([FromRoute] string roleId)
         {
-            Rol rolusu = new Rol();
-            rolusu = _rolservice.GetById(id);
-            return rolusu;
+            try
+            {
+                var role = await _roleService.GetRoleByIdAsync(roleId);
+
+                return Ok(role);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
 
         [HttpPost("login")]
-        [AllowAnonymous]
-        public async Task<ActionResult<UserToken>> Login(/*[FromBody]*/ Shared.DTOs.UserInfo userInfo)
+        public async Task<ActionResult<UserToken>> Login(AccountLoginRequest userInfo)
         {
-            var result = _usuarioservice.GetByUserNameAndPass(userInfo);
-            if (result != null)
+            try
             {
-                Usuario usuario = _usuarioservice.GetByUsername(userInfo.usuario);
-                Rol rolusu = _rolservice.GetById(usuario.rol);
-                //var roles = usuario.roles.Select(x => x.nombre).ToList();
-                //List<String> roles = new List<String>(){ "admin" };
-                return BuildToken(userInfo, rolusu.nombre);
+                var result = await _userService.VerifyUserLoginAsync(userInfo.Username, userInfo.Password);
+                if (result)
+                {
+                    User user = await _userService.GetUserByNameAsync(userInfo.Username);
+                    Role role = await _roleService.GetRoleByIdAsync(user.Rol);
+                    var userToken = BuildToken(user, role.Name);
+                    return Ok(userToken);
+                }
+                else
+                {
+                    return BadRequest("Intento de inicio de sesión inválido.");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest("Invalid login attempt");
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
-        private UserToken BuildToken(Shared.DTOs.UserInfo userInfo, String rol)//IList<string> roles
+        private UserToken BuildToken(User user, string roleName)
         {
             var claims = new List<Claim>()
             {
-                new Claim(JwtRegisteredClaimNames.UniqueName, userInfo.usuario),
-                new Claim(ClaimTypes.Name, userInfo.usuario),
+                new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName),
+                new Claim(ClaimTypes.Name, user.UserName),
                 new Claim("miValor", "Lo que yo quiera"),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            claims.Add(new Claim(ClaimTypes.Role, rol));
+            claims.Add(new Claim(ClaimTypes.Role, roleName));
 
-            var key = new SymmetricSecurityKey
-                (Encoding.UTF8.GetBytes(_configuration["JWT:key"]));
-            var creds = new SigningCredentials(key,
-                SecurityAlgorithms.HmacSha256);
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:key"]));
+            var creds = new SigningCredentials(key,SecurityAlgorithms.HmacSha256);
 
             var expiration = DateTime.UtcNow.AddHours(-5).AddYears(1);
 
