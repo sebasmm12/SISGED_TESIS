@@ -61,6 +61,13 @@ namespace SISGED.Server.Services.Repositories
             return user is not null;
         }
 
+        public async Task<bool> VerifyUserLoginAsync(string username, string password)
+        {
+            var user = await _usersCollection.Find(user => user.UserName == username && user.Password == password).FirstOrDefaultAsync();
+
+            return user is not null;
+        }
+
         public async Task UpdateUserAsync(User user)
         {
             var filter = Builders<User>.Filter.Eq(user => user.Id, user.Id);
