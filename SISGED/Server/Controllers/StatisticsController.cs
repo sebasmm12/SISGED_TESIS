@@ -24,7 +24,7 @@ namespace SISGED.Server.Controllers
             {
                 IEnumerable<DocumentsByMonthAndAreaResponse> documents;
 
-                if(string.IsNullOrEmpty(documentsByMonthAndAreaQuery.Area)) documents = await _statisticService.GetDocumentsByMonthAsync(documentsByMonthAndAreaQuery);
+                if (string.IsNullOrEmpty(documentsByMonthAndAreaQuery.Area)) documents = await _statisticService.GetDocumentsByMonthAsync(documentsByMonthAndAreaQuery);
                 else documents = await _statisticService.GetDocumentsByMonthAndAreaAsync(documentsByMonthAndAreaQuery);
 
                 return Ok(documents);
@@ -63,6 +63,21 @@ namespace SISGED.Server.Controllers
             catch (Exception ex)
             {
 
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet("dossiers")]
+        public async Task<ActionResult<IEnumerable<DossierGanttDiagramResponse>>> GetDossierGanttDiagramAsync([FromQuery] DossierGanttDiagramQuery dossierGanttDiagramQuery)
+        {
+            try
+            {
+                var dossiers = await _statisticService.GetDossierGanttDiagramAsync(dossierGanttDiagramQuery);
+              
+                return Ok(dossiers);
+            }
+            catch (Exception ex)
+            {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }

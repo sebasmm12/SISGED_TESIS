@@ -35,5 +35,10 @@ namespace SISGED.Server.Services.Repositories
             return await _documentService.GetDocumentsByStateAsync(documentsByStateQuery);
         }
 
+        public async Task<IEnumerable<DossierGanttDiagramResponse>> GetDossierGanttDiagramAsync(DossierGanttDiagramQuery dossierGanttDiagramQuery)
+        {
+            return await _reportService.GetDossierGanttDiagramAsync(dossierGanttDiagramQuery);
+        }
+
     }
 }

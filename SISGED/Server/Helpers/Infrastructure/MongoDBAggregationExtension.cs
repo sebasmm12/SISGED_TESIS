@@ -109,5 +109,15 @@ namespace SISGED.Server.Helpers.Infrastructure
         {
             return new BsonDocument("$nin", new BsonArray().AddRange(valuesToExclude));
         }
+
+        public static BsonDocument Switch(IEnumerable<BsonValue> cases, BsonValue defaultValue)
+        {
+            return new BsonDocument("$switch", new BsonDocument().Add("branches", new BsonArray().AddRange(cases)).Add("default", defaultValue));
+        }
+
+        public static BsonDocument Case(BsonValue condition, BsonValue result)
+        {
+            return new BsonDocument().Add("case", condition).Add("then", result);
+        }
     }
 }
