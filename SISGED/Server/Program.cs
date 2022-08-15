@@ -50,6 +50,8 @@ try
     // Swagger Dependency Injection
     builder.Services.AddSwaggerGen(swaggerGen =>
     {
+        swaggerGen.CustomSchemaIds(type => type.ToString());
+
         swaggerGen.SwaggerDoc("v1", new()
         {
             Title = "SisgedAPI",

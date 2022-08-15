@@ -1,136 +1,110 @@
-﻿using MongoDB.Driver;
+﻿using AutoMapper;
+using MongoDB.Driver;
 using SISGED.Server.Services.Contracts;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Requests.Step;
+using SISGED.Shared.Models.Responses.Step;
+using StepGenericModel = SISGED.Shared.Models.Generics.Step;
 
 namespace SISGED.Server.Services.Repositories
 {
     public class StepService : IStepService
     {
-        private readonly IMongoCollection<Steps> _stepsCollection;
+        private readonly IMongoCollection<Step> _stepsCollection;
+        private readonly IMapper _mapper;
         public string CollectionName => "pasos";
-        public StepService(IMongoDatabase mongoDatabase)
+        public StepService(IMongoDatabase mongoDatabase, IMapper mapper)
         {
-            _stepsCollection = mongoDatabase.GetCollection<Steps>(CollectionName);
+            _stepsCollection = mongoDatabase.GetCollection<Step>(CollectionName);
+            _mapper = mapper;
         }
 
-        public async Task<Steps> GetStepByDossierNameAsync(string dossierName)
+        public async Task<Step> GetStepByDossierNameAsync(string dossierName)
         {
             var steps = await _stepsCollection.Find(step => step.DossierName == dossierName).FirstOrDefaultAsync();
 
-            if (steps is null) throw new Exception("No se ha podido encontrar los pasos registrados del expediente");
+            if (steps is null) throw new Exception($"No se pudo encontrar los pasos registrados del expediente {dossierName}");
 
             return steps;
         }
 
-        public async Task<Steps> GetStepByIdAsync(string stepId)
+        public async Task<Step> GetStepByIdAsync(string stepId)
         {
             var steps = await _stepsCollection.Find(step => step.Id == stepId).FirstOrDefaultAsync();
 
-            if (steps is null) throw new Exception("No se ha podido encontrar los pasos registrados del expediente");
+            if (steps is null) throw new Exception($"No se pudo encontrar los pasos registrados del expediente con identificador {stepId}");
 
             return steps;
         }
 
-        public async Task<List<StepsRequest>> GetStepRequestAsync()
+        public async Task<IEnumerable<DossierStepsResponse>> GetStepRequestAsync()
         {
-            List<Steps> steps = await _stepsCollection.Find(x => true).ToListAsync();
-            List<StepsRequest> stepsrequest = new List<StepsRequest>();
-            stepsrequest = (List<StepsRequest>)steps.Select(x => new StepsRequest()
+            var steps = await GetStepsAsync();
+
+            if (!steps.Any()) return new List<DossierStepsResponse>();
+
+            var stepsRequest = steps.Select(step =>
             {
-                Id = x.Id,
-                DossierName = x.DossierName,
-                Documents = (List<DocumentStepRequest>)x.Documents.Select((a, b) => new DocumentStepRequest()
-                {
-                    Uid = GenerateUID(),
-                    Index = b,
-                    Type = a.Type,
-                    Steps = (List<StepRequest>)a.Steps.Select((c, d) => new StepRequest()
-                    {
-                        Uid = GenerateUID(),
-                        Index = c.Index,
-                        Name = c.Name,
-                        Description = c.Description,
-                        Days = c.Days,
-                        Substep = (List<Substep>)c.Substep.Select((e, f) => new Substep()
-                        {
-                            Index = e.Index,
-                            Description = e.Description
-                        }).ToList()
-                    }).ToList()
-                }).ToList()
+                var stepRequest = _mapper.Map<DossierStepsResponse>(step);
+
+                stepRequest.Documents = step.Documents.Select(GetDocumentRequest).ToList();
+
+                return stepRequest;
+                
             }).ToList();
-            return stepsrequest;
+
+            return stepsRequest;
         }
 
-        public async Task<List<Steps>> GetStepsAsync()
+        private StepGenericModel.StepDocument GetDocumentRequest(StepDocument stepDocument, int stepDocumentIndex)
         {
-            List<Steps> steps = await _stepsCollection.Find(x => true).ToListAsync();
+            var stepDocumentRequest = new StepGenericModel.StepDocument(stepDocumentIndex);
+
+            stepDocumentRequest = _mapper.Map(stepDocument, stepDocumentRequest);
+
+            return stepDocumentRequest;
+        }
+
+        public async Task<List<Step>> GetStepsAsync()
+        {
+            var steps = await _stepsCollection.Find(x => true).ToListAsync();
+
+            if (steps is null) throw new Exception("No se pudo obtener la hoja de ruta de los expedientes registrados");
+
             return steps;
         }
 
-        public async Task<StepsRequest> ModifyStep(StepsRequest stepsRequest)
+        public async Task UpdateStepAsync(StepUpdateRequest stepUpdateRequest)
         {
-            Steps steps = new Steps()
-            {
-                Id = stepsRequest.Id,
-                DossierName = stepsRequest.DossierName,
-                Documents = stepsRequest.Documents.Select(x => new DocumentStep()
-                {
-                    Type = x.Type,
-                    Steps = (List<Step>)x.Steps.Select((a, b) => new Step()
-                    {
-                        Index = b,
-                        Name = a.Name,
-                        Description = a.Description,
-                        Days = a.Days,
-                        Substep = (List<Substep>)a.Substep.Select((c, d) => new Substep()
-                        {
-                            Index = d,
-                            Description = c.Description
-                        }).ToList()
-                    }).ToList()
-                }).ToList()
-            };
+            var step = _mapper.Map<Step>(stepUpdateRequest);
 
-            var filter = Builders<Steps>.Filter.Eq("id", steps.Id);
-            var update = Builders<Steps>.Update
-                .Set("nombreexpediente", steps.DossierName)
-                .Set("documentos", steps.Documents);
-            await _stepsCollection.FindOneAndUpdateAsync<Pasos>(filter, update);
-            return stepsRequest;
+            var filter = Builders<Step>.Filter.Eq("id", step.Id);
+            var update = SetStepInformation(step);
+
+            var updatedUser = await _stepsCollection.UpdateOneAsync(filter, update);
+
+            if (updatedUser is null) throw new Exception($"No se pudo actualizar la hoja de ruta del expediente { stepUpdateRequest.DossierName }");
         }
 
-        public async Task<StepsRequest> RegisterStepAsync(StepsRequest stepsRequest)
+        public async Task RegisterStepAsync(StepRegisterRequest stepRegisterRequest)
         {
-            Steps steps = new Steps()
-            {
-                DossierName = stepsRequest.DossierName,
-                Documents = stepsRequest.Documents.Select(x => new DocumentStep()
-                {
-                    Type = x.Type,
-                    Steps = (List<Step>)x.Steps.Select((a, b) => new Step()
-                    {
-                        Index = b,
-                        Name = a.Name,
-                        Description = a.Description,
-                        Days = a.Days,
-                        Substep = (List<Substep>)a.Substep.Select((c, d) => new Substep()
-                        {
-                            Index = d,
-                            Description = c.Description
-                        }).ToList()
-                    }).ToList()
-                }).ToList()
-            };
-            await _stepsCollection.InsertOneAsync(steps);
-            stepsRequest.Id = steps.Id;
-            return stepsRequest;
+            var step = _mapper.Map<Step>(stepRegisterRequest);
+            
+            await _stepsCollection.InsertOneAsync(step);
+
+            if (step.Id is null) throw new Exception($"No se pudo registrar la hoja de ruta del expediente { stepRegisterRequest.DossierName }");
         }
 
         public string GenerateUID()
         {
             return Guid.NewGuid().ToString("N");
+        }
+
+        private static UpdateDefinition<Step> SetStepInformation(Step step)
+        {
+            return Builders<Step>.Update
+                .Set("nombreexpediente", step.DossierName)
+                .Set("documentos", step.Documents);
         }
     }
 }

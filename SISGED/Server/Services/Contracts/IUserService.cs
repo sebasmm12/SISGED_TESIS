@@ -17,6 +17,6 @@ namespace SISGED.Server.Services.Contracts
         Task UpdateUserPasswordAsync(string userId, string password);
         Task UpdateUserStateAsync(string userId, string state);
         Task<bool> VerifyUserExistsAsync(string userId);
-        Task<bool> VerifyUserLoginAsync(string username, string password)
+        Task<bool> VerifyUserLoginAsync(string username, string password);
     }
 }

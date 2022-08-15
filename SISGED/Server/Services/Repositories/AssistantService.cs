@@ -17,7 +17,7 @@ namespace SISGED.Server.Services.Repositories
         }
         public async Task<Assistant> CreateAsync(Assistant assistant)
         {
-            Steps steps = await _stepService.GetStepByDossierNameAsync(assistant.Steps.DossierName);
+            Step steps = await _stepService.GetStepByDossierNameAsync(assistant.Steps.DossierName);
 
             assistant.Steps = new AssistantStep { Documents = steps.Documents, DossierName = steps.DossierName};
             assistant.Step = 0;
@@ -87,7 +87,7 @@ namespace SISGED.Server.Services.Repositories
 
         public async Task<Assistant> UpdateInitialRequestAsync(Assistant assistant, string dossierName)
         {
-            Steps steps = await _stepService.GetStepByDossierNameAsync(dossierName);
+            Step steps = await _stepService.GetStepByDossierNameAsync(dossierName);
 
             steps.Documents.Find(x => x.Type == assistant.DocumentType)!
                 .Steps.Find(x => x.Index == assistant.Step - 1)!.StartDate = assistant.Steps.Documents.ElementAt(0).Steps.ElementAt(0).StartDate;

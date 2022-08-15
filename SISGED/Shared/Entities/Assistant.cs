@@ -23,6 +23,6 @@ namespace SISGED.Shared.Entities
     public class AssistantStep
     {
         public String DossierName { get; set; } = default!;
-        public List<DocumentStep> Documents { get; set; } = default!;
+        public List<StepDocument> Documents { get; set; } = default!;
     }
 }

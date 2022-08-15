@@ -17,6 +17,7 @@ namespace SISGED.Server.Helpers.Infrastructure
             services.AddScoped<IDocumentService, DocumentService>();
             services.AddScoped<IDossierService, DossierService>();
             services.AddScoped<IStatisticService, StatisticService>();
+            services.AddScoped<IStepService, StepService>();
 
             return services;
         }

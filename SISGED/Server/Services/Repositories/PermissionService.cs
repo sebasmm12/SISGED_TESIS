@@ -17,7 +17,7 @@ namespace SISGED.Server.Services.Repositories
         {
             var permissions = await _permissionCollection.Find(permission => permission.Id == permissionId).FirstOrDefaultAsync();
 
-            if (permissions is null) throw new Exception($"No se pudo encontrar el permiso con el identificador { permission }");
+            if (permissions is null) throw new Exception($"No se pudo encontrar el permiso con el identificador { permissionId }");
 
             return permissions;
         }
