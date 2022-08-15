@@ -9,7 +9,7 @@ namespace SISGED.Server.Services.Repositories
     public class AssistantService : IAssistantService
     {
         private readonly IMongoCollection<Assistant> _assistantCollection;
-        private readonly StepService _stepService;
+        private readonly IStepService _stepService;
         public string CollectionName => "asistente";
         public AssistantService(IMongoDatabase mongoDatabase)
         {

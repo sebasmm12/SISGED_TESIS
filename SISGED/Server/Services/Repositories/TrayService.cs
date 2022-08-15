@@ -7,11 +7,14 @@ namespace SISGED.Server.Services.Repositories
     public class TrayService : ITrayService
     {
        private readonly IMongoCollection<Tray> _traysCollection;
+       private readonly IMongoCollection<User> _usersCollection;
         public string CollectionName => "bandejas";
+        public string SecondCollectionName => "usuarios";
 
         public TrayService(IMongoDatabase mongoDatabase)
         {
             _traysCollection = mongoDatabase.GetCollection<Tray>(CollectionName);
+            _usersCollection = mongoDatabase.GetCollection<User>(SecondCollectionName);
         }
         
         public async Task RegisterUserTrayAsync(string type, string userId)
@@ -22,5 +25,7 @@ namespace SISGED.Server.Services.Repositories
 
             if (string.IsNullOrEmpty(userTray.Id)) throw new Exception($"No se pudo registrar la bandeja del usuario {userId} al sistema");
         }
+
+
     }
 }

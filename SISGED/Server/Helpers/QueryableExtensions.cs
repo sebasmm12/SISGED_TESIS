@@ -1,4 +1,4 @@
-﻿using SISGED.Shared.DTOs;
+﻿using SISGED.Shared.Models;
 
 namespace SISGED.Server.Helpers
 {

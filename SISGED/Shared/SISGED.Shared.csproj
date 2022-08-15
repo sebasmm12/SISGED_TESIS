@@ -17,6 +17,8 @@
 
   <ItemGroup>
     <Folder Include="Helpers\" />
+    <Folder Include="Models\Requests\Granter\" />
+    <Folder Include="Models\Responses\Dossier\" />
   </ItemGroup>
 
   <ItemGroup>
