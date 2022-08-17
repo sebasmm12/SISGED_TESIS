@@ -21,17 +21,17 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpGet("{usuario}")]
-        public async Task<ActionResult<InputOutputTrayResponse>> GetAsync(string usuario)
+        public async Task<ActionResult<InputOutputTrayResponse>> GetAsync(string user)
         {
-            //return await _trayService.ObtenerBandeja(usuario);
-            return NoContent();
+            var tray = await _trayService.GetAsync(user);
+            return Ok(tray);
         }
 
         [HttpGet("bandejaentrada/{usuario}")]
-        public async Task<ActionResult<List<InputTrayResponse>>> GetInputStrayAsync(string usuario)
+        public async Task<ActionResult<List<InputTrayResponse>>> GetInputStrayAsync(string user)
         {
-            //return await _trayService.ObtenerBandejaEntrada(usuario);
-            return NoContent();
+            var tray = await _trayService.GetInputStrayAsync(user);
+            return Ok(tray);
         }
     }
 }
