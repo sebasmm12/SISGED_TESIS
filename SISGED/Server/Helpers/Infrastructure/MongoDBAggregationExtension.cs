@@ -17,6 +17,14 @@ namespace SISGED.Server.Helpers.Infrastructure
             return new BsonDocument("$eq", bsonArray);
         }
 
+        public static BsonDocument Filter(BsonValue bsonElements, BsonValue bsonFilter)
+        {
+
+            return new BsonDocument("$filter", new BsonDocument("input", bsonElements)
+                                                     .Add("as", "item")
+                                                     .Add("cond", bsonFilter));
+        }
+
         public static BsonDocument Match(BsonValue bsonElements)
         {
             return new BsonDocument("$match", bsonElements);
@@ -88,6 +96,16 @@ namespace SISGED.Server.Helpers.Infrastructure
         public static BsonDocument Sum(BsonValue value)
         {
             return new BsonDocument("$sum", value);
+        }
+
+        public static BsonDocument First(BsonValue value)
+        {
+            return new BsonDocument("$first", value);
+        }
+
+        public static BsonDocument Push(BsonValue value)
+        {
+            return new BsonDocument("$push", value);
         }
 
         public static BsonDocument Month(BsonValue date)
