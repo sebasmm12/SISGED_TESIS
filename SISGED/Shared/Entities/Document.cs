@@ -1,315 +1,464 @@
 ﻿using MongoDB.Bson;
-using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization.Attributes;
-using SISGED.Shared.DTOs;
 
 namespace SISGED.Shared.Entities
 {
-    [BsonDiscriminator(RootClass = true)]
+    [BsonDiscriminator("Documento")]
     [BsonKnownTypes(
-        typeof(SolicitudDenuncia),
-        typeof(OficioBPN),
-        typeof(SolicitudBPN),
-        typeof(ResultadoBPN),
-        typeof(SolicitudExpedicionFirma),
-        typeof(OficioDesignacionNotario),
-        typeof(ConclusionFirma),
-        typeof(AperturamientoDisciplinario),
-        typeof(SolicitudExpedienteNotario),
-        typeof(EntregaExpedienteNotario),
-        typeof(Dictamen),
-        typeof(Resolucion),
-        typeof(Apelacion),
-        typeof(SolicitudInicial))]
+        typeof(ComplaintRequest),
+        typeof(BPNDocument),
+        typeof(BPNRequest),
+        typeof(BPNResult),
+        typeof(SignExpeditionRequest),
+        typeof(SolicitorDesignationDocument),
+        typeof(SignConclusion),
+        typeof(DisciplinaryOpenness),
+        typeof(SolicitorDossierRequest),
+        typeof(SolicitorDossierShipment),
+        typeof(Dictum),
+        typeof(Resolution),
+        typeof(Appeal),
+        typeof(InitialRequest))]
     public class Document
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string id { get; set; }
+        [BsonElement("id")]
+        public string Id { get; set; } = default!;
         [BsonElement("tipo")]
-        public string tipo { get; set; }
+        public string Type { get; set; } = default!;
         [BsonElement("historialcontenido")]
-        public List<ContenidoVersion> historialcontenido { get; set; } = new List<ContenidoVersion>();
+        public List<ContentVersion> ContentsHistory { get; set; } = new();
         [BsonElement("historialproceso")]
-        public List<Proceso> historialproceso { get; set; } = new List<Proceso>();
+        public List<Process> ProcessesHistory { get; set; } = new();
         [BsonElement("urlanexo")]
-        public List<string> urlanexo { get; set; } = new List<string>();
+        public List<string> AttachedUrls { get; set; } = new();
         [BsonElement("estado")]
-        public string estado { get; set; }
+        public string State { get; set; } = default!;
         [BsonElement("fechacreacion")]
-        public DateTime fechacreacion { get; set; } = DateTime.Now;
+        public DateTime CreationDate { get; set; } = DateTime.UtcNow.AddHours(-5);
     }
-    public class Evaluacion
+    public class Evaluation
     {
-        public string resultado { get; set; }
-        public List<EvaluacionIndividual> evaluaciones { get; set; } = new List<EvaluacionIndividual>();
+        [BsonElement("resultado")]
+        public string Result { get; set; } = default!;
+        [BsonElement("evaluaciones")]
+        public List<IndividualEvaluation> Evaluations { get; set; } = new();
     }
 
-    public class EvaluacionIndividual
+    public class IndividualEvaluation
     {
-        public string idparticipante { get; set; }
-        public string status { get; set; }
-        public string descripcion { get; set; }
+        [BsonElement("idparticipante")]
+        public string ParticipantId { get; set; } = default!;
+        [BsonElement("status")]
+        public string Status { get; set; } = default!;
+        [BsonElement("descripcion")]
+        public string Description { get; set; } = default!;
     }
 
 
-    public class ContenidoSolicitudDenuncia
+    public class ComplaintRequestContent
     {
-        public string codigo { get; set; }
-        public string titulo { get; set; }
-        public string descripcion { get; set; }
-        public string nombrecliente { get; set; }
-        public DateTime fechaentrega { get; set; }
-        public string url { get; set; }
-        public string firma { get; set; }
-        public string urlGenerado { get; set; }
+        [BsonElement("codigo")]
+        public string Code { get; set; } = default!;
+        [BsonElement("titulo")]
+        public string Title { get; set; } = default!;
+        [BsonElement("descripcion")]
+        public string Description { get; set; } = default!;
+        [BsonElement("nombrecliente")]
+        public string ClientName { get; set; } = default!;
+        [BsonElement("fechaentrega")]
+        public DateTime DeliveryDate { get; set; }
+        [BsonElement("url")]
+        public string Url { get; set; } = default!;
+        [BsonElement("firma")]
+        public string Sign { get; set; } = default!;
+        [BsonElement("urlGenerado")]
+        public string GeneratedUrl { get; set; } = default!;
     }
 
-
-
-    public class SolicitudDenuncia : Document
+    [BsonDiscriminator("SolicitudDenuncia")]
+    public class ComplaintRequest : Document
     {
-
-        public ContenidoSolicitudDenuncia contenido { get; set; } = new ContenidoSolicitudDenuncia();
+        [BsonElement("contenido")]
+        public ComplaintRequestContent Content { get; set; } = new();
     }
 
-    public class ContenidoOficioBPN
+    public class BPNDocumentContent
     {
-        public string codigo { get; set; }
-        public string titulo { get; set; }
-        public string descripcion { get; set; }
-        //public string observacion { get; set; }
-        public string idcliente { get; set; }
-        public string direccionoficio { get; set; }
-        public string idnotario { get; set; }
-        public string actojuridico { get; set; }
-        public string tipoprotocolo { get; set; }
-        public List<string> otorgantes { get; set; }
-        public DateTime fecharealizacion { get; set; }
-        public string url { get; set; }
-        public string firma { get; set; }
-        public string urlGenerado { get; set; }
+        [BsonElement("codigo")]
+        public string Code { get; set; } = default!;
+        [BsonElement("titulo")]
+        public string Title { get; set; } = default!;
+        [BsonElement("descripcion")]
+        public string Description { get; set; } = default!;
+        [BsonElement("idcliente")]
+        public string ClientId { get; set; } = default!;
+        [BsonElement("direccionoficio")]
+        public string DocumentAddress { get; set; } = default!;
+        [BsonElement("idnotario")]
+        public string SolicitorId { get; set; } = default!;
+        [BsonElement("actojuridico")]
+        public string JuridicalAct { get; set; } = default!;
+        [BsonElement("tipoprotocolo")]
+        public string ProtocolType { get; set; } = default!;
+        [BsonElement("otorgantes")]
+        public List<string> Grantors { get; set; } = new();
+        [BsonElement("fecharealizacion")]
+        public DateTime RealizationDate { get; set; }
+        [BsonElement("url")]
+        public string Url { get; set; } = default!;
+        [BsonElement("firma")]
+        public string Sign { get; set; } = default!;
+        [BsonElement("urlGenerado")]
+        public string GeneratedUrl { get; set; } = default!;
 
     }
-    public class OficioBPN : Document
+
+    [BsonDiscriminator("OficioBPN")]
+    public class BPNDocument : Document
     {
         [BsonElement("evaluacion")]
-        public Evaluacion evaluacion { get; set; }
-        public ContenidoOficioBPN contenido { get; set; } = new ContenidoOficioBPN();
+        public Evaluation Evaluation { get; set; } = default!;
+        [BsonElement("contenido")]
+        public BPNDocumentContent Content { get; set; } = new();
 
     }
     public class ContenidoSolicitudBPN
     {
-        public string codigo { get; set; }
-        public string idcliente { get; set; }
-        public string direccionoficio { get; set; }
-        public string idnotario { get; set; }
-        public string actojuridico { get; set; }
-        public string tipoprotocolo { get; set; }
-        public List<string> otorgantes { get; set; } = new List<String>();
-        //public List<Otorgantelista> otorganteslista { get; set; } 
-        public DateTime fecharealizacion { get; set; }
-        public string firma { get; set; }
-        public string urlGenerado { get; set; }
+        [BsonElement("codigo")]
+        public string Code { get; set; } = default!;
+        [BsonElement("idcliente")]
+        public string ClientId { get; set; } = default!;
+        [BsonElement("direccionoficio")]
+        public string DocumentAddress { get; set; } = default!;
+        [BsonElement("idnotario")]
+        public string SolicitorId { get; set; } = default!;
+        [BsonElement("actojuridico")]
+        public string JuridicalAct { get; set; } = default!;
+        [BsonElement("tipoprotocolo")]
+        public string ProtocolType { get; set; } = default!;
+        [BsonElement("otorgantes")]
+        public List<string> Grantors { get; set; } = new();
+        [BsonElement("fecharealizacion")]
+        public DateTime RealizationDate { get; set; }
+        [BsonElement("firma")]
+        public string Sign { get; set; } = default!;
+        [BsonElement("urlGenerado")]
+        public string GeneratedUrl { get; set; } = default!;
 
     }
 
-    public class SolicitudBPN : Document
+    [BsonDiscriminator("SolicitudBPN")]
+    public class BPNRequest : Document
     {
-        public ContenidoSolicitudBPN contenido { get; set; } = new ContenidoSolicitudBPN();
+        [BsonElement("contenido")]
+        public ContenidoSolicitudBPN Content { get; set; } = new();
 
     }
-    public class ContenidoResultadoBPN
+    public class BPNResultContent
     {
-        public string codigo { get; set; }
-        public Int32 costo { get; set; }
-        public Int32 cantidadfoja { get; set; }
-        public string estado { get; set; }
-        public string idescriturapublica { get; set; }
-        public string firma { get; set; }
-        public string urlGenerado { get; set; }
+        [BsonElement("codigo")]
+        public string Code { get; set; } = default!;
+        [BsonElement("costo")]
+        public int Cost { get; set; }
+        [BsonElement("cantidadfoja")]
+        public int TotalSheets { get; set; }
+        [BsonElement("estado")]
+        public string Status { get; set; } = default!;
+        [BsonElement("idescriturapublica")]
+        public string PublicDeedId { get; set; } = default!;
+        [BsonElement("firma")]
+        public string Sign { get; set; } = default!;
+        [BsonElement("urlGenerado")]
+        public string GeneratedUrl { get; set; } = default!;
 
     }
 
-    public class ResultadoBPN : Document
+    [BsonDiscriminator("ResultadoBPN")]
+
+    public class BPNResult : Document
     {
-        public ContenidoResultadoBPN contenido { get; set; }
+        [BsonElement("contenido")]
+        public BPNResultContent Content { get; set; } = default!;
 
     }
 
-    public class ContenidoSolicitudExpedicionFirma
+    public class SignExpeditionRequestContent
     {
-        public string codigo { get; set; }
-        public string titulo { get; set; }
-        public string descripcion { get; set; }
-        public string cliente { get; set; }
-        public DateTime fecharealizacion { get; set; }
-        public string url { get; set; }
-        public string firma { get; set; }
-        public string urlGenerado { get; set; }
+        [BsonElement("codigo")]
+        public string Code { get; set; } = default!;
+        [BsonElement("titulo")]
+        public string Title { get; set; } = default!;
+        [BsonElement("descripcion")]
+        public string Description { get; set; } = default!;
+        [BsonElement("cliente")]
+        public string Client { get; set; } = default!;
+        [BsonElement("fecharealizacion")]
+        public DateTime RealizationDate { get; set; }
+        [BsonElement("url")]
+        public string Url { get; set; } = default!;
+        [BsonElement("firma")]
+        public string Sign { get; set; } = default!;
+        [BsonElement("urlGenerado")]
+        public string GeneratedUrl { get; set; } = default!;
 
     }
 
-    public class SolicitudExpedicionFirma : Document
+    [BsonDiscriminator("SolicitudExpedicionFirma")]
+    public class SignExpeditionRequest : Document
     {
-        public ContenidoSolicitudExpedicionFirma contenido { get; set; }
+        [BsonElement("contenido")]
+        public SignExpeditionRequestContent Content { get; set; } = new();
+
+    }
+    public class SignConclusionContent
+    {
+        [BsonElement("codigo")]
+        public string Code { get; set; } = default!;
+        [BsonElement("idescriturapublica")]
+        public string PublicDeedId { get; set; } = default!;
+        [BsonElement("idnotario")]
+        public string SolicitorId { get; set; } = default!;
+        [BsonElement("idcliente")]
+        public string ClientId { get; set; } = default!;
+        [BsonElement("cantidadfoja")]
+        public int TotalSheets { get; set; }
+        [BsonElement("precio")]
+        public double Price { get; set; }
+        [BsonElement("firma")]
+        public string Sign { get; set; } = default!;
+        [BsonElement("urlGenerado")]
+        public string GeneratedUrl { get; set; } = default!;
 
     }
 
-    public class ContenidoConclusionFirma
+    [BsonDiscriminator("ConclusionFirma")]
+    public class SignConclusion : Document
     {
-        public string codigo { get; set; }
-        public string idescriturapublica { get; set; }
-        public string idnotario { get; set; }
-        public string idcliente { get; set; }
-        public Int32 cantidadfoja { get; set; }
-        public double precio { get; set; }
-        public string firma { get; set; }
-        public string urlGenerado { get; set; }
-
+        [BsonElement("contenido")]
+        public SignConclusionContent Content { get; set; } = new();
     }
-    public class ConclusionFirma : Document
-    {
-        public ContenidoConclusionFirma contenido { get; set; }
-    }
-
-
-    public class OficioDesignacionNotario : Document
-    {
-        [BsonElement("evaluacion")]
-        public Evaluacion evaluacion { get; set; }
-        public ContenidoOficioDesignacionNotario contenido { get; set; } = new ContenidoOficioDesignacionNotario();
-    }
-    public class ContenidoOficioDesignacionNotario
-    {
-        public string codigo { get; set; }
-        public string titulo { get; set; }
-        public string descripcion { get; set; }
-        public DateTime fecharealizacion { get; set; }
-        public string lugaroficionotarial { get; set; }
-        public string idusuario { get; set; }
-        public string idnotario { get; set; }
-        public string firma { get; set; }
-        public string urlGenerado { get; set; }
-    }
-
-    public class ContenidoAperturamientoDisciplinario
-    {
-        public string codigo { get; set; }
-        public string idnotario { get; set; }
-        public string idfiscal { get; set; }
-        public string nombredenunciante { get; set; }
-        public string titulo { get; set; }
-        public string descripcion { get; set; }
-        public DateTime fechainicioaudiencia { get; set; } = DateTime.Now;
-        public DateTime fechafinaudiencia { get; set; } = DateTime.Now;
-        public List<string> participantes { get; set; } = new List<string>();
-        public string lugaraudiencia { get; set; }
-        public List<string> hechosimputados { get; set; } = new List<string>();
-        //public string estado { get; set; }
-        public string url { get; set; }
-        public string firma { get; set; }
-        public string urlGenerado { get; set; }
-    }
-    public class AperturamientoDisciplinario : Document
-    {
-        public ContenidoAperturamientoDisciplinario contenido { get; set; }
-    }
-
-    public class ContenidoSolicitudExpedienteNotario
-    {
-        public string codigo { get; set; }
-        public string titulo { get; set; }
-        public string descripcion { get; set; }
-        public string idnotario { get; set; }
-        public DateTime fechaemision { get; set; }
-        public string firma { get; set; }
-        public string urlGenerado { get; set; }
-    }
-    public class SolicitudExpedienteNotario : Document
-    {
-        public ContenidoSolicitudExpedienteNotario contenido { get; set; }
-    }
-
-    public class ContenidoDictamen
-    {
-        public string codigo { get; set; }
-        public string nombredenunciante { get; set; }
-        public string descripcion { get; set; }
-        public string titulo { get; set; }
-        public List<string> observaciones { get; set; }
-        public string conclusion { get; set; }
-        public List<string> recomendaciones { get; set; }
-        public string firma { get; set; }
-        public string urlGenerado { get; set; }
-    }
-
-    public class Dictamen : Document
-    {
-        public ContenidoDictamen contenido { get; set; }
-    }
-
-    public class ContenidoResolucion
-    {
-        public string codigo { get; set; }
-        public string titulo { get; set; }
-        public string descripcion { get; set; }
-        public DateTime fechainicioaudiencia { get; set; }
-        public DateTime fechafinaudiencia { get; set; }
-        public List<string> participantes { get; set; }
-        public string sancion { get; set; }
-        public string url { get; set; }
-        public string firma { get; set; }
-        public string urlGenerado { get; set; }
-    }
-    public class Resolucion : Document
+    
+    [BsonDiscriminator("OficioDesignacionNotario")]
+    public class SolicitorDesignationDocument : Document
     {
         [BsonElement("evaluacion")]
-        public Evaluacion evaluacion { get; set; }
-        public ContenidoResolucion contenido { get; set; }
+        public Evaluation Evaluation { get; set; } = new();
+        [BsonElement("contenido")]
+        public SolicitorDesignationDocumentContent Content { get; set; } = new();
     }
-    public class ContenidoApelacion
+    public class SolicitorDesignationDocumentContent
     {
-        public string codigo { get; set; }
-        public string titulo { get; set; }
-        public string descripcion { get; set; }
-        public DateTime fechaapelacion { get; set; }
-        public string url { get; set; }
-        public string firma { get; set; }
-        public string urlGenerado { get; set; }
-
+        [BsonElement("codigo")]
+        public string Code { get; set; } = default!;
+        [BsonElement("titulo")]
+        public string Title { get; set; } = default!;
+        [BsonElement("descripcion")]
+        public string Description { get; set; } = default!;
+        [BsonElement("fecharealizacion")]
+        public DateTime RealizationDate { get; set; } = default!;
+        [BsonElement("lugaroficionotarial")]
+        public string SolicitorAddress { get; set; } = default!;
+        [BsonElement("idusuario")]
+        public string UserId { get; set; } = default!;
+        [BsonElement("idnotario")]
+        public string SolicitorId { get; set; } = default!;
+        [BsonElement("firma")]
+        public string Sign { get; set; } = default!;
+        [BsonElement("urlGenerado")]
+        public string GeneratedUrl { get; set; } = default!;
     }
-    public class Apelacion : Document
+
+    public class DisciplinaryOpennessContent
+    {
+        [BsonElement("codigo")]
+        public string Code { get; set; } = default!;
+        [BsonElement("idnotario")]
+        public string SolicitorId { get; set; } = default!;
+        [BsonElement("idfiscal")]
+        public string FiscalId { get; set; } = default!;
+        [BsonElement("nombredenunciante")] 
+        public string ComplainantName { get; set; } = default!;
+        [BsonElement("titulo")]
+        public string Title { get; set; } = default!;
+        [BsonElement("descripcion")]
+        public string Description { get; set; } = default!;
+        [BsonElement("fechainicioaudiencia")]
+        public DateTime AudienceStartDate { get; set; } = DateTime.UtcNow.AddHours(-5);
+        [BsonElement("fechafinaudiencia")]
+        public DateTime AudienceEndDate { get; set; } = DateTime.UtcNow.AddDays(-5);
+        [BsonElement("participantes")]
+        public List<string> Participants { get; set; } = new();
+        [BsonElement("lugaraudiencia")]
+        public string AudiencePlace { get; set; } = default!;
+        [BsonElement("hechosimputados")]
+        public List<string> ImputedFacts { get; set; } = new();
+        [BsonElement("url")]
+        public string Url { get; set; } = default!;
+        [BsonElement("firma")]
+        public string Sign { get; set; } = default!;
+        [BsonElement("urlGenerado")]
+        public string GeneratedUrl { get; set; } = default!;
+    }
+
+    [BsonDiscriminator("AperturamientoDisciplinario")]
+    public class DisciplinaryOpenness : Document
+    {
+        [BsonElement("contenido")]
+        public DisciplinaryOpennessContent Content { get; set; } = default!;
+    }
+
+    public class SolicitorDossierRequestContent
+    {
+        [BsonElement("codigo")]
+        public string Code { get; set; } = default!;
+        [BsonElement("titulo")]
+        public string Title { get; set; } = default!;
+        [BsonElement("descripcion")]
+        public string Description { get; set; } = default!;
+        [BsonElement("idnotario")]
+        public string SolicitorId { get; set; } = default!;
+        [BsonElement("fechaemision")]
+        public DateTime IssueDate { get; set; }
+        [BsonElement("firma")]
+        public string Sign { get; set; } = default!;
+        [BsonElement("urlGenerado")]
+        public string GeneratedUrl { get; set; } = default!;
+    }
+
+    [BsonDiscriminator("SolicitudExpedienteNotario")]
+    public class SolicitorDossierRequest : Document
+    {
+        [BsonElement("contenido")]
+        public SolicitorDossierRequestContent Content { get; set; } = new();
+    }
+
+    public class DictumContent
+    {
+        [BsonElement("codigo")]
+        public string Code { get; set; } = default!;
+        [BsonElement("nombredenunciante")]
+        public string ComplainantName { get; set; }=  default!;
+        [BsonElement("descripcion")]
+        public string Description { get; set; } =  default!;
+        [BsonElement("titulo")]
+        public string Title { get; set; } = default!;
+        [BsonElement("observaciones")]
+        public List<string> Observations { get; set; } = new();
+        [BsonElement("conclusion")]
+        public string Conclusion { get; set; } = default!;
+        [BsonElement("recomendaciones")]
+        public List<string> Recommendations { get; set; } = new();
+        [BsonElement("firma")]
+        public string Sign { get; set; } = default!;
+        [BsonElement("urlGenerado")]
+        public string GeneratedUrl { get; set; } = default!;
+    }
+
+    [BsonDiscriminator("Dictamen")]
+    public class Dictum : Document
+    {
+        [BsonElement("contenido")]
+        public DictumContent Content { get; set; } = new();
+    }
+
+    public class ResolutionContent
+    {
+        [BsonElement("codigo")]
+        public string Code { get; set; } = default!;
+        [BsonElement("titulo")]
+        public string Title { get; set; } = default!;
+        [BsonElement("descripcion")]
+        public string Description { get; set; } = default!;
+        [BsonElement("fechainicioaudiencia")]
+        public DateTime AudienceStartDate { get; set; }
+        [BsonElement("fechafinaudiencia")]
+        public DateTime AudienceEndDate { get; set; }
+        [BsonElement("participantes")]
+        public List<string> Participants { get; set; } = new();
+        [BsonElement("sancion")]
+        public string Sanction { get; set; } = default!;
+        [BsonElement("url")]
+        public string Url { get; set; } = default!;
+        [BsonElement("firma")]
+        public string Sign { get; set; } = default!;
+        [BsonElement("urlGenerado")]
+        public string GeneratedUrl { get; set; } = default!;
+    }
+
+    [BsonDiscriminator("Resolucion")]
+    public class Resolution : Document
     {
         [BsonElement("evaluacion")]
-        public Evaluacion evaluacion { get; set; }
-        public ContenidoApelacion contenido { get; set; }
+        public Evaluation Evaluation { get; set; } = default!;
+        [BsonElement("contenido")]
+        public ResolutionContent Content { get; set; } = default!;
+    }
+    public class AppealContent
+    {
+        [BsonElement("codigo")]
+        public string Code { get; set; } = default!;
+        [BsonElement("titulo")]
+        public string Title { get; set; } = default!;
+        [BsonElement("descripcion")]
+        public string Description { get; set; } = default!;
+        [BsonElement("fechaapelacion")]
+        public DateTime AppealDate { get; set; }
+        [BsonElement("url")]
+        public string Url { get; set; } = default!;
+        [BsonElement("firma")]
+        public string Sign { get; set; } = default!;
+        [BsonElement("urlGenerado")]
+        public string GeneratedUrl { get; set; } = default!;
+
     }
 
-    public class ContenidoSolicitudInicial
+    [BsonDiscriminator("Apelacion")]
+    public class Appeal : Document
     {
-        public string descripcion { get; set; }
-        public string titulo { get; set; }
+        [BsonElement("evaluacion")]
+        public Evaluation Evaluation { get; set; } = new();
+        [BsonElement("contenido")]
+        public AppealContent Content { get; set; } = new();
+    }
+
+    public class InitialRequestContent
+    {
+        [BsonElement("descripcion")]
+        public string Description { get; set; } = default!;
+        [BsonElement("titulo")]
+        public string Title { get; set; } = default!;
 
     }
 
-    public class SolicitudInicial : Document
+    [BsonDiscriminator("SolicitudInicial")]
+    public class InitialRequest : Document
     {
-        public ContenidoSolicitudInicial contenido { get; set; }
+        [BsonElement("contenido")]
+        public InitialRequestContent Content { get; set; } = new();
     }
 
-    public class ContenidoEntregaExpedienteNotario
+    public class SolicitorDossierShipmentContent
     {
-        public string codigo { get; set; }
-        public string descripcion { get; set; }
-        public string titulo { get; set; }
-        public string idnotario { get; set; }
-        public string firma { get; set; }
-        public string urlGenerado { get; set; }
+        [BsonElement("codigo")]
+        public string Code { get; set; } = default!;
+        [BsonElement("descripcion")]
+        public string Description { get; set; } = default!;
+        [BsonElement("titulo")]
+        public string Title { get; set; } = default!;
+        [BsonElement("idnotario")]
+        public string SolicitorId { get; set; } = default!;
+        [BsonElement("firma")]
+        public string Sign { get; set; } = default!;
+        [BsonElement("urlGenerado")]        
+        public string GeneratedUrl { get; set; } = default!;
     }
 
-    public class EntregaExpedienteNotario : Document
+    [BsonDiscriminator("EntregaExpedienteNotario")]
+    public class SolicitorDossierShipment : Document
     {
-        public ContenidoEntregaExpedienteNotario contenido { get; set; }
+        [BsonElement("contenido")]
+        public SolicitorDossierShipmentContent Content { get; set; } = new();
     }
 }

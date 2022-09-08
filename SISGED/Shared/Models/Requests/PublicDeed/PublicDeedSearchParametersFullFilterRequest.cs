@@ -19,6 +19,6 @@ namespace SISGED.Shared.Models.Requests.PublicDeed
         public string NotarialOfficeDirection { get; set; } = default!;
         public string NotaryName { get; set; } = default!;
         public string LegalAct { get; set; } = default!;
-        public List<string> GrantersName { get; set; } = default!
+        public List<string> GrantersName { get; set; } = default!;
     }
 }

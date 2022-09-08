@@ -2,6 +2,7 @@
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Requests.Step;
 using SISGED.Shared.Models.Requests.User;
+using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.Role;
 using SISGED.Shared.Models.Responses.Solicitor;
 using SISGED.Shared.Models.Responses.Step;
@@ -42,6 +43,9 @@ namespace SISGED.Server.Helpers.Infrastructure
                 .ForMember(stepRequest => stepRequest.Documents, options => new List<StepRegisterRequest>());
 
             CreateMap<StepRegisterRequest, Step>();
+
+            // Dossier Mapper
+            CreateMap<Dossier, DossierInfoResponse>();
 
         }
 

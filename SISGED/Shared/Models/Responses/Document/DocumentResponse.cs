@@ -17,6 +17,6 @@ namespace SISGED.Shared.Models.Responses.Document
         public Object State { get; set; } = default!;
         public Object Evaluation { get; set; } = default!;
         public DateTime CreationDate { get; set; } = default!;
-        public List<string> UrlAnnex { get; set; } = = default!;
+        public List<string> UrlAnnex { get; set; } =  default!;
     }
 }

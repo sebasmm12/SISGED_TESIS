@@ -22,7 +22,7 @@ namespace SISGED.Server.Controllers
         {
             try
             {
-                var folders = await _folderService.Get();
+                var folders = await _folderService.GetAsync();
  
                 return Ok(folders);
             }

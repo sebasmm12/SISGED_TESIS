@@ -16,15 +16,15 @@ namespace SISGED.Shared.DTOs
     {
         public ContenidoEntregaExpedienteNotarioDTO contenidoDTO { get; set; } = new ContenidoEntregaExpedienteNotarioDTO();
     }
-    public class EntregaExpedienteNotario_lookup
-    {
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string id { get; set; }
-        public string tipo { get; set; }
-        public List<ContenidoVersion> historialcontenido { get; set; } = new List<ContenidoVersion>();
-        public List<Proceso> historialproceso { get; set; } = new List<Proceso>();
-        public string estado { get; set; }
-        public ContenidoSolicitudExpedienteNotario contenido { get; set; } = new ContenidoSolicitudExpedienteNotario();
-        public List<Notario> notario { get; set; } = new List<Notario>();
-    }
+    //public class EntregaExpedienteNotario_lookup
+    //{
+    //    [BsonRepresentation(BsonType.ObjectId)]
+    //    public string id { get; set; }
+    //    public string tipo { get; set; }
+    //    public List<ContenidoVersion> historialcontenido { get; set; } = new List<ContenidoVersion>();
+    //    public List<Proceso> historialproceso { get; set; } = new List<Proceso>();
+    //    public string estado { get; set; }
+    //    public ContenidoSolicitudExpedienteNotario contenido { get; set; } = new ContenidoSolicitudExpedienteNotario();
+    //    public List<Notario> notario { get; set; } = new List<Notario>();
+    //}
 }

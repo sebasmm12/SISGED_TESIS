@@ -13,7 +13,7 @@ namespace SISGED.Server.Services.Repositories
             _foldersCollection = mongoDatabase.GetCollection<Folder>(CollectionName);
         }
 
-        public async Task<IEnumerable<Folder>> IFolderService.GetAsync()
+        public async Task<IEnumerable<Folder>> GetAsync()
         {
             return await _foldersCollection.Find(carpeta => true).ToListAsync();
         }
