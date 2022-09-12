@@ -2,6 +2,7 @@
 using MongoDB.Driver;
 using SISGED.Server.Helpers.Infrastructure;
 using SISGED.Server.Services.Contracts;
+using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Responses.Tray;
 
@@ -31,7 +32,7 @@ namespace SISGED.Server.Services.Repositories
 
         public async Task<InputOutputTrayResponse> GetAsync(string user)
         {
-            var tray = await _traysCollection.Aggregate<InputOutputTrayResponse>(GetTrayPipeline(user)).FirstAsync();
+            var tray = await _traysCollection.Aggregate(GetTrayPipeline(user)).FirstAsync();
 
             if (tray is null) throw new Exception("No se ha podido encontrar la bandeja.");
 
@@ -41,7 +42,7 @@ namespace SISGED.Server.Services.Repositories
 
         public async Task<InputTrayResponse> GetInputStrayAsync(string user)
         {
-            var tray = await _traysCollection.Aggregate<InputTrayResponse>(GetInputTrayPipeline(user)).FirstAsync();
+            var tray = await _traysCollection.Aggregate(GetInputTrayPipeline(user)).FirstAsync();
 
             if (tray is null) throw new Exception("No se ha podido encontrar la bandeja.");
 
@@ -53,6 +54,20 @@ namespace SISGED.Server.Services.Repositories
             return await _traysCollection.FindAsync(t => t.User == user).Result.FirstAsync();
         }
 
+        public async Task UpdateTrayForDerivationAsync(UpdateTrayDTO updateTrayDTO)
+        {
+            var documentTray = new DocumentTray(updateTrayDTO.DossierId, updateTrayDTO.DocumentId);
+
+            var receiverInputTrayUpdate = PushDocumentTrayAsync(new(documentTray, updateTrayDTO.RecieverUserId, "bandejaentrada"));
+
+            var senderOutputTrayUpdate = PullDocumentTrayAsync(new(documentTray, updateTrayDTO.SenderUserId, "bandejasalida"));
+
+            var senderInputTrayUpdate = PullDocumentTrayAsync(new(documentTray, updateTrayDTO.SenderUserId, "bandejaentrada"));
+
+            await Task.WhenAll(receiverInputTrayUpdate, senderOutputTrayUpdate, senderInputTrayUpdate);
+
+        }
+        
         #region private methods
         private PipelineDefinition<Tray, InputTrayResponse> GetInputTrayPipeline(string user)
         {
@@ -284,6 +299,25 @@ namespace SISGED.Server.Services.Repositories
 
             return MongoDBAggregationExtension.Lookup(new("expedientes", letPipeline, lookUpPipeline, "bandejadocumento"));
         }
+
+        private async Task PushDocumentTrayAsync(UpdateDocumentTrayDTO updateDocumentTrayDTO)
+        {
+            var updateDocumentTray = Builders<Tray>.Update.Push(updateDocumentTrayDTO.TrayType , updateDocumentTrayDTO);
+
+            var updateTray = await _traysCollection.UpdateOneAsync(tray => tray.User == updateDocumentTrayDTO.UserId, updateDocumentTray);
+
+            if (updateTray is null) throw new Exception($"No se pudo actualizar la bandeja del usuario con identificador {updateDocumentTrayDTO.UserId}");
+        }
+
+        private async Task PullDocumentTrayAsync(UpdateDocumentTrayDTO updateDocumentTrayDTO)
+        {
+            var updateDocumentTray = Builders<Tray>.Update.Pull(updateDocumentTrayDTO.TrayType, updateDocumentTrayDTO);
+
+            var updateTray = await _traysCollection.UpdateOneAsync(tray => tray.User == updateDocumentTrayDTO.UserId, updateDocumentTray);
+
+            if (updateTray is null) throw new Exception($"No se pudo actualizar la bandeja del usuario con identificador {updateDocumentTrayDTO.UserId}");
+        }
+        
         #endregion
     }
 }

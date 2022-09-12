@@ -18,8 +18,8 @@ namespace SISGED.Shared.Models
         /*posibles lugares 'tools' o 'workspace'*/
         public string currentPlace { get; set; } = "tools";
         public string originPlace { get; set; }
-        public Cliente cliente { get; set; }
+        public Client cliente { get; set; }
         public string itemstatus { get; set; } = "ninguno";
-        public EscrituraPublicaRDTO escriturapublica { get; set; }
+       // public EscrituraPublicaRDTO escriturapublica { get; set; }
     }
 }

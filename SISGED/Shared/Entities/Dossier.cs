@@ -12,7 +12,7 @@ namespace SISGED.Shared.Entities
         [BsonElement("tipo")]
         public string Type { get; set; } = default!;
         [BsonElement("cliente")]
-        public Cliente Client { get; set; } = default!;
+        public Client Client { get; set; } = default!;
         [BsonElement("fechainicio")]
         public DateTime StartDate { get; set; }
         [BsonElement("fechafin")]

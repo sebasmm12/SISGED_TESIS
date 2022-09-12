@@ -77,14 +77,14 @@ namespace SISGED.Server.Helpers.Infrastructure
             return new BsonDocument("$concat", new BsonArray().AddRange(valuesToConcat));
         }
 
-        public static BsonDocument Regex(string regexPatter, string? options)
+        public static BsonDocument Regex(string regexPatter, string? options = null)
         {
             var regexAggregation = new BsonDocument
             {
-                { "regex", regexPatter }
+                { "$regex", regexPatter }
             };
 
-            if (!string.IsNullOrEmpty(options)) regexAggregation.Add("options", options);
+            if (!string.IsNullOrEmpty(options)) regexAggregation.Add("$options", options);
 
             return regexAggregation;
         }
@@ -138,19 +138,19 @@ namespace SISGED.Server.Helpers.Infrastructure
             return new BsonDocument().Add("case", condition).Add("then", result);
         }
 
-        public static BsonDocument First(BsonValue value)
-        {
-            return new BsonDocument("$first", value);
-        }
-        
-        public static BsonDocument Push(BsonValue value)
-        {
-            return new BsonDocument("$push", value);
-        }
-
         public static BsonDocument ArrayElementAt(IEnumerable<BsonValue> values)
         {
             return new BsonDocument("$arrayElemAt", new BsonArray().AddRange(values));
+        }
+
+        public static BsonDocument Skip(int totalRecordsToSkip)
+        {
+            return new BsonDocument("$skip", totalRecordsToSkip);
+        }
+
+        public static BsonDocument Limit(int totalRecordsToTake)
+        {
+            return new BsonDocument("$limit", totalRecordsToTake);
         }
     }
 }

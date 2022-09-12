@@ -20,7 +20,7 @@ namespace SISGED.Shared.Entities
         [BsonElement("idnotario")]
         public string NotaryId { get; set; } = default!;
         [BsonElement("actosjuridicos")]
-        public List<ActoJuridico> LegalActs { get; set; } = default!;
+        public List<LegalAct> LegalActs { get; set; } = default!;
         [BsonElement("fechaescriturapublica")]
         public DateTime PublicDeedDate { get; set; }
         [BsonElement("url")]

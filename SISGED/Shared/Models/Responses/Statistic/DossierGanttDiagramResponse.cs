@@ -17,7 +17,7 @@ namespace SISGED.Shared.Models.Responses.Statistic
         [BsonElement("documentType")]
         public string DocumentType { get; set; } = default!;
         [BsonElement("client")]
-        public Cliente Client { get; set; } = default!;
+        public Client Client { get; set; } = default!;
         [BsonElement("creationDate")]
         public DateTime CreationDate { get; set; }
         [BsonElement("delayDate")]

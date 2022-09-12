@@ -13,8 +13,24 @@ namespace SISGED.Shared.Entities
         [BsonElement("fechaemision")]
         public DateTime IssuanceDate { get; set; }
         [BsonElement("idemisor")]
-        public string IssueId { get; set; } = default!;
+        public string SenderId { get; set; } = default!;
         [BsonElement("idreceptor")]
         public string ReceiverId { get; set; } = default!;
+
+        public Process()
+        {
+            
+        }
+
+        public Process(string area, string senderId, string receiverId, DateTime? receiptDate = null,
+                       DateTime? issuanceDate = null)
+        {
+            Area = area;
+            SenderId = senderId;
+            ReceiverId = receiverId;
+            ReceiptDate = receiptDate ?? DateTime.UtcNow.AddHours(-5);
+            IssuanceDate = issuanceDate ?? DateTime.UtcNow.AddHours(-5);
+
+        }
     }
 }

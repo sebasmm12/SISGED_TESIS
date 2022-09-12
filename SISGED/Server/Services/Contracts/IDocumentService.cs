@@ -1,4 +1,5 @@
-﻿using SISGED.Shared.Models.Queries.Statistic;
+﻿using SISGED.Shared.Entities;
+using SISGED.Shared.Models.Queries.Statistic;
 using SISGED.Shared.Models.Responses.Statistic;
 
 namespace SISGED.Server.Services.Contracts
@@ -9,5 +10,6 @@ namespace SISGED.Server.Services.Contracts
         Task<IEnumerable<DocumentsByMonthAndAreaResponse>> GetDocumentsByMonthAsync(DocumentsByMonthQuery documentsByMonthQuery);
         Task<IEnumerable<DocumentByStateResponse>> GetDocumentsByStateAsync(DocumentsByStateQuery documentsByStateQuery);
         Task<IEnumerable<ExpiredDocumentsResponse>> GetExpiredDocumentsByMonthAsync(DocumentsByMonthQuery documentsByMonthQuery);
+        Task UpdateDocumentProcessAsync(Process proccess, string documentId);
     }
 }

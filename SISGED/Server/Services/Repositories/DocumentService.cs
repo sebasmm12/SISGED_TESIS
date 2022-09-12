@@ -53,6 +53,15 @@ namespace SISGED.Server.Services.Repositories
             return documentsByState;
         }
 
+        public async Task UpdateDocumentProcessAsync(Process proccess, string documentId)
+        {
+            var updateDocumentProccess = Builders<Document>.Update.Push(document => document.ProcessesHistory, proccess);
+
+            var updatedDocument = await _documentsCollection.UpdateOneAsync(document => document.Id == documentId, updateDocumentProccess);
+
+            if (updatedDocument is null) throw new Exception($"No se pudo actualizar el historial del proceso del documento con identificador { documentId }");
+        }
+
         #region private methods
         private static BsonDocument[] GetDocumentsPipeline(BsonDocument matchAggregation, BsonDocument[] monthPipelines)
         {

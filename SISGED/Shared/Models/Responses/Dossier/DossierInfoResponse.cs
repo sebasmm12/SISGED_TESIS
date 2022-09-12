@@ -8,7 +8,7 @@ namespace SISGED.Shared.Models.Responses.Dossier
     {
         public string Id { get; set; } = default!;
         public string Type { get; set; } = default!;
-        public Cliente Client { get; set; } = default!;
+        public Client Client { get; set; } = default!;
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public List<DossierDocument> Documents { get; set; } = default!;

@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using SISGED.Server.Services.Contracts;
+using SISGED.Shared.Entities;
+using SISGED.Shared.Models.Queries.Dossier;
 using SISGED.Shared.Models.Requests.Dossier;
 using SISGED.Shared.Models.Responses.Dossier;
 
@@ -36,6 +38,24 @@ namespace SISGED.Server.Controllers
             }
         }
 
+        [HttpGet("{dossierId}")]
+        public async Task<ActionResult<DossierInfoResponse>> GetDossierAsync([FromRoute] string dossierId)
+        {
+            try
+            {
+                var dossier = await _dossierService.GetDossierAsync(dossierId);
+
+                var dossierResponse = _mapper.Map<DossierInfoResponse>(dossier);
+
+                return Ok(dossier);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
         [HttpPost("derivations/{userId}")]
         public async Task<ActionResult<IEnumerable<DossierLastDocumentResponse>>> RegisterDerivationAsync([FromBody] DossierLastDocumentRequest dossierLastDocumentRequest, [FromRoute] string userId)
         {
@@ -49,6 +69,24 @@ namespace SISGED.Server.Controllers
             {
 
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message); 
+            }
+        }
+
+        [HttpGet("filtered")]
+        public async Task<ActionResult<IEnumerable<DossierInfoResponse>>> GetFilteredDossiersAsync([FromQuery] DossierHistoryQuery dossierHistoryQuery)
+        {
+            try
+            {
+                var filteredDossiers = await _dossierService.GetDossierByFiltersAsync(dossierHistoryQuery);
+
+                var dossiersResponse = _mapper.Map<IEnumerable<DossierInfoResponse>>(filteredDossiers);
+
+                return Ok(dossiersResponse);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
     }

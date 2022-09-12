@@ -8,5 +8,16 @@ namespace SISGED.Shared.Entities
         public string DossierId { get; set; } = default!;
         [BsonElement("iddocumento")]
         public string DocumentId { get; set; } = default!;
+
+        public DocumentTray()
+        {
+            
+        }
+
+        public DocumentTray(string dossierId, string documentId)
+        {
+            DossierId = dossierId;
+            DocumentId = documentId;
+        }
     }
 }
