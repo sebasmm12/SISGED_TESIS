@@ -124,7 +124,7 @@ namespace SISGED.Shared.Entities
         public BPNDocumentContent Content { get; set; } = new();
 
     }
-    public class ContenidoSolicitudBPN
+    public class BPNRequestContent
     {
         [BsonElement("codigo")]
         public string Code { get; set; } = default!;
@@ -153,7 +153,7 @@ namespace SISGED.Shared.Entities
     public class BPNRequest : Document
     {
         [BsonElement("contenido")]
-        public ContenidoSolicitudBPN Content { get; set; } = new();
+        public BPNRequestContent Content { get; set; } = new();
 
     }
     public class BPNResultContent

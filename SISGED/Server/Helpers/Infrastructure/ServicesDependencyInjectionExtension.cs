@@ -14,14 +14,13 @@ namespace SISGED.Server.Helpers.Infrastructure
             services.AddScoped<ITrayService, TrayService>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<ISolicitorService, SolicitorService>();
-            services.AddScoped<IDocumentService, DocumentService>();
             services.AddScoped<IDossierService, DossierService>();
+            services.AddScoped<IDocumentService, DocumentService>();
             services.AddScoped<IStatisticService, StatisticService>();
             services.AddScoped<IFolderService, FolderService>();
             services.AddScoped<IAssistantService, AssistantService>();
             services.AddScoped<IPublicDeedsService, PublicDeedsService>();
             services.AddScoped<IStepService, StepService>();
-            services.AddScoped<IDossierService, DossierService>();
 
             return services;
         }
