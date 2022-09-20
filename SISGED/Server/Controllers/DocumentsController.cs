@@ -3,10 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using SISGED.Server.Services.Contracts;
 using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.Document.Appeal;
+using SISGED.Shared.Models.Responses.Document.BPNDocument;
 using SISGED.Shared.Models.Responses.Document.BPNRequest;
 using SISGED.Shared.Models.Responses.Document.Dictum;
 using SISGED.Shared.Models.Responses.Document.InitialRequest;
 using SISGED.Shared.Models.Responses.Document.Resolution;
+using SISGED.Shared.Models.Responses.Document.SolicitorDesignationDocument;
+using SISGED.Shared.Models.Responses.Document.SolicitorDossierRequest;
+using SISGED.Shared.Models.Responses.Document.SolicitorDossierShipment;
 using SISGED.Shared.Models.Responses.Document.UserRequest;
 
 namespace SISGED.Server.Controllers
@@ -146,7 +150,7 @@ namespace SISGED.Server.Controllers
             }
         }
 
-        [HttpGet("initialRequest/{documentId}")]
+        [HttpGet("initialRequests/{documentId}")]
         public async Task<ActionResult<InitialRequestInfoResponse>> GetInitialRequestDocumentAsync([FromRoute] string documentId)
         {
             try
@@ -163,9 +167,88 @@ namespace SISGED.Server.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
-            
-        
-        #endregion        
+
+        [HttpGet("bpnDocuments/{documentId}")]
+        public async Task<ActionResult<BPNDocumentInfoResponse>> GetBPNDocumentAsync([FromRoute] string documentId)
+        {
+            try
+            {
+                var bpnDocumentResponse = await _documentService.GetBPNDocumentAsync(documentId);
+
+                return Ok(bpnDocumentResponse);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet("solicitorDesignations/{documentId}")]
+        public async Task<ActionResult<SolicitorDesignationInfoResponse>> GetSolicitorDesignationAsync([FromRoute] string documentId)
+        {
+            try
+            {
+                var bpnDocumentResponse = await _documentService.GetSolicitorDesignationAsync(documentId);
+
+                return Ok(bpnDocumentResponse);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet("bpnResults/{documentId}")]
+        public async Task<ActionResult<SolicitorDesignationInfoResponse>> GetBPNResultAsync([FromRoute] string documentId)
+        {
+            try
+            {
+                var bpnDocumentResponse = await _documentService.GetBPNResultAsync(documentId);
+
+                return Ok(bpnDocumentResponse);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet("solicitorDossierRequests/{documentId}")]
+        public async Task<ActionResult<SolicitorDossierRequestInfoResponse>> GetSolicitorDossierRequestAsync([FromRoute] string documentId)
+        {
+            try
+            {
+                var solicitorDossierRequestResponse = await _documentService.GetSolicitorDossierRequestAsync(documentId);
+
+                return Ok(solicitorDossierRequestResponse);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet("solicitorDossierShipments/{documentId}")]
+        public async Task<ActionResult<SolicitorDossierShipmentInfoResponse>> GetSolicitorDossierShipmentAsync([FromRoute] string documentId)
+        {
+            try
+            {
+                var solicitorDossierShipmentResponse = await _documentService.GetSolicitorDossierShipmentAsync(documentId);
+
+                return Ok(solicitorDossierShipmentResponse);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        #endregion
 
         #region PUT Services
         #endregion
