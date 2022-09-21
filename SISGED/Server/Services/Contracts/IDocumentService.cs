@@ -59,6 +59,8 @@ namespace SISGED.Server.Services.Contracts
         Task UpdateSENDocumentAsync(SolicitorDesignationDocumentRegister dossierWrapper);
         Task<BPNResult> UpdateBPNResultDocumentAsync(SolicitorDesignationDocumentRegister dossierWrapper, List<string> url2);
         Task UpdateInitialRequestDocumentAsync(SolicitorDesignationDocumentRegister dossierWrapper);
+        Task UpdateEENDocumentAsync(SolicitorDesignationDocumentRegister dossierWrapper);
+        Task UpdateInitialRequestStateAsync(SolicitorDesignationDocumentRegister dossierWrapper);
 
     }
 }

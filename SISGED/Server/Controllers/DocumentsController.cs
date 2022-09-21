@@ -560,12 +560,15 @@ namespace SISGED.Server.Controllers
                 if (!string.IsNullOrWhiteSpace(document.Sign))
                 {
                     var solicitudBytes2 = Convert.FromBase64String(document.Sign);
-                    document.Sign = await _fileService.saveDoc(solicitudBytes2, "png", "resultadobpn");
+                    FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "resultadobpn");
+                    document.Sign = await _fileService.SaveFileAsync(file) ?? string.Empty;
+
                 }
                 if (!string.IsNullOrWhiteSpace(document.GeneratedURL))
                 {
                     var solicitudBytes2 = Convert.FromBase64String(document.GeneratedURL);
-                    document.GeneratedURL = await _fileService.saveDoc(solicitudBytes2, "pdf", "resultadobpn");
+                    FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "resultadobpn");
+                    document.GeneratedURL = await _fileService.SaveFileAsync(file) ?? string.Empty;
                 }
 
                 var generated = await _documentService.GenerateDocumentAsync(document);
@@ -606,7 +609,8 @@ namespace SISGED.Server.Controllers
                     if (!string.IsNullOrWhiteSpace(u))
                     {
                         var solicitudBytes2 = Convert.FromBase64String(u);
-                        urlData2 = await _fileService.saveDoc(solicitudBytes2, "pdf", "oficiodesignacionnotario");
+                        FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "oficiodesignacionnotario");
+                        urlData2 = await _fileService.SaveFileAsync(file) ?? string.Empty;
                         url2.Add(urlData2);
                     }
                 }
@@ -635,14 +639,16 @@ namespace SISGED.Server.Controllers
                     if (!string.IsNullOrWhiteSpace(u))
                     {
                         var solicitudBytes2 = Convert.FromBase64String(u);
-                        urlData2 = await _fileService.saveDoc(solicitudBytes2, "pdf", "apelaciones");
+                        FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "apelaciones");
+                        urlData2 = await _fileService.SaveFileAsync(file) ?? string.Empty;
                         url2.Add(urlData2);
                     }
                 }
                 if (!string.IsNullOrWhiteSpace(DTO.Content.Data))
                 {
                     var solicitudBytes = Convert.FromBase64String(DTO.Content.Data);
-                    urlData = await _fileService.saveDoc(solicitudBytes, "pdf", "apelaciones");
+                    FileRegisterDTO file = new FileRegisterDTO(solicitudBytes, "pdf", "apelaciones");
+                    urlData = await _fileService.SaveFileAsync(file) ?? string.Empty;
                 }
                 var appeal = await _documentService.AppealDocumentUpdateAsync(dossierWrapper, urlData, url2);
                 return Ok(appeal);
@@ -668,7 +674,8 @@ namespace SISGED.Server.Controllers
                     if (!string.IsNullOrWhiteSpace(u))
                     {
                         var solicitudBytes2 = Convert.FromBase64String(u);
-                        urlData2 = await _fileService.saveDoc(solicitudBytes2, "pdf", "aperturamientodiciplinario");
+                        FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "aperturamientodiciplinario");
+                        urlData2 = await _fileService.SaveFileAsync(file) ?? string.Empty;
                         url2.Add(urlData2);
                     }
                 }
@@ -696,7 +703,8 @@ namespace SISGED.Server.Controllers
                     if (!string.IsNullOrWhiteSpace(u))
                     {
                         var solicitudBytes2 = Convert.FromBase64String(u);
-                        urlData2 = await _fileService.saveDoc(solicitudBytes2, "pdf", "dictamen");
+                        FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "dictamen");
+                        urlData2 = await _fileService.SaveFileAsync(file) ?? string.Empty;
                         url2.Add(urlData2);
                     }
                 }
@@ -724,7 +732,8 @@ namespace SISGED.Server.Controllers
                     if (!string.IsNullOrWhiteSpace(u))
                     {
                         var solicitudBytes2 = Convert.FromBase64String(u);
-                        urlData2 = await _fileService.saveDoc(solicitudBytes2, "pdf", "dictamen");
+                        FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "dictamen");
+                        urlData2 = await _fileService.SaveFileAsync(file) ?? string.Empty;
                         url2.Add(urlData2);
                     }
                 }
@@ -752,7 +761,8 @@ namespace SISGED.Server.Controllers
                     if (!string.IsNullOrWhiteSpace(u))
                     {
                         var solicitudBytes2 = Convert.FromBase64String(u);
-                        urlData2 = await _fileService.saveDoc(solicitudBytes2, "pdf", "oficiobpn");
+                        FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "oficiobpn");
+                        urlData2 = await _fileService.SaveFileAsync(file) ?? string.Empty;
                         url2.Add(urlData2);
                     }
                 }
@@ -781,14 +791,16 @@ namespace SISGED.Server.Controllers
                     if (!string.IsNullOrWhiteSpace(u))
                     {
                         var solicitudBytes2 = Convert.FromBase64String(u);
-                        urlData2 = await _fileService.saveDoc(solicitudBytes2, "pdf", "resolucion");
+                        FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "resolucion");
+                        urlData2 = await _fileService.SaveFileAsync(file) ?? string.Empty;
                         url2.Add(urlData2);
                     }
                 }
                 if (!string.IsNullOrWhiteSpace(DTO.Content.Data))
                 {
                     var solicitudBytes = Convert.FromBase64String(DTO.Content.Data);
-                    urlData = await _fileService.saveDoc(solicitudBytes, "pdf", "resolucion");
+                    FileRegisterDTO file = new FileRegisterDTO(solicitudBytes, "pdf", "resolucion");
+                    urlData = await _fileService.SaveFileAsync(file) ?? string.Empty;
                 }
 
                 var update = await _documentService.UpdateResolutionDocumentAsync(dossierWrapper, urlData, url2);
@@ -829,7 +841,8 @@ namespace SISGED.Server.Controllers
                     if (!string.IsNullOrWhiteSpace(u))
                     {
                         var solicitudBytes2 = Convert.FromBase64String(u);
-                        urlData2 = await _fileService.saveDoc(solicitudBytes2, "pdf", "resultadobpn");
+                        FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "resultadobpn");
+                        urlData2 = await _fileService.SaveFileAsync(file) ?? string.Empty;
                         url2.Add(urlData2);
                     }
                 }
@@ -848,6 +861,7 @@ namespace SISGED.Server.Controllers
             try
             {
                 await _documentService.UpdateInitialRequestDocumentAsync(dossierWrapper);
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -860,6 +874,7 @@ namespace SISGED.Server.Controllers
             try
             {
                 await _documentService.UpdateEENDocumentAsync(dossierWrapper);
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -873,6 +888,7 @@ namespace SISGED.Server.Controllers
             try
             {
                 await _documentService.UpdateInitialRequestStateAsync(dossierWrapper);
+                return Ok();
             }
             catch (Exception ex)
             {

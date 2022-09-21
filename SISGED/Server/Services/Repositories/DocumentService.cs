@@ -28,10 +28,9 @@ namespace SISGED.Server.Services.Repositories
         private readonly IDossierService _dossierService;
         public string CollectionName => "documentos";
         public string DossierCollectionName => "expedientes";
-        public string TrayCollectionName => "expedientes";
+        public string TrayCollectionName => "bandejas";
 
         private readonly IMongoCollection<Dossier> _dossiersCollection;
-        private string DossierCollectionName => "expedientes";
 
         public DocumentService(IMongoDatabase mongoDatabase)
         {
@@ -1288,7 +1287,7 @@ namespace SISGED.Server.Services.Repositories
 
             await _documentsCollection.UpdateOneAsync(filter, update);
         }
-        public async Task InitialRequestStateModify(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task UpdateInitialRequestStateAsync(SolicitorDesignationDocumentRegister dossierWrapper)
         {
             //Deserealizacion de Obcject a tipo DTO
             InitialRequestResponse DTO = new InitialRequestResponse();
