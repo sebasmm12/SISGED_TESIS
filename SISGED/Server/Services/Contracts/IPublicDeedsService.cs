@@ -8,7 +8,7 @@ namespace SISGED.Server.Services.Contracts
     public interface IPublicDeedsService
     {
         public Task<IEnumerable<PublicDeed>> Filter(string term);
-        public Task<UpdateResult> updatePublicDeedBySignatureConclusion(PublicDeed ep);
+        public Task<UpdateResult> updatePublicDeedBySignatureConclusionAsync(PublicDeed ep);
         public Task<IEnumerable<PublicDeedFilterResponse>> SpecialFilter(PublicDeedSearchParametersFullFilterRequest searchparameters);
         public Task<PublicDeed> GetById(string id);
     }

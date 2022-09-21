@@ -112,6 +112,23 @@ namespace SISGED.Server.Services.Repositories
             return filteredDossiers;
         }
 
+        public async Task<DossierResponse> GetDossierByIdAsync(string documentId)
+        {
+            Dossier dossier = await _dossiersCollection.Find(exp => exp.Id == documentId).FirstOrDefaultAsync();
+            DossierResponse dTO = new DossierResponse
+            {
+                Client = dossier.Client,
+                Derivations = dossier.Derivations,
+                Documents = dossier.Documents,
+                State = dossier.State,
+                EndDate = dossier.EndDate,
+                StartDate = dossier.StartDate,
+                Id = dossier.Id,
+                Type = dossier.Type
+            };
+            return dTO;
+        }
+
         #region private methods
         private BsonDocument[] GetFilteredDossiersPipeline(DossierHistoryQuery dossierHistoryQuery)
         {

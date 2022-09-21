@@ -16,5 +16,6 @@ namespace SISGED.Server.Services.Contracts
         Task<IEnumerable<Dossier>> GetDossiersAsync();
         Task<DossierLastDocumentResponse> RegisterDerivationAsync(DossierLastDocumentRequest dossierLastDocumentRequest, string userId);
         Task<Dossier> UpdateDossierForInitialRequestAsync(Dossier dossier);
+        Task<DossierResponse> GetDossierByIdAsync(string id);
     }
 }

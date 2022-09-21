@@ -43,7 +43,7 @@ namespace SISGED.Server.Services.Repositories
             return filtered;
         }
 
-        public async Task<UpdateResult> updatePublicDeedBySignatureConclusion(PublicDeed pd)
+        public async Task<UpdateResult> updatePublicDeedBySignatureConclusionAsync(PublicDeed pd)
         {
             var filter = Builders<PublicDeed>.Filter.Eq(deed => deed.Id, pd.Id);
 
