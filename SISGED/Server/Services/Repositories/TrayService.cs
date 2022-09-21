@@ -67,7 +67,18 @@ namespace SISGED.Server.Services.Repositories
             await Task.WhenAll(receiverInputTrayUpdate, senderOutputTrayUpdate, senderInputTrayUpdate);
 
         }
-        
+
+        public async Task UserInputTrayInsertAsync(string dossierId, string DocumentId, string Username)
+        {
+            DocumentTray bandejaDocumento = new DocumentTray();
+            bandejaDocumento.DocumentId = dossierId;
+            bandejaDocumento.DocumentId = DocumentId;
+            UpdateDefinition<Tray> updateBandeja = Builders<Tray>.Update.Push("bandejaentrada", bandejaDocumento);
+            User usuario = await _usersCollection.Find(user => user.UserName == Username).FirstAsync();
+            await _traysCollection.UpdateOneAsync(band => band.User == usuario.Id, updateBandeja);
+        }
+
+
         #region private methods
         private PipelineDefinition<Tray, InputTrayResponse> GetInputTrayPipeline(string user)
         {

@@ -11,7 +11,7 @@ namespace SISGED.Shared.Models.Responses.Dossier
         public Client Client { get; set; } = default!;
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public List<DossierDocument> Documents { get; set; } = default!;
+        public List<Entities.DossierDocument> Documents { get; set; } = default!;
         public List<Derivation> Derivations { get; set; } = default!;
         public string State { get; set; } = default!;
     }
