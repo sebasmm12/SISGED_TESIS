@@ -255,7 +255,7 @@ namespace SISGED.Server.Services.Repositories
             dossierDocument.DelayDate = DateTime.UtcNow.AddHours(-5).AddDays(5);
             dossierDocument.DelayDate = null;
             UpdateDefinition<Dossier> updateExpediente = Builders<Dossier>.Update.Push("documentos", dossierDocument);
-            Dossier dossier = await _dossierCollection.FindOneAndUpdateAsync(x => x.Id == dossierwrapper.Id, updateExpediente);
+            Dossier dossier = await _dossierService.FindOneAndUpdateAsync(dossierwrapper.Id, updateExpediente);
             // TODO: IMPLEMENT A NEW SERVICE IN THE DOSSIER SERVICE
 
             //actualizacion bandeja salida del usuario
@@ -335,7 +335,8 @@ namespace SISGED.Server.Services.Repositories
             dossierDocument.DelayDate = null;
 
             UpdateDefinition<Dossier> updateExpediente = Builders<Dossier>.Update.Push("documentos", dossierDocument);
-            Dossier expediente = await _dossierCollection.FindOneAndUpdateAsync(x => x.Id == dossierWrapper.Id, updateExpediente);
+            Dossier expediente = await _dossierService.FindOneAndUpdateAsync(dossierWrapper.Id, updateExpediente);
+
             // TODO: IMPLEMENT A NEW SERVICE IN THE DOSSIER SERVICE
 
             //Actulizar el documento anterior a revisado
@@ -578,7 +579,7 @@ namespace SISGED.Server.Services.Repositories
             documentoExpediente.DelayDate = null;
 
             UpdateDefinition<Dossier> updateExpediente = Builders<Dossier>.Update.Push("documentos", documentoExpediente);
-            Dossier expediente = await _dossierCollection.FindOneAndUpdateAsync(x => x.Id == dossierWrapper.Id, updateExpediente);
+            Dossier expediente = await _dossierService.FindOneAndUpdateAsync(dossierWrapper.Id, updateExpediente);
             // TODO: IMPLEMENT A NEW SERVICE IN THE DOSSIER SERVICE
 
             //Actulizar el documento anterior a revisado
@@ -651,7 +652,7 @@ namespace SISGED.Server.Services.Repositories
         public async Task<Dossier> UpdateDossierAsync(DossierDocument dossierDocument, string dossierId)
         {
             UpdateDefinition<Dossier> update = Builders<Dossier>.Update.Push("documentos", dossierDocument);
-            Dossier dossier = await _dossierCollection.FindOneAndUpdateAsync(x => x.Id == dossierId, update);
+            Dossier dossier = await _dossierService.FindOneAndUpdateAsync(dossierId, update);
             // TODO: IMPLEMENT A NEW SERVICE IN THE DOSSIER SERVICE
             return dossier;
         }

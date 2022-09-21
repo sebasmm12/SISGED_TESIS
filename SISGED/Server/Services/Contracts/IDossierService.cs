@@ -1,4 +1,5 @@
 ﻿using MongoDB.Bson;
+using MongoDB.Driver;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Queries.Dossier;
 using SISGED.Shared.Models.Queries.Statistic;
@@ -22,5 +23,6 @@ namespace SISGED.Server.Services.Contracts
         Task<DossierResponse> GetDossierByIdAsync(string id);
         Task<IEnumerable<UserRequestDocumentResponse>> GetUserRequestDocumentsAsync(string documentNumber);
         Task<IEnumerable<UserRequestWithPublicDeedResponse>> GetUserRequestsWithPublicDeedAsync(string documentNumber);
+        Task<Dossier> FindOneAndUpdateAsync(string Id, UpdateDefinition<Dossier> update);
     }
 }

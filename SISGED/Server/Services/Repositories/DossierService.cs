@@ -154,7 +154,10 @@ namespace SISGED.Server.Services.Repositories
             return userRequestDocuments;
         }
 
-
+        public async Task<Dossier> FindOneAndUpdateAsync(string Id, UpdateDefinition<Dossier> update)
+        {
+            return await _dossiersCollection.FindOneAndUpdateAsync(x => x.Id == Id, update);
+        }
         #region private methods
         private static BsonDocument[] GetUserRequestsWithPublicDeedPipeline(string documentNumber)
         {
