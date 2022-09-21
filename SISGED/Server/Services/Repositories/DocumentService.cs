@@ -7,6 +7,8 @@ using SISGED.Shared.Models.Queries.Statistic;
 using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.Document.BPNDocument;
 using SISGED.Shared.Models.Responses.Document.BPNResult;
+using SISGED.Shared.Models.Responses.Document.DisciplinaryOpenness;
+using SISGED.Shared.Models.Responses.Document.SignConclusion;
 using SISGED.Shared.Models.Responses.Document.SolicitorDesignationDocument;
 using SISGED.Shared.Models.Responses.Document.SolicitorDossierRequest;
 using SISGED.Shared.Models.Responses.Document.SolicitorDossierShipment;
@@ -150,6 +152,24 @@ namespace SISGED.Server.Services.Repositories
             return solicitorDossierShipmentDocument;
         }
 
+        public async Task<SignConclusionInfoResponse> GetSignConclusionAsync(string documentId)
+        {
+            var signConclusionDocument = await _documentsCollection.Aggregate<SignConclusionInfoResponse>(GetSignConclusionPipeline(documentId)).FirstAsync();
+
+            if (signConclusionDocument is null) throw new Exception($"No se pudo obtener la conclusión de firma con identificador {documentId}");
+
+            return signConclusionDocument;
+        }
+
+        public async Task<DisciplinaryOpennessInfoResponse> GetDisciplinaryOpennessAsync(string documentId)
+        {
+            var disciplinaryOpennessDocument = await _documentsCollection.Aggregate<DisciplinaryOpennessInfoResponse>(GetDisciplinaryOpennessPipeline(documentId)).FirstAsync();
+
+            if (disciplinaryOpennessDocument is null) throw new Exception($"No se pudo obtener el aperturamiento disciplinario con identificador { documentId }");
+
+            return disciplinaryOpennessDocument;
+        }
+
         public async Task<IEnumerable<DocumentsByMonthAndAreaResponse>> GetDocumentsByMonthAndAreaAsync(DocumentsByMonthAndAreaQuery documentsByMonthAndAreaQuery)
         {
             var documentsByMonthAndArea = await _documentsCollection.Aggregate<DocumentsByMonthAndAreaResponse>(GetDocumentsByMonthAndAreaPipeline(documentsByMonthAndAreaQuery)).ToListAsync();
@@ -196,6 +216,77 @@ namespace SISGED.Server.Services.Repositories
         }
 
         #region private methods
+        private static BsonDocument[] GetDisciplinaryOpennessPipeline(string documentId)
+        {
+            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("_id", new ObjectId(documentId)));
+
+            var lookupAggregation = GetSolicitorsLookUpPipeline();
+
+            var unwinAggregation = MongoDBAggregationExtension.UnWind(new("$solicitors"));
+
+            var projectAggregation = MongoDBAggregationExtension.Project(new()
+            {
+                { "type", "$tipo" },
+                { "state", "$estado" },
+                { "contentsHistory", "$historialcontenido" },
+                { "processesHistory", "$historialproceso" },
+                { "attachedUrls", "$urlanexo" },
+                { "content", new BsonDocument()
+                {
+                    { "solicitor", "$solicitors" },
+                    { "fiscalId", "$contenido.idfiscal" },
+                    { "complainantName", "$contenido.nombredenunciante" },
+                    { "title", "$contenido.titulo" },
+                    { "description", "$contenido.descripcion" },
+                    { "audienceStartDate", "$contenido.fechainicioaudiencia" },
+                    { "audienceEndDate", "$contenido.fechafindaudiencia" },
+                    { "participants", "$contenido.participantes" },
+                    { "audiencePlace", "$contenido.lugaraudiencia" },
+                    { "imputedFacts", "$contenido.hechosimputados" },
+                    { "url", "$contenido.url" }
+                } }
+            });
+
+            return new BsonDocument[] { matchAggregation, lookupAggregation, unwinAggregation, projectAggregation };
+        }
+
+        private static BsonDocument[] GetSignConclusionPipeline(string documentId)
+        {
+            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("_id", new ObjectId(documentId)));
+
+            var publicDeedLookUpPipeline = GetPublicDeedLookUpPipeline();
+
+            var publicDeedUnwindPipeline = MongoDBAggregationExtension.UnWind(new("$publicDeeds"));
+
+            var solicitorLookUpPipeline = GetSolicitorsLookUpPipeline();
+
+            var solicitorUnwindPipeline = MongoDBAggregationExtension.UnWind(new("$solicitors"));
+
+            var clientLookUpPipeline = GetClientLookUpPipeline();
+
+            var clientUnwindPipeline = MongoDBAggregationExtension.UnWind(new("$clients"));
+
+            var projectPipeline = MongoDBAggregationExtension.Project(new()
+            {
+                { "type", "$tipo" },
+                { "state", "$estado" },
+                { "contentsHistory", "$historialcontenido" },
+                { "processesHistory", "$historialproceso" },
+                { "attachedUrls", "$urlanexo" },
+                { "content", new BsonDocument()
+                {
+                    { "client", "$clients" },
+                    { "solicitor", "$solicitors" },
+                    { "publicDeed", "$publicDeeds" },
+                    { "price", "$contenido.precio" },
+                    { "totalSheets", "$contenido.cantidadfoja" }
+                } }
+            });
+
+            return new BsonDocument[] { matchAggregation, publicDeedLookUpPipeline, publicDeedUnwindPipeline, 
+                solicitorLookUpPipeline, solicitorUnwindPipeline, clientLookUpPipeline, clientUnwindPipeline, projectPipeline };
+        }
+
         private static BsonDocument[] GetSolicitorDossierShipmentPipeline(string documentId)
         {
             var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("_id", new ObjectId(documentId)));
@@ -329,7 +420,7 @@ namespace SISGED.Server.Services.Repositories
 
             var solicitorUnWindPipeline = MongoDBAggregationExtension.UnWind(new("$solicitors"));
 
-            var clientLookUpPipeline = GetBPNDocumentClientLookUpPipeline();
+            var clientLookUpPipeline = GetClientLookUpPipeline();
 
             var clientUnWindPipeline = MongoDBAggregationExtension.UnWind(new("$clients"));
 
@@ -375,7 +466,7 @@ namespace SISGED.Server.Services.Repositories
             return MongoDBAggregationExtension.Lookup(new("notarios", letPipeline, lookUpPipeline, "solicitors"));
         }
 
-        private static BsonDocument GetBPNDocumentClientLookUpPipeline()
+        private static BsonDocument GetClientLookUpPipeline()
         {
             var letPipeline = new Dictionary<string, BsonValue>()
             {

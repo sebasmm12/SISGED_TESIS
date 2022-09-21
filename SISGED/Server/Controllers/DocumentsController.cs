@@ -6,8 +6,10 @@ using SISGED.Shared.Models.Responses.Document.Appeal;
 using SISGED.Shared.Models.Responses.Document.BPNDocument;
 using SISGED.Shared.Models.Responses.Document.BPNRequest;
 using SISGED.Shared.Models.Responses.Document.Dictum;
+using SISGED.Shared.Models.Responses.Document.DisciplinaryOpenness;
 using SISGED.Shared.Models.Responses.Document.InitialRequest;
 using SISGED.Shared.Models.Responses.Document.Resolution;
+using SISGED.Shared.Models.Responses.Document.SignConclusion;
 using SISGED.Shared.Models.Responses.Document.SolicitorDesignationDocument;
 using SISGED.Shared.Models.Responses.Document.SolicitorDossierRequest;
 using SISGED.Shared.Models.Responses.Document.SolicitorDossierShipment;
@@ -240,6 +242,38 @@ namespace SISGED.Server.Controllers
                 var solicitorDossierShipmentResponse = await _documentService.GetSolicitorDossierShipmentAsync(documentId);
 
                 return Ok(solicitorDossierShipmentResponse);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet("signConclusion/{documentId}")]
+        public async Task<ActionResult<SignConclusionInfoResponse>> GetSignConclusionAsync([FromRoute] string documentId)
+        {
+            try
+            {
+                var signConclusionResponse = await _documentService.GetSignConclusionAsync(documentId);
+
+                return Ok(signConclusionResponse);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet("disciplinaryOpenness/{documentId}")]
+        public async Task<ActionResult<DisciplinaryOpennessInfoResponse>> GetDisciplinaryOpennessAsync([FromRoute] string documentId)
+        {
+            try
+            {
+                var disciplinaryOpennessResponse = await _documentService.GetDisciplinaryOpennessAsync(documentId);
+
+                return Ok(disciplinaryOpennessResponse);
             }
             catch (Exception ex)
             {
