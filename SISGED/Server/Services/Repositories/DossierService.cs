@@ -112,6 +112,11 @@ namespace SISGED.Server.Services.Repositories
             return filteredDossiers;
         }
 
+        public async Task<IEnumerable<T>> ExecuteDossierAggregateAsync<T>(BsonDocument[] pipelines)
+        {
+            return await _dossiersCollection.Aggregate<T>(pipelines).ToListAsync();
+        }
+
         public async Task<DossierResponse> GetDossierByIdAsync(string documentId)
         {
             Dossier dossier = await _dossiersCollection.Find(exp => exp.Id == documentId).FirstOrDefaultAsync();

@@ -12,7 +12,7 @@ namespace SISGED.Shared.Entities
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
+        public string Id { get; set; } = default!;
         [BsonElement("direccionoficio")]
         public string JudicialOfficeDirection { get; set; } = default!;
         [BsonElement("titulo")]

@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using SISGED.Shared.DTOs;
+using System.Runtime.CompilerServices;
 
 namespace SISGED.Server.Helpers.Infrastructure
 {
@@ -151,6 +152,20 @@ namespace SISGED.Server.Helpers.Infrastructure
         public static BsonDocument Limit(int totalRecordsToTake)
         {
             return new BsonDocument("$limit", totalRecordsToTake);
+        }
+        
+        public static BsonDocument Size(BsonValue value)
+        {
+            return new BsonDocument("$size", value);
+        }
+
+        public static BsonDocument Filter(string input, BsonValue cond, string? asName = null)
+        {
+            var filterPipeline = new BsonDocument().Add("input", input).Add("cond", cond);
+
+            if (!string.IsNullOrEmpty(asName)) filterPipeline.Add("as", asName);
+
+            return new BsonDocument("$filter", filterPipeline);
         }
     }
 }

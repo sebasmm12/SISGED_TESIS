@@ -1,4 +1,5 @@
-﻿using SISGED.Shared.Entities;
+﻿using MongoDB.Bson;
+using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Queries.Dossier;
 using SISGED.Shared.Models.Queries.Statistic;
 using SISGED.Shared.Models.Requests.Dossier;
@@ -10,6 +11,7 @@ namespace SISGED.Server.Services.Contracts
     public interface IDossierService : IGenericService
     {
         Task CreateDossierAsync(Dossier dossier);
+        Task<IEnumerable<T>> ExecuteDossierAggregateAsync<T>(BsonDocument[] pipelines);
         Task<Dossier> GetDossierAsync(string dossierId);
         Task<IEnumerable<Dossier>> GetDossierByFiltersAsync(DossierHistoryQuery dossierHistoryQuery);
         Task<IEnumerable<DossierGanttDiagramResponse>> GetDossierGanttDiagramAsync(DossierGanttDiagramQuery dossierGanttDiagramQuery);

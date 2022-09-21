@@ -2,6 +2,12 @@
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Requests.Step;
 using SISGED.Shared.Models.Requests.User;
+using SISGED.Shared.Models.Responses.Document;
+using SISGED.Shared.Models.Responses.Document.Appeal;
+using SISGED.Shared.Models.Responses.Document.BPNRequest;
+using SISGED.Shared.Models.Responses.Document.Dictum;
+using SISGED.Shared.Models.Responses.Document.InitialRequest;
+using SISGED.Shared.Models.Responses.Document.Resolution;
 using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.Role;
 using SISGED.Shared.Models.Responses.Solicitor;
@@ -47,6 +53,29 @@ namespace SISGED.Server.Helpers.Infrastructure
             // Dossier Mapper
             CreateMap<Dossier, DossierInfoResponse>();
 
+            // Documents Mapper and its related classes
+            CreateMap<Document, DocumentInfoResponse>();
+
+            // BPN Request Mapper
+            CreateMap<BPNRequestContent, BPNRequestContentInfo>();
+            CreateMap<BPNRequest, BPNRequestInfoResponse>();
+
+            // Dictum Mapper
+            CreateMap<DictumContent, DictumContentInfo>();
+            CreateMap<Dictum, DictumInfoResponse>();
+
+            // Resolution Mapper
+            CreateMap<ResolutionContent, ResolutionContentInfo>();
+            CreateMap<Resolution, ResolutionInfoResponse>();
+
+            // Appeal Mapper
+            CreateMap<AppealContent, AppealContentInfo>();
+            CreateMap<Appeal, AppealInfoResponse>();
+
+            // Initial Request Mapper
+            CreateMap<InitialRequestContent, InitialRequestContentInfo>();
+            CreateMap<InitialRequest, InitialRequestInfoResponse>();
+
         }
 
         private string MapStepDocumentRequestUID(StepDocument stepDocument, StepGenericModel.StepDocument stepDocumentRequest)
@@ -60,7 +89,7 @@ namespace SISGED.Server.Helpers.Infrastructure
         }
 
 
-        private string GenerateUID()
+        private static string GenerateUID()
         {
             return Guid.NewGuid().ToString("N");
         }
