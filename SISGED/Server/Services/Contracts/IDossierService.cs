@@ -3,6 +3,7 @@ using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Queries.Dossier;
 using SISGED.Shared.Models.Queries.Statistic;
 using SISGED.Shared.Models.Requests.Dossier;
+using SISGED.Shared.Models.Responses.Document.UserRequest;
 using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.Statistic;
 
@@ -19,5 +20,7 @@ namespace SISGED.Server.Services.Contracts
         Task<DossierLastDocumentResponse> RegisterDerivationAsync(DossierLastDocumentRequest dossierLastDocumentRequest, string userId);
         Task<Dossier> UpdateDossierForInitialRequestAsync(Dossier dossier);
         Task<DossierResponse> GetDossierByIdAsync(string id);
+        Task<IEnumerable<UserRequestDocumentResponse>> GetUserRequestDocumentsAsync(string documentNumber);
+        Task<IEnumerable<UserRequestWithPublicDeedResponse>> GetUserRequestsWithPublicDeedAsync(string documentNumber);
     }
 }
