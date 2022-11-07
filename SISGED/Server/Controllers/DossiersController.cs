@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using SISGED.Server.Services.Contracts;
-using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Queries.Dossier;
 using SISGED.Shared.Models.Requests.Dossier;
 using SISGED.Shared.Models.Responses.Dossier;
@@ -11,7 +10,7 @@ namespace SISGED.Server.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [ApiConventionType(typeof(DefaultApiConventions))]
-    public class DossiersController: ControllerBase
+    public class DossiersController : ControllerBase
     {
         private readonly IDossierService _dossierService;
         private readonly IMapper _mapper;
@@ -68,7 +67,7 @@ namespace SISGED.Server.Controllers
             catch (Exception ex)
             {
 
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message); 
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
 

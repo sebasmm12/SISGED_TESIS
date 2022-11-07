@@ -1,0 +1,55 @@
+﻿@page "/cuentas"
+
+
+<PageTitle>Cuentas</PageTitle>
+
+<GenericListHeader HeaderIcon="fa-users" HeaderTitle="Cuentas" HeaderDescription="Visualice todas las cuentas registradas en el sistema"
+CreationButtonDescription="Agregar Cuenta"></GenericListHeader>
+
+<MudCard Elevation="5" Class="mt-2">
+    <MudTable ServerData="@(new Func<TableState, Task<TableData<UserInfoResponse>>>(ReloadTableAsync))" Hover="true" Loading="usersLoading"
+        Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Primary" @ref="usersList" RowsPerPage="5">
+        <HeaderContent>
+            <MudTh class="header-table">Nombres y Apellidos</MudTh>
+            <MudTh class="header-table">Número de Documento</MudTh>
+            <MudTh class="header-table">Correo Electrónico</MudTh>
+            <MudTh class="header-table">Estado</MudTh>
+            <MudTh class="header-table">Acciones</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Nombres y Apellidos">@context.Data.Name @context.Data.LastName</MudTd>
+            <MudTd DataLabel="Número de Documento">@context.Data.DocumentNumber</MudTd>
+            <MudTd DataLabel="Correo Electrónico">@context.Data.Email</MudTd>
+            <MudTd DataLabel="Estado">
+                <MudChip Variant="Variant.Text" Color="@GetUserStateColor(context.State)">
+                    @context.State.First().ToString().ToUpper()@context.State.Substring(1)</MudChip>
+             </MudTd>
+            <MudTd DataLabel="Acciones">
+                <MudPaper Elevation="0" Class="transparent-color">
+                    <MudTooltip Text="Modificar" Arrow="true" Placement="Placement.Top">
+                        <MudIconButton Icon="fas fa-user-pen" Color="Color.Warning"
+                                       Class="rounded-circle"></MudIconButton>
+                    </MudTooltip>
+                    <MudTooltip Text="@GetLockedUserText(context.State)" Arrow="true" Placement="Placement.Top">
+                        <MudIconButton Icon="fas fa-user-slash" Color="@GetLockedUserColor(context.State)"
+                                       Class="rounded-circle" OnClick="@(() => ChangeUserStateAsync(context))"></MudIconButton>
+                    </MudTooltip>
+                    <MudTooltip Text="Detalle" Arrow="true" Placement="Placement.Top">
+                        <MudIconButton Icon="fas fa-user" Color="Color.Info"
+                                       Class="rounded-circle"></MudIconButton>
+                    </MudTooltip>
+                </MudPaper>     
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <MudPaper Elevation="0" Class="transparent-color">
+                <MudText Typo="Typo.h6" Class="text-center">No se encontraron usuarios registrados en el sistema</MudText>
+            </MudPaper>
+        </NoRecordsContent>
+        <PagerContent>
+            @if(TotalUsers > 0) {
+                <MudPagination SelectedChanged="ChangePage" MiddleCount="5" Count="TotalUsers" Class="pa-3" />
+            }
+        </PagerContent>
+    </MudTable>
+</MudCard>

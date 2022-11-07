@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
@@ -84,7 +83,7 @@ try
             }
         });
     });
-    
+
 
 
     var app = builder.Build();

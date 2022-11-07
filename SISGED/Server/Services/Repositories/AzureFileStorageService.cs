@@ -24,7 +24,7 @@ namespace SISGED.Server.Services.Repositories
             var blob = client.GetBlobClient(fileName);
 
             await blob.DeleteIfExistsAsync();
-            
+
         }
 
         public async Task<string> SaveFileAsync(FileRegisterDTO fileRegisterDTO)

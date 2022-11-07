@@ -9,7 +9,7 @@ namespace SISGED.Server.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [ApiConventionType(typeof(DefaultApiConventions))]
-    public class StepsController: ControllerBase
+    public class StepsController : ControllerBase
     {
         private readonly IStepService _stepService;
         public StepsController(IStepService stepService)
@@ -30,11 +30,11 @@ namespace SISGED.Server.Controllers
 
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
-            
+
         }
-        
+
         [HttpGet("{stepId}")]
-        public async Task<ActionResult<Step>> GetStepByIdAsync([FromRoute]string stepId)
+        public async Task<ActionResult<Step>> GetStepByIdAsync([FromRoute] string stepId)
         {
             try
             {
@@ -47,7 +47,7 @@ namespace SISGED.Server.Controllers
 
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
-           
+
         }
         [HttpGet("dossiers")]
         public async Task<ActionResult<List<DossierStepsResponse>>> GetStepRequestAsync()
@@ -64,7 +64,7 @@ namespace SISGED.Server.Controllers
 
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
-            
+
         }
         [HttpPost]
         public async Task<ActionResult> RegisterStepAsync(StepRegisterRequest stepsRequest)
@@ -80,7 +80,7 @@ namespace SISGED.Server.Controllers
 
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
-            
+
         }
         [HttpPut]
         public async Task<ActionResult> UpdateStepAsync(StepUpdateRequest stepUpdateRequest)
@@ -96,7 +96,7 @@ namespace SISGED.Server.Controllers
 
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
-            
+
         }
     }
 }

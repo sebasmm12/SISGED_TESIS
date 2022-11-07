@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SISGED.Shared.Entities;
+﻿using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Queries.Statistic;
 using SISGED.Shared.Models.Requests.Documents;
-using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.Document.BPNDocument;
 using SISGED.Shared.Models.Responses.Document.BPNResult;

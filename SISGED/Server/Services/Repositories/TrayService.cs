@@ -32,9 +32,12 @@ namespace SISGED.Server.Services.Repositories
 
         public async Task<InputOutputTrayResponse> GetAsync(string user)
         {
-            var tray = await _traysCollection.Aggregate(GetTrayPipeline(user)).FirstAsync();
+            var tray = await _traysCollection.Aggregate<InputOutputTrayResponse>(GetTrayPipeline(user)).FirstAsync();
 
             if (tray is null) throw new Exception("No se ha podido encontrar la bandeja.");
+
+            tray.InputDossier = tray.InputDossier.Where(inputDossier => !string.IsNullOrEmpty(inputDossier.DossierId)).ToList();
+            tray.OutputDossier = tray.OutputDossier.Where(ouputDossier => !string.IsNullOrEmpty(ouputDossier.DossierId)).ToList();
 
             return tray;
 
@@ -86,10 +89,11 @@ namespace SISGED.Server.Services.Repositories
 
             var conditionalFilter = MongoDBAggregationExtension.Eq(new BsonArray() { "$$item.iddocumento", MongoDBAggregationExtension.ObjectId("$bandejaentrada.iddocumento") });
 
-            var filter = MongoDBAggregationExtension.Filter("$bandejadocumento.documentos", conditionalFilter);
+            var filter = MongoDBAggregationExtension.Filter("$bandejadocumento.documentos", conditionalFilter, "item");
 
-            var varDeclaration = new BsonDocument("$let", new BsonDocument("vars", new BsonDocument("documento", filter))
-                                                            .AddRange(MongoDBAggregationExtension.In("$arrayElemAt", new BsonArray { "$$documento", 0 })));
+            var varDeclaration = MongoDBAggregationExtension.Let(new BsonDocument("documento", filter),
+                    MongoDBAggregationExtension.In("$arrayElemAt", new BsonArray { "$$documento", 0 }));
+
 
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
@@ -108,12 +112,12 @@ namespace SISGED.Server.Services.Repositories
             return new BsonDocument[] { userFilterMatchAggregation, unWindAggregation1, dossierInputLookupPipeline, unWindAggregation2, projectAggregation };
 
         }
-        private PipelineDefinition<Tray, InputOutputTrayResponse> GetTrayPipeline(string user)
+        private /*PipelineDefinition<Tray, InputOutputTrayResponse>*/ BsonDocument[] GetTrayPipeline(string user)
         {
             var dossierLookupPipeline = DossierLookUpPipeline();
             var documentLookupPipeline = DocumentLookUpPipeline();
 
-            /* Group para agrupar los documentos en un array */
+            ///* Group para agrupar los documentos en un array */
 
             var groupAggregation = MongoDBAggregationExtension.Group(new()
             {
@@ -126,14 +130,15 @@ namespace SISGED.Server.Services.Repositories
                 { "idbandeja", MongoDBAggregationExtension.First("$_id") }
             });
 
-            /* Proyección para devolver los datos que se necesitan */
+            ///* Proyección para devolver los datos que se necesitan */
 
             var conditionalFilter = MongoDBAggregationExtension.Eq(new BsonArray() { "$$item._id", MongoDBAggregationExtension.ObjectId("$bandejasalida.iddocumento") });
 
-            var filtro = MongoDBAggregationExtension.Filter("$documentosobj", conditionalFilter);
+            var filtro = MongoDBAggregationExtension.Filter("$documentosobj", conditionalFilter, "item");
 
-            var declararVariable = new BsonDocument("$let", new BsonDocument("vars", new BsonDocument("documento", filtro))
-                                                            .AddRange(MongoDBAggregationExtension.In("$arrayElemAt", new BsonArray { "$$documento", 0 })));
+            var declararVariable = MongoDBAggregationExtension.Let(new BsonDocument("documento", filtro),
+                new BsonDocument("$arrayElemAt", new BsonArray { "$$documento", 0 }));
+
 
             var documentProjectAggregation = MongoDBAggregationExtension.Project(new()
             {
@@ -190,10 +195,10 @@ namespace SISGED.Server.Services.Repositories
 
             var conditionalInputFilter = MongoDBAggregationExtension.Eq(new BsonArray { "$$item._id", MongoDBAggregationExtension.ObjectId("$bandejaentrada.iddocumento") });
 
-            var inputfilter = MongoDBAggregationExtension.Filter("$documentosobj", conditionalInputFilter);
+            var inputfilter = MongoDBAggregationExtension.Filter("$documentosobj", conditionalInputFilter, "item");
 
-            var inputVarDeclaration = new BsonDocument("$let", new BsonDocument("vars", new BsonDocument("documento", inputfilter))
-                                                            .AddRange(MongoDBAggregationExtension.In("$arrayElemAt", new BsonArray { "$$documento", 0 })));
+            var inputVarDeclaration = MongoDBAggregationExtension.Let(new BsonDocument("documento", inputfilter),
+                new BsonDocument("$arrayElemAt", new BsonArray { "$$documento", 0 }));
 
             var inputProjectAggregation = MongoDBAggregationExtension.Project(new()
             {
@@ -209,44 +214,45 @@ namespace SISGED.Server.Services.Repositories
 
             var inputDossierProjectBsonAux = new BsonDocument()
             {
-                { "DossierId", "$_id" },
-                { "Client", "$cliente" },
-                { "Type", "$tipo" },
-                { "DocumentObjects", "$documentosobj" },
-                { "Document", "$documento" }
+                { "idexpediente", "$_id" },
+                { "cliente", "$cliente" },
+                { "tipo", "$tipo" },
+                { "documentosobj", "$documentosobj" },
+                { "documento", "$documento" }
             };
 
             /* Proyección para crear el expedienteentrada*/
             var inputDossierProjectAggregation = MongoDBAggregationExtension.Project(new()
             {
                 { "_id", 0 },
-                { "Id", 1},
-                { "OutputDossier", 1 },
+                { "Id", "$idbandeja"},
+                { "OutputDossier", "$expedientesalida" },
                 { "InputDossier", inputDossierProjectBsonAux }
             });
 
             /* Group final para la unión de los expedientes */
             var groupFinalAggregation = MongoDBAggregationExtension.Group(new()
             {
-                { "_id", "$idbandeja" },
-                { "InputDossier", MongoDBAggregationExtension.First("$InputDossier") },
-                { "OutputDossier", MongoDBAggregationExtension.Push("$OutputDossier") },
+                { "_id", "$Id" },
+                { "InputDossier", MongoDBAggregationExtension.Push("$InputDossier") },
+                { "OutputDossier", MongoDBAggregationExtension.First("$OutputDossier") },
             });
 
-            var userfilter = Builders<Tray>.Filter.Eq("usuario", user).ToBsonDocument();
+            var userFilterMatchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("usuario", user));
 
-            var userFilterMatchAggregation = MongoDBAggregationExtension.Match(userfilter);
 
-            var unWindAggregation0 = MongoDBAggregationExtension.UnWind(new("$documentosobj"));
-            var unWindAggregation1 = MongoDBAggregationExtension.UnWind(new("$bandejasalida"));
-            var unWindAggregation2 = MongoDBAggregationExtension.UnWind(new("$bandejadocumento"));
-            var unWindAggregation3 = MongoDBAggregationExtension.UnWind(new("$bandejadocumento.Documents"));
-            var unWindAggregation4 = MongoDBAggregationExtension.UnWind(new("$documentosobj"));
-            var unWindAggregation5 = MongoDBAggregationExtension.UnWind(new("$bandejaentrada"));
-            var unWindAggregation6 = MongoDBAggregationExtension.UnWind(new("$bandejadocumento"));
-            var unWindAggregation7 = MongoDBAggregationExtension.UnWind(new("$bandejadocumento.Documents"));
+            var unWindAggregation0 = MongoDBAggregationExtension.UnWind(new("$bandejasalida", preserveNullAndEmptyArrays: true));
+            var unWindAggregation1 = MongoDBAggregationExtension.UnWind(new("$bandejadocumento", preserveNullAndEmptyArrays: true));
+            var unWindAggregation2 = MongoDBAggregationExtension.UnWind(new("$bandejadocumento.documentos", preserveNullAndEmptyArrays: true));
+            var unWindAggregation3 = MongoDBAggregationExtension.UnWind(new("$documentosobj", preserveNullAndEmptyArrays: true));
+            var unWindAggregation4 = MongoDBAggregationExtension.UnWind(new("$bandejaentrada", preserveNullAndEmptyArrays: true));
 
-            return new BsonDocument[] { userFilterMatchAggregation, unWindAggregation0, dossierLookupPipeline, unWindAggregation1, unWindAggregation2, documentLookupPipeline, unWindAggregation3, groupAggregation, documentProjectAggregation, projectOutputCreationAggregation, groupOutputTrayDossierAggregation, unWindAggregation4, dossierInputTrayLookUpAggregation, unWindAggregation5, unWindAggregation6, documentLookupPipeline, unWindAggregation7, inputGroupAggregation, inputProjectAggregation, inputDossierProjectAggregation, groupFinalAggregation };
+            return new BsonDocument[] { userFilterMatchAggregation, unWindAggregation0, dossierLookupPipeline, unWindAggregation1,
+                unWindAggregation2,  documentLookupPipeline, unWindAggregation3, groupAggregation, documentProjectAggregation,
+                projectOutputCreationAggregation,
+                groupOutputTrayDossierAggregation, unWindAggregation4, dossierInputTrayLookUpAggregation,
+                unWindAggregation1, unWindAggregation2, documentLookupPipeline, unWindAggregation3,
+                inputGroupAggregation, inputProjectAggregation, inputDossierProjectAggregation, groupFinalAggregation };
         }
         private static BsonDocument DossierInputTrayLookUpPipeline()
         {
@@ -313,7 +319,7 @@ namespace SISGED.Server.Services.Repositories
 
         private async Task PushDocumentTrayAsync(UpdateDocumentTrayDTO updateDocumentTrayDTO)
         {
-            var updateDocumentTray = Builders<Tray>.Update.Push(updateDocumentTrayDTO.TrayType , updateDocumentTrayDTO);
+            var updateDocumentTray = Builders<Tray>.Update.Push(updateDocumentTrayDTO.TrayType, updateDocumentTrayDTO);
 
             var updateTray = await _traysCollection.UpdateOneAsync(tray => tray.User == updateDocumentTrayDTO.UserId, updateDocumentTray);
 
@@ -328,7 +334,7 @@ namespace SISGED.Server.Services.Repositories
 
             if (updateTray is null) throw new Exception($"No se pudo actualizar la bandeja del usuario con identificador {updateDocumentTrayDTO.UserId}");
         }
-        
+
         #endregion
     }
 }

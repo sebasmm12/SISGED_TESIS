@@ -1,6 +1,5 @@
 ﻿using MongoDB.Bson;
 using SISGED.Shared.DTOs;
-using System.Runtime.CompilerServices;
 
 namespace SISGED.Server.Helpers.Infrastructure
 {
@@ -58,7 +57,7 @@ namespace SISGED.Server.Helpers.Infrastructure
 
             if (!string.IsNullOrEmpty(unwindAggregationDTO.IncludeArrayIndex)) unWindAggregation.Add("includeArrayIndex", unwindAggregationDTO.IncludeArrayIndex);
 
-            if (unwindAggregationDTO.PreserveNullAndEmptyArrays.HasValue) unWindAggregation.Add("preserveNullAndEmptyArrays", unwindAggregationDTO.PreserveNullAndEmptyArrays);
+            if (unwindAggregationDTO.PreserveNullAndEmptyArrays.HasValue) unWindAggregation.Add("preserveNullAndEmptyArrays", unwindAggregationDTO.PreserveNullAndEmptyArrays.Value);
 
             return new BsonDocument("$unwind", unWindAggregation);
         }
@@ -153,7 +152,7 @@ namespace SISGED.Server.Helpers.Infrastructure
         {
             return new BsonDocument("$limit", totalRecordsToTake);
         }
-        
+
         public static BsonDocument Size(BsonValue value)
         {
             return new BsonDocument("$size", value);
@@ -166,6 +165,11 @@ namespace SISGED.Server.Helpers.Infrastructure
             if (!string.IsNullOrEmpty(asName)) filterPipeline.Add("as", asName);
 
             return new BsonDocument("$filter", filterPipeline);
+        }
+
+        public static BsonDocument Let(BsonValue variables, BsonValue inExpression)
+        {
+            return new BsonDocument("$let", new BsonDocument().Add("vars", variables).Add("in", inExpression));
         }
     }
 }

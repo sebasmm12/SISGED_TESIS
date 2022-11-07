@@ -11,7 +11,7 @@ namespace SISGED.Server.Services.Repositories
         {
             _fileStorageService = fileStorageService;
         }
-        
+
         public async Task<string?> SaveFileAsync(FileStreamRegisterDTO fileStreamRegisterDTO)
         {
             if (string.IsNullOrEmpty(fileStreamRegisterDTO.Image)) return null;

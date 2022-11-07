@@ -1,9 +1,12 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Inicio</PageTitle>
 
-<h1>Hello, world!</h1>
+@if (SessionAccount.User.Type.Equals("cliente")) {
+    
+}
+else {
+    <WorkEnvironment></WorkEnvironment>
+}
 
-Welcome to your new app.
 
-<SurveyPrompt Title="How is Blazor working for you?" />

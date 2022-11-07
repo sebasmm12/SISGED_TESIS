@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SISGED.Server.Services.Contracts;
 using SISGED.Shared.Entities;
 
@@ -23,7 +22,7 @@ namespace SISGED.Server.Controllers
             try
             {
                 var folders = await _folderService.GetAsync();
- 
+
                 return Ok(folders);
             }
             catch (Exception ex)

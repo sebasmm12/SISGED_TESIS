@@ -1,6 +1,5 @@
-﻿using System.Text;
-using System;
-using SISGED.Shared.DTOs;
+﻿using SISGED.Shared.DTOs;
+using System.Text;
 
 namespace SISGED.Server.Helpers.Middlewares
 {
@@ -23,6 +22,18 @@ namespace SISGED.Server.Helpers.Middlewares
             "POST",
             "PUT",
             "PATCH"
+        };
+
+        private List<string> httpResponseUrls = new()
+        {
+            "html",
+            "js",
+            "css",
+            "json",
+            "png",
+            "jpg",
+            "jpeg",
+            "webp"
         };
 
         public HttpLoggerMiddleware(ILogger<HttpLoggerMiddleware> httpLogger, RequestDelegate requestDelegate)
@@ -75,8 +86,8 @@ namespace SISGED.Server.Helpers.Middlewares
         /// <param name="httpResponseWriterDTO">Contains all information related to the httpContext for the response</param>
         /// <returns>A task that specifies if the http response body could be written successfully</returns>
         private async Task WriteHttpResponseBodyAsync(HttpResponseWriterDTO httpResponseWriterDTO)
-            
-        { 
+
+        {
             httpResponseWriterDTO.HttpMemoryStream.Seek(0, SeekOrigin.Begin);
 
             var responseBody = new StreamReader(httpResponseWriterDTO.HttpMemoryStream).ReadToEnd();
@@ -87,9 +98,11 @@ namespace SISGED.Server.Helpers.Middlewares
 
             httpResponseWriterDTO.Context.Response.Body = httpResponseWriterDTO.OriginalStream;
 
+            if (httpResponseUrls.Contains(httpResponseWriterDTO.Context.Request.Path.Value!)
+                || httpResponseWriterDTO.Context.Request.Path.Value!.Contains("framework")) return;
+
             if (httpResponseWriterDTO.Context.Response.StatusCode.ToString().StartsWith("2")) _httpLogger.LogInformation("Http Response Body: {responseBody}", responseBody);
             else _httpLogger.LogError("Http Response Exception Message: {responseBody}", responseBody);
-
         }
 
     }

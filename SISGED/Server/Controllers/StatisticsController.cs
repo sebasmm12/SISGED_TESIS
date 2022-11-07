@@ -73,7 +73,7 @@ namespace SISGED.Server.Controllers
             try
             {
                 var dossiers = await _statisticService.GetDossierGanttDiagramAsync(dossierGanttDiagramQuery);
-              
+
                 return Ok(dossiers);
             }
             catch (Exception ex)

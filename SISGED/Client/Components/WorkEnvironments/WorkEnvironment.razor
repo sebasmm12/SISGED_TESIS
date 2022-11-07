@@ -1,0 +1,72 @@
+﻿
+@if(!isRendered) {
+
+    <MudPaper Elevation="0" Class="d-flex align-center justify-center h-100 w-100 standard-color">
+        <MudProgressCircular Color="Color.Primary" Style="width: 100px;height: 100px"
+                         Indeterminate="true"></MudProgressCircular>
+    </MudPaper>
+}
+else {
+    <div class="flex-basis mt-5 h-100">
+        <div class="work-box-title-style">
+            <span>Área de Trabajo Especializada - Usuario: @SessionAccount.User.Data.Name @SessionAccount.User.Data.LastName</span>
+        </div>
+        <MudDropContainer T="Item" Items="Items" ItemsSelector="VerifySelector" Class="h-100" ItemDropped="UpdateItem" CanDropClass="mud-border-success"
+        NoDropClass="mud-border-error">
+                <ChildContent>
+                    <div class="wfe-container">
+                        <div class="input common-box-style">
+                            <MudDropZone T="Item" Identifier="inputs" Class="h-100 border-2 border-solid mud-border-lines-default"
+                                CanDrop="@((item) => item.OriginPlace == "inputs")" >
+                                <div class="box-title-style">
+                                    <span>Bandeja de Entrada</span>
+                                </div>
+                            </MudDropZone>
+                        </div>
+                        <div class="workspace common-box-style">
+                            <MudDropZone T="Item" Identifier="workplace" Class="h-100 border-2 border-solid mud-border-lines-default"
+                                 CanDrop="@((item) => CanDropToWorkZone(item, workPlaceItems))">
+                                <ChildContent>
+                                    @if(workPlaceItems.Count == 0) {
+                                        <div class="window h-100">
+                                            <h1 class="default-title-style light-text">Arrastre una herramienta al espacio de trabajo</h1>
+                                        </div>
+                                    }
+                                </ChildContent>
+                                <ItemRenderer Context="item">
+                                    <CascadingValue Value="workPlaceItems" Name="WorkPlaceItems">
+                                        <WorkItem Item="item"></WorkItem>
+                                        @if (item.OriginPlace == "tools")
+                                        {
+                                            <ToolWindow DraggedItem="item"></ToolWindow>
+                                        }
+                                    </CascadingValue>
+                                </ItemRenderer>
+                            </MudDropZone>
+                        </div>
+                        <div class="container-ot">
+                             <div class="tools common-box-style">
+                              <MudDropZone T="Item" Identifier="outputs" Class="h-100 border-2 border-solid mud-border-lines-default" CanDrop="@((item) => item.OriginPlace == "outputs")">
+                                <div class="box-title-style">
+                                    <span>Bandeja de Salida</span>
+                                </div>
+                             </MudDropZone>
+                            </div>
+                            <div class="tools common-box-style">
+
+                            <MudDropZone T="Item" Identifier="tools" Class="h-100 border-2 border-solid mud-border-lines-default" CanDrop="@((item) => item.OriginPlace == "tools")">
+                                <div class="box-title-style">
+                                    <span>Herramientas</span>
+                                </div>
+                            </MudDropZone>
+                            </div>
+                        </div>
+                    </div>
+                </ChildContent>
+                <ItemRenderer Context="item">
+                    <WorkItem Item="item" ></WorkItem>
+                </ItemRenderer>
+            </MudDropContainer>
+    </div>
+}
+

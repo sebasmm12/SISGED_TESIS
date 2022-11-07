@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SISGED.Server.Services.Contracts;
 using SISGED.Shared.Models.Responses.Tray;
@@ -14,20 +13,29 @@ namespace SISGED.Server.Controllers
         private readonly ITrayService _trayService;
         private readonly IMapper _mapper;
 
-        public TrayController(ITrayService trayService,IMapper mapper)
+        public TrayController(ITrayService trayService, IMapper mapper)
         {
             _trayService = trayService;
             _mapper = mapper;
         }
 
-        [HttpGet("{usuario}")]
+        [HttpGet("{user}")]
         public async Task<ActionResult<InputOutputTrayResponse>> GetAsync(string user)
         {
-            var tray = await _trayService.GetAsync(user);
-            return Ok(tray);
+            try
+            {
+                var tray = await _trayService.GetAsync(user);
+                return Ok(tray);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+
         }
 
-        [HttpGet("bandejaentrada/{usuario}")]
+        [HttpGet("bandejaentrada/{user}")]
         public async Task<ActionResult<List<InputTrayResponse>>> GetInputStrayAsync(string user)
         {
             var tray = await _trayService.GetInputStrayAsync(user);

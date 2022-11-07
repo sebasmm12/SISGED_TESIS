@@ -1,0 +1,23 @@
+﻿<link href="/css/shared/user-menu.css" rel="stylesheet" />
+<MudCard class="profile-card standard-color" Elevation="0">
+    <MudCardContent Class="pa-0">
+        <MudList Clickable="true">
+            <MudListSubheader>
+                <div class="d-flex flex-row gap-3">
+                    <MudImage Src="/images/default_profile_pic.jpg" Alt="User profile" Class="rounded-circle align-self-center" Width="50" Height="50"></MudImage>
+                    <div class="d-flex flex-column">
+                        <MudText Typo="Typo.subtitle1">Sebastian Miranda Manrique</MudText>
+                        <MudText Typo="Typo.caption">smirandamanrique@gmail.com</MudText>
+                    </div>
+                </div>
+            </MudListSubheader>
+            <MudDivider />
+            <MudListItem Icon="@Icons.Material.Filled.SupervisedUserCircle" Class="shades-text" Text="Datos del Perfil" IconColor="Color.Primary"></MudListItem>
+            <MudListItem Icon="@Icons.Material.Filled.Logout" Text="Salir" Class="shades-text" IconColor="Color.Primary"></MudListItem>
+        </MudList>
+    </MudCardContent>
+</MudCard>
+
+@code {
+
+}

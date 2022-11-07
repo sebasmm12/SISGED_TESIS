@@ -41,7 +41,7 @@ namespace SISGED.Server.Helpers.Infrastructure
                 .ForMember(stepDocumentRequest => stepDocumentRequest.Uid, options => options.MapFrom(MapStepDocumentRequestUID));
 
             CreateMap<StepGenericModel.StepDocument, StepDocument>();
-            
+
             CreateMap<Step, DossierStepsResponse>()
                 .ForMember(stepRequest => stepRequest.Documents, options => new List<StepRegisterRequest>());
 

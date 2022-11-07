@@ -1,0 +1,87 @@
+﻿
+.tool-container {
+    display: flex;
+    padding: 6px 5px 6px 15px;
+    color: white;
+    text-align: left;
+    justify-content: left;
+    flex-direction: row;
+    align-items: center;
+}
+
+.tool-sub-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.tool-name {
+    font-size: 16px;
+    font-family: sans-serif;
+    display: block;
+    margin: 0px 0px 0px 7px;
+    color: #25393D;
+}
+
+.tool-description {
+    display: block;
+    margin: 0px 0px 0px 7px;
+    color: #25393D;
+}
+
+.li-tool {
+    list-style: none;
+}
+
+.li-drag-style {
+    border: 2px solid #85A68E !important;
+    margin: 6px;
+    border-radius: 15px;
+    background-color: #F3F3F3 !important;
+    transition: 300ms all;
+}
+
+.li-drag-style:hover {
+    transform: scale(1.05);
+    border: 2px solid #0066ff !important;
+}
+
+.li-drag-style:hover .tool-name, .li-drag-style:hover i.material-icons {
+    transform: scale(1);
+    color: #0066ff !important;
+}
+
+.registro {
+    color: #cca300;
+    font-weight: bold;
+    margin-left: 7px;
+}
+
+::deep .mud-info-c {
+    color: #1FA270 !important;
+    border: 1px solid #1FA270 !important;
+    border-radius: 15px !important;
+    font-size: 13px !important;
+    transition: all 300ms !important;
+}
+
+.field-container {
+    padding: 5px;
+}
+
+.color-tool {
+    background-color: #25393D !important;
+}
+
+.color-tool .tool-name {
+    color: white !important;
+}
+
+.tool-client-name {
+    display: block;
+    margin: 0px 0px 0px 7px;
+    color: #25393D;
+}
+
+::deep .tool-container .mud-icon-root {
+    color: #1FA270 !important;
+}

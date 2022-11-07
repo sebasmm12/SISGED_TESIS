@@ -1,0 +1,20 @@
+﻿<MudCard Elevation="5" Class="mt-3">
+    <MudCardContent>
+        <MudGrid Justify="Justify.Center" class="justify-sm-start">
+            <MudItem>
+                <MudIcon Icon="@($"fas { HeaderIcon }")" Size="Size.Large"></MudIcon>
+            </MudItem>
+            <MudItem>
+                <MudText Class="text-sm-center">@HeaderTitle</MudText>
+                <MudText Typo="Typo.body2" Class="text-sm-center">@HeaderDescription</MudText>
+            </MudItem>
+            <MudItem sm="12" Class="pt-0">
+                <MudPaper Elevation="0">
+                    <MudButton Variant="Variant.Filled" Link="/cuentas/registro" Color="Color.Secondary" Class="rounded-pill creation-button">@CreationButtonDescription</MudButton>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+        
+    </MudCardContent>
+</MudCard>
+

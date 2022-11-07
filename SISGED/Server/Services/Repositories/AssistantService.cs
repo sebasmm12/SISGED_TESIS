@@ -19,7 +19,7 @@ namespace SISGED.Server.Services.Repositories
         {
             Step steps = await _stepService.GetStepByDossierNameAsync(assistant.Steps.DossierName);
 
-            assistant.Steps = new AssistantStep { Documents = steps.Documents, DossierName = steps.DossierName};
+            assistant.Steps = new AssistantStep { Documents = steps.Documents, DossierName = steps.DossierName };
             assistant.Step = 0;
             assistant.Substep = 0;
             assistant.DocumentType = "SolicitudInicial";

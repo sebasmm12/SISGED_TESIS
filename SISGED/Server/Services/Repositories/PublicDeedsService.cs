@@ -59,7 +59,7 @@ namespace SISGED.Server.Services.Repositories
             var lookUpAggregation = GetFilteredLookUpPipeline();
 
             //Creación del BsonDocument del filtros de busqueda
-            var filteredDoc =  SearchFilterBsonDocCreation(param);
+            var filteredDoc = SearchFilterBsonDocCreation(param);
 
             var unWindAggregation = MongoDBAggregationExtension.UnWind(new("$notario"));
 

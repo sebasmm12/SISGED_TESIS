@@ -1,7 +1,30 @@
 ﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
+::-webkit-scrollbar {
+    width: 0.5rem !important;
+    height: 0.5rem !important;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #25393D !important;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #25393D !important;
+    cursor: pointer !important;
+}
+
+body {
+    /*background-image: url('../images/sysged-background-image.png');*/
+    background-color: #F3F3F3;
+    background-attachment: fixed;
+}
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    margin: 0;
 }
 
 h1:focus {
@@ -62,3 +85,87 @@ a, .btn-link {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
+
+:root {
+    --mud-palette-appbar-background: #22A570 !important;
+    --mud-palette-primary: #22A570 !important;
+    --mud-palette-secondary: #25393D !important;
+}
+
+.standard-color {
+    background-color: #F3F3F3;
+}
+
+.w-100 {
+    width: 100% !important;
+}
+
+.navbar-icon-color {
+    color: #25393D;
+}
+
+.sisged-navmenu.mud-navmenu.mud-navmenu-default .mud-nav-link.active:not(.mud-nav-link-disabled) {
+    color: white !important;
+}
+
+.progress-center {
+    position: absolute;
+    top: calc(50% - 50px);
+    left: calc(50% - 50px);
+}
+
+.total-screen {
+    height: 100vh;
+}
+
+.h-100 {
+    height: 100%;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+.flex-basis {
+    flex-basis: 100%;
+}
+
+.light-text {
+    font-weight: 500;
+}
+
+.creation-button:hover {
+    transform: scale(1.05);
+    border: 2px solid #0066ff !important;
+    color: #0066ff !important;
+    background-color: var(--mud-palette-secondary) !important;
+}
+
+.transparent-color {
+    background-color: rgba(0, 0, 0, 0) !important;
+}
+
+.header-table {
+    background-color: var(--mud-palette-secondary) !important;
+    color: white !important;
+}
+
+
+@media only screen and (max-width: 467px) {
+    .text-sm-center {
+        text-align: center;
+    }
+
+    .mud-table-pagination {
+        justify-content: center !important;
+    }
+}
+
+.mud-table-pagination {
+    display: flex;
+    justify-content: end;
+}
+
+.mud-button-filled.mud-button-filled-primary:hover, .mud-button-filled.mud-button-filled-primary:focus-visible {
+    background-color: var(--mud-palette-appbar-background) !important;
+}

@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using SISGED.Server.Helpers;
 using SISGED.Server.Services.Contracts;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
-using SISGED.Shared.Models;
 using SISGED.Shared.Models.Requests.Documents;
 using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.Document.Appeal;

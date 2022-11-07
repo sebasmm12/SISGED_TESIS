@@ -1,15 +1,14 @@
 ﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using SISGED.Server.Helpers.Infrastructure;
 using SISGED.Server.Services.Contracts;
-using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
+using SISGED.Shared.Models.Queries.User;
 using SISGED.Shared.Models.Responses.User;
 
 namespace SISGED.Server.Services.Repositories
 {
-    public class UserService: IUserService
+    public class UserService : IUserService
     {
         private readonly IMongoCollection<User> _usersCollection;
         public string CollectionName => "usuarios";
@@ -17,11 +16,14 @@ namespace SISGED.Server.Services.Repositories
         {
             _usersCollection = mongoDatabase.GetCollection<User>(CollectionName);
         }
-        
-        public async Task<List<User>> GetUsersAsync()
+
+        public async Task<List<User>> GetUsersAsync(UserPaginationQuery userPaginationQuery)
         {
-            
-            var users = await _usersCollection.Find(user => true).ToListAsync();
+
+            var users = await _usersCollection.Find(user => true)
+                .Skip(userPaginationQuery.Page * userPaginationQuery.PageSize)
+                .Limit(userPaginationQuery.PageSize)
+                .ToListAsync();
 
             if (users is null) throw new Exception("No se ha podido encontrar los usuarios registrados");
 
@@ -33,7 +35,7 @@ namespace SISGED.Server.Services.Repositories
             await _usersCollection.InsertOneAsync(user);
 
             if (string.IsNullOrEmpty(user.Id)) throw new Exception("No se pudo registrar el usuario al sistema");
-            
+
         }
 
         public async Task<User> GetUserByIdAsync(string userId)
@@ -116,7 +118,7 @@ namespace SISGED.Server.Services.Repositories
 
             if (prosecutorUsers is null) throw new Exception("No se ha podido encontrar los fiscales registrados");
 
-            return prosecutorUsers;                                     
+            return prosecutorUsers;
         }
 
         public async Task<IEnumerable<ClientUserInfoResponse>> GetClientUsersAsync(string userName)
@@ -134,7 +136,7 @@ namespace SISGED.Server.Services.Repositories
                 LastName = user.Data.LastName,
                 Profile = user.Data.Profile
             });
-           
+
             var clientUsers = await _usersCollection.Find(regexFilter & userTypeFilter).Project(clientProjection).ToListAsync();
 
             if (clientUsers is null) throw new Exception($"No se pudo encontrar los clientes registrados en el sistema con el nombre {userName}");
@@ -147,9 +149,16 @@ namespace SISGED.Server.Services.Repositories
             var autocompletedUsers = await _usersCollection.Aggregate<AutocompletedUserResponse>(GetUsersPipepline(userName))
                                                             .ToListAsync();
 
-            if (autocompletedUsers is null) throw new Exception($"No se pudo encontrar los usuarios registrados con el nombre { userName}");
+            if (autocompletedUsers is null) throw new Exception($"No se pudo encontrar los usuarios registrados con el nombre {userName}");
 
             return autocompletedUsers;
+        }
+
+        public async Task<long> CountUsersAsync()
+        {
+            long totalUsers = await _usersCollection.CountDocumentsAsync(_ => true);
+
+            return totalUsers;
         }
 
         #region private methods

@@ -29,7 +29,7 @@ namespace SISGED.Server.Services.Repositories
         {
             return await _documentService.GetExpiredDocumentsByMonthAsync(documentsByMonthQuery);
         }
-        
+
         public async Task<IEnumerable<DocumentByStateResponse>> GetDocumentsByStateAsync(DocumentsByStateQuery documentsByStateQuery)
         {
             return await _documentService.GetDocumentsByStateAsync(documentsByStateQuery);

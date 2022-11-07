@@ -1,0 +1,162 @@
+﻿
+.mdc-floating-label--float-above {
+    color: black !important;
+}
+
+:root {
+    --mdc-theme-primary: #1FA270 !important;
+}
+
+div.input {
+    flex-grow: 1;
+    text-align: center;
+    overflow: auto;
+}
+
+div.output {
+    flex-grow: 1;
+    text-align: center;
+    overflow-y: scroll;
+}
+
+div.tools {
+    border-top: 0px;
+    flex-grow: 1;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll !important;
+}
+
+.container-ot > div {
+    flex: 1;
+    display: flex;
+}
+
+.container-ot {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    /**/
+    max-height: 100%;
+}
+
+div.workspace {
+    border-left: 0px;
+    border-right: 0px;
+    flex-grow: 10;
+    text-align: center;
+    display: flex;
+    max-height: 100%;
+    flex-direction: column;
+}
+
+
+
+.common-box-style {
+    border: 3px solid #25393D;
+    background-color: white;
+}
+
+.wfe-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    height: calc(90% - 20px);
+}
+
+.box-title-style {
+    background-color: #25393D;
+    margin: 6px 4px 10px 4px;
+    border: 2px solid #4d4d4d;
+    border-radius: 7px 7px 0px 0px;
+    flex-basis: 9%;
+}
+
+    .box-title-style span {
+        color: white;
+        font-size: 20px;
+    }
+
+.work-box-title-style span {
+    color: white;
+    font-size: 23px;
+}
+
+.work-box-title-style {
+    background-color: #25393D;
+    margin: 6px 0px 0px 0px;
+    padding: 3px;
+    border: 2px solid #25393D;
+    text-align: center;
+    border-bottom: none;
+    border-radius: 8px 8px 0px 0px;
+}
+
+.loader-block {
+    display: flex;
+    flex-basis: 91%;
+    width: inherit;
+    height: inherit;
+    background-color: #4d4d4d;
+    justify-content: center;
+    justify-content: center;
+    align-items: center;
+    background: #1a1a1a;
+}
+/* Estilos del dragableList*/
+.div-style {
+    display: flex;
+    flex-direction: column;
+    flex-basis: 100%;
+    max-height: 100%;
+    min-height: 100%;
+    /*  overflow-y: auto;
+        overflow-x: hidden;*/
+}
+
+.div-view {
+    display: flex;
+    flex-basis: 100%;
+    flex-direction: column;
+    overflow-y: scroll !important;
+}
+
+.div-tool-list {
+    flex-basis: 15%;
+}
+
+/*Estilos del dragableItem*/
+
+.side-bar-collapse-button > i.material-icons,
+.bar-menu-item-container > i.material-icons {
+    color: white !important;
+}
+
+.modal-info-solicitudBPN {
+    display: flex;
+    flex-direction: column;
+    /*height: 700px;*/
+    width: 500px;
+    background-color: #808080;
+}
+
+.window {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border: none;
+    text-align: center;
+    color: black;
+    width: inherit;
+    flex-basis: 100%;
+}
+
+.default-title-style {
+    display: block;
+    color: #25393D;
+}

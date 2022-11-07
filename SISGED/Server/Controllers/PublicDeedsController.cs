@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SISGED.Server.Helpers;
 using SISGED.Server.Services.Contracts;
 using SISGED.Shared.Entities;
@@ -27,7 +26,8 @@ namespace SISGED.Server.Controllers
             {
                 var deedList = await _publicdeedsService.Filter(term);
                 return Ok(deedList);
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }

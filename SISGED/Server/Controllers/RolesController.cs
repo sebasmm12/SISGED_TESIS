@@ -8,7 +8,7 @@ namespace SISGED.Server.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [ApiConventionType(typeof(DefaultApiConventions))]
-    public class RolesController: ControllerBase
+    public class RolesController : ControllerBase
     {
         private readonly IRoleService _roleService;
         private readonly IMapper _mapper;

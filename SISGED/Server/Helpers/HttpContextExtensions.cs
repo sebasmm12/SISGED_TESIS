@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-namespace SISGED.Server.Helpers
+﻿namespace SISGED.Server.Helpers
 {
     public static class HttpContextExtensions
     {

@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using SISGED.Server.Services.Contracts;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
-using SISGED.Shared.Models;
 using SISGED.Shared.Models.Requests.Account;
 using SISGED.Shared.Models.Requests.User;
 using SISGED.Shared.Models.Responses.Account;
@@ -60,39 +58,31 @@ namespace SISGED.Server.Controllers
         {
             try
             {
-                SessionAccountResponse sessionAccount = new SessionAccountResponse();
-                List<Permission> permisosInterfaces = new List<Permission>();
-                List<Permission> toolsPermissions = new List<Permission>();
 
-                User user = new User();
-                user = await _userService.GetUserByNameAsync(username);
+                var user = await _userService.GetUserByNameAsync(username);
+                var userrole = await _roleService.GetRoleByIdAsync(user.Rol);
 
-                Role userrole = new Role();
-                userrole = await _roleService.GetRoleByIdAsync(user.Rol);
-
-                foreach (string permissionId in userrole.Interfaces)
+                var permissionInterfacesTasks = userrole.Interfaces.Select(async (permissionId) =>
                 {
-                    //Obtener el objeto permiso y añadirlo
-                    Permission permission = new Permission();
-                    permission = await _permissionService.GetPermissionByIdAsync(permissionId);
-                    permisosInterfaces.Add(permission);
-                }
+                    var permission = await _permissionService.GetPermissionByIdAsync(permissionId);
+                    return permission;
+                });
 
-                foreach (string permissionId in userrole.Tools)
+                var permissionToolsTasks = userrole.Tools.Select(async (permissionId) =>
                 {
-                    //Obtener el bjeto permiso y añadirlo
-                    Permission permission = new Permission();
-                    permission = await _permissionService.GetPermissionByIdAsync(permissionId);
-                    toolsPermissions.Add(permission);
-                }
+                    var permission = await _permissionService.GetPermissionByIdAsync(permissionId);
+                    return permission;
+                });
 
-                sessionAccount.User = user;
-                sessionAccount.Role = userrole.Name;
-                sessionAccount.ToolPermissions = toolsPermissions;
-                sessionAccount.InterfacePermissions = permisosInterfaces;
+                var permissionInterfaces = await Task.WhenAll(permissionInterfacesTasks);
+                var permissionTools = await Task.WhenAll(permissionToolsTasks);
+
+                var sessionAccount = new SessionAccountResponse(permissionTools.ToList(), permissionInterfaces.ToList(), userrole.Name, user);
 
                 return Ok(sessionAccount);
-            } catch (Exception ex)
+
+            }
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
@@ -150,7 +140,7 @@ namespace SISGED.Server.Controllers
             claims.Add(new Claim(ClaimTypes.Role, roleName));
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:key"]));
-            var creds = new SigningCredentials(key,SecurityAlgorithms.HmacSha256);
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var expiration = DateTime.UtcNow.AddHours(-5).AddYears(1);
 

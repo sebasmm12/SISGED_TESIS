@@ -20,6 +20,7 @@ namespace SISGED.Server.Helpers.Infrastructure
             services.AddScoped<IFolderService, FolderService>();
             services.AddScoped<IAssistantService, AssistantService>();
             services.AddScoped<IPublicDeedsService, PublicDeedsService>();
+            services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<IStepService, StepService>();
 
             return services;

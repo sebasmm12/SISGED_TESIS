@@ -255,7 +255,7 @@ namespace SISGED.Server.Services.Repositories
             dossierDocument.DelayDate = DateTime.UtcNow.AddHours(-5).AddDays(5);
             dossierDocument.DelayDate = null;
             UpdateDefinition<Dossier> updateExpediente = Builders<Dossier>.Update.Push("documentos", dossierDocument);
-            Dossier dossier = await _dossierService.FindOneAndUpdateAsync(dossierwrapper.Id, updateExpediente);
+            await _dossierService.FindOneAndUpdateAsync(dossierwrapper.Id, updateExpediente);
             // TODO: IMPLEMENT A NEW SERVICE IN THE DOSSIER SERVICE
 
             //actualizacion bandeja salida del usuario

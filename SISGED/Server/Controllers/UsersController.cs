@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SISGED.Server.Services.Contracts;
 using SISGED.Shared.Entities;
+using SISGED.Shared.Models.Queries.User;
 using SISGED.Shared.Models.Requests.User;
 using SISGED.Shared.Models.Responses.User;
 
@@ -26,15 +27,19 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserInfoResponse>>> GetUsersAsync()
+        public async Task<ActionResult<PaginatedUserInfoResponse>> GetUsersAsync([FromQuery] UserPaginationQuery userPaginationQuery)
         {
             try
             {
-                var users = await _userService.GetUsersAsync();
+                var users = await _userService.GetUsersAsync(userPaginationQuery);
+
+                long totalUser = await _userService.CountUsersAsync();
 
                 var usersInfoResponse = _mapper.Map<IEnumerable<UserInfoResponse>>(users);
 
-                return Ok(usersInfoResponse);
+                var paginatedUserInfoResponse = new PaginatedUserInfoResponse(usersInfoResponse, totalUser);
+
+                return Ok(paginatedUserInfoResponse);
             }
             catch (Exception ex)
             {
@@ -57,7 +62,7 @@ namespace SISGED.Server.Controllers
                 await _userService.CreateUserAsync(user);
 
                 if (user.Type != "cliente") await _trayService.RegisterUserTrayAsync(user.Type, user.Id);
-                
+
                 return NoContent();
             }
             catch (Exception ex)

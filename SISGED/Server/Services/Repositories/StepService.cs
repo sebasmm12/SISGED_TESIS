@@ -50,7 +50,7 @@ namespace SISGED.Server.Services.Repositories
                 stepRequest.Documents = step.Documents.Select(GetDocumentRequest).ToList();
 
                 return stepRequest;
-                
+
             }).ToList();
 
             return stepsRequest;
@@ -83,16 +83,16 @@ namespace SISGED.Server.Services.Repositories
 
             var updatedUser = await _stepsCollection.UpdateOneAsync(filter, update);
 
-            if (updatedUser is null) throw new Exception($"No se pudo actualizar la hoja de ruta del expediente { stepUpdateRequest.DossierName }");
+            if (updatedUser is null) throw new Exception($"No se pudo actualizar la hoja de ruta del expediente {stepUpdateRequest.DossierName}");
         }
 
         public async Task RegisterStepAsync(StepRegisterRequest stepRegisterRequest)
         {
             var step = _mapper.Map<Step>(stepRegisterRequest);
-            
+
             await _stepsCollection.InsertOneAsync(step);
 
-            if (step.Id is null) throw new Exception($"No se pudo registrar la hoja de ruta del expediente { stepRegisterRequest.DossierName }");
+            if (step.Id is null) throw new Exception($"No se pudo registrar la hoja de ruta del expediente {stepRegisterRequest.DossierName}");
         }
 
         public string GenerateUID()

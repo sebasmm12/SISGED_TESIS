@@ -21,8 +21,8 @@ namespace SISGED.Server.Services.Repositories
 
         public string DocumentsCollectionName => "documents";
 
-        public DossierService(IMongoDatabase mongoDatabase, ITrayService trayService, IDocumentService documentService)
-        { 
+        public DossierService(IMongoDatabase mongoDatabase, ITrayService trayService)
+        {
 
             _dossiersCollection = mongoDatabase.GetCollection<Dossier>(CollectionName);
             _documentsCollection = mongoDatabase.GetCollection<Document>(DocumentsCollectionName);
@@ -36,7 +36,7 @@ namespace SISGED.Server.Services.Repositories
             await _dossiersCollection.InsertOneAsync(dossier);
 
             if (dossier.Id is null) throw new Exception("No se pudo registrar el expediente al sistema");
-        }      
+        }
 
         public async Task<IEnumerable<Dossier>> GetDossiersAsync()
         {
@@ -54,7 +54,7 @@ namespace SISGED.Server.Services.Repositories
             if (dossiers is null) throw new Exception($"No se pudo obtener el diagrama gantt de los expedientes del cliente con número de documento {dossierGanttDiagramQuery.DocumentNumber}");
 
             return dossiers;
-        } 
+        }
 
         public async Task<DossierLastDocumentResponse> RegisterDerivationAsync(DossierLastDocumentRequest dossierLastDocumentRequest, string userId)
         {
@@ -66,10 +66,10 @@ namespace SISGED.Server.Services.Repositories
 
             string documentId = dossierLastDocumentRequest.Documents.Last().DocumentId;
 
-            var updateTrayDTO = new UpdateTrayDTO(dossierLastDocumentRequest.Id, userId, 
+            var updateTrayDTO = new UpdateTrayDTO(dossierLastDocumentRequest.Id, userId,
                                                   dossierDerivation.SenderUser,
                                                   documentId);
-            
+
             var usersTraysupdate = _trayService.UpdateTrayForDerivationAsync(updateTrayDTO);
 
             var process = new Process(dossierDerivation.OriginArea, dossierDerivation.SenderUser, dossierDerivation.ReceiverUser);
@@ -325,19 +325,19 @@ namespace SISGED.Server.Services.Repositories
                 new()
                 {
                     Condition = (DossierHistoryQuery dossierHistoryQuery) => !string.IsNullOrEmpty(dossierHistoryQuery.State),
-                    Result = (BsonDocument dossiersFilter, DossierHistoryQuery dossierHistoryQuery) => 
+                    Result = (BsonDocument dossiersFilter, DossierHistoryQuery dossierHistoryQuery) =>
                                            dossiersFilter.Add("estado", MongoDBAggregationExtension.Regex(dossierHistoryQuery.State! + ".*", "i"))
                 },
                 new()
                 {
                     Condition = (DossierHistoryQuery dossierHistoryQuery) => !string.IsNullOrEmpty(dossierHistoryQuery.Type),
-                    Result = (BsonDocument dossiersFilter, DossierHistoryQuery dossierHistoryQuery) => 
+                    Result = (BsonDocument dossiersFilter, DossierHistoryQuery dossierHistoryQuery) =>
                                             dossiersFilter.Add("tipo", MongoDBAggregationExtension.Regex(dossierHistoryQuery.Type! + ".*", "i"))
                 },
                 new()
                 {
                     Condition = (DossierHistoryQuery dossierHistoryQuery) => !string.IsNullOrEmpty(dossierHistoryQuery.ClientName),
-                    Result = (BsonDocument dossiersFilter, DossierHistoryQuery dossierHistoryQuery) => 
+                    Result = (BsonDocument dossiersFilter, DossierHistoryQuery dossierHistoryQuery) =>
                                            dossiersFilter.Add("cliente.nombre", MongoDBAggregationExtension.Regex(dossierHistoryQuery.ClientName! + ".*", "i"))
                 }
             };
@@ -348,11 +348,11 @@ namespace SISGED.Server.Services.Repositories
         private async Task UpdateDossierDerivationsAsync(Derivation derivation, string dossierId)
         {
 
-            var updatedDossier = await _dossiersCollection.UpdateOneAsync(dossier => dossier.Id == dossierId, 
+            var updatedDossier = await _dossiersCollection.UpdateOneAsync(dossier => dossier.Id == dossierId,
                                                            Builders<Dossier>.Update.Push(dossier => dossier.Derivations, derivation));
 
 
-            if (updatedDossier is null) throw new Exception($"No se pudo actualizar las derivaciones del expediente con identificador { dossierId }");
+            if (updatedDossier is null) throw new Exception($"No se pudo actualizar las derivaciones del expediente con identificador {dossierId}");
 
         }
 
@@ -381,7 +381,7 @@ namespace SISGED.Server.Services.Repositories
                 { "type", MongoDBAggregationExtension.First("$tipo")  },
                 { "client", MongoDBAggregationExtension.First("$cliente") },
                 { "documents", MongoDBAggregationExtension.Push("$documents") }
-                
+
             });
 
             var projectAggregation = MongoDBAggregationExtension.Project(new Dictionary<string, BsonValue>()
@@ -426,7 +426,7 @@ namespace SISGED.Server.Services.Repositories
                 projectAggregation
             };
         }
-        
+
         private static BsonDocument GetDocumentsLookUpPipeline()
         {
             var letPipeline = new Dictionary<string, BsonValue>()

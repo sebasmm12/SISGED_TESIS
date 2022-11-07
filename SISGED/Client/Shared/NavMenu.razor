@@ -1,39 +1,14 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">SISGED</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+﻿<MudNavMenu Class="w-100 sisged-navmenu" Rounded="true" Bordered="true">
+    <div class="d-flex flex-row gap-2 px-4">
+        <MudImage Src="/images/step2.png" Width="50" Height="50"></MudImage>
+        <MudText Typo="Typo.h5" Class="align-self-center">SISGED</MudText>
     </div>
-</div>
-
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-            </NavLink>
-        </div>
-    </nav>
-</div>
-
-@code {
-    private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
+    <MudDivider Class="my-2" />
+    @foreach (var interfacePermission in InterfacePermissions)
     {
-        collapseNavMenu = !collapseNavMenu;
+       <MudNavLink Icon="@interfacePermission.Icon" IconColor="Color.Secondary" Href="@interfacePermission.Url" Class="text-white"
+                Match="GetLinkMatch(interfacePermission)">@interfacePermission.Label</MudNavLink>
     }
-}
+</MudNavMenu>
+
+

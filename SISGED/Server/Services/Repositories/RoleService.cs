@@ -11,14 +11,14 @@ namespace SISGED.Server.Services.Repositories
 
         public RoleService(IMongoDatabase mongoDatabase)
         {
-           _rolesCollection = mongoDatabase.GetCollection<Role>(CollectionName);
+            _rolesCollection = mongoDatabase.GetCollection<Role>(CollectionName);
         }
 
         public async Task<Role> GetRoleByIdAsync(string roleId)
         {
             var role = await _rolesCollection.Find(role => role.Id == roleId).FirstOrDefaultAsync();
 
-            if (role is null) throw new Exception($"No se pudo encontrar el rol con el identificador { roleId }");
+            if (role is null) throw new Exception($"No se pudo encontrar el rol con el identificador {roleId}");
 
             return role;
         }

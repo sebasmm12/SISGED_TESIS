@@ -8,7 +8,7 @@ namespace SISGED.Server.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [ApiConventionType(typeof(DefaultApiConventions))]
-    public class SolicitorsController: ControllerBase
+    public class SolicitorsController : ControllerBase
     {
         private readonly ISolicitorService _solicitorService;
         private readonly IMapper _mapper;
@@ -26,7 +26,7 @@ namespace SISGED.Server.Controllers
             {
                 var solicitor = await _solicitorService.GetSolicitorByIdAsync(solicitorId);
                 var solicitorResponse = _mapper.Map<SolicitorInfoResponse>(solicitor);
-                
+
                 return Ok(solicitorResponse);
             }
             catch (Exception ex)
