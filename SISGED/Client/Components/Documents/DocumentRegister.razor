@@ -1,5 +1,15 @@
 ﻿<MudGrid>
     <MudItem xs="12">
+        <MudSelect T="DocumentOption" AdornmentIcon="fas fa-file-lines" AdornmentColor="Color.Primary"
+            Label="Documentos" Dense="true" Variant="Variant.Outlined" Clearable="true" ValueChanged="GetDocument">
+            @foreach (var documentOption in documentOptions)
+            {
+                <MudSelectItem Value="documentOption"></MudSelectItem>
+            }
+        </MudSelect>
+    </MudItem>
+    <MudItem xs="12">
+        @childContent
     </MudItem>
 </MudGrid>
 

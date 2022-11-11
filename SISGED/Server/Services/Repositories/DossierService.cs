@@ -4,6 +4,7 @@ using SISGED.Server.Helpers.Infrastructure;
 using SISGED.Server.Services.Contracts;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
+using SISGED.Shared.Models.Queries.Document;
 using SISGED.Shared.Models.Queries.Dossier;
 using SISGED.Shared.Models.Queries.Statistic;
 using SISGED.Shared.Models.Requests.Dossier;
@@ -145,11 +146,11 @@ namespace SISGED.Server.Services.Repositories
             return userRequestDocuments;
         }
 
-        public async Task<IEnumerable<UserRequestWithPublicDeedResponse>> GetUserRequestsWithPublicDeedAsync(string documentNumber)
+        public async Task<IEnumerable<UserRequestWithPublicDeedResponse>> GetUserRequestsWithPublicDeedAsync(UserRequestPaginationQuery userRequestPaginationQuery)
         {
-            var userRequestDocuments = await _dossiersCollection.Aggregate<UserRequestWithPublicDeedResponse>(GetUserRequestsWithPublicDeedPipeline(documentNumber)).ToListAsync();
+            var userRequestDocuments = await _dossiersCollection.Aggregate<UserRequestWithPublicDeedResponse>(GetUserRequestsWithPublicDeedPipeline(userRequestPaginationQuery)).ToListAsync();
 
-            if (userRequestDocuments is null) throw new Exception($"No se pudo obtener las solicitudes iniciales del cliente con número de documento {documentNumber}");
+            if (userRequestDocuments is null) throw new Exception($"No se pudo obtener las solicitudes iniciales del cliente con número de documento {userRequestPaginationQuery.DocumentNumber}");
 
             return userRequestDocuments;
         }
@@ -158,14 +159,23 @@ namespace SISGED.Server.Services.Repositories
         {
             return await _dossiersCollection.FindOneAndUpdateAsync(x => x.Id == Id, update);
         }
-        #region private methods
-        private static BsonDocument[] GetUserRequestsWithPublicDeedPipeline(string documentNumber)
+
+        public async Task<long> CountUserRequestsAsync(string documentNumber)
         {
-            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("cliente.numerodocumento", documentNumber));
+            long totalRequests = await _dossiersCollection.CountDocumentsAsync(dossier => dossier.Client.DocumentNumber == documentNumber);
+
+            return totalRequests;
+        }
+        
+        #region private methods
+        private static BsonDocument[] GetUserRequestsWithPublicDeedPipeline(UserRequestPaginationQuery userRequestPaginationQuery)
+        {
+            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("cliente.numerodocumento", userRequestPaginationQuery.DocumentNumber));
 
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
                 { "type", "$tipo" },
+                { "initDate", "$fechainicio" },
                 { "initialDocument", MongoDBAggregationExtension.ArrayElementAt(new List<BsonValue>() { "$documentos", 0 }) },
                 { "lastDocument", MongoDBAggregationExtension.ArrayElementAt(new List<BsonValue>() { "$documentos", -1 })  }
             });
@@ -176,6 +186,7 @@ namespace SISGED.Server.Services.Repositories
             {
                 { "_id", 0 },
                 { "type", 1  },
+                { "initDate", 1 },
                 { "initialDocument", MongoDBAggregationExtension.First(MongoDBAggregationExtension.Filter("$documents",
                     MongoDBAggregationExtension.Eq(new() { "$$documents._id", MongoDBAggregationExtension.ObjectId("$initialDocument.iddocumento") }), "documents"))},
                 { "lastDocument", MongoDBAggregationExtension.First(MongoDBAggregationExtension.Filter("$documents",
@@ -186,8 +197,15 @@ namespace SISGED.Server.Services.Repositories
 
             var userRequestsWithPublicDeedProject = GetUserRequestWithPublicDeedProjectPipeline();
 
+            var sortAggregation = MongoDBAggregationExtension.Sort(new BsonDocument("initDate", -1));
+
+            var skipAggregation = MongoDBAggregationExtension.Skip(userRequestPaginationQuery.Page * userRequestPaginationQuery.PageSize);
+
+            var limitAggregation = MongoDBAggregationExtension.Limit(userRequestPaginationQuery.PageSize);
+
             return new BsonDocument[] { matchAggregation, projectAggregation, lookUpPipeline,
-                documentsProjectAggregation, publicDeedLookUpAggregation, userRequestsWithPublicDeedProject };
+                documentsProjectAggregation, publicDeedLookUpAggregation, userRequestsWithPublicDeedProject,
+                sortAggregation, skipAggregation, limitAggregation };
 
         }
 
@@ -196,6 +214,7 @@ namespace SISGED.Server.Services.Repositories
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
                 { "_id", "$initialDocument._id" },
+                { "initDate", 1 },
                 { "type", 1 },
                 { "state", "$initialDocument.estado" },
                 { "content", "$initialDocument.contenido" },

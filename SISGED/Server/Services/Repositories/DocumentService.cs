@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using SISGED.Server.Helpers.Infrastructure;
 using SISGED.Server.Services.Contracts;
 using SISGED.Shared.Entities;
+using SISGED.Shared.Models.Queries.Document;
 using SISGED.Shared.Models.Queries.Statistic;
 using SISGED.Shared.Models.Requests.Documents;
 using SISGED.Shared.Models.Responses.Document;
@@ -41,9 +42,14 @@ namespace SISGED.Server.Services.Repositories
             return await _dossierService.GetUserRequestDocumentsAsync(documentNumber);
         }
 
-        public async Task<IEnumerable<UserRequestWithPublicDeedResponse>> GetUserRequestsWithPublicDeedAsync(string documentNumber)
+        public async Task<IEnumerable<UserRequestWithPublicDeedResponse>> GetUserRequestsWithPublicDeedAsync(UserRequestPaginationQuery userRequestPaginationQuery)
         {
-            return await _dossierService.GetUserRequestsWithPublicDeedAsync(documentNumber);
+            return await _dossierService.GetUserRequestsWithPublicDeedAsync(userRequestPaginationQuery);
+        }
+
+        public async Task<long> CountUserRequestAsync(string documentNumber)
+        {
+            return await _dossierService.CountUserRequestsAsync(documentNumber);
         }
 
         public async Task<BPNRequest> GetBPNRequestDocumentAsync(string documentId)

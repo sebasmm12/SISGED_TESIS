@@ -6,5 +6,7 @@ namespace SISGED.Shared.Models.Responses.Document.UserRequest
     {
         [BsonElement("dossierUrl")]
         public string DossierUrl { get; set; } = default!;
+        [BsonElement("initDate")]
+        public DateTime InitDate { get; set; }
     }
 }

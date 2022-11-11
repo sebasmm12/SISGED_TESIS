@@ -22,6 +22,8 @@ namespace SISGED.Client.Components.WorkEnvironments
         private bool isRendered = false;
         private List<Item> workPlaceItems { get; set; } = new();
 
+        private bool CanReorder => workPlaceItems.Count > 0;
+
         protected override async Task OnInitializedAsync()
         {
             UserTray = await GetUserTrayAsync(SessionAccount.User.Id);

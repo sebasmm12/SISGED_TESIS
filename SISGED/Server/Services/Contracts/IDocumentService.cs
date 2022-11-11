@@ -1,4 +1,5 @@
 ﻿using SISGED.Shared.Entities;
+using SISGED.Shared.Models.Queries.Document;
 using SISGED.Shared.Models.Queries.Statistic;
 using SISGED.Shared.Models.Requests.Documents;
 using SISGED.Shared.Models.Responses.Document;
@@ -34,7 +35,7 @@ namespace SISGED.Server.Services.Contracts
         Task<SolicitorDossierRequestInfoResponse> GetSolicitorDossierRequestAsync(string documentId);
         Task<SolicitorDossierShipmentInfoResponse> GetSolicitorDossierShipmentAsync(string documentId);
         Task<IEnumerable<UserRequestDocumentResponse>> GetUserRequestDocumentsAsync(string documentNumber);
-        Task<IEnumerable<UserRequestWithPublicDeedResponse>> GetUserRequestsWithPublicDeedAsync(string documentNumber);
+        Task<IEnumerable<UserRequestWithPublicDeedResponse>> GetUserRequestsWithPublicDeedAsync(UserRequestPaginationQuery userRequestPaginationQuery);
         Task UpdateDocumentProcessAsync(Process proccess, string documentId);
         Task<SolicitorDesignationDocument> SolicitorDesignationOfficeRegisterAsync(SolicitorDesignationDocumentRegister dossier, List<string> url2);
         Task<BPNDocument> RegisterBPNOfficeAsync(SolicitorDesignationDocumentRegister dossierWrapper, List<string> url2, string url);
@@ -63,6 +64,6 @@ namespace SISGED.Server.Services.Contracts
         Task UpdateInitialRequestDocumentAsync(SolicitorDesignationDocumentRegister dossierWrapper);
         Task UpdateEENDocumentAsync(SolicitorDesignationDocumentRegister dossierWrapper);
         Task UpdateInitialRequestStateAsync(SolicitorDesignationDocumentRegister dossierWrapper);
-
+        Task<long> CountUserRequestAsync(string documentNumber);
     }
 }

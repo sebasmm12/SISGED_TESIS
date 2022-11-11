@@ -9,22 +9,26 @@ namespace SISGED.Client.Services.Repositories
         {
             return new List<DocumentOption>()
             {
-                new("Documento de Solicitud de Búsqueda de Protocolo", "SolicitudBPN", Roles.MesaPartes),
-                new("Documento de Oficio de Búsqueda de Protocolo", "OficioBPN", Roles.OrientacionLegal),
-                new("Documento de Resultado de Búsqueda de Protocolo", "ResultadoBPN", Roles.ArchivosExnotarios),
-                new("Documento de Solicitud de Expedición de Firma", "SolicitudExpedicionFirma", Roles.MesaPartes),
-                new("Documento de Oficio de Designación de Notario", "OficioDesignacionNotario", Roles.ArchivosExnotarios),
-                new("Documento de Conclusión de Firma", "ConclusionFirma", Roles.ArchivosExnotarios),
-                new("Documento de Solicitud de Denuncia", "SolicitudDenuncia", Roles.MesaPartes),
-                new("Documento de Aperturamiento Disciplinario", "AperturamientoDisciplinario", Roles.TribunalHonor),
-                new("Documento de Solicitud de Expediente de Notario", "SolicitudExpedienteNotario", Roles.TribunalHonor),
-                
+                new("Solicitud de Búsqueda de Protocolo", "BPNRequest", Roles.MesaPartes),
+                new("Oficio de Búsqueda de Protocolo", "OficioBPN", Roles.OrientacionLegal),
+                new("Resultado de Búsqueda de Protocolo - Archivo General", "ResultadoArchivoBPN", Roles.ArchivosExnotarios),
+                new("Pago de Protocolo Notarial", "PagoBPN", Roles.ArchivosExnotarios),
+                new("Resultado de Búsqueda de Protocolo - MicroForma", "ResultadoMicroformaBPN", Roles.ArchivosExnotarios),
+                new("Resultado de Búsqueda de Protocolo - Físico", "ResultadoProveedorBPN", Roles.ArchivosExnotarios),
+                new("Solicitud de Expedición de Firma", "SignExpeditionRequest", Roles.MesaPartes),
+                new("Oficio de Expedición de Firma", "OficioExpedicionFirma", Roles.OrientacionLegal),
+                new("Oficio de Designación de Notario", "OficioDesignacionNotario", Roles.ArchivosExnotarios),
+                new("Resolución de Sesión", "ResolucionSesion", Roles.SecretariaGeneral),
+                new("Conclusión de Firma - Rechazo Notarial", "RechazoConclusionFirma", Roles.ArchivosExnotarios),
+                new("Pago de Entrega de Testimonio", "PagoTestimonio", Roles.ArchivosExnotarios),
+                new("Conclusión de Firma - Aprobación Notarial", "AprobacionConclusionFirma", Roles.ArchivosExnotarios),
+                new("Solicitud de Denuncia", "ComplaintRequest", Roles.MesaPartes),
+                new("Aperturamiento Disciplinario", "AperturamientoDisciplinario", Roles.TribunalHonor),
+                new("Solicitud de Expediente de Notario", "SolicitudExpedienteNotario", Roles.Fiscal),
+                new("Entrega de Expediente de Notario", "EntregaExpedienteNotario", Roles.TramiteDocumentario),
+                new("Dictamen", "Dictamen", Roles.Fiscal),
+                new("Resolución", "Resolucion", Roles.TribunalHonor),
             };
-        }
-
-        public IEnumerable<DocumentOption> GetDocumentTypesWithOutDossier()
-        {
-            throw new NotImplementedException();
         }
     }
 }

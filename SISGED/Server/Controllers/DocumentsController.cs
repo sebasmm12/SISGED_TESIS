@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using SISGED.Server.Services.Contracts;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
+using SISGED.Shared.Models.Queries.Document;
 using SISGED.Shared.Models.Requests.Documents;
 using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.Document.Appeal;
@@ -898,7 +899,7 @@ namespace SISGED.Server.Controllers
         #endregion
 
         #region GET Services
-        [HttpGet("userRequests/{documentNumber}")]
+        [HttpGet("user-requests/{documentNumber}")]
         public async Task<ActionResult<IEnumerable<UserRequestDocumentResponse>>> GetUserRequestDocumentsAsync([FromRoute] string documentNumber)
         {
             try
@@ -914,14 +915,18 @@ namespace SISGED.Server.Controllers
             }
         }
 
-        [HttpGet("userRequests-publicDeeds/{documentNumber}")]
-        public async Task<ActionResult<IEnumerable<UserRequestWithPublicDeedResponse>>> GetUserRequestsWithPublicDeedAsync([FromRoute] string documentNumber)
+        [HttpGet("user-requests-public-deeds")]
+        public async Task<ActionResult<IEnumerable<UserRequestWithPublicDeedResponse>>> GetUserRequestsWithPublicDeedAsync([FromQuery] UserRequestPaginationQuery userRequestPaginationQuery)
         {
             try
             {
-                var usersRequestWithPublicDeed = await _documentService.GetUserRequestsWithPublicDeedAsync(documentNumber);
+                var usersRequestWithPublicDeed = await _documentService.GetUserRequestsWithPublicDeedAsync(userRequestPaginationQuery);
 
-                return Ok(usersRequestWithPublicDeed);
+                long totalUserRequests = await _documentService.CountUserRequestAsync(userRequestPaginationQuery.DocumentNumber);
+
+                var paginatedUserRequests = new PaginatedUserRequest(usersRequestWithPublicDeed, totalUserRequests);
+
+                return Ok(paginatedUserRequests);
             }
             catch (Exception ex)
             {

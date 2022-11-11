@@ -22,8 +22,10 @@ static void ConfigureServices(IServiceCollection services)
 {
     services.AddScoped<ISwalFireRepository, SwalFireRepository>();
     services.AddScoped<IHttpRepository, HttpRepository>();
+    services.AddScoped<IDocumentRepository, DocumentRepository>();
 
     services.AddTransient<ToolWindowStrategy>();
+    services.AddTransient<DocumentStrategy>();
 }
 
     

@@ -1,0 +1,43 @@
+﻿@page "/solicitudes"
+
+<PageTitle>Solicitudes</PageTitle>
+
+<GenericListHeader HeaderIcon="fa-copy" HeaderTitle="Solicitudes" HeaderDescription="Visualice todas las solicitudes registradas en el sistema"
+                   CreationButtonDescription="Agregar Solicitud"></GenericListHeader>
+
+<MudCard Elevation="5" Class="mt-2">
+    <MudTable ServerData="@(new Func<TableState, Task<TableData<UserRequestWithPublicDeedResponse>>>(ReloadTableAsync))" Hover="true" Loading="requestsLoading"
+        Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Primary" @ref="requestsList" RowsPerPage="5">
+        <HeaderContent>
+            <MudTh class="header-table">Título</MudTh>
+            <MudTh class="header-table">Tipo</MudTh>
+            <MudTh class="header-table">Estado</MudTh>
+            <MudTh class="header-table">Fecha de Registro</MudTh>
+            <MudTh class="header-table">Acciones</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Título">@context.Content.Title</MudTd>
+            <MudTd DataLabel="Tipo">@context.Type</MudTd>
+            <MudTd DataLabel="Estado">
+                <MudChip Variant="Variant.Text" Color="Color.Success">
+                    @context.State.First().ToString().ToUpper()@context.State.Substring(1)
+                </MudChip>
+            </MudTd>
+            <MudTd DataLabel="Fecha de Registro">
+                @context.InitDate.ToString("dd/MM/yyyy")
+            </MudTd>
+            <MudTd DataLabel="Acciones"></MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <MudPaper Elevation="0" Class="transparent-color">
+                <MudText Typo="Typo.h6" Class="text-center">No se encontraron sus solicitudes registradas en el sistema</MudText>
+            </MudPaper>
+        </NoRecordsContent>
+        <PagerContent>
+            @if (TotalUserRequests > 0)
+            {
+                <MudPagination SelectedChanged="ChangePage" MiddleCount="5" Count="TotalUserRequests" Class="pa-3" />
+            }
+        </PagerContent>
+    </MudTable>
+</MudCard>

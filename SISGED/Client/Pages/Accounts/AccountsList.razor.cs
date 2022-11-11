@@ -10,7 +10,7 @@ using System.Linq.Expressions;
 
 namespace SISGED.Client.Pages.Accounts
 {
-    public partial class AccountList
+    public partial class AccountsList
     {
         [Inject]
         public IHttpRepository HttpRepository { get; set; } = default!;

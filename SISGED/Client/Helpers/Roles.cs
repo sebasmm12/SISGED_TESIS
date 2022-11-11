@@ -8,6 +8,7 @@
         SecretariaGeneral,
         JuntaDirectiva,
         TribunalHonor,
+        Fiscal,
         TramiteDocumentario
     }
 }
