@@ -23,7 +23,7 @@ namespace SISGED.Client.Services.Repositories
                 new("Pago de Entrega de Testimonio", "PagoTestimonio", Roles.ArchivosExnotarios),
                 new("Conclusión de Firma - Aprobación Notarial", "AprobacionConclusionFirma", Roles.ArchivosExnotarios),
                 new("Solicitud de Denuncia", "ComplaintRequest", Roles.MesaPartes),
-                new("Aperturamiento Disciplinario", "AperturamientoDisciplinario", Roles.TribunalHonor),
+                new("Aperturamiento Disciplinario", "DisciplinaryOpenness", Roles.TribunalHonor),
                 new("Solicitud de Expediente de Notario", "SolicitudExpedienteNotario", Roles.Fiscal),
                 new("Entrega de Expediente de Notario", "EntregaExpedienteNotario", Roles.TramiteDocumentario),
                 new("Dictamen", "Dictamen", Roles.Fiscal),

@@ -1,4 +1,5 @@
-﻿using SISGED.Client.Services.Contracts;
+﻿using SISGED.Client.Components.Documents.Registers;
+using SISGED.Client.Services.Contracts;
 using SISGED.Shared.Entities;
 
 namespace SISGED.Client.Services.Repositories
@@ -9,7 +10,8 @@ namespace SISGED.Client.Services.Repositories
         {
             new BPNRequestDocument(),
             new SignExpeditionRequestDocument(),
-            new ComplaintRequestDocument()
+            new ComplaintRequestDocument(),
+            new DisciplinaryOpennessDocument()
         };
 
         public IDocumentRender GetDocument(string documentType)
