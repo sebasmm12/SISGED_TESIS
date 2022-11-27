@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SISGED.Shared.Models.Requests.Documents
 {
-    public class SolicitorDesignationDocumentRegister
+    public class DossierWrapper
     {
         public string Id { get; set; }
         public object Document { get; set; }

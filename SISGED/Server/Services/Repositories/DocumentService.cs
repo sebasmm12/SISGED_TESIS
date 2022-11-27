@@ -217,7 +217,7 @@ namespace SISGED.Server.Services.Repositories
             if (updatedDocument is null) throw new Exception($"No se pudo actualizar el historial del proceso del documento con identificador {documentId}");
         }
 
-        public async Task<SolicitorDesignationDocument> SolicitorDesignationOfficeRegisterAsync(SolicitorDesignationDocumentRegister dossierwrapper, List<string> url2)
+        public async Task<SolicitorDesignationDocument> SolicitorDesignationOfficeRegisterAsync(DossierWrapper dossierwrapper, List<string> url2)
         {
             //Deserealizacion de Obcject a tipo OficioDesignacionNotarioDTO
             SolicitorDesignationDocumentResponse oficioDesignacionNotarioDTO = new SolicitorDesignationDocumentResponse();
@@ -285,7 +285,7 @@ namespace SISGED.Server.Services.Repositories
             return documentoODN;
         }
 
-        public async Task<BPNDocument> RegisterBPNOfficeAsync(SolicitorDesignationDocumentRegister dossierWrapper, List<string> url2, string url)
+        public async Task<BPNDocument> RegisterBPNOfficeAsync(DossierWrapper dossierWrapper, List<string> url2, string url)
         {
             //Obtenemos los datos del expedientewrapper
             BPNOfficeResponse oficioBPNDTO = new BPNOfficeResponse();
@@ -353,7 +353,7 @@ namespace SISGED.Server.Services.Repositories
             return documentoBPN;
         }
 
-        public async Task<BPNRequest> RegisterBPNRquestAsync(SolicitorDesignationDocumentRegister dossierWrapper, List<string> url2)
+        public async Task<BPNRequest> RegisterBPNRquestAsync(DossierWrapper dossierWrapper, List<string> url2)
         {
             //Obtenemos los datos del expedientewrapper
             BPNRequestResponse document = new BPNRequestResponse();
@@ -421,7 +421,7 @@ namespace SISGED.Server.Services.Repositories
             return solicitudBPN;
         }
 
-        public async Task<ComplaintRequest> RegisterComplaintRequestAsync(SolicitorDesignationDocumentRegister dossierWrapper, List<string> url2, string urlData)
+        public async Task<ComplaintRequest> RegisterComplaintRequestAsync(DossierWrapper dossierWrapper, List<string> url2, string urlData)
         {
             //conversion de Object a Tipo especifico
             ComplaintRequestResponse documento = new ComplaintRequestResponse();
@@ -480,7 +480,7 @@ namespace SISGED.Server.Services.Repositories
             return solicitudDenuncia;
         }
 
-        public async Task<SignExpeditionRequest> RegisterSignExpeditionRequestAsync(SolicitorDesignationDocumentRegister dossierWrapepr, List<string> url2, string urlData)
+        public async Task<SignExpeditionRequest> RegisterSignExpeditionRequestAsync(DossierWrapper dossierWrapepr, List<string> url2, string urlData)
         {
             //Conversion de Obj a tipo SolicitudExpedicionFirmaDTO
             SignExpeditionRegisterResponse solicitudExpedicionFirmasDTO = new SignExpeditionRegisterResponse();
@@ -545,7 +545,7 @@ namespace SISGED.Server.Services.Repositories
             return documentIR;
         }
 
-        public async Task<SignConclusion> singConclusionERegisterAsync(SolicitorDesignationDocumentRegister dossierWrapper, List<string> url2, string documentId)
+        public async Task<SignConclusion> singConclusionERegisterAsync(DossierWrapper dossierWrapper, List<string> url2, string documentId)
         {
             //Obtenemos los datos del expedientewrapper
             SignConclusionResponse DTO = new SignConclusionResponse();
@@ -663,7 +663,7 @@ namespace SISGED.Server.Services.Repositories
             return dossier;
         }
 
-        public async Task<Dictum> DictumRegisterAsync(DictumResponse DTO, SolicitorDesignationDocumentRegister dossierWrapper, List<string> url2)
+        public async Task<Dictum> DictumRegisterAsync(DictumResponse DTO, DossierWrapper dossierWrapper, List<string> url2)
         {
             //Obtenemos los datos del expedientewrapper
 
@@ -840,7 +840,7 @@ namespace SISGED.Server.Services.Repositories
             return bPNResult;
         }
 
-        public async Task<SolicitorDossierShipment> SolicitorDossierShipmentRegisterAsync(SolicitorDossierShipmentResponse DTO, SolicitorDesignationDocumentRegister dossierWrapper, List<string> url2)
+        public async Task<SolicitorDossierShipment> SolicitorDossierShipmentRegisterAsync(SolicitorDossierShipmentResponse DTO, DossierWrapper dossierWrapper, List<string> url2)
         {
             //Obtenemos los datos del expedientewrapper
             var json = JsonConvert.SerializeObject(dossierWrapper.Document);
@@ -947,7 +947,7 @@ namespace SISGED.Server.Services.Repositories
             return await _documentsCollection.FindOneAndUpdateAsync<Document>(filter, update);
         }
 
-        public async Task<SolicitorDesignationDocument> UpdateDocumentODNAsync(SolicitorDesignationDocumentRegister dossierWrapper, List<string> url2)
+        public async Task<SolicitorDesignationDocument> UpdateDocumentODNAsync(DossierWrapper dossierWrapper, List<string> url2)
         {
             //Deserealizacion de Obcject a tipo OficioDesignacionNotarioDTO
             SolicitorDesignationDocumentResponse DTO = new SolicitorDesignationDocumentResponse();
@@ -976,7 +976,7 @@ namespace SISGED.Server.Services.Repositories
             return oficioDesignacionNotario;
         }
 
-        public async Task<Appeal> AppealDocumentUpdateAsync(SolicitorDesignationDocumentRegister dossierWrapper, string urlData, List<string> url2)
+        public async Task<Appeal> AppealDocumentUpdateAsync(DossierWrapper dossierWrapper, string urlData, List<string> url2)
         {
             //Deserealizacion de Obcject a tipo DTO
             AppealResponse DTO = new AppealResponse();
@@ -1003,7 +1003,7 @@ namespace SISGED.Server.Services.Repositories
             return appeal;
         }
 
-        public async Task<DisciplinaryOpenness> DisciplinaryOpennessDocumentUpdateAsync(SolicitorDesignationDocumentRegister dossierWrapper, List<string> url2)
+        public async Task<DisciplinaryOpenness> DisciplinaryOpennessDocumentUpdateAsync(DossierWrapper dossierWrapper, List<string> url2)
         {
             //Deserealizacion de Obcject a tipo DTO
             DisciplinaryOpennessResponse DTO = new DisciplinaryOpennessResponse();
@@ -1056,7 +1056,7 @@ namespace SISGED.Server.Services.Repositories
             return disciplinaryOpenness;
         }
 
-        public async Task<SignConclusion> UpdateSignConclusionDocumentAsync(SolicitorDesignationDocumentRegister dossierWrapper, List<string> url2)
+        public async Task<SignConclusion> UpdateSignConclusionDocumentAsync(DossierWrapper dossierWrapper, List<string> url2)
         {
             //Deserealizacion de Obcject a tipo DTO
             SignConclusionResponse DTO = new SignConclusionResponse();
@@ -1086,7 +1086,7 @@ namespace SISGED.Server.Services.Repositories
             return signConclusion;
         }
 
-        public async Task<Dictum> UpdateDictumDocumentAsync(SolicitorDesignationDocumentRegister dossierWrapper, List<string> url2)
+        public async Task<Dictum> UpdateDictumDocumentAsync(DossierWrapper dossierWrapper, List<string> url2)
         {
             //Deserealizacion de Obcject a tipo DTO
             DictumResponse DTO = new DictumResponse();
@@ -1133,7 +1133,7 @@ namespace SISGED.Server.Services.Repositories
 
         }
 
-        public async Task<BPNDocument> UpdateBPNOfficeDocumentAsync(SolicitorDesignationDocumentRegister dossierWrapper, List<string> url2)
+        public async Task<BPNDocument> UpdateBPNOfficeDocumentAsync(DossierWrapper dossierWrapper, List<string> url2)
         {
             //Deserealizacion de Obcject a tipo DTO
             BPNOfficeResponse DTO = new BPNOfficeResponse();
@@ -1174,7 +1174,7 @@ namespace SISGED.Server.Services.Repositories
             return oficioBPN;
         }
 
-        public async Task<Resolution> UpdateResolutionDocumentAsync(SolicitorDesignationDocumentRegister dossierWrapper, string urlData, List<string> url2)
+        public async Task<Resolution> UpdateResolutionDocumentAsync(DossierWrapper dossierWrapper, string urlData, List<string> url2)
         {
             //Deserealizacion de Obcject a tipo DTO
             ResolutionResponse DTO = new ResolutionResponse();
@@ -1215,7 +1215,7 @@ namespace SISGED.Server.Services.Repositories
             return resolution;
         }
 
-        public async Task UpdateSENDocumentAsync(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task UpdateSENDocumentAsync(DossierWrapper dossierWrapper)
         {
             //Deserealizacion de Obcject a tipo DTO
             SolicitorDossierRequestResponse DTO = new SolicitorDossierRequestResponse();
@@ -1238,7 +1238,7 @@ namespace SISGED.Server.Services.Repositories
             await _documentsCollection.UpdateOneAsync(filter, update);
         }
 
-        public async Task<BPNResult> UpdateBPNResultDocumentAsync(SolicitorDesignationDocumentRegister dossierWrapper, List<string> url2)
+        public async Task<BPNResult> UpdateBPNResultDocumentAsync(DossierWrapper dossierWrapper, List<string> url2)
         {
             //Deserealizacion de Obcject a tipo DTO
             BPNResultResponse DTO = new BPNResultResponse();
@@ -1264,7 +1264,7 @@ namespace SISGED.Server.Services.Repositories
             return result;
         }
 
-        public async Task UpdateInitialRequestDocumentAsync(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task UpdateInitialRequestDocumentAsync(DossierWrapper dossierWrapper)
         {
             //Deserealizacion de Obcject a tipo DTO
             InitialRequestResponse DTO = new InitialRequestResponse();
@@ -1286,7 +1286,7 @@ namespace SISGED.Server.Services.Repositories
             await _documentsCollection.UpdateOneAsync(filter, update);
         }
 
-        public async Task UpdateEENDocumentAsync(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task UpdateEENDocumentAsync(DossierWrapper dossierWrapper)
         {
             //Deserealizacion de Obcject a tipo DTO
             SolicitorDossierShipmentResponse DTO = new SolicitorDossierShipmentResponse();
@@ -1302,7 +1302,7 @@ namespace SISGED.Server.Services.Repositories
 
             await _documentsCollection.UpdateOneAsync(filter, update);
         }
-        public async Task UpdateInitialRequestStateAsync(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task UpdateInitialRequestStateAsync(DossierWrapper dossierWrapper)
         {
             //Deserealizacion de Obcject a tipo DTO
             InitialRequestResponse DTO = new InitialRequestResponse();

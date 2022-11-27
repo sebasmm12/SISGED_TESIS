@@ -53,7 +53,7 @@ namespace SISGED.Client.Pages.Requests
 
                 if(userRequestsResponse.Error)
                 {
-                    await SwalFireRepository.ShowErroSwalFireAsync("No se pudo obtener las solicitudes del sistema");
+                    await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener las solicitudes del sistema");
                 }
 
                 if (requestsLoading) requestsLoading = false;
@@ -63,7 +63,7 @@ namespace SISGED.Client.Pages.Requests
             catch (Exception)
             {
 
-                await SwalFireRepository.ShowErroSwalFireAsync("No se pudo obtener sus solicitudes registradas en el sistema");
+                await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener sus solicitudes registradas en el sistema");
                 return new PaginatedUserRequest(new List<UserRequestWithPublicDeedResponse>(), 0);
             }
         }

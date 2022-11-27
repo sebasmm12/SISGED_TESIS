@@ -23,7 +23,7 @@ namespace SISGED.Client.Services.Repositories
             await ShowSwalFireAsync(new("Exitoso", htmlContent, SwalFireIcons.Success));
         }
         
-        public async Task ShowErroSwalFireAsync(string htmlContent)
+        public async Task ShowErrorSwalFireAsync(string htmlContent)
         {
             await ShowSwalFireAsync(new("Error", htmlContent, SwalFireIcons.Error));
         }
