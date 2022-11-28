@@ -27,7 +27,7 @@ namespace SISGED.Client.Services.Repositories
                 new("Solicitud de Expediente de Notario", "SolicitorDossierRequest", Roles.Fiscal),
                 new("Entrega de Expediente de Notario", "EntregaExpedienteNotario", Roles.TramiteDocumentario),
                 new("Dictamen", "Dictamen", Roles.Fiscal),
-                new("Resolución", "Resolucion", Roles.TribunalHonor),
+                new("Resolución", "Resolution", Roles.TribunalHonor),
             };
         }
     }

@@ -7,7 +7,7 @@
 
                 <div class="field-container input-group-2 @CurrentEditContext.FieldCssClass( () => solicitorDossierRequest.Content.Title)">
                     <MudTextField @bind-Value="@solicitorDossierRequest.Content.Title" Class="text-field-style"
-                                  Label="Title de la solicitud" @oninput='@(e => KeyUp(e,"Title",solicitorDossierRequest.Content))'></MudTextField>
+                                  Label="Título de la solicitud" @oninput='@(e => KeyUp(e,"Title",solicitorDossierRequest.Content))'></MudTextField>
                     <div class="incorrecto">
                         <MudIcon Icon="@Icons.Filled.Error" Class="val-icon bad-icon"></MudIcon>
                         <ValidationMessage For="@(() => solicitorDossierRequest.Content.Title)" />
