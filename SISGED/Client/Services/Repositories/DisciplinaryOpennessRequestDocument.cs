@@ -5,9 +5,9 @@ using SISGED.Shared.Entities;
 
 namespace SISGED.Client.Services.Repositories
 {
-    public class DisciplinaryOpennessDocument : IDocumentRender
+    public class DisciplinaryOpennessRequestDocument : IDocumentRender
     {
-        public string DocumentType { get; set; } = "DisciplinaryOpenness";
+        public string DocumentType { get; set; } = "DisciplinaryOpennessRequest";
         public RenderFragment RenderFragment { get; set; } = builder =>
         {
             builder.OpenComponent(0, typeof(DisciplinaryOpennessRegister));

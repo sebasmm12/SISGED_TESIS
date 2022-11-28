@@ -11,7 +11,8 @@ namespace SISGED.Client.Services.Repositories
             new BPNRequestDocument(),
             new SignExpeditionRequestDocument(),
             new ComplaintRequestDocument(),
-            new DisciplinaryOpennessDocument()
+            new DisciplinaryOpennessRequestDocument(),
+            new SolicitorDossierRequestDocument()
         };
 
         public IDocumentRender GetDocument(string documentType)
