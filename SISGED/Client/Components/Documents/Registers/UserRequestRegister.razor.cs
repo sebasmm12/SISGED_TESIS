@@ -56,17 +56,17 @@ namespace SISGED.Client.Components.Documents.Registers
             await RegisterUserRequestDocumentAsync(documentRegister);
         }
         
-        private SolicitorDesignationDocumentRegister GetDocumentRegister()
+        private DossierWrapper GetDocumentRegister()
         {
             var initialRequestContent = Mapper.Map<InitialRequestResponseContent>(userRequest);
             var initialRequest = new InitialRequestResponse(initialRequestContent, annexes);
 
-            var documentRegister = new SolicitorDesignationDocumentRegister(initialRequest);
+            var documentRegister = new DossierWrapper(initialRequest);
 
             return documentRegister;
         }
 
-        private async Task RegisterUserRequestDocumentAsync(SolicitorDesignationDocumentRegister documentRegister)
+        private async Task RegisterUserRequestDocumentAsync(DossierWrapper documentRegister)
         {
             try
             {
@@ -74,13 +74,13 @@ namespace SISGED.Client.Components.Documents.Registers
 
                 if (userRequestResponse.Error)
                 {
-                    await SwalFireRepository.ShowErroSwalFireAsync("No se pudo registar su solicitud");
+                    await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo registar su solicitud");
                 }
             }
             catch (Exception)
             {
 
-                await SwalFireRepository.ShowErroSwalFireAsync("No se pudo registar su solicitud");
+                await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo registar su solicitud");
             }
         }
 
@@ -92,14 +92,14 @@ namespace SISGED.Client.Components.Documents.Registers
 
                 if(documentTypesResponse.Error)
                 {
-                    await SwalFireRepository.ShowErroSwalFireAsync("No se pudo obtener los tipos de solicitudes del sistema");
+                    await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los tipos de solicitudes del sistema");
                 }
 
                 return documentTypesResponse.Response!;
             }
             catch (Exception)
             {
-                await SwalFireRepository.ShowErroSwalFireAsync("No se pudo obtener los tipos de solicitudes del sistema");
+                await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los tipos de solicitudes del sistema");
                 return new List<DocumentTypeInfoResponse>();
             }
         }

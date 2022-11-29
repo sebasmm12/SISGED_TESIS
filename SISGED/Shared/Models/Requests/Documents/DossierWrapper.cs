@@ -13,11 +13,11 @@ namespace SISGED.Shared.Models.Requests.Documents
         public string? CurrentUserId { get; set; }
         public string? InputDocument { get; set; }
 
-        public SolicitorDesignationDocumentRegister(object document)
+        public DossierWrapper(object document)
         {
             Document = document;
         }
 
-        public SolicitorDesignationDocumentRegister() {  }
+        public DossierWrapper() {  }
     }
 }

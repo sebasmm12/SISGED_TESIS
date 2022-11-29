@@ -44,7 +44,7 @@ namespace SISGED.Client.Generics
 
                 if (autocompletedSolicitorResponse.Error)
                 {
-                    await SwalFireRepository.ShowErroSwalFireAsync("No se pudo obtener los notarios registrados en el sistema");
+                    await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los notarios registrados en el sistema");
                 }
 
                 await JSRuntime.InvokeVoidAsync("console.log", autocompletedSolicitorResponse.Response);
@@ -53,7 +53,7 @@ namespace SISGED.Client.Generics
             }
             catch (Exception)
             {
-                await SwalFireRepository.ShowErroSwalFireAsync("No se pudo obtener los notarios registrados en el sistema");
+                await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los notarios registrados en el sistema");
                 return new List<SolicitorInfoResponse>();
             }
         }
