@@ -1,244 +1,132 @@
 ﻿<div class="div-form">
-    <EditForm EditContext="@_editContext" Context="CurrentEditContext" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
+    @if (pageLoading)
+    {
+        <GenericPageLoader Body="Cargando los elementos para el registro de la solicitud, por favor espere..."></GenericPageLoader>
+    }
+    else
+    {
+        <MudForm @ref="requestForm" ValidationDelay="0" Model="disciplinaryOpenness" Validation="@(disciplinaryOpennessRegisterValidator.ValidateValue)">
 
-        <FluentValidator></FluentValidator>
+            <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+                <MudTabPanel Text="General">
 
-        <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
-            <MudTabPanel Text="General">
+                    <div class="field-container input-group-2 @(() => disciplinaryOpenness.Content.Title)">
+                        <MudTextField @bind-Value="@disciplinaryOpenness.Content.Title" Class="text-field-style"
+                                  Label="Titulo del Oficio" For="@(()=>disciplinaryOpenness.Content.Title)"></MudTextField>
+                    </div>
 
-                <div class="field-container input-group-2 @CurrentEditContext.FieldCssClass( () => disciplinaryOpenness.Content.Title)">
-                    <MudTextField @bind-Value="@disciplinaryOpenness.Content.Title" Class="text-field-style"
-                                  Label="Titulo del Oficio" @oninput='@(e => KeyUp(e,"Title",disciplinaryOpenness.Content))'></MudTextField>
-                    <div class="incorrecto">
-                        <MudIcon Icon="@Icons.Filled.Error" Class="val-icon bad-icon"></MudIcon>
-                        <ValidationMessage For="@(() => disciplinaryOpenness.Content.Title)" />
+                    <div class="field-container input-group-2 @(() => disciplinaryOpenness.Content.Description)">
+                        <MudTextField @bind-Value="@disciplinaryOpenness.Content.Description" Class="text-field-style"
+                                  Label="Description del aperturamiento" For="@(()=>disciplinaryOpenness.Content.Description)"></MudTextField>
                     </div>
-                    <div class="correcto">
-                        <MudIcon Icon="@Icons.Filled.Check" Class="val-icon good-icon"></MudIcon>
-                        <span class="good-msg">Correcto</span>
-                    </div>
-                </div>
 
-                <div class="field-container input-group-2 @CurrentEditContext.FieldCssClass( () => disciplinaryOpenness.Content.Description)">
-                    <MudTextField @bind-Value="@disciplinaryOpenness.Content.Description" Class="text-field-style"
-                                  Label="Description del aperturamiento" @oninput='@(e => KeyUp(e,"Description",disciplinaryOpenness.Content))'></MudTextField>
-                    <div class="incorrecto">
-                        <MudIcon Icon="@Icons.Filled.Error" Class="val-icon bad-icon"></MudIcon>
-                        <ValidationMessage For="@(() => disciplinaryOpenness.Content.Description)" />
+                    <div class="field-container input-group-2 @(() => disciplinaryOpenness.Content.Complainant)">
+                        <MudTextField @bind-Value="@disciplinaryOpenness.Content.Complainant" Class="text-field-style"
+                                  Label="Nombre del denunciante" For="@(()=>disciplinaryOpenness.Content.Complainant)"></MudTextField>
                     </div>
-                    <div class="correcto">
-                        <MudIcon Icon="@Icons.Filled.Check" Class="val-icon good-icon"></MudIcon>
-                        <span class="good-msg">Correcto</span>
-                    </div>
-                </div>
 
-                <div class="field-container input-group-2 @CurrentEditContext.FieldCssClass( () => disciplinaryOpenness.Content.Complainant)">
-                    <MudTextField @bind-Value="@disciplinaryOpenness.Content.Complainant" Class="text-field-style"
-                                  Label="Nombre del denunciante" @oninput='@(e => KeyUp(e,"Complainant",disciplinaryOpenness.Content))'></MudTextField>
-                    <div class="incorrecto">
-                        <MudIcon Icon="@Icons.Filled.Error" Class="val-icon bad-icon"></MudIcon>
-                        <ValidationMessage For="@(() => disciplinaryOpenness.Content.Complainant)" />
+                    <div class="field-container input-group-2 @(() => disciplinaryOpenness.Content.AudienceLocation)">
+                        <MudTextField @bind-Value="@disciplinaryOpenness.Content.AudienceLocation" Class="text-field-style"
+                                  Label="Lugar de la audiencia" For="@(()=>disciplinaryOpenness.Content.AudienceLocation)"></MudTextField>
                     </div>
-                    <div class="correcto">
-                        <MudIcon Icon="@Icons.Filled.Check" Class="val-icon good-icon"></MudIcon>
-                        <span class="good-msg">Correcto</span>
-                    </div>
-                </div>
 
-                <div class="field-container input-group-2 @CurrentEditContext.FieldCssClass( () => disciplinaryOpenness.Content.AudienceLocation)">
-                    <MudTextField @bind-Value="@disciplinaryOpenness.Content.AudienceLocation" Class="text-field-style"
-                                  Label="Lugar de la audiencia" @oninput='@(e => KeyUp(e,"AudienceLocation",disciplinaryOpenness.Content))'></MudTextField>
-                    <div class="incorrecto">
-                        <MudIcon Icon="@Icons.Filled.Error" Class="val-icon bad-icon"></MudIcon>
-                        <ValidationMessage For="@(() => disciplinaryOpenness.Content.AudienceLocation)" />
-                    </div>
-                    <div class="correcto">
-                        <MudIcon Icon="@Icons.Filled.Check" Class="val-icon good-icon"></MudIcon>
-                        <span class="good-msg">Correcto</span>
-                    </div>
-                </div>
+                    <div class="field-container input-group-2 @(() => disciplinaryOpenness.Content.AudienceStartDate)">
 
-                <div class="field-container input-group-2 @CurrentEditContext.FieldCssClass(() => disciplinaryOpenness.Content.AudienceStartDate)">
+                        <MudDatePicker Label="Fecha de Inicio" AllowInput="false" @bind-Value="@disciplinaryOpenness.Content.AudienceStartDate" For="@(()=>disciplinaryOpenness.Content.AudienceStartDate)"></MudDatePicker>
+                    </div>
 
-                    <MudDatePicker Label="Fecha de Inicio" AllowInput="false" @bind-Value="@disciplinaryOpenness.Content.AudienceStartDate"></MudDatePicker>
-                    <div class="incorrecto">
-                        <MudIcon Icon="@Icons.Filled.Error" Class="val-icon bad-icon"></MudIcon>
-                        <ValidationMessage For="@(() => disciplinaryOpenness.Content.AudienceStartDate)" />
-                    </div>
-                    <div class="correcto">
-                        <MudIcon Icon="@Icons.Filled.Check" Class="val-icon good-icon"></MudIcon>
-                        <span class="good-msg">Correcto</span>
-                    </div>
-                </div>
+                    <div class="field-container input-group-2 @(() => disciplinaryOpenness.Content.AudienceEndDate)">
 
-                <div class="field-container input-group-2 @CurrentEditContext.FieldCssClass(() => disciplinaryOpenness.Content.AudienceEndDate)">
-
-                    <MudDatePicker Label="Fecha de Finalizacion" AllowInput="false" @bind-Value="@disciplinaryOpenness.Content.AudienceEndDate"></MudDatePicker>
-                    <div class="incorrecto">
-                        <MudIcon Icon="@Icons.Filled.Error" Class="val-icon bad-icon"></MudIcon>
-                        <ValidationMessage For="@(() => disciplinaryOpenness.Content.AudienceEndDate)" />
+                        <MudDatePicker Label="Fecha de Finalizacion" AllowInput="false" @bind-Value="@disciplinaryOpenness.Content.AudienceEndDate" For="@(()=>disciplinaryOpenness.Content.AudienceEndDate)"></MudDatePicker>
                     </div>
-                    <div class="correcto">
-                        <MudIcon Icon="@Icons.Filled.Check" Class="val-icon good-icon"></MudIcon>
-                        <span class="good-msg">Correcto</span>
-                    </div>
-                </div>
 
 
-                <div class="field-container input-group-2 @CurrentEditContext.FieldCssClass(() => disciplinaryOpenness.Content.SolicitorId)">
-                    <MudAutocomplete @bind-Value="@disciplinaryOpenness.Content.SolicitorId"
-                                     Placeholder="Ingrese el Nombre del Notario">
-                        <ItemSelectedTemplate>
-                            <strong>Notario: @context.Name @context.LastName  -  N° DNI: @context.DNI</strong>
-                        </ItemSelectedTemplate>
-                        <ItemTemplate>
-                            <strong>Notario: @context.Name @context.LastName  -  N° DNI: @context.DNI</strong>
-                        </ItemTemplate>
-                        <NoItemsTemplate>
-                            <span style="color:red;font-size:20px">NO SE ENCONTRARON RESULTADOS</span>
-                        </NoItemsTemplate>
-                    </MudAutocomplete>
-                    <div class="incorrecto">
-                        <MudIcon Icon="@Icons.Filled.Error" Class="val-icon bad-icon"></MudIcon>
-                        <ValidationMessage For="@(() => disciplinaryOpenness.Content.SolicitorId)" />
+                    <div class="field-container input-group-2 @(() => disciplinaryOpenness.Content.SolicitorId)">
+                        <MudAutocomplete @bind-Value="@disciplinaryOpenness.Content.SolicitorId"
+                                     Placeholder="Ingrese el Nombre del Notario" For="@(()=>disciplinaryOpenness.Content.SolicitorId)">
+                            <ItemSelectedTemplate>
+                                <strong>Notario: @context.Name @context.LastName  -  N° DNI: @context.DNI</strong>
+                            </ItemSelectedTemplate>
+                            <ItemTemplate>
+                                <strong>Notario: @context.Name @context.LastName  -  N° DNI: @context.DNI</strong>
+                            </ItemTemplate>
+                            <NoItemsTemplate>
+                                <span style="color:red;font-size:20px">NO SE ENCONTRARON RESULTADOS</span>
+                            </NoItemsTemplate>
+                        </MudAutocomplete>
                     </div>
-                    <div class="correcto">
-                        <MudIcon Icon="@Icons.Filled.Check" Class="val-icon good-icon"></MudIcon>
-                        <span class="good-msg">Correcto</span>
-                    </div>
-                </div>
 
-                <div class="field-container input-group-2 @CurrentEditContext.FieldCssClass( () => disciplinaryOpenness.Content.ProsecutorId)">
-                    <InputSelect @bind-Value="@disciplinaryOpenness.Content.ProsecutorId" class="text-field-style custom-select">
-                        <option value="">--Seleccione un Fiscal--</option>
-                        @foreach (ProsecutorUserInfoResponse prosecutor in prosecutors)
+                    <div class="field-container input-group-2 @(() => disciplinaryOpenness.Content.ProsecutorId)">
+                        <MudSelect @bind-Value="@disciplinaryOpenness.Content.ProsecutorId" Label="Seleccione un Fiscal" class="text-field-style custom-select" For="@(()=>disciplinaryOpenness.Content.ProsecutorId)">
+                            @foreach (ProsecutorUserInfoResponse prosecutor in prosecutors)
+                            {
+                                <MudSelectItem Value="@prosecutor.Id">@prosecutor.Name @prosecutor.LastName</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </div>
+
+                    <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                        <DocumentAnnex Annexes="files"></DocumentAnnex>
+                    </MudItem>
+
+                </MudTabPanel>
+
+                <MudTabPanel Text="Participantes y Conclusiones">
+                    <!--**************************************************************************************-->
+                    <div class="contenedor-participantes">
+                        <div class="titulo-paticipantes">
+                            <div><span class="titulo">Participantes</span></div>
+                            <div class="icono" @onclick="@(addParticipant)">
+                                <MudIcon Icon="add_circle_outline"></MudIcon>
+                            </div>
+                        </div>
+                        @for (int i = 0; i < disciplinaryOpenness.Content.Participants.Count; i++)
                         {
-                            <option value="@prosecutor.Id">@prosecutor.Name @prosecutor.LastName</option>
+                            int index = i;
+                            <div class="single-textfield-container">
+                                <div class="field-container base-field input-group-2 @(() => disciplinaryOpenness.Content.Participants[index].Name)">
+                                    <MudTextField @bind-Value="@disciplinaryOpenness.Content.Participants[index].Name" Class="text-field-style"
+                                          Label="Nombre del participante" For="@(()=>disciplinaryOpenness.Content.Participants[index].Name)"></MudTextField>
+                                </div>
+                                <div class="base-icon" @onclick="@(() => removeParticipant(index))">
+                                    <MudIcon Icon="remove_circle_outline"></MudIcon>
+                                </div>
+                            </div>
                         }
-                    </InputSelect>
-                    <div class="incorrecto">
-                        <MudIcon Icon="@Icons.Filled.Error" Class="val-icon bad-icon"></MudIcon>
-                        <ValidationMessage For="@(() => disciplinaryOpenness.Content.ProsecutorId)" />
                     </div>
-                    <div class="correcto">
-                        <MudIcon Icon="@Icons.Filled.Check" Class="val-icon good-icon"></MudIcon>
-                        <span class="good-msg">Correcto</span>
-                    </div>
-                </div>
-
-                <InputFileV2 datosFile="@disciplinaryOpenness.Content.URL" archivoSeleccionado="SelectedImage"></InputFileV2>
-
-            </MudTabPanel>
-            <MudTabPanel Text="Participantes y Conclusiones">
-                <!--**************************************************************************************-->
-                <div class="contenedor-participantes">
-                    <div class="titulo-paticipantes">
-                        <div><span class="titulo">Participantes</span></div>
-                        <div class="icono" @onclick="@(addParticipant)">
-                            <MudIcon Icon="add_circle_outline"></MudIcon>
-                        </div>
-                    </div>
-                    @for (int i = 0; i < disciplinaryOpenness.Content.Participants.Count; i++)
-                    {
-                        int index = i;
-                        <div class="single-textfield-container">
-                            <div class="field-container base-field input-group-2 @CurrentEditContext.FieldCssClass(() => disciplinaryOpenness.Content.Participants[index].Name)">
-                                <MudTextField @bind-Value="@disciplinaryOpenness.Content.Participants[index].Name" Class="text-field-style"
-                                          Label="Nombre del participante"
-                                          @oninput='@(e => KeyUp(e, "nombre", disciplinaryOpenness.Content.Participants[index]))'></MudTextField>
-                                <div class="incorrecto">
-                                    <MudIcon Icon="@Icons.Filled.Error" Class="val-icon bad-icon"></MudIcon>
-                                    <ValidationMessage For="@(() => disciplinaryOpenness.Content.Participants[index].Name)" />
-                                </div>
-                                <div class="correcto">
-                                    <MudIcon Icon="@Icons.Filled.Check" Class="val-icon good-icon"></MudIcon>
-                                    <span class="good-msg">Correcto</span>
-                                </div>
-                            </div>
-                            <div class="base-icon" @onclick="@(() => removeParticipant(index))">
-                                <MudIcon Icon="remove_circle_outline"></MudIcon>
+                    <!--**************************************************************************************-->
+                    <div class="contenedor-participantes">
+                        <div class="titulo-paticipantes">
+                            <div><span class="titulo">Hechos Imputados</span></div>
+                            <div class="icono" @onclick="@(addDeed)">
+                                <MudIcon Icon="add_circle_outline"></MudIcon>
                             </div>
                         </div>
-                    }
-                    <div class="field-container base-field input-group-2 @CurrentEditContext.FieldCssClass(() => disciplinaryOpenness.Content.Participants)">
-                        <div class="incorrecto">
-                            <MudIcon Icon="@Icons.Filled.Error" Class="val-icon bad-icon"></MudIcon>
-                            <ValidationMessage For="@(() => disciplinaryOpenness.Content.Participants)" />
-                        </div>
-                        <div class="correcto">
-                            <MudIcon Icon="@Icons.Filled.Check" Class="val-icon good-icon"></MudIcon>
-                            <span class="good-msg">Correcto</span>
-                        </div>
-                    </div>
-                </div>
-                <!--**************************************************************************************-->
-                <div class="contenedor-participantes">
-                    <div class="titulo-paticipantes">
-                        <div><span class="titulo">Hechos Imputados</span></div>
-                        <div class="icono" @onclick="@(addDeed)">
-                            <MudIcon Icon="add_circle_outline"></MudIcon>
-                        </div>
-                    </div>
-                    @for (int i = 0; i < disciplinaryOpenness.Content.ChargedDeeds.Count; i++)
-                    {
-                        int index = i;
-                        <div class="single-textfield-container">
-                            <div class="field-container base-field input-group-2 @CurrentEditContext.FieldCssClass(() => disciplinaryOpenness.Content.ChargedDeeds[index].Description)">
-                                <MudTextField @bind-Value="@disciplinaryOpenness.Content.ChargedDeeds[index].Description" Class="text-field-style"
-                                          Label="Nombre del participante"
-                                          @oninput='@(e => KeyUp(e, "Description", disciplinaryOpenness.Content.ChargedDeeds[index]))'></MudTextField>
-                                <div class="incorrecto">
-                                    <MudIcon Icon="@Icons.Filled.Error" Class="val-icon bad-icon"></MudIcon>
-                                    <ValidationMessage For="@(() => disciplinaryOpenness.Content.ChargedDeeds[index].Description)" />
+                        @for (int i = 0; i < disciplinaryOpenness.Content.ChargedDeeds.Count; i++)
+                        {
+                            int index = i;
+                            <div class="single-textfield-container">
+                                <div class="field-container base-field input-group-2 @(() => disciplinaryOpenness.Content.ChargedDeeds[index].Description)">
+                                    <MudTextField @bind-Value="@disciplinaryOpenness.Content.ChargedDeeds[index].Description" Class="text-field-style"
+                                          Label="Nombre del participante" For="@(()=>disciplinaryOpenness.Content.ChargedDeeds[index].Description)"></MudTextField>
                                 </div>
-                                <div class="correcto">
-                                    <MudIcon Icon="@Icons.Filled.Check" Class="val-icon good-icon"></MudIcon>
-                                    <span class="good-msg">Correcto</span>
+                                <div class="base-icon" @onclick="@(() => removeDeed(index))">
+                                    <MudIcon Icon="remove_circle_outline"></MudIcon>
                                 </div>
                             </div>
-                            <div class="base-icon" @onclick="@(() => removeDeed(index))">
-                                <MudIcon Icon="remove_circle_outline"></MudIcon>
-                            </div>
-                        </div>
-                    }
-                    <div class="field-container base-field input-group-2 @CurrentEditContext.FieldCssClass(() => disciplinaryOpenness.Content.ChargedDeeds)">
-                        <div class="incorrecto">
-                            <MudIcon Icon="@Icons.Filled.Error" Class="val-icon bad-icon"></MudIcon>
-                            <ValidationMessage For="@(() => disciplinaryOpenness.Content.ChargedDeeds)" />
-                        </div>
-                        <div class="correcto">
-                            <MudIcon Icon="@Icons.Filled.Check" Class="val-icon good-icon"></MudIcon>
-                            <span class="good-msg">Correcto</span>
-                        </div>
+                        }
                     </div>
-                </div>
 
-            </MudTabPanel>
-            <MudTabPanel Text="Subir Anexo">
-                <DragnDrop Label="" ImagenSeleccionada="SelectedImage2" FileNames="FileName"></DragnDrop>
-                @if (names != null && names.Count > 0)
-                {
-                    @for (int i = 0; i < names.Count; i++)
-                    {
-                        int index = i;
-                        string a = names[i];
-                        <div>
-                            @names[i]
-
-                            <button class="btn btn-link text-danger p-0 pl-1" type="button"
-                            @onclick="@(e => RemoveFile(a,index))">
-                                <small class="RedText">Eliminar</small>
-                            </button>
-                        </div>
-                    }
-                }
-                <div class="field-container">
-                    <MudButton ButtonType="@ButtonType.Submit"
-                               Disabled="@loadProcess"
-                               Icon="@Icons.Filled.CheckCircleOutline"
-                               Class="button-input-style mat-success-c sub-but">Registrar Ahora</MudButton>
-                </div>
-            </MudTabPanel>
-        </MudTabs>
-    </EditForm>
+                </MudTabPanel>
+                <MudTabPanel Text="Subir Anexo">
+                    <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                        <DocumentAnnex Annexes="annexes"></DocumentAnnex>
+                    </MudItem>
+                    <div class="field-container">
+                        <MudButton Color="Color.Success" Class="rounded-pill" OnClick="@(async() => await RegisterRequestAsync())">Registrar Ahora</MudButton>
+                    </div>
+                </MudTabPanel>
+            </MudTabs>
+        </MudForm>
+    }
 </div>

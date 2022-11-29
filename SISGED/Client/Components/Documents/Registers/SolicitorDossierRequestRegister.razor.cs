@@ -29,6 +29,8 @@ using SISGED.Client.Services.Contracts;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Responses.Document;
 using Newtonsoft.Json;
+using SISGED.Shared.Validators;
+using SISGED.Shared.DTOs;
 
 namespace SISGED.Client.Components.Documents.Registers
 {
@@ -38,18 +40,22 @@ namespace SISGED.Client.Components.Documents.Registers
         private IHttpRepository httpRepository { get; set; } = default!;
         [Inject]
         private ISwalFireRepository swalFireRepository { get; set; } = default!;
+        [Inject]
+        public SolicitorDossierRequestRegisterValidator SolicitorDossierRequestRegisterValidator { get; set; } = default!;
 
         //Variables de sesion
         [CascadingParameter] WorkEnvironment workspace { get; set; }
         [CascadingParameter(Name = "SesionUsuario")] protected SessionAccountResponse session { get; set; }
 
+        private MudForm? requestForm = default!;
+
         //Datos del formulario
         [Parameter] public EventCallback<DossierTrayResponse> increaseTray { get; set; }
         private SolicitorDossierRequestResponse solicitorDossierRequest = new SolicitorDossierRequestResponse();
         List<string> names = new List<string>();
-        private EditContext _editContext;
-        private string tempImage;
+        private List<MediaRegisterDTO> files = new();
         private bool loadprocess = false;
+        private bool pageLoading = true;
         int step = 0;
         int substep = 0;
         String typeDocument = "SolicitudExpedienteNotario";
@@ -57,12 +63,10 @@ namespace SISGED.Client.Components.Documents.Registers
         protected override async Task OnInitializedAsync()
         {
             solicitorDossierRequest.Content.URLAnnex = new List<string>();
-            _editContext = new EditContext(solicitorDossierRequest);
             foreach (string u in solicitorDossierRequest.Content.URLAnnex)
             {
                 if (!string.IsNullOrWhiteSpace(u))
                 {
-                    tempImage = u;
                     solicitorDossierRequest.Content.URLAnnex = null;
                 }
             }
@@ -87,31 +91,7 @@ namespace SISGED.Client.Components.Documents.Registers
             //workspace.ChangeMessage(message);
 
             //await voiceMessage;
-
-        }
-        private void SelectedImage(string imagenbase64)
-        {
-            solicitorDossierRequest.Content.URLAnnex.Add(imagenbase64);
-        }
-
-        private void FileName(string imagenbase64)
-        {
-            names.Add(imagenbase64);
-        }
-
-        private async Task RemoveFile(string file, int imagen64)
-        {
-            names.Remove(file);
-            solicitorDossierRequest.Content.URLAnnex.RemoveAt(imagen64);
-            StateHasChanged();
-        }
-
-        void KeyUp(ChangeEventArgs e, string memberName, object val)
-        {
-            var property = val.GetType().GetProperty(memberName);
-            property.SetValue(val, e.Value.ToString());
-            var fi = new FieldIdentifier(val, memberName);
-            _editContext.NotifyFieldChanged(fi);
+            pageLoading = false;
         }
 
         public async Task HandleValidSubmit()
@@ -210,6 +190,19 @@ namespace SISGED.Client.Components.Documents.Registers
         {
             loadprocess = false;
             swalFireRepository.ShowErrorSwalFireAsync("Por favor, Verifique los Datos Ingresados");
+        }
+
+        private async Task RegisterRequestAsync()
+        {
+            await requestForm!.Validate();
+
+            if (!requestForm.IsValid)
+            {
+                HandleInvalidSubmit();
+                return;
+            }
+
+            await HandleValidSubmit();
         }
     }
 }

@@ -28,6 +28,8 @@ using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Requests.Documents;
 using SISGED.Shared.Models.Responses.Account;
 using Newtonsoft.Json;
+using SISGED.Shared.Validators;
+using SISGED.Shared.DTOs;
 
 namespace SISGED.Client.Components.Documents.Registers
 {
@@ -37,6 +39,10 @@ namespace SISGED.Client.Components.Documents.Registers
         private IHttpRepository httpRepository { get; set; } = default!;
         [Inject]
         private ISwalFireRepository swalFireRepository { get; set; } = default!;
+        [Inject]
+        public DisciplinaryOpennessRegisterValidator disciplinaryOpennessRegisterValidator { get; set; } = default!;
+
+        private MudForm? requestForm = default!;
 
         //Variables de sesion
         [CascadingParameter] WorkEnvironment workspace { get; set; }
@@ -44,14 +50,14 @@ namespace SISGED.Client.Components.Documents.Registers
         //Datos del formulario
         [Parameter] public EventCallback<DossierTrayResponse> increaseTray { get; set; }
         private DisciplinaryOpennessResponse disciplinaryOpenness = new DisciplinaryOpennessResponse();
-        private EditContext _editContext;
-        List<string> names = new List<string>();
-        private string tempImage;
-        private string tempImage2;
+
         private bool loadProcess = false;
+        private bool pageLoading = false;
         int step = 0;
         int substep = 0;
         String typeDocument = "AperturamientoDisciplinario";
+        private List<MediaRegisterDTO> files = new();
+        private List<MediaRegisterDTO> annexes = new();
 
         List<ProsecutorUserInfoResponse> prosecutors { get; set; } = new List<ProsecutorUserInfoResponse>();
 
@@ -60,18 +66,16 @@ namespace SISGED.Client.Components.Documents.Registers
             disciplinaryOpenness.Content.Participants = new List<Participant>() { new Participant() { Index = 0, Name = "" } };
             disciplinaryOpenness.Content.ChargedDeeds = new List<Deed>() { new Deed() { Index = 0, Description = "" } };
             disciplinaryOpenness.Content.URLAnnex = new List<string>();
-            _editContext = new EditContext(disciplinaryOpenness);
+
             foreach (string u in disciplinaryOpenness.Content.URLAnnex)
             {
                 if (!string.IsNullOrWhiteSpace(u))
                 {
-                    tempImage2 = u;
                     disciplinaryOpenness.Content.URLAnnex = null;
                 }
             }
             if (!string.IsNullOrEmpty(disciplinaryOpenness.Content.URL))
             {
-                tempImage = disciplinaryOpenness.Content.URL;
                 disciplinaryOpenness.Content.URL = null;
             }
             var httpResponse = await httpRepository.GetAsync<List<ProsecutorUserInfoResponse>>("api/users/prosecutors");
@@ -103,6 +107,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
             //await voiceMessage;
 
+            pageLoading = false;
 
         }
 
@@ -128,29 +133,6 @@ namespace SISGED.Client.Components.Documents.Registers
             StateHasChanged();
         }
 
-        private void SelectedImage(string imagenbase64)
-        {
-            disciplinaryOpenness.Content.URL = imagenbase64;
-        }
-
-        private void SelectedImage2(string imagenbase64)
-        {
-            disciplinaryOpenness.Content.URLAnnex.Add(imagenbase64);
-        }
-
-        private void FileName(string imagenbase64)
-        {
-            names.Add(imagenbase64);
-        }
-
-        private void RemoveFile(string file, int imagen64)
-        {
-            names.Remove(file);
-            disciplinaryOpenness.Content.URLAnnex.RemoveAt(imagen64);
-            StateHasChanged();
-
-        }
-
         //Consulta de notarios
         private async Task<IEnumerable<Solicitor>> Match(string searchtext)
         {
@@ -163,14 +145,6 @@ namespace SISGED.Client.Components.Documents.Registers
             {
                 return httpResponse.Response!;
             }
-        }
-
-        void KeyUp(ChangeEventArgs e, string memberName, object val)
-        {
-            var property = val.GetType().GetProperty(memberName);
-            property.SetValue(val, e.Value.ToString());
-            var fi = new FieldIdentifier(val, memberName);
-            _editContext.NotifyFieldChanged(fi);
         }
 
         public async Task HandleValidSubmit()
@@ -267,6 +241,19 @@ namespace SISGED.Client.Components.Documents.Registers
         {
             loadProcess = false;
             swalFireRepository.ShowErrorSwalFireAsync("Por favor, verifique los Datos Ingresados");
+        }
+
+        private async Task RegisterRequestAsync()
+        {
+            await requestForm!.Validate();
+
+            if (!requestForm.IsValid)
+            {
+                HandleInvalidSubmit();
+                return;
+            }
+
+            await HandleValidSubmit();
         }
     }
 }
