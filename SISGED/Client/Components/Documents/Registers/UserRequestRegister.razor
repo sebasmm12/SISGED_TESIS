@@ -1,0 +1,65 @@
+﻿<MudDialog>
+    <DialogContent>
+        @if(pageLoading)
+        {
+            <GenericPageLoader Body="Cargando los elementos para el registro de la solicitud, por favor espere..."></GenericPageLoader>
+        }
+        else
+        {
+            <MudCard Elevation="0" class="w-100">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <GenericFormHeader HeaderIcon="fa-file-circle-plus" HeaderTitle="Registro de Solicitud" HeaderDescription="Registre su solicitud para que se puede comenzar con su atención"></GenericFormHeader>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudForm @ref="userRequestForm" ValidationDelay="0" Model="userRequest" Validation="@(UserRequestRegisterValidator.ValidateValue)">
+                    <MudCardContent>
+                        <MudGrid>
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                                <MudSelect T="DocumentTypeInfoResponse" AdornmentIcon="fas fa-file-lines" AdornmentColor="Color.Primary"
+                                       Label="Tipo de Solicitud" Dense="true" Variant="Variant.Outlined" Clearable="true" @bind-Value="userRequest.DocumentType"
+                                       For="@(() => userRequest.DocumentType)">
+                                    @foreach (var documentType in documentTypes)
+                                    {
+                                        <MudSelectItem Value="documentType"></MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                                <MudTextField @bind-Value="userRequest.Title" Label="Título" Variant="Variant.Outlined"
+                                          Adornment="Adornment.End" AdornmentIcon="fas fa-pencil" Immediate="true"
+                                          For="@(() => userRequest.Title)"></MudTextField>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                                <MudSwitch @bind-Checked="userRequest.HasSolicitor" Color="Color.Secondary">Asociado a un notario?</MudSwitch>
+                            </MudItem>
+                            @if (userRequest.HasSolicitor)
+                            {
+                                <MudItem xs="12" sm="12" md="6" lg="6" xl="12" class="pr-0">
+                                    <GenericSolicitorAutocomplete SelectedSolicitor="userRequest.Solicitor"></GenericSolicitorAutocomplete>
+                                </MudItem>
+                            }
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <MudTextField @bind-Value="userRequest.Description" Label="Asunto" Variant="Variant.Outlined" 
+                                            Lines="5" Immediate="true" For="@(() => userRequest.Description)"
+                                ></MudTextField>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <DocumentAnnex Annexes="annexes"></DocumentAnnex>
+                            </MudItem>
+                        </MudGrid>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudPaper Elevation="0" Class="ml-auto">
+                            <MudButton Variant="Variant.Filled" Color="Color.Error" Class="rounded-pill" OnClick="@(() => CancelRegister())">Cancelar</MudButton>
+                            <MudButton Variant="Variant.Filled" Color="Color.Success" Class="rounded-pill" OnClick="@(async() => await RegisterUserRequestAsync())">Registrar Solicitud</MudButton>
+                        </MudPaper>
+                    </MudCardActions>
+                </MudForm>
+            </MudCard>  
+        }
+        
+    </DialogContent>
+</MudDialog>
+
+

@@ -1,0 +1,14 @@
+﻿@media only screen and (max-width: 467px) {
+    .text-sm-center {
+        text-align: center;
+    }
+
+    .mud-table-pagination {
+        justify-content: center !important;
+    }
+
+    .solicitor-item {
+        flex-basis: 100%;
+        text-align: center
+    }
+}

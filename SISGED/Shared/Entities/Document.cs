@@ -429,12 +429,30 @@ namespace SISGED.Shared.Entities
         public string Description { get; set; } = default!;
         [BsonElement("titulo")]
         public string Title { get; set; } = default!;
+        [BsonElement("idtiposolicitud")]
+        public string RequestTypeId { get; set; } = default!;
+        [BsonElement("tienenotario")]
+        public bool HasSolicitor { get; set; }
+        [BsonElement("idnotario")]
+        public string SolicitorId { get; set; } = default!;
 
     }
 
     [BsonDiscriminator("SolicitudInicial")]
     public class InitialRequest : Document
     {
+        public InitialRequest() {  }
+
+        public InitialRequest(InitialRequestContent content, string state, List<string> urls)
+        {
+            Content = content;
+            State = state;
+            Type = "SolicitudInicial";
+            ContentsHistory = new();
+            ProcessesHistory = new();
+            AttachedUrls = urls;
+        }
+
         [BsonElement("contenido")]
         public InitialRequestContent Content { get; set; } = new();
     }

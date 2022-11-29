@@ -27,6 +27,8 @@ namespace SISGED.Shared.Entities
         public SolicitorOffice SolicitorOffice { get; set; } = new();
         [BsonElement("imagen")]
         public string Profile { get; set; } = default!;
+        [BsonElement("exnotario")]
+        public bool ExSolicitor { get; set; }
         [BsonElement("expedientes")]
         public List<string> Dossiers { get; set; } = new();
     }

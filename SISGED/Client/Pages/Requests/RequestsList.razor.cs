@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
+using SISGED.Client.Components.Documents.Registers;
 using SISGED.Client.Services.Contracts;
 using SISGED.Shared.Models.Responses.Document.UserRequest;
 using SISGED.Shared.Models.Responses.User;
@@ -27,6 +28,12 @@ namespace SISGED.Client.Pages.Requests
 
         private int TotalUserRequests => (requestsList.GetFilteredItemsCount() + requestsList.RowsPerPage - 1) / requestsList.RowsPerPage;
 
+        private void CreateUserRequest()
+        {
+             DialogService.Show<UserRequestRegister>("Registro de Solicitud", 
+                new DialogOptions() { FullWidth = true, MaxWidth = MaxWidth.Large, Position = DialogPosition.Center, NoHeader = true});
+        }
+        
         private void ChangePage(int page)
         {
             requestsList.NavigateTo(page - 1);

@@ -3,7 +3,8 @@
 <PageTitle>Solicitudes</PageTitle>
 
 <GenericListHeader HeaderIcon="fa-copy" HeaderTitle="Solicitudes" HeaderDescription="Visualice todas las solicitudes registradas en el sistema"
-                   CreationButtonDescription="Agregar Solicitud"></GenericListHeader>
+                   CreationButtonDescription="Agregar Solicitud"
+                   OnCreationButton="CreateUserRequest"></GenericListHeader>
 
 <MudCard Elevation="5" Class="mt-2">
     <MudTable ServerData="@(new Func<TableState, Task<TableData<UserRequestWithPublicDeedResponse>>>(ReloadTableAsync))" Hover="true" Loading="requestsLoading"

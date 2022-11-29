@@ -9,6 +9,7 @@ namespace SISGED.Server.Helpers.Infrastructure
         {
             services.AddSingleton<IFileStorageService, AzureFileStorageService>();
             services.AddSingleton<IFileService, FileService>();
+            services.AddSingleton<IMediaService, MediaService>();
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITrayService, TrayService>();
@@ -22,6 +23,7 @@ namespace SISGED.Server.Helpers.Infrastructure
             services.AddScoped<IPublicDeedsService, PublicDeedsService>();
             services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<IStepService, StepService>();
+            services.AddScoped<IDocumentTypeService, DocumentTypeService>();
 
             return services;
         }

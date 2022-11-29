@@ -1,0 +1,19 @@
+﻿<MudFileUpload T="IReadOnlyList<IBrowserFile>" Hidden="false" OnFilesChanged="@(async(e) => await OnInputFileChanged(e))"
+    @ondragenter="@(() => SetDragClass())" @ondragleave="@(() => ClearDragClass())" @ondragend="@(() => ClearDragClass())"
+               InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20 opacity-0">
+    <ButtonTemplate>
+        <MudPaper Height="300px" Outlined="true" class="@dragClass">
+            <MudText Typo="Typo.h6">Arrastre los archivos o haga clic para subir los anexos</MudText>
+            <MudGrid>
+                @foreach (var annex in Annexes)
+                {
+                    <MudItem Class="width-min-content z-30" @key="annex.Name">
+                        <AnnexPrevisualization AnnexName="@annex.Name" AnnexPreview="GetAnnexPreview(annex.Extension)"
+                                           DeleteAnnex="DeleteAnnex"></AnnexPrevisualization>
+                    </MudItem>
+                }
+            </MudGrid>
+        </MudPaper>
+    </ButtonTemplate>
+</MudFileUpload>
+

@@ -6,8 +6,6 @@ namespace SISGED.Client.Generics
 {
     public partial class GenericDialogContent
     {
-        [Inject]
-        public ISwalFireRepository SwalFireRepository { get; set; } = default!;
 
         [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
         [Parameter] public string Body { get; set; } = default!;

@@ -21,6 +21,7 @@ using SISGED.Shared.Models.Responses.Document.SolicitorDossierShipment;
 using SISGED.Shared.Models.Responses.Document.UserRequest;
 using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.DossierDocument;
+using Json = System.Text.Json;
 
 namespace SISGED.Server.Controllers
 {
@@ -37,7 +38,13 @@ namespace SISGED.Server.Controllers
         private readonly IAssistantService _assistantService;
         private readonly IMapper _mapper;
 
-        public DocumentsController(IDocumentService documentService, IDossierService dossierService, ITrayService trayService, IPublicDeedsService publicDeedsService, IFileStorageService fileStorage, IAssistantService assistantService, IMapper mapper)
+        private readonly IMediaService _mediaService;
+
+        private readonly string _containerName = "solicitudesiniciales";
+
+        public DocumentsController(IDocumentService documentService, IDossierService dossierService, ITrayService trayService, 
+            IPublicDeedsService publicDeedsService, IFileStorageService fileStorage, IAssistantService assistantService, IMapper mapper,
+            IMediaService mediaService)
         {
             _documentService = documentService;
             _dossierService = dossierService;
@@ -46,6 +53,7 @@ namespace SISGED.Server.Controllers
             _fileService = fileStorage;
             _assistantService = assistantService;
             _mapper = mapper;
+            _mediaService = mediaService;
         }
 
         #region POST
@@ -242,89 +250,30 @@ namespace SISGED.Server.Controllers
             }
         }
 
-        [HttpPost("registrarsolicitudinicial")]
-        public async Task<ActionResult<DossierDocumentInitialRequestResponse>> InitialRequestDocumentRegister(SolicitorDesignationDocumentRegister dossierWrapper)
+        [HttpPost("user-requests")]
+        public async Task<ActionResult<DossierDocumentInitialRequestResponse>> RegisterInitialRequestDocumentAsync(SolicitorDesignationDocumentRegister dossierWrapper)
         {
             try
             {
-                //Obtenemos los datos del expedientewrapper
-                InitialRequestResponse doc = new InitialRequestResponse();
-                var json = JsonConvert.SerializeObject(dossierWrapper.Document);
-                doc = JsonConvert.DeserializeObject<InitialRequestResponse>(json)!;
+                var document = DeserializeDocument<InitialRequestResponse>(dossierWrapper.Document);
 
-                List<string> url2 = new List<string>();
-                string urlData2 = "";
-                foreach (string u in doc.Content.URLAnnex)
-                {
-                    if (!string.IsNullOrWhiteSpace(u))
-                    {
-                        var solicitudBytes2 = Convert.FromBase64String(u);
-                        FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "solicitudesiniciales");
-                        urlData2 = await _fileService.SaveFileAsync(file) ?? string.Empty;
-                        url2.Add(urlData2);
-                    }
-                }
+                var initialRequest = await RegisterInitialRequestAsync(document);
+                
+                var dossier = await RegisterInitialDossierAsync(document, initialRequest);
 
-                //Creacionde Obj y almacenamiento en la coleccion documento
-                InitialRequestContent contenidoDTOInicial = new InitialRequestContent()
-                {
-                    Title = doc.Content.Title,
-                    Description = doc.Content.Description,
-                };
+                await _trayService.UserInputTrayInsertAsync(dossier.Id, initialRequest.Id, "MesaPartes");
 
-                InitialRequest soliInicial = new InitialRequest()
-                {
-                    Type = "SolicitudInicial",
-                    Content = contenidoDTOInicial,
-                    State = "pendiente",
-                    AttachedUrls = url2,
-                    ContentsHistory = new List<ContentVersion>(),
-                    ProcessesHistory = new List<Process>()
-                };
+                // TODO: Implement the assistant service when creating the initial request
+                //var assistant = new Assistant();
+                //assistant.DossierId = dossier.Id;
+                //assistant.Steps = new();
+                //assistant.Steps.DossierName = "Solicitud";
 
-                soliInicial = await _documentService.InitialRequestRegisterAsync(soliInicial);
+                //await _assistantService.CreateAsync(assistant);
+                
+                var dossierDocumentResponse = new DossierDocumentInitialRequestResponse(dossier, initialRequest);
 
-                //Creacionde del Obj. Expediente de Denuncia y registro en coleccion de expedientes
-                Shared.Entities.Client cliente = new Shared.Entities.Client()
-                {
-                    Name = doc.ClientName,
-                    DocumentType = doc.DocumentType,
-                    DocumentNumber = doc.DocumentNumber
-                };
-                Dossier expediente = new Dossier();
-                expediente.Type = "Solicitud";
-                expediente.Client = cliente;
-                expediente.StartDate = DateTime.UtcNow.AddHours(-5);
-                expediente.EndDate = null;
-                expediente.Documents = new List<DossierDocument>()
-            {
-                new DossierDocument(){
-                    Index = 1,
-                    DocumentId = soliInicial.Id,
-                    Type  = "SolicitudInicial",
-                    CreationDate = DateTime.UtcNow.AddHours(-5),
-                    ExcessDate= DateTime.UtcNow.AddHours(-5).AddDays(10),
-                    DelayDate = null
-                }
-            };
-                expediente.Derivations = new List<Derivation>();
-                expediente.State = "solicitado";
-                await _dossierService.CreateDossierAsync(expediente);
-
-                await _trayService.UserInputTrayInsertAsync(expediente.Id, soliInicial.Id, "josue");
-
-                Assistant assistant = new Assistant();
-                assistant.DossierId = expediente.Id;
-                assistant.Steps = new AssistantStep();
-                assistant.Steps.DossierName = "Solicitud";
-
-                await _assistantService.CreateAsync(assistant);
-
-                DossierDocumentInitialRequestResponse dossierDocIR = new DossierDocumentInitialRequestResponse();
-                dossierDocIR.Dossier = expediente;
-                dossierDocIR.InitialRequest = soliInicial;
-
-                return Ok(dossierDocIR);
+                return Ok(dossierDocumentResponse);
             }
             catch (Exception ex)
             {
@@ -1153,6 +1102,34 @@ namespace SISGED.Server.Controllers
             }
         }
 
+        #endregion
+
+        #region POST private methods
+        private async Task<InitialRequest> RegisterInitialRequestAsync(InitialRequestResponse document)
+        {
+            var urls = await _mediaService.SaveFilesAsync(document.URLAnnex, _containerName);
+
+            var initialRequestContent = _mapper.Map<InitialRequestContent>(document.Content);
+            var initialRequest = new InitialRequest(initialRequestContent, "pendiente", urls.ToList());
+
+            return await _documentService.InitialRequestRegisterAsync(initialRequest);
+        }
+        private async Task<Dossier> RegisterInitialDossierAsync(InitialRequestResponse document, InitialRequest initialRequest)
+        {
+            var client = new Shared.Entities.Client(document.ClientName, document.DocumentType, document.DocumentNumber);
+            var dossier = new Dossier(client, "Solicitud", "registrado"); // In the past, the state was "solicitado"
+
+            dossier.AddDocument(new DossierDocument(1, initialRequest.Id, "SolicitudInicial", DateTime.UtcNow.AddHours(-5).AddDays(10)));
+
+            await _dossierService.CreateDossierAsync(dossier);
+
+            return dossier;
+        }
+        private static T DeserializeDocument<T>(object document)
+        {
+            string json = Json.JsonSerializer.Serialize(document);
+            return Json.JsonSerializer.Deserialize<T>(json)!;
+        }
         #endregion
 
     }

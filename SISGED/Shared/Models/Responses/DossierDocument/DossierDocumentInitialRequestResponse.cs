@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SISGED.Shared.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,15 @@ namespace SISGED.Shared.Models.Responses.DossierDocument
 {
     public class DossierDocumentInitialRequestResponse
     {
-        public Entities.Dossier Dossier { get; set; }
-        public Entities.InitialRequest InitialRequest{ get; set; }
+        public Entities.Dossier Dossier { get; set; } = default!;
+        public Entities.InitialRequest InitialRequest { get; set; } = default!;
+
+        public DossierDocumentInitialRequestResponse() { }
+
+        public DossierDocumentInitialRequestResponse(Entities.Dossier dossier, InitialRequest initialRequest)
+        {
+            Dossier = dossier;
+            InitialRequest = initialRequest;
+        }
     }
 }

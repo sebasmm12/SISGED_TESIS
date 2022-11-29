@@ -12,5 +12,14 @@ namespace SISGED.Client.Generics
         public string HeaderDescription { get; set; } = default!;
         [Parameter]
         public string CreationButtonDescription { get; set; } = default!;
+        [Parameter]
+        public EventCallback OnCreationButton { get; set; }
+
+        private async Task CreateEntityAsync()
+        {
+            await OnCreationButton.InvokeAsync();
+        }
+
+
     }
 }

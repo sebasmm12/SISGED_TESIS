@@ -8,6 +8,7 @@ using SISGED.Shared.Models.Responses.Document.BPNRequest;
 using SISGED.Shared.Models.Responses.Document.Dictum;
 using SISGED.Shared.Models.Responses.Document.InitialRequest;
 using SISGED.Shared.Models.Responses.Document.Resolution;
+using SISGED.Shared.Models.Responses.DocumentType;
 using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.Role;
 using SISGED.Shared.Models.Responses.Solicitor;
@@ -29,7 +30,10 @@ namespace SISGED.Server.Helpers.Infrastructure
             CreateMap<Role, RoleInfoResponse>().ReverseMap();
 
             // Solicitor Mapper
-            CreateMap<Solicitor, SolicitorInfoResponse>().ReverseMap();
+            CreateMap<Solicitor, SolicitorInfoResponse>()
+                .ForMember(solicitorInfoResponse => solicitorInfoResponse.SolicitorOfficeName, options => options.MapFrom(solicitor => solicitor.SolicitorOffice.Name));
+
+            CreateMap<SolicitorInfoResponse, Solicitor>();
 
             // Steps Mapper and its related classes
             CreateMap<DocumentStep, StepGenericModel.DocumentStep>()
@@ -75,6 +79,10 @@ namespace SISGED.Server.Helpers.Infrastructure
             // Initial Request Mapper
             CreateMap<InitialRequestContent, InitialRequestContentInfo>();
             CreateMap<InitialRequest, InitialRequestInfoResponse>();
+            CreateMap<InitialRequestResponseContent, InitialRequestContent>();
+
+            // Document Type Mapper
+            CreateMap<DocumentType, DocumentTypeInfoResponse>().ReverseMap();
 
         }
 

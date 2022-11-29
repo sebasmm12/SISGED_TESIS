@@ -1,0 +1,7 @@
+﻿<MudBadge Icon="@Icons.Material.Filled.Close" Color="Color.Error" Overlap="true" Bordered="true"
+          OnClick="@(async() => await DeleteAnnexAsync())" BadgeClass="pointer">
+    <MudPaper Elevation="5" class="text-center pa-2 relative">
+        <MudIcon Class="@($"fas { AnnexPreview.Icon } { AnnexPreview.Color }")" Size="Size.Large"></MudIcon>
+        <MudText Typo="Typo.body1">@AnnexName</MudText>
+    </MudPaper>
+</MudBadge>

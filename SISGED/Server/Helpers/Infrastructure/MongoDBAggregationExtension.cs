@@ -181,5 +181,15 @@ namespace SISGED.Server.Helpers.Infrastructure
         {
             return new BsonDocument("$sort", new BsonDocument().AddRange(valuesToSort));
         }
+
+        public static BsonDocument AddFields(Dictionary<string, BsonValue> valuesToAdd)
+        {
+            return new BsonDocument("$addFields", new BsonDocument().AddRange(valuesToAdd));
+        }
+
+        public static BsonDocument UnSet(BsonValue bsonElement)
+        {
+            return new BsonDocument("$unset", bsonElement);
+        }
     }
 }

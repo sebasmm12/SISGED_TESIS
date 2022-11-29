@@ -71,18 +71,52 @@ namespace SISGED.Server.Services.Repositories
 
         }
 
-        public async Task UserInputTrayInsertAsync(string dossierId, string DocumentId, string Username)
+        public async Task UserInputTrayInsertAsync(string dossierId, string documentId, string type)
         {
-            DocumentTray bandejaDocumento = new DocumentTray();
-            bandejaDocumento.DocumentId = dossierId;
-            bandejaDocumento.DocumentId = DocumentId;
-            UpdateDefinition<Tray> updateBandeja = Builders<Tray>.Update.Push("bandejaentrada", bandejaDocumento);
-            User usuario = await _usersCollection.Find(user => user.UserName == Username).FirstAsync();
-            await _traysCollection.UpdateOneAsync(band => band.User == usuario.Id, updateBandeja);
+            var documentTray = new DocumentTray(dossierId, documentId);
+            
+            Tray userTray = await GetUserTrayWithLessInputTrayAsync(type);
+
+            await PushDocumentTrayAsync(new(documentTray, userTray.User, "bandejaentrada"));
         }
 
 
         #region private methods
+        private async Task<Tray> GetUserTrayWithLessInputTrayAsync(string type)
+        {
+            var userTray = await _traysCollection.Aggregate<Tray>(GetUserTrayWithLessInputTrayPipeLine(type)).FirstOrDefaultAsync();
+
+            if (userTray is null) throw new Exception($"No se pudo encontrar el usuario con bandeja mediante el tipo {type}");
+
+            return userTray;
+        }
+
+        private static BsonDocument[] GetUsersTraysWithLessInputTray(string type)
+        {
+            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("tipo", type));
+
+            var addFieldAggregation = MongoDBAggregationExtension.AddFields(new()
+            {
+                { "totalInputTrays", MongoDBAggregationExtension.Size("$bandejaentrada") } 
+            });
+
+            var sortAggregation = MongoDBAggregationExtension.Sort(new BsonDocument("totalInputTrays", 1));
+
+            var unSetAggregation = MongoDBAggregationExtension.UnSet("totalInputTrays");
+
+            return new BsonDocument[] { matchAggregation, addFieldAggregation, sortAggregation, unSetAggregation };
+        }
+
+        private static BsonDocument[] GetUserTrayWithLessInputTrayPipeLine(string type)
+        {
+            var usersTraysWithLessInputTray = GetUsersTraysWithLessInputTray(type);
+
+            var limitAggregation = MongoDBAggregationExtension.Limit(1);
+
+            return usersTraysWithLessInputTray.Append(limitAggregation).ToArray();
+        }
+        
+
         private PipelineDefinition<Tray, InputTrayResponse> GetInputTrayPipeline(string user)
         {
             var dossierInputLookupPipeline = DossierInputLookUpPipeline();
@@ -319,7 +353,7 @@ namespace SISGED.Server.Services.Repositories
 
         private async Task PushDocumentTrayAsync(UpdateDocumentTrayDTO updateDocumentTrayDTO)
         {
-            var updateDocumentTray = Builders<Tray>.Update.Push(updateDocumentTrayDTO.TrayType, updateDocumentTrayDTO);
+            var updateDocumentTray = Builders<Tray>.Update.Push(updateDocumentTrayDTO.TrayType, updateDocumentTrayDTO.DocumentTray);
 
             var updateTray = await _traysCollection.UpdateOneAsync(tray => tray.User == updateDocumentTrayDTO.UserId, updateDocumentTray);
 
@@ -328,7 +362,7 @@ namespace SISGED.Server.Services.Repositories
 
         private async Task PullDocumentTrayAsync(UpdateDocumentTrayDTO updateDocumentTrayDTO)
         {
-            var updateDocumentTray = Builders<Tray>.Update.Pull(updateDocumentTrayDTO.TrayType, updateDocumentTrayDTO);
+            var updateDocumentTray = Builders<Tray>.Update.Pull(updateDocumentTrayDTO.TrayType, updateDocumentTrayDTO.DocumentTray);
 
             var updateTray = await _traysCollection.UpdateOneAsync(tray => tray.User == updateDocumentTrayDTO.UserId, updateDocumentTray);
 

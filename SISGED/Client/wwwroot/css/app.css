@@ -134,6 +134,14 @@ a, .btn-link {
     font-weight: 500;
 }
 
+.text-center {
+    text-align: center;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
 .creation-button:hover {
     transform: scale(1.05);
     border: 2px solid #0066ff !important;
@@ -150,6 +158,17 @@ a, .btn-link {
     color: white !important;
 }
 
+.opacity-0 {
+    opacity: 0;
+}
+
+.width-min-content {
+    width: min-content;
+}
+
+.swal2-container {
+    z-index: 2000 !important;
+}
 
 @media only screen and (max-width: 467px) {
     .text-sm-center {
