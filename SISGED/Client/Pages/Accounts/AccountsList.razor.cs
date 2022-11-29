@@ -66,7 +66,7 @@ namespace SISGED.Client.Pages.Accounts
 
                 if (usersResponse.Error)
                 {
-                    await SwalFireRepository.ShowErroSwalFireAsync("No se pudo obtener los usuarios del sistema");
+                    await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los usuarios del sistema");
                 }
                 
                 if(usersLoading) usersLoading = false;
@@ -75,7 +75,7 @@ namespace SISGED.Client.Pages.Accounts
             }
             catch (Exception)
             {
-                await SwalFireRepository.ShowErroSwalFireAsync("No se pudo obtener los usuarios del sistema");
+                await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los usuarios del sistema");
                 return new PaginatedUserInfoResponse(new List<UserInfoResponse>(), 0);
             }
         }
@@ -170,14 +170,14 @@ namespace SISGED.Client.Pages.Accounts
 
                 if (deletedUserResponse.Error)
                 {
-                    await SwalFireRepository.ShowErroSwalFireAsync($"No se pudo {userStateMessage} al usuario {user.UserName}");
+                    await SwalFireRepository.ShowErrorSwalFireAsync($"No se pudo {userStateMessage} al usuario {user.UserName}");
                     isChanged = false;
                 }
             }
             catch (Exception)
             {
 
-                await SwalFireRepository.ShowErroSwalFireAsync($"No se pudo {userStateMessage} al usuario {user.UserName}");
+                await SwalFireRepository.ShowErrorSwalFireAsync($"No se pudo {userStateMessage} al usuario {user.UserName}");
                 isChanged = false;
             }
 

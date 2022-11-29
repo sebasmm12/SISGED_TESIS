@@ -1,0 +1,86 @@
+﻿<div class="div-form">
+    <EditForm EditContext="@_editContext" Context="CurrentEditContext"
+              OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
+        <FluentValidator></FluentValidator>
+        <MudTabs>
+            <MudTabPanel Text="Datos de la solicitud de expediente de notario">
+
+                <div class="field-container input-group-2 @CurrentEditContext.FieldCssClass( () => solicitorDossierRequest.Content.Title)">
+                    <MudTextField @bind-Value="@solicitorDossierRequest.Content.Title" Class="text-field-style"
+                                  Label="Título de la solicitud" @oninput='@(e => KeyUp(e,"Title",solicitorDossierRequest.Content))'></MudTextField>
+                    <div class="incorrecto">
+                        <MudIcon Icon="@Icons.Filled.Error" Class="val-icon bad-icon"></MudIcon>
+                        <ValidationMessage For="@(() => solicitorDossierRequest.Content.Title)" />
+                    </div>
+                    <div class="correcto">
+                        <MudIcon Icon="@Icons.Filled.Check" Class="val-icon good-icon"></MudIcon>
+                        <span class="good-msg">Correcto</span>
+                    </div>
+                </div>
+
+                <div class="field-container input-group-2 @CurrentEditContext.FieldCssClass( () => solicitorDossierRequest.Content.Description)">
+                    <MudTextField @bind-Value="@solicitorDossierRequest.Content.Description" Class="text-field-style"
+                                  Label="Descripción de la solicitud" @oninput='@(e => KeyUp(e,"Description",solicitorDossierRequest.Content))'></MudTextField>
+                    <div class="incorrecto">
+                        <MudIcon Icon="@Icons.Filled.Error" Class="val-icon bad-icon"></MudIcon>
+                        <ValidationMessage For="@(() => solicitorDossierRequest.Content.Description)" />
+                    </div>
+                    <div class="correcto">
+                        <MudIcon Icon="@Icons.Filled.Check" Class="val-icon good-icon"></MudIcon>
+                        <span class="good-msg">Correcto</span>
+                    </div>
+                </div>
+
+                <div class="field-container input-group-2 @CurrentEditContext.FieldCssClass(() => solicitorDossierRequest.Content.SolicitorId)">
+                    <MudAutocomplete @bind-Value="@solicitorDossierRequest.Content.SolicitorId"
+                                     Placeholder="Ingrese el Nombre del Notario">
+                        <ItemSelectedTemplate>
+                            <strong>Notario: @context.Name @context.LastName  -  N° DNI: @context.DNI</strong>
+                        </ItemSelectedTemplate>
+                        <ItemTemplate>
+                            <strong>Notario: @context.Name @context.LastName  -  N° DNI: @context.DNI</strong>
+                        </ItemTemplate>
+                        <NoItemsTemplate>
+                            <span style="color:red;font-size:20px">NO SE ENCONTRARON RESULTADOS</span>
+                        </NoItemsTemplate>
+                    </MudAutocomplete>
+                    <div class="incorrecto">
+                        <MudIcon Icon="@Icons.Filled.Error" Class="val-icon bad-icon"></MudIcon>
+                        <ValidationMessage For="@(() => solicitorDossierRequest.Content.SolicitorId)" />
+                    </div>
+                    <div class="correcto">
+                        <MudIcon Icon="@Icons.Filled.Check" Class="val-icon good-icon"></MudIcon>
+                        <span class="good-msg">Correcto</span>
+                    </div>
+                </div>
+
+
+            </MudTabPanel>
+            <MudTabPanel Text="Subir Anexo">
+                <DragnDrop Label="" ImagenSeleccionada="SelectedImage" FileNames="FileName"></DragnDrop>
+                @if (names != null && names.Count > 0)
+                {
+                    @for (int i = 0; i < names.Count; i++)
+                    {
+                        int index = i;
+                        string a = names[i];
+                        <div>
+                            @names[i]
+
+                            <button class="btn btn-link text-danger p-0 pl-1" type="button"
+                                    @onclick="@(e => RemoveFile(a,index))">
+                                <small class="RedText">Eliminar</small>
+                            </button>
+                        </div>
+                    }
+                }
+                <div class="field-container">
+                    <MudButton ButtonType="@ButtonType.Submit"
+                               Disabled="@loadprocess"
+                               Icon="@Icons.Filled.CheckCircleOutline"
+                               Class="button-input-style mat-success-c sub-but">Registrar Ahora</MudButton>
+                </div>
+            </MudTabPanel>
+        </MudTabs>
+    </EditForm>
+</div>

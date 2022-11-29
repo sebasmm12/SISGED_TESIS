@@ -59,7 +59,7 @@ namespace SISGED.Server.Controllers
         #region POST
 
         [HttpPost("documentoodn")]
-        public async Task<ActionResult<SolicitorDesignationDocument>> SolicitorDesignationOfficeRegister(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task<ActionResult<SolicitorDesignationDocument>> SolicitorDesignationOfficeRegister(DossierWrapper dossierWrapper)
         {
             try
             {
@@ -90,7 +90,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPost("documentosbpn")]
-        public async Task<ActionResult<BPNDocument>> OfficeBPNDocumentRegister(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task<ActionResult<BPNDocument>> OfficeBPNDocumentRegister(DossierWrapper dossierWrapper)
         {
             try
             {
@@ -128,7 +128,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPost("documentosolicbpn")]
-        public async Task<ActionResult<BPNRequest>> BPNRequestDocumentRegister(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task<ActionResult<BPNRequest>> BPNRequestDocumentRegister(DossierWrapper dossierWrapper)
         {
             try
             {
@@ -166,7 +166,7 @@ namespace SISGED.Server.Controllers
 
         [HttpPost("documentosd")]
         //public async Task<ActionResult<ExpedienteBandejaDTO>> RegistrarDocumentoSolicitudDenuncia(ExpedienteWrapper expedientewrapper)
-        public async Task<ActionResult<ComplaintRequest>> ComplaintRequestDocumentRegister(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task<ActionResult<ComplaintRequest>> ComplaintRequestDocumentRegister(DossierWrapper dossierWrapper)
         {
             try
             {
@@ -209,7 +209,7 @@ namespace SISGED.Server.Controllers
 
         [HttpPost("documentosef")]
         //public async Task<ActionResult<ExpedienteBandejaDTO>> RegistrarDocumentoSEF(ExpedienteWrapper expedientewrapper)
-        public async Task<ActionResult<SignExpeditionRequest>> RegisterSEFDocument(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task<ActionResult<SignExpeditionRequest>> RegisterSEFDocument(DossierWrapper dossierWrapper)
         {
             try
             {
@@ -251,7 +251,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPost("user-requests")]
-        public async Task<ActionResult<DossierDocumentInitialRequestResponse>> RegisterInitialRequestDocumentAsync(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task<ActionResult<DossierDocumentInitialRequestResponse>> InitialRequestDocumentRegister(DossierWrapper dossierWrapper)
         {
             try
             {
@@ -283,7 +283,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPost("documentocf")]
-        public async Task<ActionResult<SignConclusion>> CFDocumentRegister(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task<ActionResult<SignConclusion>> CFDocumentRegister(DossierWrapper dossierWrapper)
         {
             try
             {
@@ -319,7 +319,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPost("documentoad")]
-        public async Task<ActionResult<DisciplinaryOpenness>> DisciplinaryOpennessDocumentRegister(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task<ActionResult<DisciplinaryOpenness>> DisciplinaryOpennessDocumentRegister(DossierWrapper dossierWrapper)
         {
             try
             {
@@ -358,7 +358,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPost("documentod")]
-        public async Task<ActionResult<Dictum>> DictumDocumentRegister(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task<ActionResult<Dictum>> DictumDocumentRegister(DossierWrapper dossierWrapper)
         {
             try
             {
@@ -387,7 +387,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPost("documentor")]
-        public async Task<ActionResult<Resolution>> ResolutionDocumentRegister(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task<ActionResult<Resolution>> ResolutionDocumentRegister(DossierWrapper dossierWrapper)
         {
             try
             {
@@ -429,7 +429,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPost("documentoResultadoBPN")]
-        public async Task<ActionResult<BPNResult>> BPNResultDocumentRegister(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task<ActionResult<BPNResult>> BPNResultDocumentRegister(DossierWrapper dossierWrapper)
         {
             try
             {
@@ -463,7 +463,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPost("documentoEntregaExpedienteNotario")]
-        public async Task<ActionResult<SolicitorDossierShipment>> RegistrarDocumentoEntregaExpedienteNotario(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task<ActionResult<SolicitorDossierShipment>> RegistrarDocumentoEntregaExpedienteNotario(DossierWrapper dossierWrapper)
         {
             //Deserealizacion de objeto de tipo C
             SolicitorDossierShipmentResponse DTO = new SolicitorDossierShipmentResponse();
@@ -545,7 +545,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPut("actualizarDocumentoODN")]
-        public async Task<ActionResult<SolicitorDesignationDocument>> ModifyDocumentODN(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task<ActionResult<SolicitorDesignationDocument>> ModifyDocumentODN(DossierWrapper dossierWrapper)
         {
             try
             {
@@ -574,7 +574,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPut("actualizarDocumentoAPE")]
-        public async Task<ActionResult<Appeal>> AppealDocumentModify(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task<ActionResult<Appeal>> AppealDocumentModify(DossierWrapper dossierWrapper)
         {
             try
             {
@@ -610,7 +610,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPut("actualizarDocumentoAD")]
-        public async Task<ActionResult<DisciplinaryOpenness>> DisciplinaryOpennessDocumentModify(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task<ActionResult<DisciplinaryOpenness>> DisciplinaryOpennessDocumentModify(DossierWrapper dossierWrapper)
         {
             try
             {
@@ -639,7 +639,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPut("actualizarDocumentoCF")]
-        public async Task<ActionResult<SignConclusion>> SignConclusionDocumentModify(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task<ActionResult<SignConclusion>> SignConclusionDocumentModify(DossierWrapper dossierWrapper)
         {
             try
             {
@@ -668,7 +668,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPut("actualizarDocumentoD")]
-        public async Task<ActionResult<Dictum>> DictumDocumentModify(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task<ActionResult<Dictum>> DictumDocumentModify(DossierWrapper dossierWrapper)
         {
             try
             {
@@ -697,7 +697,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPut("actualizarDocumentoOficioBPN")]
-        public async Task<ActionResult<BPNDocument>> BPNOfficeDocumentModify(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task<ActionResult<BPNDocument>> BPNOfficeDocumentModify(DossierWrapper dossierWrapper)
         {
             try
             {
@@ -726,7 +726,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPut("actualizarDocumentoR")]
-        public async Task<ActionResult<Resolution>> ResolutionDocumentModify(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task<ActionResult<Resolution>> ResolutionDocumentModify(DossierWrapper dossierWrapper)
         {
             try
             {
@@ -763,7 +763,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPut("actualizarDocumentoSEN")]
-        public async Task<ActionResult> SENDocumentModify(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task<ActionResult> SENDocumentModify(DossierWrapper dossierWrapper)
         {
             try
             {
@@ -777,7 +777,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPut("actualizarDocumentoResultadoBPN")]
-        public async Task<ActionResult<BPNResult>> BPNResultDocumentModify(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task<ActionResult<BPNResult>> BPNResultDocumentModify(DossierWrapper dossierWrapper)
         {
             try
             {
@@ -806,7 +806,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPut("actualizarDocumentoSolicitudInicial")]
-        public async Task<ActionResult> InitialRequestDocumentModify(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task<ActionResult> InitialRequestDocumentModify(DossierWrapper dossierWrapper)
         {
             try
             {
@@ -819,7 +819,7 @@ namespace SISGED.Server.Controllers
             }
         }
         [HttpPut("actualizarDocumentoEEN")]
-        public async Task<ActionResult> EENDocumentModify(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task<ActionResult> EENDocumentModify(DossierWrapper dossierWrapper)
         {
             try
             {
@@ -833,7 +833,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPut("estadosolicitud")]
-        public async Task<ActionResult> InitialRequestStateModify(SolicitorDesignationDocumentRegister dossierWrapper)
+        public async Task<ActionResult> InitialRequestStateModify(DossierWrapper dossierWrapper)
         {
             try
             {
