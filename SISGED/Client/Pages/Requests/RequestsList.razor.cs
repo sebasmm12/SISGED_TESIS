@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
 using SISGED.Client.Components.Documents.Registers;
+using SISGED.Client.Helpers;
 using SISGED.Client.Services.Contracts;
+using SISGED.Shared.Models.Responses.Account;
 using SISGED.Shared.Models.Responses.Document.UserRequest;
 using SISGED.Shared.Models.Responses.User;
 
@@ -18,6 +20,9 @@ namespace SISGED.Client.Pages.Requests
         public ISwalFireRepository SwalFireRepository { get; set; } = default!;
         [Inject]
         public IDialogService DialogService { get; set; } = default!;
+        
+        [CascadingParameter(Name = "SessionAccount")]
+        public SessionAccountResponse SessionAccount { get; set; } = default!;
 
         private bool requestsLoading = true;
         private MudTable<UserRequestWithPublicDeedResponse> requestsList = default!;
@@ -28,12 +33,35 @@ namespace SISGED.Client.Pages.Requests
 
         private int TotalUserRequests => (requestsList.GetFilteredItemsCount() + requestsList.RowsPerPage - 1) / requestsList.RowsPerPage;
 
-        private void CreateUserRequest()
+        private async Task CreateUserRequest()
         {
-             DialogService.Show<UserRequestRegister>("Registro de Solicitud", 
+            var dialogParameters = GetDialogParameters(new()
+            {
+                new("SessionAccount", SessionAccount)
+            });
+
+            var dialog = DialogService.Show<UserRequestRegister>("Registro de Solicitud", dialogParameters,
                 new DialogOptions() { FullWidth = true, MaxWidth = MaxWidth.Large, Position = DialogPosition.Center, NoHeader = true});
+
+            var dialogResult = await dialog.Result;
+
+            if (dialogResult.Cancelled) return;
+
+            await requestsList.ReloadServerData();
         }
-        
+
+        private static DialogParameters GetDialogParameters(List<DialogParameter> dialogParameterDTOs)
+        {
+            var dialogParameters = new DialogParameters();
+
+            dialogParameterDTOs.ForEach(dialogParameterDTO =>
+            {
+                dialogParameters.Add(dialogParameterDTO.Name, dialogParameterDTO.Value);
+            });
+
+            return dialogParameters;
+        }
+
         private void ChangePage(int page)
         {
             requestsList.NavigateTo(page - 1);

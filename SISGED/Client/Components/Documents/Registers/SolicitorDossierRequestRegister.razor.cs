@@ -137,20 +137,20 @@ namespace SISGED.Client.Components.Documents.Registers
                 dossierTray.Document.Content = updateSolicitorDossierRequest.Content;
                 dossierTray.Document.State = updateSolicitorDossierRequest.State;
                 //expedientebandeja.documentosobj.Add(expedientebandeja.documento);
-                SISGED.Shared.Models.Item itemSalida = new SISGED.Shared.Models.Item()
-                {
-                    Name = dossierTray.Type,
-                    Value = dossierTray,
-                    Icon = "alarm_add",
-                    Description = ((DocumentResponse)dossierTray.Document).Type,
-                    CurrentPlace = "workspace",
-                    OriginPlace = "inputs",
-                    Client = dossierTray.Client,
-                    ItemStatus = "registrado"
-                };
+                //SISGED.Shared.Models.Item itemSalida = new SISGED.Shared.Models.Item()
+                //{
+                //    Name = dossierTray.Type,
+                //    Value = dossierTray,
+                //    Icon = "alarm_add",
+                //    Description = ((DocumentResponse)dossierTray.Document).Type,
+                //    CurrentPlace = "workspace",
+                //    OriginPlace = "inputs",
+                //    Client = dossierTray.Client,
+                //    ItemStatus = "registrado"
+                //};
 
-                workspace.UpdateRegisteredDocument(itemSalida);
-                workspace.UpdateTools("Registrar Documento");
+                //workspace.UpdateRegisteredDocument(itemSalida);
+                //workspace.UpdateTools("Registrar Documento");
 
                 DocumentResponse doc = new DocumentResponse();
                 doc.Id = updateSolicitorDossierRequest.Id;

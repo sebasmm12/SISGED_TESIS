@@ -19,9 +19,9 @@ namespace SISGED.Client.Components.WorkEnvironments
 
         public InputOutputTrayResponse UserTray { get; set; } = default!;
         public DossierTrayResponse SelectedTray { get; set; } = default!;
-        private List<SISGED.Shared.Models.Item> Items { get; set; } = new();
+        private List<Item> Items { get; set; } = new();
         private bool isRendered = false;
-        private List<SISGED.Shared.Models.Item> workPlaceItems { get; set; } = new();
+        private readonly List<Item> workPlaceItems = new();
 
         private bool CanReorder => workPlaceItems.Count > 0;
 
@@ -40,9 +40,9 @@ namespace SISGED.Client.Components.WorkEnvironments
             Items.AddRange(GetTrays(UserTray.OutputDossier, "outputs"));
         }
 
-        private static List<SISGED.Shared.Models.Item> GetTools(List<Permission> permissions)
+        private static List<Item> GetTools(List<Permission> permissions)
         {
-            return permissions.Select(permission => new SISGED.Shared.Models.Item()
+            return permissions.Select(permission => new Item()
             {
                 Name = permission.Label,
                 Value = permission.Name,
@@ -53,9 +53,9 @@ namespace SISGED.Client.Components.WorkEnvironments
             }).ToList();
         }
 
-        private static List<SISGED.Shared.Models.Item> GetTrays(List<DossierTrayResponse> trays, string place)
+        private static List<Item> GetTrays(List<DossierTrayResponse> trays, string place)
         {
-            return trays.Select(inputTray => new SISGED.Shared.Models.Item()
+            return trays.Select(inputTray => new Item()
             {
                 Name = inputTray.Type!,
                 Value = inputTray,
@@ -68,7 +68,7 @@ namespace SISGED.Client.Components.WorkEnvironments
             }).ToList();
         }
 
-        private void UpdateItem(MudItemDropInfo<SISGED.Shared.Models.Item> item)
+        private void UpdateItem(MudItemDropInfo<Item> item)
         {
             if (item.Item.CurrentPlace == "workplace" && item.DropzoneIdentifier != "workplace") workPlaceItems.Remove(item.Item);
 
@@ -77,22 +77,22 @@ namespace SISGED.Client.Components.WorkEnvironments
             if (item.DropzoneIdentifier == "workplace") workPlaceItems.Add(item.Item);
         }
 
-        public void UpdateTools(string name)
-        {
-            var tool = SessionAccount.UsableTools.SingleOrDefault(x => x.Name == name);
-            tool.CurrentPlace = "tools";
-            SessionAccount.UsableTools[SessionAccount.UsableTools.FindIndex(ind => ind.Name.Equals(name))] = tool;
-            StateHasChanged();
-        }
+        //public void UpdateTools(string name)
+        //{
+        //    var tool = SessionAccount.UsableTools.SingleOrDefault(x => x.Name == name);
+        //    tool.CurrentPlace = "tools";
+        //    SessionAccount.UsableTools[SessionAccount.UsableTools.FindIndex(ind => ind.Name.Equals(name))] = tool;
+        //    StateHasChanged();
+        //}
 
-        public void UpdateRegisteredDocument(SISGED.Shared.Models.Item newItem)
-        {
-            SessionAccount.Inputs[SessionAccount.Inputs.FindIndex(ind =>
-            ind.OriginPlace == "inputs" &&
-            ind.CurrentPlace == "workspace")] = newItem;
-            //sesion.herramientasutilizables[sesion.listaentradas.FindIndex(ind => ind.currentPlace == "workspace")].currentPlace = "tools";
-            StateHasChanged();
-        }
+        //public void UpdateRegisteredDocument(SISGED.Shared.Models.Item newItem)
+        //{
+        //    SessionAccount.Inputs[SessionAccount.Inputs.FindIndex(ind =>
+        //    ind.OriginPlace == "inputs" &&
+        //    ind.CurrentPlace == "workspace")] = newItem;
+        //    //sesion.herramientasutilizables[sesion.listaentradas.FindIndex(ind => ind.currentPlace == "workspace")].currentPlace = "tools";
+        //    StateHasChanged();
+        //}
 
         private async Task<InputOutputTrayResponse> GetUserTrayAsync(string userId)
         {
@@ -105,8 +105,6 @@ namespace SISGED.Client.Components.WorkEnvironments
                 {
                     return new();
                 }
-
-                //await JSRuntime.InvokeVoidAsync("console.log", userTrayResponse.Response);
 
                 return userTrayResponse.Response!;
             }

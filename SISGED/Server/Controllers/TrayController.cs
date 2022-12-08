@@ -11,12 +11,10 @@ namespace SISGED.Server.Controllers
     public class TrayController : ControllerBase
     {
         private readonly ITrayService _trayService;
-        private readonly IMapper _mapper;
 
         public TrayController(ITrayService trayService, IMapper mapper)
         {
             _trayService = trayService;
-            _mapper = mapper;
         }
 
         [HttpGet("{user}")]

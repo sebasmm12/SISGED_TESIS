@@ -7,11 +7,20 @@ namespace SISGED.Shared.Entities
     {
         public Dossier() {  }
 
-        public Dossier(Client client, string type, string state)
+        public Dossier(string type, string state)
         {
-            Client = client;
             Type = type;
             State = state;
+        }
+
+        public Dossier(Client client, string type, string state) : this(type, state)
+        {
+            Client = client;
+        }
+
+        public Dossier(string id, string type, string state) : this(type, state)
+        {
+            Id = id;
         }
 
         [BsonId]

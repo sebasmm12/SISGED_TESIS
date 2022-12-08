@@ -37,6 +37,11 @@ namespace SISGED.Shared.Entities
         public string State { get; set; } = default!;
         [BsonElement("fechacreacion")]
         public DateTime CreationDate { get; set; } = DateTime.UtcNow.AddHours(-5);
+
+        public void AddProcess(Process process)
+        {
+            ProcessesHistory.Add(process);
+        }
     }
     public class Evaluation
     {
@@ -65,12 +70,14 @@ namespace SISGED.Shared.Entities
         public string Title { get; set; } = default!;
         [BsonElement("descripcion")]
         public string Description { get; set; } = default!;
-        [BsonElement("nombrecliente")]
-        public string ClientName { get; set; } = default!;
+        [BsonElement("idnotario")]
+        public string SolicitorId { get; set; } = default!;
+        [BsonElement("idcliente")]
+        public string ClientId { get; set; } = default!;
+        [BsonElement("tipoDenuncia")]
+        public string ComplaintType { get; set; } = default!;
         [BsonElement("fechaentrega")]
         public DateTime DeliveryDate { get; set; }
-        [BsonElement("url")]
-        public string Url { get; set; } = default!;
         [BsonElement("firma")]
         public string Sign { get; set; } = default!;
         [BsonElement("urlGenerado")]
@@ -80,6 +87,19 @@ namespace SISGED.Shared.Entities
     [BsonDiscriminator("SolicitudDenuncia")]
     public class ComplaintRequest : Document
     {
+        public ComplaintRequest(ComplaintRequestContent content, string state, List<string> urls)
+        {
+            Content = content;
+            State = state;
+            AttachedUrls = urls;
+            Type = "SolicitudDenuncia";
+            ContentsHistory = new();
+            ProcessesHistory = new();
+
+        }
+
+        public ComplaintRequest() {  }
+
         [BsonElement("contenido")]
         public ComplaintRequestContent Content { get; set; } = new();
     }
@@ -465,8 +485,8 @@ namespace SISGED.Shared.Entities
         public string Description { get; set; } = default!;
         [BsonElement("titulo")]
         public string Title { get; set; } = default!;
-        [BsonElement("idnotario")]
-        public string SolicitorId { get; set; } = default!;
+        [BsonElement("notario")]
+        public string Solicitor { get; set; } = default!;
         [BsonElement("firma")]
         public string Sign { get; set; } = default!;
         [BsonElement("urlGenerado")]        

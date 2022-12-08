@@ -2,7 +2,7 @@
     @ondragenter="@(() => SetDragClass())" @ondragleave="@(() => ClearDragClass())" @ondragend="@(() => ClearDragClass())"
                InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20 opacity-0">
     <ButtonTemplate>
-        <MudPaper Height="300px" Outlined="true" class="@dragClass">
+        <MudPaper Height="@AnnexesHeight" Outlined="true" class="@dragClass">
             <MudText Typo="Typo.h6">Arrastre los archivos o haga clic para subir los anexos</MudText>
             <MudGrid>
                 @foreach (var annex in Annexes)

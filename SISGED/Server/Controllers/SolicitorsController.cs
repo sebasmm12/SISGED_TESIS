@@ -20,12 +20,12 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpGet("{solicitorId}")]
-        public async Task<ActionResult<SolicitorInfoResponse>> GetSolicitorAsync(string solicitorId)
+        public async Task<ActionResult<AutocompletedSolicitorResponse>> GetSolicitorAsync(string solicitorId)
         {
             try
             {
                 var solicitor = await _solicitorService.GetSolicitorByIdAsync(solicitorId);
-                var solicitorResponse = _mapper.Map<SolicitorInfoResponse>(solicitor);
+                var solicitorResponse = _mapper.Map<AutocompletedSolicitorResponse>(solicitor);
 
                 return Ok(solicitorResponse);
             }
@@ -36,13 +36,13 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpGet("autocomplete")]
-        public async Task<ActionResult<IEnumerable<SolicitorInfoResponse>>> GetAutocompletedSolicitorsAsync([FromQuery] string? solicitorName,
+        public async Task<ActionResult<IEnumerable<AutocompletedSolicitorResponse>>> GetAutocompletedSolicitorsAsync([FromQuery] string? solicitorName,
             [FromQuery] bool? exSolicitor)
         {
             try
             {
                 var solicitors = await _solicitorService.GetAutocompletedSolicitorsAsync(solicitorName, exSolicitor);
-                var solicitorsResponse = _mapper.Map<IEnumerable<SolicitorInfoResponse>>(solicitors);
+                var solicitorsResponse = _mapper.Map<IEnumerable<AutocompletedSolicitorResponse>>(solicitors);
 
                 return Ok(solicitorsResponse);
             }

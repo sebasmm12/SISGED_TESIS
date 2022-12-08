@@ -2,7 +2,7 @@
 
 namespace SISGED.Shared.Models.Responses.Solicitor
 {
-    public class SolicitorInfoResponse
+    public class AutocompletedSolicitorResponse
     {
         [BsonElement("id")]
         public string Id { get; set; } = default!;
@@ -14,5 +14,7 @@ namespace SISGED.Shared.Models.Responses.Solicitor
         public string SolicitorOfficeName { get; set; } = default!;
         [BsonElement("email")]
         public string Email { get; set; } = default!;
+        [BsonElement("address")]
+        public string Address { get; set; } = default!;
     }
 }

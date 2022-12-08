@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Requests.Step;
 using SISGED.Shared.Models.Requests.User;
@@ -30,10 +31,11 @@ namespace SISGED.Server.Helpers.Infrastructure
             CreateMap<Role, RoleInfoResponse>().ReverseMap();
 
             // Solicitor Mapper
-            CreateMap<Solicitor, SolicitorInfoResponse>()
-                .ForMember(solicitorInfoResponse => solicitorInfoResponse.SolicitorOfficeName, options => options.MapFrom(solicitor => solicitor.SolicitorOffice.Name));
+            CreateMap<Solicitor, AutocompletedSolicitorResponse>()
+                .ForMember(AutocompletedSolicitorResponse => AutocompletedSolicitorResponse.SolicitorOfficeName, options => options.MapFrom(solicitor => solicitor.SolicitorOffice.Name));
 
-            CreateMap<SolicitorInfoResponse, Solicitor>();
+            
+            CreateMap<AutocompletedSolicitorResponse, Solicitor>();
 
             // Steps Mapper and its related classes
             CreateMap<DocumentStep, StepGenericModel.DocumentStep>()
@@ -83,6 +85,9 @@ namespace SISGED.Server.Helpers.Infrastructure
 
             // Document Type Mapper
             CreateMap<DocumentType, DocumentTypeInfoResponse>().ReverseMap();
+
+            // Complaint Type Mapper
+            CreateMap<ComplaintRequestResponseContent, ComplaintRequestContent>();
 
         }
 

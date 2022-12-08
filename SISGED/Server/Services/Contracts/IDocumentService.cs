@@ -40,7 +40,6 @@ namespace SISGED.Server.Services.Contracts
         Task<SolicitorDesignationDocument> SolicitorDesignationOfficeRegisterAsync(DossierWrapper dossier, List<string> url2);
         Task<BPNDocument> RegisterBPNOfficeAsync(DossierWrapper dossierWrapper, List<string> url2, string url);
         Task<BPNRequest> RegisterBPNRquestAsync(DossierWrapper dossierWrapper, List<string> url2);
-        Task<ComplaintRequest> RegisterComplaintRequestAsync(DossierWrapper dossierWrapper, List<string> url2, string urlData);
         Task<SignExpeditionRequest> RegisterSignExpeditionRequestAsync(DossierWrapper expedientewrapper, List<string> url2, string urlData);
         Task<InitialRequest> InitialRequestRegisterAsync(InitialRequest documentIR);
         Task<SignConclusion> singConclusionERegisterAsync(DossierWrapper dossierWrapper, List<string> url2, string documentId);
@@ -65,5 +64,6 @@ namespace SISGED.Server.Services.Contracts
         Task UpdateEENDocumentAsync(DossierWrapper dossierWrapper);
         Task UpdateInitialRequestStateAsync(DossierWrapper dossierWrapper);
         Task<long> CountUserRequestAsync(string documentNumber);
+        Task<ComplaintRequest> RegisterComplaintRequestAsync(ComplaintRequest complaintRequest);
     }
 }

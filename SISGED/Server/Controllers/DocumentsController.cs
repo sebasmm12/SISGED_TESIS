@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SISGED.Server.Services.Contracts;
@@ -37,6 +39,7 @@ namespace SISGED.Server.Controllers
         private readonly IFileStorageService _fileService;
         private readonly IAssistantService _assistantService;
         private readonly IMapper _mapper;
+        private readonly IUserService _userService;
 
         private readonly IMediaService _mediaService;
 
@@ -44,7 +47,7 @@ namespace SISGED.Server.Controllers
 
         public DocumentsController(IDocumentService documentService, IDossierService dossierService, ITrayService trayService, 
             IPublicDeedsService publicDeedsService, IFileStorageService fileStorage, IAssistantService assistantService, IMapper mapper,
-            IMediaService mediaService)
+            IMediaService mediaService, IUserService userService)
         {
             _documentService = documentService;
             _dossierService = dossierService;
@@ -54,6 +57,7 @@ namespace SISGED.Server.Controllers
             _assistantService = assistantService;
             _mapper = mapper;
             _mediaService = mediaService;
+            _userService = userService;
         }
 
         #region POST
@@ -164,41 +168,22 @@ namespace SISGED.Server.Controllers
             }
         }
 
-        [HttpPost("documentosd")]
+        [HttpPost("complaint-requests")]
         //public async Task<ActionResult<ExpedienteBandejaDTO>> RegistrarDocumentoSolicitudDenuncia(ExpedienteWrapper expedientewrapper)
         public async Task<ActionResult<ComplaintRequest>> ComplaintRequestDocumentRegister(DossierWrapper dossierWrapper)
         {
             try
             {
-                //conversion de Object a Tipo especifico
-                ComplaintRequestResponse document = new ComplaintRequestResponse();
-                var json = JsonConvert.SerializeObject(dossierWrapper.Document);
-                document = JsonConvert.DeserializeObject<ComplaintRequestResponse>(json)!;
-                List<string> url2 = new List<string>();
-                string urlData2 = "";
-                foreach (string u in document.Content.URLAnnex)
-                {
-                    if (!string.IsNullOrWhiteSpace(u))
-                    {
-                        var solicitudBytes2 = Convert.FromBase64String(u);
-                        FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "solicituddenuncia");
-                        urlData2 = await _fileService.SaveFileAsync(file) ?? string.Empty;
-                        url2.Add(urlData2);
-                    }
-                }
-                //subida de archivo a repositorio y retorno de url
-                string urlData = "";
-                if (!string.IsNullOrWhiteSpace(document.Content.URLData))
-                {
-                    var solicitudBytes = Convert.FromBase64String(document.Content.URLData);
-                    FileRegisterDTO file = new FileRegisterDTO(solicitudBytes, "pdf", "solicituddenuncia");
-                    urlData2 = await _fileService.SaveFileAsync(file) ?? string.Empty;
-                }
+                var document = DeserializeDocument<ComplaintRequestResponse>(dossierWrapper.Document);
 
-                ComplaintRequest solicitudDenuncia = new ComplaintRequest();
-                solicitudDenuncia = await _documentService.RegisterComplaintRequestAsync(dossierWrapper, url2, urlData);
+                //var user = await GetUserAsync("userId");
+                var user = await _userService.GetUserByIdAsync("5eeaf61e8ca4ff53a0b791e6");
 
-                return Ok(solicitudDenuncia);
+                var complaintRequest = await RegisterComplaintRequestAsync(document, user);
+
+                var updatedDossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia", complaintRequest.Id, "En proceso"));
+
+                return Ok(complaintRequest);
             }
             catch (Exception ex)
             {
@@ -250,6 +235,7 @@ namespace SISGED.Server.Controllers
             }
         }
 
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost("user-requests")]
         public async Task<ActionResult<DossierDocumentInitialRequestResponse>> InitialRequestDocumentRegister(DossierWrapper dossierWrapper)
         {
@@ -257,12 +243,17 @@ namespace SISGED.Server.Controllers
             {
                 var document = DeserializeDocument<InitialRequestResponse>(dossierWrapper.Document);
 
-                var initialRequest = await RegisterInitialRequestAsync(document);
+                var user = await GetUserAsync("userId");
+                //var user = await _userService.GetUserByIdAsync("5ef9f9c1afdbc540d868b3ce");
+
+                var initialRequest = await RegisterInitialRequestAsync(document, user);
                 
                 var dossier = await RegisterInitialDossierAsync(document, initialRequest);
 
-                await _trayService.UserInputTrayInsertAsync(dossier.Id, initialRequest.Id, "MesaPartes");
+                string receiveUserId = await _trayService.RegisterUserInputTrayAsync(dossier.Id, initialRequest.Id, "MesaPartes");
 
+                await _documentService.UpdateDocumentProcessAsync(new(user.Id, receiveUserId, "derivado"), initialRequest.Id);
+                
                 // TODO: Implement the assistant service when creating the initial request
                 //var assistant = new Assistant();
                 //assistant.DossierId = dossier.Id;
@@ -1105,18 +1096,31 @@ namespace SISGED.Server.Controllers
         #endregion
 
         #region POST private methods
-        private async Task<InitialRequest> RegisterInitialRequestAsync(InitialRequestResponse document)
+        private async Task<InitialRequest> RegisterInitialRequestAsync(InitialRequestResponse document, User user)
         {
             var urls = await _mediaService.SaveFilesAsync(document.URLAnnex, _containerName);
 
             var initialRequestContent = _mapper.Map<InitialRequestContent>(document.Content);
-            var initialRequest = new InitialRequest(initialRequestContent, "pendiente", urls.ToList());
+            var initialRequest = new InitialRequest(initialRequestContent, "registrado", urls.ToList());
+            initialRequest.AddProcess(new Process(user.Id, user.Id, "registrado"));
 
             return await _documentService.InitialRequestRegisterAsync(initialRequest);
         }
+
+        private async Task<ComplaintRequest> RegisterComplaintRequestAsync(ComplaintRequestResponse document, User user)
+        {
+            var urls = await _mediaService.SaveFilesAsync(document.URLAnnex, _containerName);
+
+            var complaintRequestContent = _mapper.Map<ComplaintRequestContent>(document.Content);
+            var complaintRequest = new ComplaintRequest(complaintRequestContent, "registrado", urls.ToList());
+            complaintRequest.AddProcess(new Process(user.Id, user.Id, "registrado"));
+
+            return await _documentService.RegisterComplaintRequestAsync(complaintRequest);
+        }
+
         private async Task<Dossier> RegisterInitialDossierAsync(InitialRequestResponse document, InitialRequest initialRequest)
         {
-            var client = new Shared.Entities.Client(document.ClientName, document.DocumentType, document.DocumentNumber);
+            var client = new Shared.Entities.Client(document.ClientName, document.ClientLastName, document.DocumentNumber, document.DocumentType, document.ClientId);
             var dossier = new Dossier(client, "Solicitud", "registrado"); // In the past, the state was "solicitado"
 
             dossier.AddDocument(new DossierDocument(1, initialRequest.Id, "SolicitudInicial", DateTime.UtcNow.AddHours(-5).AddDays(10)));
@@ -1125,11 +1129,41 @@ namespace SISGED.Server.Controllers
 
             return dossier;
         }
+        
+        private async Task<Dossier> UpdateDossierByDocumentAsync(DossierUpdateDTO dossierUpdateDTO)
+        {
+            var dossier = new Dossier(dossierUpdateDTO.DossierWrapper.Id!, dossierUpdateDTO.DossierType, dossierUpdateDTO.DossierState);
+
+            dossier.AddDocument(new DossierDocument(2, dossierUpdateDTO.DocumentId, "SolicitudDenuncia", DateTime.UtcNow.AddHours(-5).AddDays(10)));
+
+            return await _dossierService.UpdateDossierForInitialRequestAsync(dossier);
+        }
+
         private static T DeserializeDocument<T>(object document)
         {
             string json = Json.JsonSerializer.Serialize(document);
             return Json.JsonSerializer.Deserialize<T>(json)!;
         }
+
+        private async Task<User> GetUserAsync(string claimType)
+        {
+            var identifier = GetUserClaimValue(claimType);
+
+            var user = await _userService.GetUserByIdAsync(identifier);
+
+            return user;
+        }
+        
+        private string GetUserClaimValue(string claimType)
+        {
+            var userClaim = User.Claims.FirstOrDefault(c => c.Type == claimType);
+
+            if (userClaim is null) throw new Exception("Información no especificada en la cabecera de la petición");
+
+            return userClaim.Value;
+            
+        }
+
         #endregion
 
     }

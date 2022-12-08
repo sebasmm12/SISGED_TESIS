@@ -153,6 +153,8 @@ div.workspace {
     text-align: center;
     color: black;
     width: inherit;
+    margin-left: 6px;
+    margin-right: 6px;
     flex-basis: 100%;
 }
 

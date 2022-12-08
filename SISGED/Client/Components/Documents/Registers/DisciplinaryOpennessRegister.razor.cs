@@ -198,19 +198,19 @@ namespace SISGED.Client.Components.Documents.Registers
                     dossierTray.Document.Content = updateDisciplinaryOpenness.Content;
                     dossierTray.Document.State = updateDisciplinaryOpenness.State;
 
-                    SISGED.Shared.Models.Item outItem = new SISGED.Shared.Models.Item()
-                    {
-                        Name = dossierTray.Type!,
-                        Value = dossierTray,
-                        Icon = "alarm_add",
-                        Description = ((DocumentResponse)dossierTray.Document).Type,
-                        CurrentPlace = "workspace",
-                        OriginPlace = "inputs",
-                        Client = dossierTray.Client!,
-                        ItemStatus = "registrado"
-                    };
-                    workspace.UpdateRegisteredDocument(outItem);
-                    workspace.UpdateTools("Registrar Documento");
+                    //SISGED.Shared.Models.Item outItem = new SISGED.Shared.Models.Item()
+                    //{
+                    //    Name = dossierTray.Type!,
+                    //    Value = dossierTray,
+                    //    Icon = "alarm_add",
+                    //    Description = ((DocumentResponse)dossierTray.Document).Type,
+                    //    CurrentPlace = "workspace",
+                    //    OriginPlace = "inputs",
+                    //    Client = dossierTray.Client!,
+                    //    ItemStatus = "registrado"
+                    //};
+                    //workspace.UpdateRegisteredDocument(outItem);
+                    //workspace.UpdateTools("Registrar Documento");
                     DocumentResponse documentRequest = new DocumentResponse();
                     documentRequest.Id = updateDisciplinaryOpenness.Id;
                     documentRequest.Type = updateDisciplinaryOpenness.Type;

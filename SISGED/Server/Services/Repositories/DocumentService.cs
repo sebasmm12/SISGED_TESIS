@@ -421,63 +421,13 @@ namespace SISGED.Server.Services.Repositories
             return solicitudBPN;
         }
 
-        public async Task<ComplaintRequest> RegisterComplaintRequestAsync(DossierWrapper dossierWrapper, List<string> url2, string urlData)
+        public async Task<ComplaintRequest> RegisterComplaintRequestAsync(ComplaintRequest complaintRequest)
         {
-            //conversion de Object a Tipo especifico
-            ComplaintRequestResponse documento = new ComplaintRequestResponse();
-            var json = JsonConvert.SerializeObject(dossierWrapper.Document);
-            documento = JsonConvert.DeserializeObject<ComplaintRequestResponse>(json)!;
+            await _documentsCollection.InsertOneAsync(complaintRequest);
 
-            //Creacionde Obj ContenidoSolicitudDenuncia y almacenamiento en la coleccion documento
-            ComplaintRequestContent content = new ComplaintRequestContent()
-            {
-                Code = documento.Content.Code,
-                Title = documento.Content.Title,
-                Description = documento.Content.Description,
-                ClientName = documento.ClientName,
-                DeliveryDate = DateTime.UtcNow.AddHours(-5),
-                Url = urlData
-            };
+            if(complaintRequest.Id is null) throw new Exception($"No se pudo registrar la solicitud de denuncia { complaintRequest.Content.Title }");
 
-            ComplaintRequest solicitudDenuncia = new ComplaintRequest()
-            {
-                Type = "SolicitudDenuncia",
-                Content = content,
-                State = "pendiente",
-                ContentsHistory = new List<ContentVersion>(),
-                AttachedUrls = url2,
-                ProcessesHistory = new List<Process>(),
-            };
-
-            Dossier expediente = new Dossier();
-            expediente.Id = dossierWrapper.Id;
-            expediente.Type = "Denuncia";
-
-            expediente.Derivations = new List<Derivation>();
-            expediente.State = "solicitado";
-
-            await _documentsCollection.InsertOneAsync(solicitudDenuncia);
-
-            expediente.Documents = new List<DossierDocument>()
-            {
-                new DossierDocument(){
-                    Index = 1,
-                    DocumentId = solicitudDenuncia.Id,
-                    Type="SolicitudDenuncia",
-                    CreationDate = solicitudDenuncia.Content.DeliveryDate,
-                    ExcessDate=solicitudDenuncia.Content.DeliveryDate.AddDays(10),
-                    DelayDate = null
-                }
-            };
-
-            await _dossierService.UpdateDossierForInitialRequestAsync(expediente);
-
-            var filter = Builders<Document>.Filter.Eq("id", dossierWrapper.InputDocument);
-            var update = Builders<Document>.Update
-                .Set("estado", "revisado");
-            _documentsCollection.UpdateOne(filter, update);
-
-            return solicitudDenuncia;
+            return complaintRequest;
         }
 
         public async Task<SignExpeditionRequest> RegisterSignExpeditionRequestAsync(DossierWrapper dossierWrapepr, List<string> url2, string urlData)
@@ -851,7 +801,7 @@ namespace SISGED.Server.Services.Repositories
             {
                 Title = DTO.Content.Title,
                 Description = DTO.Content.Description,
-                SolicitorId = DTO.Content.SolicitorId.Id
+                Solicitor = DTO.Content.SolicitorId.Id
             };
 
             SolicitorDossierShipment solicitorDossierShipment = new SolicitorDossierShipment()

@@ -19,7 +19,7 @@ namespace SISGED.Client.Pages.Accounts
         [Inject]
         public ISwalFireRepository SwalFireRepository { get; set; } = default!;
         [Inject]
-        public IDialogService DialogService { get; set; } = default!;
+        public IDialogContentRepository DialogContentRepository { get; set; } = default!;
 
         private bool usersLoading = true;
         private MudTable<UserInfoResponse> usersList = default!;
@@ -115,39 +115,11 @@ namespace SISGED.Client.Pages.Accounts
         {
            string dialogTitle = $"Cambiando estado de la cuenta del usuario {userInfoResponse.UserName}";
 
-           var dialogParameters = GetDialogParameters(new()
-           {
-               new("Body", "Realizando la operación, por favor espere..."),
-               new("DialogMethod", UpdateUserStateAsync(userInfoResponse, userStateMessage))
-           });
+           var functionToExecute = () => UpdateUserStateAsync(userInfoResponse, userStateMessage);
 
-           var dialog = await InvokeDialogAsync<GenericDialogContent>(dialogTitle, dialogParameters);
-
-           if(dialog.Cancelled) return false;
-
-            _ = bool.TryParse(dialog.Data.ToString(), out bool isChanged);
-
-            return isChanged;
-              
+           return await DialogContentRepository.ShowLoadingDialogAsync(functionToExecute, dialogTitle);   
         }
 
-        private static DialogParameters GetDialogParameters(List<DialogParameter> dialogParameterDTOs)
-        {
-            var dialogParameters = new DialogParameters();
-
-            dialogParameterDTOs.ForEach(dialogParameterDTO =>
-            {
-                dialogParameters.Add(dialogParameterDTO.Name, dialogParameterDTO.Value);
-            });
-
-            return dialogParameters;
-        }
-
-        private async Task<DialogResult> InvokeDialogAsync<T>(string title, DialogParameters dialogParameters) where T : ComponentBase
-        {
-            var dialogService = DialogService.Show<T>(title, dialogParameters);
-            return await dialogService.Result;
-        }
 
         private static SwalFireInfo GetSwalFireInfo(UserInfoResponse userInfoResponse)
         {

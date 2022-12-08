@@ -5,7 +5,7 @@
             <p class="tool-name">@Item.Name</p>
             <p class="tool-description">@Item.Description</p>
             @if(Item.Client is not null) {
-                <p class="tool-client-name">@Item.Client.Name - @Item.Client.DocumentNumber</p>
+                <p class="tool-client-name">@Item.Client.GetShortName() - @Item.Client.DocumentNumber</p>
                 var dossierTray = (DossierTrayResponse)Item.Value;
                 if (accepetedStatusToDocument.Contains(Item.ItemStatus) && Item.OriginPlace.Equals("inputs"))
                 {

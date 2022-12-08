@@ -73,7 +73,7 @@ namespace SISGED.Server.Services.Repositories
 
             var usersTraysupdate = _trayService.UpdateTrayForDerivationAsync(updateTrayDTO);
 
-            var process = new Process(dossierDerivation.OriginArea, dossierDerivation.SenderUser, dossierDerivation.ReceiverUser);
+            var process = new Process(dossierDerivation.SenderUser, dossierDerivation.ReceiverUser, "derivado", dossierDerivation.OriginArea);
 
             var documentProcessupdate = UpdateDocumentProcessAsync(process, documentId);
 
@@ -95,6 +95,7 @@ namespace SISGED.Server.Services.Repositories
         {
             var filter = Builders<Dossier>.Filter.Eq(dossierToUpdate => dossierToUpdate.Id, dossier.Id);
             var update = Builders<Dossier>.Update.Set(dossierToUpdate => dossierToUpdate.Type, dossier.Type)
+                                                 .Set(dossierToUpdate => dossierToUpdate.State, dossier.State)
                                                  .Push(dossierToUpdate => dossierToUpdate.Documents, dossier.Documents.First());
 
             var updatedDossier = await _dossiersCollection.FindOneAndUpdateAsync(filter, update, new()

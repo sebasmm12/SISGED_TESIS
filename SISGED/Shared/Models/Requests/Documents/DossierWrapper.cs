@@ -18,6 +18,11 @@ namespace SISGED.Shared.Models.Requests.Documents
             Document = document;
         }
 
+        public DossierWrapper(string dossierId, object document) : this(document)
+        {
+            Id = dossierId;
+        }
+
         public DossierWrapper() {  }
     }
 }

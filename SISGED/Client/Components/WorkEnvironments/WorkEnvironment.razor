@@ -15,7 +15,7 @@ else {
         NoDropClass="mud-border-error">
                 <ChildContent>
                     <div class="wfe-container">
-                        <div class="input common-box-style">
+                        <div class="input common-box-style mud-grid-item-sm-12 mud-grid-item-md-2 mud-grid-item-lg-2">
                             <MudDropZone T="Item" Identifier="inputs" Class="h-100 border-2 border-solid mud-border-lines-default"
                                 CanDrop="@((item) => item.OriginPlace == "inputs")" >
                                 <div class="box-title-style">
@@ -23,7 +23,7 @@ else {
                                 </div>
                             </MudDropZone>
                         </div>
-                        <div class="workspace common-box-style">
+                    <div class="workspace common-box-style mud-grid-item-sm-12 mud-grid-item-md-8 mud-grid-item-lg-8">
                             <MudDropZone T="Item" Identifier="workplace" Class="h-100 border-2 border-solid mud-border-lines-default"
                                  CanDrop="@((item) => CanDropToWorkZone(item, workPlaceItems))" AllowReorder="CanReorder">
                                 <ChildContent>
@@ -44,7 +44,7 @@ else {
                                 </ItemRenderer>
                             </MudDropZone>
                         </div>
-                        <div class="container-ot">
+                    <div class="container-ot mud-grid-item-sm-12 mud-grid-item-md-2 mud-grid-item-lg-2">
                              <div class="tools common-box-style">
                               <MudDropZone T="Item" Identifier="outputs" Class="h-100 border-2 border-solid mud-border-lines-default" CanDrop="@((item) => item.OriginPlace == "outputs")">
                                 <div class="box-title-style">

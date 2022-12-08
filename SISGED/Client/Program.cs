@@ -28,12 +28,14 @@ static void ConfigureServices(IServiceCollection services)
     services.AddScoped<IHttpRepository, HttpRepository>();
     services.AddScoped<IDocumentRepository, DocumentRepository>();
     services.AddScoped<ISolicitorRepository, SolicitorRepository>();
+    services.AddScoped<IDialogContentRepository, DialogContentRepository>();
     services.AddScoped<IAnnexFactory, AnnexFactory>();
 
     services.AddTransient<ToolWindowStrategy>();
     services.AddTransient<DocumentStrategy>();
 
     services.AddTransient<UserRequestRegisterValidator>();
+    services.AddTransient<ComplaintRequestValidator>();
 }
 
     

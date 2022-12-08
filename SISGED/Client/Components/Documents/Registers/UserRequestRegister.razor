@@ -36,7 +36,7 @@
                             @if (userRequest.HasSolicitor)
                             {
                                 <MudItem xs="12" sm="12" md="6" lg="6" xl="12" class="pr-0">
-                                    <GenericSolicitorAutocomplete SelectedSolicitor="userRequest.Solicitor"></GenericSolicitorAutocomplete>
+                                    <GenericSolicitorAutocomplete SolicitorResponse="GetSolicitorResponse" CanShowSolicitorHelper="true"></GenericSolicitorAutocomplete>
                                 </MudItem>
                             }
                             <MudItem xs="12" sm="12" md="12" lg="12" xl="12">

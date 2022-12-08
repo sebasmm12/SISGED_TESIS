@@ -1,7 +1,9 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
+using SISGED.Server.Helpers.Infrastructure;
 using SISGED.Server.Services.Contracts;
 using SISGED.Shared.Entities;
+using System.Collections.Generic;
 
 namespace SISGED.Server.Services.Repositories
 {
@@ -17,14 +19,7 @@ namespace SISGED.Server.Services.Repositories
 
         public async Task<IEnumerable<Solicitor>> GetAutocompletedSolicitorsAsync(string? solicitorName, bool? exSolicitor)
         {
-            var solicitorRegularExpression = new BsonRegularExpression(solicitorName + ".*", "i");
-
-            var solicitorFilter = Builders<Solicitor>.Filter.Regex(s => s.Name, solicitorRegularExpression)
-               | Builders<Solicitor>.Filter.Regex(s => s.LastName, solicitorRegularExpression);
-
-            if (exSolicitor is not null) solicitorFilter &= Builders<Solicitor>.Filter.Eq(s => s.ExSolicitor, exSolicitor.Value);
-
-            var autocompletedSolicitors = await _solicitorCollection.Find(solicitorFilter).ToListAsync();
+            var autocompletedSolicitors = await _solicitorCollection.Aggregate<Solicitor>(GetAutocompletedSolicitorPipeline(solicitorName, exSolicitor)).ToListAsync();
 
             if (autocompletedSolicitors is null) throw new Exception($"No se pudo encontrar ningun notario con el nombre {solicitorName}");
 
@@ -38,6 +33,34 @@ namespace SISGED.Server.Services.Repositories
             if (solicitor is null) throw new Exception($"No se pudo encontrar ningun notario con el identificador {solicitorId}");
 
             return solicitor;
+        }
+
+        private static BsonDocument[] GetAutocompletedSolicitorPipeline(string? solicitorName, bool? exSolicitor)
+        {
+            var addFieldAggregation = MongoDBAggregationExtension.AddFields(new()
+            {
+                { "fullName", MongoDBAggregationExtension.Concat(new List<BsonValue>() { "$nombre", " ", "$apellido" }) }
+            });
+
+            var matchAggregation = GetAutocompletedSolicitorMatch(solicitorName, exSolicitor);
+
+            var unSetAggregation = MongoDBAggregationExtension.UnSet("fullName");
+
+            return new BsonDocument[] { addFieldAggregation, matchAggregation, unSetAggregation };
+        }
+
+        private static BsonDocument GetAutocompletedSolicitorMatch(string? solicitorName, bool? exSolicitor)
+        {
+            var solicitorMatchDictionary = new Dictionary<string, BsonValue>()
+            {
+                { "fullName", MongoDBAggregationExtension.Regex(solicitorName?.Trim().ToLower() + ".*", "i") } 
+            };
+
+            if (exSolicitor is not null) solicitorMatchDictionary.Add("exnotario", exSolicitor.Value);
+
+            var matchAggregation = MongoDBAggregationExtension.Match(solicitorMatchDictionary);
+
+            return matchAggregation;
         }
     }
 }

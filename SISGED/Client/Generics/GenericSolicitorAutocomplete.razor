@@ -1,8 +1,9 @@
 ﻿<MudGrid Class="w-100">
-    <MudItem xs="12" sm="12" md="11" lg="11" Class="pr-0">
-    <MudAutocomplete T="SolicitorInfoResponse" Label="Notarios" Value="SelectedSolicitor"
-                     SearchFunc="async(solicitorName) => await GetAutocompletedSolicitorAsync(solicitorName)" AdornmentIcon="@Icons.Material.Filled.Search"
-                     ToStringFunc="ConvertToString" Variant="Variant.Outlined" ResetValueOnEmptyText="true" Ador>
+    <MudItem xs="12" sm="12" md="@SolicitorMeasurement" lg="@SolicitorMeasurement" Class="pr-0">
+        <MudAutocomplete T="AutocompletedSolicitorResponse" Label="Notarios" Value="Solicitor" ValueChanged="GetSolicitorResponseAsync"
+                     SearchFunc="GetAutocompletedSolicitorAsync" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary"
+                     ToStringFunc="ConvertToString" Variant="Variant.Outlined" ResetValueOnEmptyText="true" 
+                     ShowProgressIndicator="true" ProgressIndicatorColor="Color.Primary">
        <ItemTemplate Context="solicitor">
             <MudGrid>
                <MudItem Class="solicitor-item">
@@ -28,17 +29,20 @@
        </MoreItemsTemplate>
     </MudAutocomplete>
     </MudItem>
-    <MudItem xs="12" sm="12" md="1" lg="1" Class="pl-md-0 align-self-center text-sm-center">
-        <MudTooltip Arrow="true" Delay="500" Placement="Placement.Top">
-            <ChildContent>
-                <MudIconButton Color="Color.Info" class="fas fa-circle-info"></MudIconButton>
-            </ChildContent>
-            <TooltipContent>
-                <MudText Typo="Typo.body2">Si en caso no pudo encontrar al notario o no se acuerda de su nombres y apellidos, no se preocupe,
-                    puede obviarlo en el registro, sin embargo se recomienda colocar una referencia en el Asunto.
-                </MudText>
-            </TooltipContent>
-        </MudTooltip>
-    </MudItem>
+    @if (CanShowSolicitorHelper)
+    {
+     <MudItem xs="12" sm="12" md="1" lg="1" Class="pl-md-0 align-self-center text-sm-center">
+            <MudTooltip Arrow="true" Delay="500" Placement="Placement.Top">
+             <ChildContent>
+                    <MudIconButton Color="Color.Info" class="fas fa-circle-info"></MudIconButton>
+                </ChildContent>
+                <TooltipContent>
+                    <MudText Typo="Typo.body2">Si en caso no pudo encontrar al notario o no se acuerda de su nombres y apellidos, no se preocupe,
+                        puede obviarlo en el registro, sin embargo se recomienda colocar una referencia en el Asunto.
+                    </MudText>
+                </TooltipContent>
+            </MudTooltip>
+     </MudItem>
+    }
 </MudGrid>
 

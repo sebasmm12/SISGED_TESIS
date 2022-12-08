@@ -9,8 +9,6 @@ namespace SISGED.Client.Generics
     public partial class GenericSolicitorAutocomplete
     {
         [Inject]
-        private IJSRuntime JSRuntime { get; set; } = default!;
-        [Inject]
         public ISwalFireRepository SwalFireRepository { get; set; } = default!;
         [Inject]
         public IHttpRepository HttpRepository { get; set; } = default!;
@@ -20,14 +18,26 @@ namespace SISGED.Client.Generics
         [Parameter]
         public bool? ExSolicitor { get; set; }
         [Parameter]
-        public SolicitorInfoResponse SelectedSolicitor { get; set; } = default!;
+        public EventCallback<AutocompletedSolicitorResponse> SolicitorResponse { get; set; } = default!;
+        [Parameter]
+        public AutocompletedSolicitorResponse? Solicitor { get; set; } = null;
+        [Parameter]
+        public bool CanShowSolicitorHelper { get; set; } = false;
 
-        private string? ConvertToString(SolicitorInfoResponse solicitorInfoResponse)
+        private int SolicitorMeasurement => CanShowSolicitorHelper ? 11: 12;
+
+        private async Task GetSolicitorResponseAsync(AutocompletedSolicitorResponse AutocompletedSolicitorResponse)
         {
-            return solicitorInfoResponse is null ? null : solicitorInfoResponse.Name + " " + solicitorInfoResponse.LastName;
+            Solicitor = AutocompletedSolicitorResponse;
+            await SolicitorResponse.InvokeAsync(AutocompletedSolicitorResponse);
         }
 
-        private async Task<IEnumerable<SolicitorInfoResponse>> GetAutocompletedSolicitorAsync(string solicitorName)
+        private static string? ConvertToString(AutocompletedSolicitorResponse AutocompletedSolicitorResponse)
+        {
+            return AutocompletedSolicitorResponse is null ? null : AutocompletedSolicitorResponse.Name + " " + AutocompletedSolicitorResponse.LastName;
+        }
+
+        private async Task<IEnumerable<AutocompletedSolicitorResponse>> GetAutocompletedSolicitorAsync(string solicitorName)
         {
             await Task.Delay(100);
 
@@ -40,21 +50,19 @@ namespace SISGED.Client.Generics
                 if (filters.Count > 0) solicitorQueries += filters.Select(filter => $"{filter.Key}=" +
                 $"{System.Web.HttpUtility.UrlEncode(filter.Value.ToString())}").Aggregate((current, next) => $"{current}&{next}");
 
-                var autocompletedSolicitorResponse = await HttpRepository.GetAsync<IEnumerable<SolicitorInfoResponse>>($"api/solicitors/autocomplete{solicitorQueries}");
+                var autocompletedSolicitorResponse = await HttpRepository.GetAsync<IEnumerable<AutocompletedSolicitorResponse>>($"api/solicitors/autocomplete{solicitorQueries}");
 
                 if (autocompletedSolicitorResponse.Error)
                 {
                     await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los notarios registrados en el sistema");
                 }
 
-                await JSRuntime.InvokeVoidAsync("console.log", autocompletedSolicitorResponse.Response);
-
                 return autocompletedSolicitorResponse.Response!;
             }
             catch (Exception)
             {
                 await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los notarios registrados en el sistema");
-                return new List<SolicitorInfoResponse>();
+                return new List<AutocompletedSolicitorResponse>();
             }
         }
 

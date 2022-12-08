@@ -71,13 +71,15 @@ namespace SISGED.Server.Services.Repositories
 
         }
 
-        public async Task UserInputTrayInsertAsync(string dossierId, string documentId, string type)
+        public async Task<string> RegisterUserInputTrayAsync(string dossierId, string documentId, string type)
         {
             var documentTray = new DocumentTray(dossierId, documentId);
             
             Tray userTray = await GetUserTrayWithLessInputTrayAsync(type);
-
+          
             await PushDocumentTrayAsync(new(documentTray, userTray.User, "bandejaentrada"));
+
+            return userTray.User;
         }
 
 
@@ -146,7 +148,7 @@ namespace SISGED.Server.Services.Repositories
             return new BsonDocument[] { userFilterMatchAggregation, unWindAggregation1, dossierInputLookupPipeline, unWindAggregation2, projectAggregation };
 
         }
-        private /*PipelineDefinition<Tray, InputOutputTrayResponse>*/ BsonDocument[] GetTrayPipeline(string user)
+        private BsonDocument[] GetTrayPipeline(string user)
         {
             var dossierLookupPipeline = DossierLookUpPipeline();
             var documentLookupPipeline = DocumentLookUpPipeline();

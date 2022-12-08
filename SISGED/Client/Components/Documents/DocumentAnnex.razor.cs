@@ -18,8 +18,12 @@ namespace SISGED.Client.Components.Documents
         [Parameter]
         public List<MediaRegisterDTO> Annexes { get; set; } = new();
 
+        [Parameter]
+        public string AnnexesHeight { get; set; } = "300px";
+
         private static readonly string defaultDragClass = "relative rounded-lg border-2 border-dashed pa-4 mt-4 mud-width-full mud-height-full";
         private string dragClass = defaultDragClass;
+        
 
         private AnnexPreview GetAnnexPreview(string annexExtension)
         {

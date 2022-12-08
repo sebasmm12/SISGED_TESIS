@@ -1,14 +1,19 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using MudBlazor;
+using SISGED.Client.Generics;
+using SISGED.Client.Helpers;
 using SISGED.Client.Services.Contracts;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Models.Requests.Documents;
+using SISGED.Shared.Models.Responses.Account;
 using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.Document.UserRequest;
 using SISGED.Shared.Models.Responses.DocumentType;
 using SISGED.Shared.Models.Responses.DossierDocument;
 using SISGED.Shared.Models.Responses.Solicitor;
+using SISGED.Shared.Models.Responses.User;
 using SISGED.Shared.Validators;
 
 namespace SISGED.Client.Components.Documents.Registers
@@ -23,21 +28,30 @@ namespace SISGED.Client.Components.Documents.Registers
         public UserRequestRegisterValidator UserRequestRegisterValidator { get; set; } = default!;
         [Inject]
         public IMapper Mapper { get; set; } = default!;
+        [Inject]
+        public IDialogContentRepository DialogContentRepository { get; set; } = default!;
 
-        [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+        [CascadingParameter] 
+        public MudDialogInstance MudDialog { get; set; } = default!;
+        [Parameter]
+        public SessionAccountResponse SessionAccount { get; set; } = default!;
 
-        
         private MudForm? userRequestForm = default!;
         private IEnumerable<DocumentTypeInfoResponse> documentTypes = default!;
         private bool pageLoading = true;
-        private UserRequestRegisterDTO userRequest = new();
-        private List<MediaRegisterDTO> annexes = new();
+        private readonly UserRequestRegisterDTO userRequest = new();
+        private readonly List<MediaRegisterDTO> annexes = new();
 
 
         protected override async Task OnInitializedAsync()
         {
             documentTypes = await GetDocumentTypesAsync();
             pageLoading = false;
+        }
+
+        private void GetSolicitorResponse(AutocompletedSolicitorResponse AutocompletedSolicitorResponse)
+        {
+            userRequest.Solicitor = AutocompletedSolicitorResponse;
         }
 
         private void CancelRegister()
@@ -53,34 +67,54 @@ namespace SISGED.Client.Components.Documents.Registers
 
             var documentRegister = GetDocumentRegister();
 
-            await RegisterUserRequestDocumentAsync(documentRegister);
+            bool registered = await ShowLoadingDialogAsync(documentRegister);
+
+            if (!registered) return;
+
+            await SwalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo registrar su solicitud de manera satisfactoria");
+
+            MudDialog.Close(DialogResult.Ok(true));
         }
-        
+
+        private async Task<bool> ShowLoadingDialogAsync(DossierWrapper documentRegister)
+        {
+            string dialogTitle = $"Realizando el registro de su solicitud, por favor espere...";
+
+            var userToRegister = () => RegisterUserRequestDocumentAsync(documentRegister);
+
+            return await DialogContentRepository.ShowLoadingDialogAsync(userToRegister, dialogTitle);
+
+        }
         private DossierWrapper GetDocumentRegister()
         {
             var initialRequestContent = Mapper.Map<InitialRequestResponseContent>(userRequest);
-            var initialRequest = new InitialRequestResponse(initialRequestContent, annexes);
-
+            var initialRequest = new InitialRequestResponse(initialRequestContent, annexes, 
+               SessionAccount.GetClient().Name, SessionAccount.GetClient().LastName,
+               SessionAccount.GetDocumentType() ,SessionAccount.GetDocumentNumber(), SessionAccount.GetUser().Id);
+            
             var documentRegister = new DossierWrapper(initialRequest);
 
             return documentRegister;
         }
 
-        private async Task RegisterUserRequestDocumentAsync(DossierWrapper documentRegister)
+        private async Task<bool> RegisterUserRequestDocumentAsync(DossierWrapper documentRegister)
         {
             try
             {
-                var userRequestResponse = await HttpRepository.PostAsync("api/dossierdocument/user-requests", documentRegister);
+                var userRequestResponse = await HttpRepository.PostAsync("api/documents/user-requests", documentRegister);
 
                 if (userRequestResponse.Error)
                 {
                     await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo registar su solicitud");
                 }
+
+                return true;
             }
             catch (Exception)
             {
 
                 await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo registar su solicitud");
+                return false;
             }
         }
 
@@ -103,7 +137,6 @@ namespace SISGED.Client.Components.Documents.Registers
                 return new List<DocumentTypeInfoResponse>();
             }
         }
-        
 
     }
 }
