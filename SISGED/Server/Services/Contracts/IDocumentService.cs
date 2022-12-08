@@ -44,6 +44,7 @@ namespace SISGED.Server.Services.Contracts
         Task<InitialRequest> InitialRequestRegisterAsync(InitialRequest documentIR);
         Task<SignConclusion> singConclusionERegisterAsync(DossierWrapper dossierWrapper, List<string> url2, string documentId);
         Task<DisciplinaryOpenness> DisciplinaryOpennessRegisterAsync(DisciplinaryOpenness disciplinaryOpenness);
+        Task<SolicitorDossierRequest> SolicitorDossierRequestRegisterAsync(SolicitorDossierRequest solicitorDossierRequest);
         Task<Dictum> DictumRegisterAsync(DictumResponse dTO, DossierWrapper expedientewrapper, List<string> url2);
         Task<Resolution> ResolutionRegisterAsync(ResolutionResponse DTO, string urldata, List<string> url2, string idusuario, string idexpediente, string iddocentrada, string iddocumentoSolicitud);
         Task<BPNResult> BPNResultRegisterAsync(BPNResultResponse DTO, List<string> url2, string UserId, string dossierId, string inputDocId, string documentRequestId);

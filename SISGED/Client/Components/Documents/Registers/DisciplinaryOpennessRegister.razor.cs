@@ -38,9 +38,9 @@ namespace SISGED.Client.Components.Documents.Registers
         [CascadingParameter(Name = "WorkPlaceItems")]
         public List<Item> WorkPlaceItems { get; set; } = default!;
         [CascadingParameter(Name = "SessionAccount")] protected SessionAccountResponse SessionAccount { get; set; }
+        
         //Datos del formulario
-        [Parameter] public EventCallback<DossierTrayResponse> increaseTray { get; set; }
-        private DisciplinaryOpennessRegisterDTO disciplinaryOpenness = new DisciplinaryOpennessRegisterDTO();
+        private DisciplinaryOpennessRegisterDTO disciplinaryOpennessRegister = new DisciplinaryOpennessRegisterDTO();
 
         private bool pageLoading = false;
         String typeDocument = "AperturamientoDisciplinario";
@@ -51,8 +51,8 @@ namespace SISGED.Client.Components.Documents.Registers
 
         protected override async Task OnInitializedAsync()
         {
-            disciplinaryOpenness.Participants = new List<Participant>() { new Participant() { Index = 0, Name = "" } };
-            disciplinaryOpenness.ChargedDeeds = new List<Deed>() { new Deed() { Index = 0, Description = "" } };
+            disciplinaryOpennessRegister.Participants = new List<Participant>() { new Participant() { Index = 0, Name = "" } };
+            disciplinaryOpennessRegister.ChargedDeeds = new List<Deed>() { new Deed() { Index = 0, Description = "" } };
 
             await GetUserRequestInformationAsync();
 
@@ -62,51 +62,32 @@ namespace SISGED.Client.Components.Documents.Registers
 
         private void addParticipant()
         {
-            disciplinaryOpenness.Participants.Add(new Participant() { Index = (disciplinaryOpenness.Participants.Count) });
+            disciplinaryOpennessRegister.Participants.Add(new Participant() { Index = (disciplinaryOpennessRegister.Participants.Count) });
             StateHasChanged();
         }
 
         private void removeParticipant(int index)
         {
-            disciplinaryOpenness.Participants.RemoveAt(index);
+            disciplinaryOpennessRegister.Participants.RemoveAt(index);
             StateHasChanged();
         }
         private void addDeed()
         {
-            disciplinaryOpenness.ChargedDeeds.Add(new Deed() { Index = (disciplinaryOpenness.ChargedDeeds.Count) });
+            disciplinaryOpennessRegister.ChargedDeeds.Add(new Deed() { Index = (disciplinaryOpennessRegister.ChargedDeeds.Count) });
             StateHasChanged();
         }
         private void removeDeed(int index)
         {
-            disciplinaryOpenness.ChargedDeeds.RemoveAt(index);
+            disciplinaryOpennessRegister.ChargedDeeds.RemoveAt(index);
             StateHasChanged();
-        }
-
-        //Consulta de notarios
-        private async Task<IEnumerable<Solicitor>> Match(string searchtext)
-        {
-            var httpResponse = await httpRepository.GetAsync<List<Solicitor>>($"api/solicitors/filter?term={searchtext}");
-            if (httpResponse.Error)
-            {
-                return new List<Solicitor>();
-            }
-            else
-            {
-                return httpResponse.Response!;
-            }
-        }
-
-        public void HandleInvalidSubmit()
-        {
-            swalFireRepository.ShowErrorSwalFireAsync("Por favor, verifique los Datos Ingresados");
         }
 
         private DossierWrapper GetDocumentRegister()
         {
-            var complaintRequestContent = Mapper.Map<ComplaintRequestResponseContent>(disciplinaryOpenness);
-            var complaint = new ComplaintRequestResponse(complaintRequestContent, annexes);
+            var disciplinaryOpennessContent = Mapper.Map<DisciplinaryOpennessResponseContent>(disciplinaryOpennessRegister);
+            var disciplinaryOpenness = new DisciplinaryOpennessResponse(disciplinaryOpennessContent, annexes);
 
-            var documentRegister = new DossierWrapper(dossierId, complaint);
+            var documentRegister = new DossierWrapper(dossierId, disciplinaryOpenness);
 
             return documentRegister;
         }
@@ -125,9 +106,9 @@ namespace SISGED.Client.Components.Documents.Registers
         {
             var documentRegister = GetDocumentRegister();
 
-            var registeredComplaint = await ShowLoadingDialogAsync(documentRegister);
+            var registeredDisciplinary = await ShowLoadingDialogAsync(documentRegister);
 
-            if (registeredComplaint is null) return;
+            if (registeredDisciplinary is null) return;
 
             await swalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo registrar el aperturamiento disciplinario de manera satisfactoria");
         }
@@ -178,7 +159,7 @@ namespace SISGED.Client.Components.Documents.Registers
         {
             var userTray = WorkPlaceItems.First(workItem => workItem.OriginPlace != "tools");
 
-            disciplinaryOpenness.Client = userTray.Client;
+            disciplinaryOpennessRegister.Client = userTray.Client;
 
             var dossierTray = userTray.Value as DossierTrayResponse;
 
@@ -190,7 +171,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
         private void GetSolicitorResponse(AutocompletedSolicitorResponse AutocompletedSolicitorResponse)
         {
-            disciplinaryOpenness.Solicitor = AutocompletedSolicitorResponse;
+            disciplinaryOpennessRegister.Solicitor = AutocompletedSolicitorResponse;
         }
 
         private static StepperLocalizedStrings GetRegisterLocalizedStrings()
@@ -206,7 +187,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
             if (!requestForm!.IsValid)
             {
-                swalFireRepository.ShowErrorSwalFireAsync("No se puede registrar la solicitud de Denuncia, por favor verifique los datos ingresados").GetAwaiter();
+                swalFireRepository.ShowErrorSwalFireAsync("No se puede registrar el aperturamiento disciplinario, por favor verifique los datos ingresados").GetAwaiter();
 
                 return true;
             }

@@ -5,7 +5,7 @@
 else
 {
     <MudCard Elevation="0">
-        <MudForm @ref="requestForm" ValidationDelay="0" Model="disciplinaryOpenness" Validation="@(disciplinaryOpennessRegisterValidator.ValidateValue)">
+        <MudForm @ref="requestForm" ValidationDelay="0" Model="disciplinaryOpennessRegister" Validation="@(disciplinaryOpennessRegisterValidator.ValidateValue)">
             <MudCardContent>
                 <MudStepper @ref="requestStepper" LocalizedStrings="GetRegisterLocalizedStrings()"
                         Color="Color.Secondary" Variant="Variant.Filled" HeaderTextView="HeaderTextView.NewLine"
@@ -14,45 +14,45 @@ else
                         <MudGrid>
 
                             <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
-                                <MudTextField @bind-Value="@disciplinaryOpenness.Title" Class="text-field-style"
-                                          Label="Titulo del Oficio" For="@(()=>disciplinaryOpenness.Title)" Variant="Variant.Outlined"
+                                <MudTextField @bind-Value="@disciplinaryOpennessRegister.Title" Class="text-field-style"
+                                          Label="Titulo del Oficio" For="@(()=>disciplinaryOpennessRegister.Title)" Variant="Variant.Outlined"
                                           Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"></MudTextField>
                             </MudItem>
 
                             <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
-                                <MudTextField @bind-Value="@disciplinaryOpenness.Complainant" Class="text-field-style"
-                                          Label="Nombre del denunciante" For="@(()=>disciplinaryOpenness.Complainant)" Variant="Variant.Outlined"
+                                <MudTextField @bind-Value="@disciplinaryOpennessRegister.Complainant" Class="text-field-style"
+                                          Label="Nombre del denunciante" For="@(()=>disciplinaryOpennessRegister.Complainant)" Variant="Variant.Outlined"
                                           Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"></MudTextField>
                             </MudItem>>
 
                             <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
-                                <MudTextField @bind-Value="@disciplinaryOpenness.Description" Class="text-field-style"
-                                          Label="Description del aperturamiento" For="@(()=>disciplinaryOpenness.Description)" Variant="Variant.Outlined"
+                                <MudTextField @bind-Value="@disciplinaryOpennessRegister.Description" Class="text-field-style"
+                                          Label="Description del aperturamiento" For="@(()=>disciplinaryOpennessRegister.Description)" Variant="Variant.Outlined"
                                           Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"></MudTextField>
                             </MudItem>>
 
                             <MudItem xs="12" sm="12" md="4" lg="4" xl="12">
-                                <MudTextField @bind-Value="@disciplinaryOpenness.AudienceLocation" Class="text-field-style"
-                                          Label="Lugar de la audiencia" For="@(()=>disciplinaryOpenness.AudienceLocation)" Lines="5" Immediate="true" Variant="Variant.Outlined"
+                                <MudTextField @bind-Value="@disciplinaryOpennessRegister.AudienceLocation" Class="text-field-style"
+                                          Label="Lugar de la audiencia" For="@(()=>disciplinaryOpennessRegister.AudienceLocation)" Lines="5" Immediate="true" Variant="Variant.Outlined"
                                           Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"></MudTextField>
                             </MudItem>>
 
                             <MudItem xs="12" sm="12" md="4" lg="4" xl="12">
-                                <MudDatePicker Label="Fecha de Inicio" AllowInput="false" @bind-Value="@disciplinaryOpenness.AudienceStartDate" For="@(()=>disciplinaryOpenness.AudienceStartDate)" Variant="Variant.Outlined"
+                                <MudDatePicker Label="Fecha de Inicio" AllowInput="false" @bind-Value="@disciplinaryOpennessRegister.AudienceStartDate" For="@(()=>disciplinaryOpennessRegister.AudienceStartDate)" Variant="Variant.Outlined"
                                            Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"></MudDatePicker>
                             </MudItem>>
 
                             <MudItem xs="12" sm="12" md="4" lg="4" xl="12">
-                                <MudDatePicker Label="Fecha de Finalizacion" AllowInput="false" @bind-Value="@disciplinaryOpenness.AudienceEndDate" For="@(()=>disciplinaryOpenness.AudienceEndDate)" Variant="Variant.Outlined"
+                                <MudDatePicker Label="Fecha de Finalizacion" AllowInput="false" @bind-Value="@disciplinaryOpennessRegister.AudienceEndDate" For="@(()=>disciplinaryOpennessRegister.AudienceEndDate)" Variant="Variant.Outlined"
                                            Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"></MudDatePicker>
                             </MudItem>>
 
                             <MudItem xs="12" sm="12" md="5" lg="5" xl="12">
-                                <GenericSolicitorAutocomplete Solicitor="disciplinaryOpenness.Solicitor" SolicitorResponse="GetSolicitorResponse"></GenericSolicitorAutocomplete>
+                                <GenericSolicitorAutocomplete Solicitor="disciplinaryOpennessRegister.Solicitor" SolicitorResponse="GetSolicitorResponse"></GenericSolicitorAutocomplete>
                             </MudItem>
 
                             <MudItem xs="12" sm="12" md="7" lg="7" xl="12">
-                                <MudSelect @bind-Value="@disciplinaryOpenness.ProsecutorId" Label="Seleccione un Fiscal" class="text-field-style custom-select" For="@(()=>disciplinaryOpenness.ProsecutorId)" Clearable="true">
+                                <MudSelect @bind-Value="@disciplinaryOpennessRegister.ProsecutorId" Label="Seleccione un Fiscal" class="text-field-style custom-select" For="@(()=>disciplinaryOpennessRegister.ProsecutorId)" Clearable="true">
                                     @foreach (ProsecutorUserInfoResponse prosecutor in prosecutors)
                                     {
                                         <MudSelectItem Value="@prosecutor.Id">@prosecutor.Name @prosecutor.LastName</MudSelectItem>
@@ -71,13 +71,13 @@ else
                                     <MudIcon Icon="add_circle_outline"></MudIcon>
                                 </div>
                             </div>
-                            @for (int i = 0; i < disciplinaryOpenness.Participants.Count; i++)
+                            @for (int i = 0; i < disciplinaryOpennessRegister.Participants.Count; i++)
                             {
                                 int index = i;
                                 <div class="single-textfield-container">
-                                    <div class="field-container base-field input-group-2 @(() => disciplinaryOpenness.Participants[index].Name)">
-                                        <MudTextField @bind-Value="@disciplinaryOpenness.Participants[index].Name" Class="text-field-style"
-                                              Label="Nombre del participante" For="@(()=>disciplinaryOpenness.Participants[index].Name)"></MudTextField>
+                                    <div class="field-container base-field input-group-2 @(() => disciplinaryOpennessRegister.Participants[index].Name)">
+                                        <MudTextField @bind-Value="@disciplinaryOpennessRegister.Participants[index].Name" Class="text-field-style"
+                                              Label="Nombre del participante" For="@(()=>disciplinaryOpennessRegister.Participants[index].Name)"></MudTextField>
                                     </div>
                                     <div class="base-icon" @onclick="@(() => removeParticipant(index))">
                                         <MudIcon Icon="remove_circle_outline"></MudIcon>
@@ -93,13 +93,13 @@ else
                                     <MudIcon Icon="add_circle_outline"></MudIcon>
                                 </div>
                             </div>
-                            @for (int i = 0; i < disciplinaryOpenness.ChargedDeeds.Count; i++)
+                            @for (int i = 0; i < disciplinaryOpennessRegister.ChargedDeeds.Count; i++)
                             {
                                 int index = i;
                                 <div class="single-textfield-container">
-                                    <div class="field-container base-field input-group-2 @(() => disciplinaryOpenness.ChargedDeeds[index].Description)">
-                                        <MudTextField @bind-Value="@disciplinaryOpenness.ChargedDeeds[index].Description" Class="text-field-style"
-                                              Label="Nombre del participante" For="@(()=>disciplinaryOpenness.ChargedDeeds[index].Description)"></MudTextField>
+                                    <div class="field-container base-field input-group-2 @(() => disciplinaryOpennessRegister.ChargedDeeds[index].Description)">
+                                        <MudTextField @bind-Value="@disciplinaryOpennessRegister.ChargedDeeds[index].Description" Class="text-field-style"
+                                              Label="Nombre del participante" For="@(()=>disciplinaryOpennessRegister.ChargedDeeds[index].Description)"></MudTextField>
                                     </div>
                                     <div class="base-icon" @onclick="@(() => removeDeed(index))">
                                         <MudIcon Icon="remove_circle_outline"></MudIcon>

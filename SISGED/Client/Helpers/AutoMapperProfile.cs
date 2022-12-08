@@ -3,6 +3,7 @@ using SISGED.Client.Components.Documents.Registers;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Responses.Document;
+using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.Solicitor;
 
 namespace SISGED.Client.Helpers
@@ -25,6 +26,10 @@ namespace SISGED.Client.Helpers
 
             // Disciplinary Openness Mapper
             CreateMap<DisciplinaryOpennessRegisterDTO, DisciplinaryOpennessResponseContent>()
+                .ForMember(complaintRequest => complaintRequest.SolicitorId, options => options.MapFrom(complaintRequestRegister => complaintRequestRegister.Solicitor.Id));
+            
+            // Solicitor Dossier Request Mapper
+            CreateMap<SolicitorDossierRequestRegisterDTO, SolicitorDossierRequestResponseContent>()
                 .ForMember(complaintRequest => complaintRequest.SolicitorId, options => options.MapFrom(complaintRequestRegister => complaintRequestRegister.Solicitor.Id));
         }
     }

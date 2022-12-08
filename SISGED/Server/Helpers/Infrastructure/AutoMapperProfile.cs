@@ -96,6 +96,11 @@ namespace SISGED.Server.Helpers.Infrastructure
                 .ForMember(disciplinaryContent => disciplinaryContent.AudiencePlace, options => options.MapFrom(disciplinaryResponse => disciplinaryResponse.AudienceLocation))
                 .ForMember(disciplinaryContent => disciplinaryContent.ImputedFacts, options => options.MapFrom(disciplinaryResponse => disciplinaryResponse.ChargedDeeds))
                 .ForMember(disciplinaryContent => disciplinaryContent.Url, options => options.MapFrom(disciplinaryResponse => disciplinaryResponse.URL));
+            
+            // Solicitor Dossier Request Type Mapper
+            CreateMap<SolicitorDossierRequestResponse, SolicitorDossierRequest>();
+            CreateMap<SolicitorDossierRequestResponseContent, SolicitorDossierRequestContent>()
+                .ForMember(disciplinaryContent => disciplinaryContent.IssueDate, options => options.MapFrom(disciplinaryResponse => disciplinaryResponse.DateIssue));
 
 
         }

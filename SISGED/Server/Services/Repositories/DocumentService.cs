@@ -563,6 +563,15 @@ namespace SISGED.Server.Services.Repositories
 
             return disciplinaryOpenness;
         }
+        
+        public async Task<SolicitorDossierRequest> SolicitorDossierRequestRegisterAsync(SolicitorDossierRequest solicitorDossierRequest)
+        {
+            await _documentsCollection.InsertOneAsync(solicitorDossierRequest);
+
+            if (solicitorDossierRequest.Id is null) throw new Exception($"No se pudo registrar la solicitud de denuncia {solicitorDossierRequest.Content.Title}");
+
+            return solicitorDossierRequest;
+        }
 
         public async Task<Dossier> UpdateDossierAsync(DossierDocument dossierDocument, string dossierId)
         {
@@ -1136,7 +1145,7 @@ namespace SISGED.Server.Services.Repositories
             {
                 Title = DTO.Content.Title,
                 Description = DTO.Content.Description,
-                SolicitorId = DTO.Content.SolicitorId.Id
+                SolicitorId = DTO.Content.SolicitorId
             };
 
             var filter = Builders<Document>.Filter.Eq("id", DTO.Id);

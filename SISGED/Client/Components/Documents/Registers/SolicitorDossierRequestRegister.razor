@@ -1,50 +1,43 @@
-﻿<div class="div-form">
-    @if (pageLoading)
-    {
-        <GenericPageLoader Body="Cargando los elementos para el registro de la solicitud, por favor espere..."></GenericPageLoader>
-    }
-    else
-    {
-        <MudForm @ref="requestForm" ValidationDelay="0" Model="solicitorDossierRequest" Validation="@(SolicitorDossierRequestRegisterValidator.ValidateValue)">
-        <MudTabs>
-            <MudTabPanel Text="Datos de la solicitud de expediente de notario">
+﻿@if (pageLoading)
+{
+    <GenericPageLoader Body="Cargando los elementos para el registro de la solicitud, por favor espere..."></GenericPageLoader>
+}
+else
+{
+    <MudCard Elevation="0">
+        <MudForm @ref="requestForm" ValidationDelay="0" Model="solicitorDossierRequestRegister" Validation="@(SolicitorDossierRequestRegisterValidator.ValidateValue)">
+            <MudCardContent>
+                <MudStepper @ref="requestStepper" LocalizedStrings="GetRegisterLocalizedStrings()"
+                        Color="Color.Secondary" Variant="Variant.Filled" HeaderTextView="HeaderTextView.NewLine"
+                        PreventStepChange="@(() => CheckRegisterAsync())">
+                    <MudStep Text="Datos de la solicitud de expediente de notario">
+                        <MudGrid>
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                                <MudTextField @bind-Value="@solicitorDossierRequestRegister.Title" Class="text-field-style"
+                                          Label="Titulo del Oficio" For="@(()=>solicitorDossierRequestRegister.Title)"></MudTextField>
+                            </MudItem>
 
-                    <div class="field-container input-group-2 @(() => solicitorDossierRequest.Content.Title)">
-                        <MudTextField @bind-Value="@solicitorDossierRequest.Content.Title" Class="text-field-style"
-                                  Label="Titulo del Oficio" For="@(()=>solicitorDossierRequest.Content.Title)"></MudTextField>
-                </div>
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                                <GenericSolicitorAutocomplete Solicitor="solicitorDossierRequestRegister.Solicitor" SolicitorResponse="GetSolicitorResponse"></GenericSolicitorAutocomplete>
+                            </MudItem>
 
-                <div class="field-container input-group-2 @(() => solicitorDossierRequest.Content.Description)">
-                    <MudTextField @bind-Value="@solicitorDossierRequest.Content.Description" Class="text-field-style"
-                                  Label="Descripción de la solicitud" For="@(()=>solicitorDossierRequest.Content.Description)"></MudTextField>
-                </div>
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
 
-                <div class="field-container input-group-2 @(() => solicitorDossierRequest.Content.SolicitorId)">
-                    <MudAutocomplete @bind-Value="@solicitorDossierRequest.Content.SolicitorId"
-                                     Placeholder="Ingrese el Nombre del Notario" For="@(()=>solicitorDossierRequest.Content.SolicitorId)">
-                        <ItemSelectedTemplate>
-                            <strong>Notario: @context.Name @context.LastName  -  N° DNI: @context.DNI</strong>
-                        </ItemSelectedTemplate>
-                        <ItemTemplate>
-                            <strong>Notario: @context.Name @context.LastName  -  N° DNI: @context.DNI</strong>
-                        </ItemTemplate>
-                        <NoItemsTemplate>
-                            <span style="color:red;font-size:20px">NO SE ENCONTRARON RESULTADOS</span>
-                        </NoItemsTemplate>
-                    </MudAutocomplete>
-                </div>
+                                <MudTextField @bind-Value="@solicitorDossierRequestRegister.Description" Class="text-field-style"
+                                          Label="Descripción de la solicitud" For="@(()=>solicitorDossierRequestRegister.Description)"></MudTextField>
+                            </MudItem>
+                        </MudGrid>
 
-
-            </MudTabPanel>
-            <MudTabPanel Text="Subir Anexo">
-                    <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
-                        <DocumentAnnex Annexes="files"></DocumentAnnex>
-                    </MudItem>
-                    <div class="field-container">
-                        <MudButton Color="Color.Success" Class="rounded-pill" OnClick="@(async() => await RegisterRequestAsync())">Registrar Ahora</MudButton>
-                    </div>
-            </MudTabPanel>
-        </MudTabs>
-    </MudForm>
-    }
-</div>
+                    </MudStep>
+                    <MudStep Text="Subir Anexo">
+                        <MudGrid>
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <DocumentAnnex Annexes="annexes"></DocumentAnnex>
+                            </MudItem>
+                        </MudGrid>
+                    </MudStep>
+                </MudStepper>
+            </MudCardContent>
+        </MudForm>
+    </MudCard>
+}

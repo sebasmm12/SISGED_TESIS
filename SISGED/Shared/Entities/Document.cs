@@ -365,6 +365,19 @@ namespace SISGED.Shared.Entities
     {
         [BsonElement("contenido")]
         public SolicitorDossierRequestContent Content { get; set; } = new();
+
+        public SolicitorDossierRequest(SolicitorDossierRequestContent content, string state, List<string> urls)
+        {
+            Content = content;
+            State = state;
+            AttachedUrls = urls;
+            Type = "SolicitudExpedienteNotario";
+            ContentsHistory = new();
+            ProcessesHistory = new();
+
+        }
+
+        public SolicitorDossierRequest() { }
     }
 
     public class DictumContent

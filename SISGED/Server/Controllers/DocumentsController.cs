@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SISGED.Server.Services.Contracts;
+using SISGED.Server.Services.Repositories;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Queries.Document;
@@ -330,40 +331,29 @@ namespace SISGED.Server.Controllers
 
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
-            //try
-            //{
-            //    //Deserealizacion de objeto de tipo AperturamientoDisciplinario
-            //    DisciplinaryOpennessResponse DTO = new DisciplinaryOpennessResponse();
-            //    var json = JsonConvert.SerializeObject(dossierWrapper.Document);
-            //    DTO = JsonConvert.DeserializeObject<DisciplinaryOpennessResponse>(json)!;
-            //    List<string> url2 = new List<string>();
-            //    string urlData2 = "";
-            //    foreach (string u in DTO.Content.URLAnnex)
-            //    {
-            //        if (!string.IsNullOrWhiteSpace(u))
-            //        {
-            //            var solicitudBytes2 = Convert.FromBase64String(u);
-            //            FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "aperturamientodiciplinario");
-            //            urlData2 = await _fileService.SaveFileAsync(file) ?? string.Empty;
-            //            url2.Add(urlData2);
-            //        }
-            //    }
-            //    //Almacenando el pdf en el servidor de archivos y obtencion de la url
-            //    string urlData = "";
-            //    if (!string.IsNullOrWhiteSpace(DTO.Content.URL))
-            //    {
-            //        var solicitudBytes = Convert.FromBase64String(DTO.Content.URL);
-            //        FileRegisterDTO file = new FileRegisterDTO(solicitudBytes, "pdf", "aperturamientodiciplinario");
-            //        urlData = await _fileService.SaveFileAsync(file) ?? string.Empty;
-            //    }
+        }
 
-            //    var disciplinaryOpenness = await _documentService.DisciplinaryOpennessRegisterAsync(DTO, urlData, url2, dossierWrapper.CurrentUserId, dossierWrapper.Id, dossierWrapper.InputDocument);
-            //    return Ok(disciplinaryOpenness);
-            //}
-            //catch (Exception ex)
-            //{
-            //    return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            //}
+        [HttpPost("solicitor-dossier-request")]
+        public async Task<ActionResult<SolicitorDossierRequest>> SolicitorDossierRequestRegister(DossierWrapper dossierWrapper)
+        {
+            try
+            {
+                var document = DeserializeDocument<SolicitorDossierRequestResponse>(dossierWrapper.Document);
+
+                //var user = await GetUserAsync("userId");
+                var user = await _userService.GetUserByIdAsync("5eeaf61e8ca4ff53a0b791e6");
+
+                var solicitorDossierRequest = await RegisterSolicitorDossierRequestDocumentAsync(document, user);
+
+                var updatedDossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "SolicitudExpedienteNotario", solicitorDossierRequest.Id, "En proceso"));
+
+                return Ok(solicitorDossierRequest);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
 
         [HttpPost("documentod")]
@@ -1187,10 +1177,21 @@ namespace SISGED.Server.Controllers
             var urls = await _mediaService.SaveFilesAsync(document.URLAnnex, _containerName);
 
             var DisciplinaryOpennessContent = _mapper.Map<DisciplinaryOpennessContent>(document.Content);
-            var DisciplinaryOpenness = new DisciplinaryOpenness(DisciplinaryOpennessContent, "en proceso", urls.ToList());
-            DisciplinaryOpenness.AddProcess(new Process(user.Id, user.Id, "en proceso"));
+            var DisciplinaryOpenness = new DisciplinaryOpenness(DisciplinaryOpennessContent, "En proceso", urls.ToList());
+            DisciplinaryOpenness.AddProcess(new Process(user.Id, user.Id, "En proceso"));
 
             return await _documentService.DisciplinaryOpennessRegisterAsync(DisciplinaryOpenness);
+        }
+        
+        public async Task<SolicitorDossierRequest> RegisterSolicitorDossierRequestDocumentAsync(SolicitorDossierRequestResponse document, User user)
+        {
+            var urls = await _mediaService.SaveFilesAsync(document.URLAnnex, _containerName);
+
+            var solicitorDossierRequestContent = _mapper.Map<SolicitorDossierRequestContent>(document.Content);
+            var SolicitorDossierRequest = new SolicitorDossierRequest(solicitorDossierRequestContent, "En proceso", urls.ToList());
+            SolicitorDossierRequest.AddProcess(new Process(user.Id, user.Id, "En proceso"));
+
+            return await _documentService.SolicitorDossierRequestRegisterAsync(SolicitorDossierRequest);
         }
 
         #endregion
