@@ -22,6 +22,10 @@ namespace SISGED.Client.Helpers
                 .ForMember(complaintRequest => complaintRequest.ClientId, options => options.MapFrom(complaintRequestRegister => complaintRequestRegister.Client.ClientId))
                 .ForMember(complaintRequest => complaintRequest.ComplaintType, options => options.MapFrom(complaintRequestRegister => complaintRequestRegister.ComplaintType.Id))
                 .ForMember(complaintRequest => complaintRequest.DeliveryDate, options => options.MapFrom(_ => DateTime.UtcNow.AddHours(-5)));
+
+            // Disciplinary Openness Mapper
+            CreateMap<DisciplinaryOpennessRegisterDTO, DisciplinaryOpennessResponseContent>()
+                .ForMember(complaintRequest => complaintRequest.SolicitorId, options => options.MapFrom(complaintRequestRegister => complaintRequestRegister.Solicitor.Id));
         }
     }
 }
