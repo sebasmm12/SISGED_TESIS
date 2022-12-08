@@ -28,6 +28,8 @@ using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.Account;
 using SISGED.Shared.Models.Requests.Documents;
 using Newtonsoft.Json;
+using SISGED.Shared.Validators;
+using SISGED.Shared.DTOs;
 
 namespace SISGED.Client.Components.Documents.Registers
 {
@@ -37,7 +39,10 @@ namespace SISGED.Client.Components.Documents.Registers
         private IHttpRepository httpRepository { get; set; } = default!;
         [Inject]
         private ISwalFireRepository swalFireRepository { get; set; } = default!;
+        [Inject]
+        public ResolutionRegisterValidator ResolutionRegisterValidator { get; set; } = default!;
 
+        private MudForm? requestForm = default!;
         //Variables de sesion
         [CascadingParameter] WorkEnvironment workspace { get; set; }
         [CascadingParameter(Name = "SesionUsuario")] protected SessionAccountResponse session { get; set; }
@@ -45,31 +50,28 @@ namespace SISGED.Client.Components.Documents.Registers
         //Datos del formulario
         [Parameter] public EventCallback<DossierTrayResponse> increaseTray { get; set; }
         private ResolutionResponse resolution = new ResolutionResponse();
-        private EditContext _editContext;
         List<string> names = new List<string>();
-        private string tempImage;
-        private string tempImage2;
         private bool loadprocess = false;
+        private bool pageLoading = true;
         int paso = 0;
         int subpaso = 0;
         String typeDocument = "Resolucion";
+        private List<MediaRegisterDTO> files = new();
+        private List<MediaRegisterDTO> annexes = new();
 
         protected override async Task OnInitializedAsync()
         {
             resolution.Content.Participants = new List<Participant>() { new Participant() { Index = 0, Name = "" } };
             resolution.Content.UrlAnnex = new List<string>();
-            _editContext = new EditContext(resolution);
             foreach (string u in resolution.Content.UrlAnnex)
             {
                 if (!string.IsNullOrWhiteSpace(u))
                 {
-                    tempImage2 = u;
                     resolution.Content.UrlAnnex = null;
                 }
             }
             if (!string.IsNullOrEmpty(resolution.Content.Data))
             {
-                tempImage = resolution.Content.Data;
                 resolution.Content.Data = null;
             }
             subpaso = 1;
@@ -92,30 +94,7 @@ namespace SISGED.Client.Components.Documents.Registers
             workspace.ChangeMessage(message);
 
             await voiceMessage;*/
-
-        }
-
-        private void SelectedImage(string imagenbase64)
-        {
-            resolution.Content.Data = imagenbase64;
-        }
-
-        private void SelectedImage2(string imagenbase64)
-        {
-            resolution.Content.UrlAnnex.Add(imagenbase64);
-        }
-
-        private void FileName(string imagenbase64)
-        {
-            names.Add(imagenbase64);
-        }
-
-        private async Task RemoveFile(string file, int imagen64)
-        {
-            names.Remove(file);
-            resolution.Content.UrlAnnex.RemoveAt(imagen64);
-            StateHasChanged();
-
+            pageLoading = false;
         }
 
         private async Task addParticipant()
@@ -129,14 +108,6 @@ namespace SISGED.Client.Components.Documents.Registers
             Console.WriteLine("INDEX REMOVE ==> " + index);
             resolution.Content.Participants.RemoveAt(index);
             StateHasChanged();
-        }
-
-        void KeyUp(ChangeEventArgs e, string memberName, object val)
-        {
-            var property = val.GetType().GetProperty(memberName);
-            property.SetValue(val, e.Value.ToString());
-            var fi = new FieldIdentifier(val, memberName);
-            _editContext.NotifyFieldChanged(fi);
         }
 
         public async Task HandleValidSubmit()
@@ -227,6 +198,19 @@ namespace SISGED.Client.Components.Documents.Registers
         {
             loadprocess = false;
             swalFireRepository.ShowErrorSwalFireAsync("Por favor, Verifique los Datos Ingresados");
+        }
+
+        private async Task RegisterRequestAsync()
+        {
+            await requestForm!.Validate();
+
+            if (!requestForm.IsValid)
+            {
+                HandleInvalidSubmit();
+                return;
+            }
+
+            await HandleValidSubmit();
         }
     }
 }
