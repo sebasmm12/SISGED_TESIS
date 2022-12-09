@@ -31,6 +31,9 @@ namespace SISGED.Client.Helpers
             // Solicitor Dossier Request Mapper
             CreateMap<SolicitorDossierRequestRegisterDTO, SolicitorDossierRequestResponseContent>()
                 .ForMember(complaintRequest => complaintRequest.SolicitorId, options => options.MapFrom(complaintRequestRegister => complaintRequestRegister.Solicitor.Id));
+
+            // Resolution Request Mapper
+            CreateMap<ResolutionRegisterDTO, ResolutionResponseContent>();
         }
     }
 }

@@ -30,6 +30,11 @@ using SISGED.Shared.Models.Requests.Documents;
 using Newtonsoft.Json;
 using SISGED.Shared.Validators;
 using SISGED.Shared.DTOs;
+using AutoMapper;
+using MudExtensions;
+using MudExtensions.Utilities;
+using SISGED.Shared.Models.Responses.Dossier;
+using SISGED.Shared.Models.Responses.Solicitor;
 
 namespace SISGED.Client.Components.Documents.Registers
 {
@@ -41,176 +46,138 @@ namespace SISGED.Client.Components.Documents.Registers
         private ISwalFireRepository swalFireRepository { get; set; } = default!;
         [Inject]
         public ResolutionRegisterValidator ResolutionRegisterValidator { get; set; } = default!;
+        [Inject]
+        public IMapper Mapper { get; set; } = default!;
+        [Inject]
+        public IDialogContentRepository dialogContentRepository { get; set; } = default!;
 
         private MudForm? requestForm = default!;
+        private MudStepper? requestStepper;
+
         //Variables de sesion
-        [CascadingParameter] WorkEnvironment workspace { get; set; }
-        [CascadingParameter(Name = "SesionUsuario")] protected SessionAccountResponse session { get; set; }
+        [CascadingParameter(Name = "WorkPlaceItems")]
+        public List<Item> WorkPlaceItems { get; set; } = default!;
+        [CascadingParameter(Name = "SessionAccount")] protected SessionAccountResponse SessionAccount { get; set; }
 
         //Datos del formulario
-        [Parameter] public EventCallback<DossierTrayResponse> increaseTray { get; set; }
-        private ResolutionResponse resolution = new ResolutionResponse();
-        List<string> names = new List<string>();
-        private bool loadprocess = false;
-        private bool pageLoading = true;
-        int paso = 0;
-        int subpaso = 0;
-        String typeDocument = "Resolucion";
-        private List<MediaRegisterDTO> files = new();
+        private ResolutionRegisterDTO resolutionRegister = new ResolutionRegisterDTO();
+        
         private List<MediaRegisterDTO> annexes = new();
+        List<string> names = new List<string>();
+        private bool pageLoading = true;
+        private string dossierId = default!;
+
+        String typeDocument = "Resolucion";
 
         protected override async Task OnInitializedAsync()
         {
-            resolution.Content.Participants = new List<Participant>() { new Participant() { Index = 0, Name = "" } };
-            resolution.Content.UrlAnnex = new List<string>();
-            foreach (string u in resolution.Content.UrlAnnex)
-            {
-                if (!string.IsNullOrWhiteSpace(u))
-                {
-                    resolution.Content.UrlAnnex = null;
-                }
-            }
-            if (!string.IsNullOrEmpty(resolution.Content.Data))
-            {
-                resolution.Content.Data = null;
-            }
-            subpaso = 1;
-            //Enviar paso=0,subpaso=1,idexp
-            /*String message = "";
+            resolutionRegister.Participants = new List<Participant>() { new Participant() { Index = 0, Name = "" } };
+            await GetUserRequestInformationAsync();
 
-            if (typeDocument != workspace.asistente.tipodocumento)
-            {
-                message = "El Document que ha elegido no es el indicado para el expediente";
-            }
-            else
-            {
-                message = workspace.asistente.pasos.documentos.Find(x => x.tipo == workspace.asistente.tipodocumento).pasos.ElementAt(paso).subpaso.ElementAt(subpaso).descripcion;
-
-                await workspace.UpdatePasoAndSubPasoNormal(paso, subpaso, workspace.asistente.tipodocumento);
-            }
-
-            Task voiceMessage = workspace.VoiceMessage(message);
-
-            workspace.ChangeMessage(message);
-
-            await voiceMessage;*/
             pageLoading = false;
         }
 
-        private async Task addParticipant()
+        private void addParticipant()
         {
-            Console.WriteLine("INDEX ADD ==> " + resolution.Content.Participants.Count);
-            resolution.Content.Participants.Add(new Participant() { Index = (resolution.Content.Participants.Count), Name = "" });
-            StateHasChanged();
-        }
-        private async Task removeParticipant(int index)
-        {
-            Console.WriteLine("INDEX REMOVE ==> " + index);
-            resolution.Content.Participants.RemoveAt(index);
+            resolutionRegister.Participants.Add(new Participant() { Index = (resolutionRegister.Participants.Count) });
             StateHasChanged();
         }
 
-        public async Task HandleValidSubmit()
+        private void removeParticipant(int index)
         {
-            loadprocess = true;
-            if (resolution.Content.Data != "" && resolution.Content.Data != null)
-            {
-                DossierWrapper dossierWrapper = new DossierWrapper();
-                dossierWrapper.Document = resolution;
-                dossierWrapper.Id = workspace.SelectedTray.DossierId;
-                dossierWrapper.CurrentUserId = session.User.Id;
-                dossierWrapper.InputDocument = workspace.SelectedTray.Document.Id;
-                var httpResponse = await httpRepository.PostAsync<DossierWrapper, Resolution>($"api/documents/documentor", dossierWrapper);
-                if (!httpResponse.Error)
-                {
-                    DossierTrayResponse dossierTray = new DossierTrayResponse();
-                    dossierTray = workspace.SelectedTray;
-                    Resolution resolutionDocument = new Resolution();
-                    resolutionDocument = httpResponse.Response!;
-                    dossierTray.Document.Id = resolutionDocument.Id;
-                    dossierTray.Document.Type = resolutionDocument.Type;
-                    dossierTray.Document.ContentsHistory = resolutionDocument.ContentsHistory;
-                    dossierTray.Document.ProcessesHistory = resolutionDocument.ProcessesHistory;
-                    dossierTray.Document.Content = resolutionDocument.Content;
-                    dossierTray.Document.State = resolutionDocument.State;
-                    //expedientebandeja.documentosobj.Add(expedientebandeja.Document);
-                    //SISGED.Shared.Models.Item itemSalida = new SISGED.Shared.Models.Item()
-
-                    //{
-                    //    Name = dossierTray.Type!,
-                    //    Value = dossierTray,
-                    //    Icon = "alarm_add",
-                    //    Description = ((DocumentResponse)dossierTray.Document).Type,
-                    //    CurrentPlace = "workspace",
-                    //    OriginPlace = "inputs",
-                    //    Client = dossierTray.Client!,
-                    //    ItemStatus = "registrado"
-                    //};
-
-                    //workspace.UpdateRegisteredDocument(itemSalida);
-                    //workspace.UpdateTools("Registrar Documento");
-                    DocumentResponse doc = new DocumentResponse();
-                    doc.Id = resolutionDocument.Id;
-                    doc.Type = resolutionDocument.Type;
-                    doc.State = resolutionDocument.State;
-                    doc.Content = JsonConvert.SerializeObject(resolutionDocument.Content);
-                    doc.ContentsHistory = resolutionDocument.ContentsHistory;
-                    doc.ProcessesHistory = resolutionDocument.ProcessesHistory;
-                    doc.UrlAnnex = resolutionDocument.AttachedUrls;
-                    workspace.SelectedTray.DocumentObjects!.Add(doc);
-                    workspace.SelectedTray.Document = doc;
-
-                    StateHasChanged();
-                    await swalFireRepository.ShowSuccessfulSwalFireAsync("Resolución registrada correctamente");
-                    subpaso = 2;
-
-                    Int32 pasoAntiguo = paso;
-                    paso = 1;
-                    subpaso = 0;
-                    //Enviar paso=0+0,subpaso=2,idexpediente
-                    /*String tipodocumentoantiguo = workspace.asistente.tipodocumento;
-
-                    await workspace.UpdatePasoAndSubPasoFinnally(paso, subpaso, workspace.asistente.tipodocumento, pasoAntiguo, tipodocumentoantiguo);
-
-                    String messageFinal = workspace.asistente.pasos.documentos
-                            .Find(x => x.tipo == workspace.asistente.tipodocumento).pasos.ElementAt(paso).descripcion;
-
-                    Task voiceMessage = workspace.VoiceMessage(messageFinal);
-
-                    workspace.ChangeMessage(messageFinal);
-
-                    await voiceMessage;*/
-                    //Enviar paso=0,subpaso=2,idexp
-                }
-                else
-                {
-                    await swalFireRepository.ShowErrorSwalFireAsync("Error en el servidor, intentelo de nuevo");
-                }
-            }
-            else
-            {
-                await swalFireRepository.ShowErrorSwalFireAsync("Debe subir un PDF obligatoriamente");
-            }
-            loadprocess = false;
+            resolutionRegister.Participants.RemoveAt(index);
+            StateHasChanged();
         }
 
-        public void HandleInvalidSubmit()
+        private DossierWrapper GetDocumentRegister()
         {
-            loadprocess = false;
-            swalFireRepository.ShowErrorSwalFireAsync("Por favor, Verifique los Datos Ingresados");
+            var resolutionContent = Mapper.Map<ResolutionResponseContent>(resolutionRegister);
+            var resolution = new ResolutionResponse(resolutionContent, annexes);
+
+            var documentRegister = new DossierWrapper(dossierId, resolution);
+
+            return documentRegister;
         }
 
-        private async Task RegisterRequestAsync()
+        private async Task<Resolution?> ShowLoadingDialogAsync(DossierWrapper documentRegister)
         {
-            await requestForm!.Validate();
+            string dialogTitle = $"Realizando el registro de su resolución, por favor espere...";
 
-            if (!requestForm.IsValid)
+            var toRegister = () => RegisterResolutionAsync(documentRegister);
+
+            return await dialogContentRepository.ShowLoadingDialogAsync(toRegister, dialogTitle);
+
+        }
+
+        private async Task RegisterResolutionAsync()
+        {
+            var documentRegister = GetDocumentRegister();
+
+            var registeredResolution = await ShowLoadingDialogAsync(documentRegister);
+
+            if (registeredResolution is null) return;
+
+            await swalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo registrar la resolución de manera satisfactoria");
+        }
+
+        private async Task<Resolution?> RegisterResolutionAsync(DossierWrapper documentRegister)
+        {
+            try
             {
-                HandleInvalidSubmit();
-                return;
+                var resolutionResponse = await httpRepository.PostAsync<DossierWrapper, Resolution>("api/documents/resolution", documentRegister);
+
+                if (resolutionResponse.Error)
+                {
+                    await swalFireRepository.ShowErrorSwalFireAsync("No se pudo registar la resolución");
+                }
+
+                return resolutionResponse.Response!;
+            }
+            catch (Exception)
+            {
+
+                await swalFireRepository.ShowErrorSwalFireAsync("No se pudo registar la resolución");
+                return null;
+            }
+        }
+
+
+
+        private async Task GetUserRequestInformationAsync()
+        {
+            var userTray = WorkPlaceItems.First(workItem => workItem.OriginPlace != "tools");
+
+            //resolutionRegister.Client = userTray.Client;
+
+            var dossierTray = userTray.Value as DossierTrayResponse;
+
+            //var documentContent = JsonSerializer.Deserialize<InitialRequestContentDTO>(JsonSerializer.Serialize(dossierTray!.Document!.Content));
+
+            //resolutionRegister.Solicitor = await GetSolicitorAsync(documentContent!.SolicitorId);
+            dossierId = dossierTray!.DossierId;
+        }
+
+        private static StepperLocalizedStrings GetRegisterLocalizedStrings()
+        {
+            return new() { Completed = "Completado", Finish = "Registrar", Next = "Siguiente", Previous = "Anterior" };
+        }
+
+        private bool CheckRegisterAsync()
+        {
+            if (requestStepper!.GetActiveIndex() != 2) return false;
+
+            requestForm!.Validate().GetAwaiter().GetResult();
+
+            if (!requestForm!.IsValid)
+            {
+                swalFireRepository.ShowErrorSwalFireAsync("No se puede registrar la resolución, por favor verifique los datos ingresados").GetAwaiter();
+
+                return true;
             }
 
-            await HandleValidSubmit();
+            RegisterResolutionAsync().GetAwaiter();
+
+            return false;
         }
     }
 }

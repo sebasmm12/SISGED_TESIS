@@ -440,6 +440,19 @@ namespace SISGED.Shared.Entities
         public Evaluation Evaluation { get; set; } = default!;
         [BsonElement("contenido")]
         public ResolutionContent Content { get; set; } = default!;
+
+        public Resolution(ResolutionContent content, string state, List<string> urls)
+        {
+            Content = content;
+            State = state;
+            AttachedUrls = urls;
+            Type = "Resolucion";
+            ContentsHistory = new();
+            ProcessesHistory = new();
+
+        }
+
+        public Resolution() { }
     }
     public class AppealContent
     {

@@ -385,40 +385,21 @@ namespace SISGED.Server.Controllers
             }
         }
 
-        [HttpPost("documentor")]
+        [HttpPost("resolution")]
         public async Task<ActionResult<Resolution>> ResolutionDocumentRegister(DossierWrapper dossierWrapper)
         {
             try
             {
-                ResolutionResponse DTO = new ResolutionResponse();
-                var json = JsonConvert.SerializeObject(dossierWrapper.Document);
-                DTO = JsonConvert.DeserializeObject<ResolutionResponse>(json)!;
-                List<string> url2 = new List<string>();
-                string urlData2 = "";
-                foreach (string u in DTO.Content.UrlAnnex)
-                {
-                    if (!string.IsNullOrWhiteSpace(u))
-                    {
-                        var solicitudBytes2 = Convert.FromBase64String(u);
-                        FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "resolucion");
-                        urlData2 = await _fileService.SaveFileAsync(file) ?? string.Empty;
-                        url2.Add(urlData2);
-                    }
-                }
-                //Almacenando el pdf en el servidor de archivos y obtencion de la url
-                string urlData = "";
-                if (!string.IsNullOrWhiteSpace(DTO.Content.Data))
-                {
-                    var solicitudBytes = Convert.FromBase64String(DTO.Content.Data);
-                    FileRegisterDTO file = new FileRegisterDTO(solicitudBytes, "pdf", "resolucion");
-                    urlData = await _fileService.SaveFileAsync(file) ?? string.Empty;
-                }
+                var document = DeserializeDocument<ResolutionResponse>(dossierWrapper.Document);
 
-                DossierResponse expedientePorConsultar = await _dossierService.GetDossierByIdAsync(dossierWrapper.Id);
-                DossierDocument documentRequest = expedientePorConsultar.Documents.Find(x => x.Type == "SolicitudInicial")!;
+                //var user = await GetUserAsync("userId");
+                var user = await _userService.GetUserByIdAsync("5eeaf61e8ca4ff53a0b791e6");
 
-                var resolution = await _documentService.ResolutionRegisterAsync(DTO, urlData, url2, dossierWrapper.CurrentUserId, dossierWrapper.Id, dossierWrapper.InputDocument, documentRequest.DocumentId);
-                return Ok(resolution);
+                var resolutionDocument = await RegisterResolutionDocumentAsync(document, user);
+
+                var updatedDossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Resolucion", resolutionDocument.Id, "Finalizado"));
+
+                return Ok(resolutionDocument);
             }
             catch (Exception ex)
             {
@@ -735,11 +716,11 @@ namespace SISGED.Server.Controllers
                 string urlData = "";
                 List<string> url2 = new List<string>();
                 string urlData2 = "";
-                foreach (string u in DTO.Content.UrlAnnex)
+                foreach (MediaRegisterDTO u in DTO.URLAnnex)
                 {
-                    if (!string.IsNullOrWhiteSpace(u))
+                    if (!string.IsNullOrWhiteSpace(u.Content))
                     {
-                        var solicitudBytes2 = Convert.FromBase64String(u);
+                        var solicitudBytes2 = Convert.FromBase64String(u.Content);
                         FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "resolucion");
                         urlData2 = await _fileService.SaveFileAsync(file) ?? string.Empty;
                         url2.Add(urlData2);
@@ -1192,6 +1173,17 @@ namespace SISGED.Server.Controllers
             SolicitorDossierRequest.AddProcess(new Process(user.Id, user.Id, "En proceso"));
 
             return await _documentService.SolicitorDossierRequestRegisterAsync(SolicitorDossierRequest);
+        }
+        
+        public async Task<Resolution> RegisterResolutionDocumentAsync(ResolutionResponse document, User user)
+        {
+            var urls = await _mediaService.SaveFilesAsync(document.URLAnnex, _containerName);
+
+            var resolutionContent = _mapper.Map<ResolutionContent>(document.Content);
+            var resolution = new Resolution(resolutionContent, "En proceso", urls.ToList());
+            resolution.AddProcess(new Process(user.Id, user.Id, "En proceso"));
+
+            return await _documentService.ResolutionRegisterAsync(resolution);
         }
 
         #endregion

@@ -559,7 +559,7 @@ namespace SISGED.Server.Services.Repositories
         {
             await _documentsCollection.InsertOneAsync(disciplinaryOpenness);
 
-            if (disciplinaryOpenness.Id is null) throw new Exception($"No se pudo registrar la solicitud de denuncia {disciplinaryOpenness.Content.Title}");
+            if (disciplinaryOpenness.Id is null) throw new Exception($"No se pudo registrar el aperturamiento disciplinario {disciplinaryOpenness.Content.Title}");
 
             return disciplinaryOpenness;
         }
@@ -568,7 +568,7 @@ namespace SISGED.Server.Services.Repositories
         {
             await _documentsCollection.InsertOneAsync(solicitorDossierRequest);
 
-            if (solicitorDossierRequest.Id is null) throw new Exception($"No se pudo registrar la solicitud de denuncia {solicitorDossierRequest.Content.Title}");
+            if (solicitorDossierRequest.Id is null) throw new Exception($"No se pudo registrar la solicitud de expediente de notario {solicitorDossierRequest.Content.Title}");
 
             return solicitorDossierRequest;
         }
@@ -644,65 +644,13 @@ namespace SISGED.Server.Services.Repositories
             return dictum;
         }
 
-        public async Task<Resolution> ResolutionRegisterAsync(ResolutionResponse DTO,
-            string urlData, List<string> url2, string userId, string dossierId, string inputDocId, string documentRequestId)
+        public async Task<Resolution> ResolutionRegisterAsync(Resolution resolution)
         {
-            //Creacionde le objeto de AperturamientoDisciplinario y registro en la coleccion documentos
-            ResolutionContent contenidoResolucion = new ResolutionContent()
-            {
-                Code = "",
-                Title = DTO.Content.Title,
-                Description = DTO.Content.Description,
-                AudienceStartDate = DTO.Content.AudienceStartDate,
-                AudienceEndDate = DTO.Content.AudienceEndDate,
-                Participants = DTO.Content.Participants.Select(x => x.Name).ToList(),
-                Sanction = DTO.Content.Penalty,
-                Url = urlData,
-                Sign = ""
-            };
-            Resolution resolucion = new Resolution()
-            {
-                Type = "Resolucion",
-                Content = contenidoResolucion,
-                ContentsHistory = new List<ContentVersion>(),
-                ProcessesHistory = new List<Process>(),
-                AttachedUrls = url2,
-                Evaluation = new Evaluation()
-                {
-                    Result = "pendiente",
-                    Evaluations = new List<IndividualEvaluation>()
-                },
-                State = "creado"
-            };
-            await _documentsCollection.InsertOneAsync(resolucion);
+            await _documentsCollection.InsertOneAsync(resolution);
 
-            //Actualizacion del expediente
-            Dossier dossier = new Dossier();
-            DossierDocument dossierDocument = new DossierDocument();
-            dossierDocument.Index = 8;
-            dossierDocument.DocumentId = resolucion.Id;
-            dossierDocument.Type = "Resolucion";
-            dossierDocument.CreationDate = DateTime.UtcNow.AddHours(-5);
-            dossierDocument.ExcessDate = DateTime.UtcNow.AddHours(-5).AddDays(5);
-            dossierDocument.DelayDate = null;
-            dossier = await UpdateDossierAsync(dossierDocument, dossierId);
+            if (resolution.Id is null) throw new Exception($"No se pudo registrar la resolución {resolution.Content.Title}");
 
-            //Actulizar el documento anterior a revisado
-            var filter = Builders<Document>.Filter.Eq("id", inputDocId);
-            var update = Builders<Document>.Update
-                .Set("estado", "revisado");
-            await _documentsCollection.UpdateOneAsync(filter, update);
-
-            //Actualizar el documento de solicitud inicial a finalizado
-            if (!String.IsNullOrEmpty(documentRequestId))
-            {
-                var filterS = Builders<Document>.Filter.Eq("id", documentRequestId);
-                var updateS = Builders<Document>.Update
-                       .Set("estado", "finalizado");
-
-                await _documentsCollection.UpdateOneAsync(filterS, updateS);
-            }
-            return resolucion;
+            return resolution;
         }
 
         public async Task<BPNResult> BPNResultRegisterAsync(BPNResultResponse DTO, List<string> url2,

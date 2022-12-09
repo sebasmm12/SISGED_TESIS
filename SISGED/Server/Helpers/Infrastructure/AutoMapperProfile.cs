@@ -100,7 +100,12 @@ namespace SISGED.Server.Helpers.Infrastructure
             // Solicitor Dossier Request Type Mapper
             CreateMap<SolicitorDossierRequestResponse, SolicitorDossierRequest>();
             CreateMap<SolicitorDossierRequestResponseContent, SolicitorDossierRequestContent>()
-                .ForMember(disciplinaryContent => disciplinaryContent.IssueDate, options => options.MapFrom(disciplinaryResponse => disciplinaryResponse.DateIssue));
+                .ForMember(solicitorContent => solicitorContent.IssueDate, options => options.MapFrom(solicitorResponse => solicitorResponse.DateIssue));
+            
+            // Resolution Type Mapper
+            CreateMap<ResolutionResponse, Resolution>();
+            CreateMap<ResolutionResponseContent, ResolutionContent>()
+                .ForMember(resolutionContent => resolutionContent.Sanction, options => options.MapFrom(resolutionResponse => resolutionResponse.Penalty));
 
 
         }

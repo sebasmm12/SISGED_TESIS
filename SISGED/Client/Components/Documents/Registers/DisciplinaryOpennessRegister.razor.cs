@@ -94,7 +94,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
         private async Task<DisciplinaryOpenness?> ShowLoadingDialogAsync(DossierWrapper documentRegister)
         {
-            string dialogTitle = $"Realizando el registro de su denuncia, por favor espere...";
+            string dialogTitle = $"Realizando el registro de su aperturamiento disciplinario, por favor espere...";
 
             var toRegister = () => RegisterDisciplinaryOpennessRequestAsync(documentRegister);
 

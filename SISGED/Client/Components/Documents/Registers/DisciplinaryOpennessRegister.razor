@@ -63,51 +63,56 @@ else
                     </MudStep>
 
                     <MudStep Text="Participantes y Conclusiones">
-                        <!--**************************************************************************************-->
-                        <div class="contenedor-participantes">
-                            <div class="titulo-paticipantes">
-                                <div><span class="titulo">Participantes</span></div>
-                                <div class="icono" @onclick="@(addParticipant)">
-                                    <MudIcon Icon="add_circle_outline"></MudIcon>
-                                </div>
-                            </div>
-                            @for (int i = 0; i < disciplinaryOpennessRegister.Participants.Count; i++)
-                            {
-                                int index = i;
-                                <div class="single-textfield-container">
-                                    <div class="field-container base-field input-group-2 @(() => disciplinaryOpennessRegister.Participants[index].Name)">
-                                        <MudTextField @bind-Value="@disciplinaryOpennessRegister.Participants[index].Name" Class="text-field-style"
-                                              Label="Nombre del participante" For="@(()=>disciplinaryOpennessRegister.Participants[index].Name)"></MudTextField>
+                        <MudGrid>
+                            <!--**************************************************************************************-->
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <div class="contenedor-participantes">
+                                    <div class="titulo-paticipantes">
+                                        <div><span class="titulo">Participantes</span></div>
+                                        <div class="icono" @onclick="@(addParticipant)">
+                                            <MudIcon Icon="add_circle_outline"></MudIcon>
+                                        </div>
                                     </div>
-                                    <div class="base-icon" @onclick="@(() => removeParticipant(index))">
-                                        <MudIcon Icon="remove_circle_outline"></MudIcon>
-                                    </div>
+                                    @for (int i = 0; i < disciplinaryOpennessRegister.Participants.Count; i++)
+                                    {
+                                        int index = i;
+                                        <div class="single-textfield-container">
+                                            <div class="field-container base-field input-group-2 @(() => disciplinaryOpennessRegister.Participants[index].Name)">
+                                                <MudTextField @bind-Value="@disciplinaryOpennessRegister.Participants[index].Name" Class="text-field-style"
+                                                      Label="Nombre del participante" For="@(()=>disciplinaryOpennessRegister.Participants[index].Name)"></MudTextField>
+                                            </div>
+                                            <div class="base-icon" @onclick="@(() => removeParticipant(index))">
+                                                <MudIcon Icon="remove_circle_outline"></MudIcon>
+                                            </div>
+                                        </div>
+                                    }
                                 </div>
-                            }
-                        </div>
-                        <!--**************************************************************************************-->
-                        <div class="contenedor-participantes">
-                            <div class="titulo-paticipantes">
-                                <div><span class="titulo">Hechos Imputados</span></div>
-                                <div class="icono" @onclick="@(addDeed)">
-                                    <MudIcon Icon="add_circle_outline"></MudIcon>
-                                </div>
-                            </div>
-                            @for (int i = 0; i < disciplinaryOpennessRegister.ChargedDeeds.Count; i++)
-                            {
-                                int index = i;
-                                <div class="single-textfield-container">
-                                    <div class="field-container base-field input-group-2 @(() => disciplinaryOpennessRegister.ChargedDeeds[index].Description)">
-                                        <MudTextField @bind-Value="@disciplinaryOpennessRegister.ChargedDeeds[index].Description" Class="text-field-style"
-                                              Label="Nombre del participante" For="@(()=>disciplinaryOpennessRegister.ChargedDeeds[index].Description)"></MudTextField>
+                            </MudItem>
+                            <!--**************************************************************************************-->
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <div class="contenedor-participantes">
+                                    <div class="titulo-paticipantes">
+                                        <div><span class="titulo">Hechos Imputados</span></div>
+                                        <div class="icono" @onclick="@(addDeed)">
+                                            <MudIcon Icon="add_circle_outline"></MudIcon>
+                                        </div>
                                     </div>
-                                    <div class="base-icon" @onclick="@(() => removeDeed(index))">
-                                        <MudIcon Icon="remove_circle_outline"></MudIcon>
-                                    </div>
+                                    @for (int i = 0; i < disciplinaryOpennessRegister.ChargedDeeds.Count; i++)
+                                    {
+                                        int index = i;
+                                        <div class="single-textfield-container">
+                                            <div class="field-container base-field input-group-2 @(() => disciplinaryOpennessRegister.ChargedDeeds[index].Description)">
+                                                <MudTextField @bind-Value="@disciplinaryOpennessRegister.ChargedDeeds[index].Description" Class="text-field-style"
+                                                      Label="Nombre del participante" For="@(()=>disciplinaryOpennessRegister.ChargedDeeds[index].Description)"></MudTextField>
+                                            </div>
+                                            <div class="base-icon" @onclick="@(() => removeDeed(index))">
+                                                <MudIcon Icon="remove_circle_outline"></MudIcon>
+                                            </div>
+                                        </div>
+                                    }
                                 </div>
-                            }
-                        </div>
-
+                            </MudItem>
+                        </MudGrid>
                     </MudStep>
                     <MudStep Text="Subir Anexo">
                         <MudGrid>

@@ -69,7 +69,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
         private async Task<SolicitorDossierRequest?> ShowLoadingDialogAsync(DossierWrapper documentRegister)
         {
-            string dialogTitle = $"Realizando el registro de su denuncia, por favor espere...";
+            string dialogTitle = $"Realizando el registro de su solicitud de expediente de notario, por favor espere...";
 
             var toRegister = () => RegisterSolicitorDossierRequestAsync(documentRegister);
 
