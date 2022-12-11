@@ -1,78 +1,83 @@
-﻿<div class="div-form">
-    @if (pageLoading)
-    {
-        <GenericPageLoader Body="Cargando los elementos para el registro de la solicitud, por favor espere..."></GenericPageLoader>
-    }
-    else
-    {
-        <MudForm @ref="requestForm" ValidationDelay="0" Model="resolution" Validation="@(ResolutionRegisterValidator.ValidateValue)">
-            <MudTabs>
-                <MudTabPanel Text="General">
+﻿@if (pageLoading)
+{
+    <GenericPageLoader Body="Cargando los elementos para el registro de la solicitud, por favor espere..."></GenericPageLoader>
+}
+else
+{
+    <MudCard Elevation="0">
+        <MudForm @ref="requestForm" ValidationDelay="0" Model="resolutionRegister" Validation="@(ResolutionRegisterValidator.ValidateValue)">
+            <MudCardContent>
+                <MudStepper @ref="requestStepper" LocalizedStrings="GetRegisterLocalizedStrings()"
+                        Color="Color.Secondary" Variant="Variant.Filled" HeaderTextView="HeaderTextView.NewLine"
+                        PreventStepChange="@(() => CheckRegisterAsync())">
+                    <MudStep Text="General">
+                        <MudGrid>
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                                <MudTextField @bind-Value="@resolutionRegister.Title" Class="text-field-style"
+                                          Label="Titulo de la resolución" For="@(()=>resolutionRegister.Title)"></MudTextField>
+                            </MudItem>
 
-                    <div class="field-container input-group-2 @(() => resolution.Content.Title)">
-                        <MudTextField @bind-Value="@resolution.Content.Title" Class="text-field-style"
-                                  Label="Titulo de la resolución" For="@(()=>resolution.Content.Title)"></MudTextField>
-                    </div>
 
-                    <div class="field-container input-group-2 @(() => resolution.Content.Description)">
-                        <MudTextField @bind-Value="@resolution.Content.Description" Class="text-field-style"
-                                  Label="Descripcion" For="@(()=>resolution.Content.Description)"></MudTextField>
-                    </div>
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                                <MudTextField @bind-Value="@resolutionRegister.Penalty" Class="text-field-style"
+                                          Label="Sancion" For="@(()=>resolutionRegister.Penalty)"></MudTextField>
+                            </MudItem>
 
-                    <div class="field-container input-group-2 @(() => resolution.Content.Penalty)">
-                        <MudTextField @bind-Value="@resolution.Content.Penalty" Class="text-field-style"
-                                  Label="Sancion" For="@(()=>resolution.Content.Penalty)"></MudTextField>
-                    </div>
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <MudTextField @bind-Value="@resolutionRegister.Description" Class="text-field-style"
+                                          Label="Descripcion" For="@(()=>resolutionRegister.Description)"></MudTextField>
+                            </MudItem>
 
-                    <div class="field-container input-group-2 @(() => resolution.Content.AudienceStartDate)">
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
 
-                        <MudDatePicker Label="Fecha de Inicio" @bind-Value="@resolution.Content.AudienceStartDate" For="@(()=>resolution.Content.AudienceStartDate)"></MudDatePicker>
-                    </div>
-                    <div class="field-container input-group-2 @(() => resolution.Content.AudienceEndDate)">
+                                <MudDatePicker Label="Fecha de Inicio" @bind-Value="@resolutionRegister.AudienceStartDate" For="@(()=>resolutionRegister.AudienceStartDate)"></MudDatePicker>
+                            </MudItem>
 
-                        <MudDatePicker AllowInput="false" Label="Fecha de Fin" @bind-Value="@resolution.Content.AudienceEndDate" For="@(()=>resolution.Content.AudienceEndDate)"></MudDatePicker>
-                    </div>
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                                <MudDatePicker AllowInput=" false" Label="Fecha de Fin" @bind-Value="@resolutionRegister.AudienceEndDate" For="@(()=>resolutionRegister.AudienceEndDate)">
+                                </MudDatePicker>
+                            </MudItem>
 
-                    <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
-                        <DocumentAnnex Annexes="files"></DocumentAnnex>
-                    </MudItem>
+                        </MudGrid>
+                    </MudStep>
 
-                </MudTabPanel>
-
-                <MudTabPanel Text="Participantes">
-
-                    <div class="contenedor-Participants">
-                        <div class="Title-paticipantes">
-                            <div><span class="Title">Participantes de la resolucion</span></div>
-                            <div class="icono" @onclick="@(addParticipant)">
-                                <MudIcon Icon="add_circle_outline"></MudIcon>
-                            </div>
-                        </div>
-                        @for (int i = 0; i < resolution.Content.Participants.Count; i++)
-                        {
-                            int index = i;
-                            <div class="single-textfield-container">
-                                <div class="field-container base-field input-group-2 @(() => resolution.Content.Participants[index].Name)">
-                                    <MudTextField @bind-Value="@resolution.Content.Participants[index].Name" Class="text-field-style"
-                                          Label="Ingrese una observación"
-                                          For="@(()=>resolution.Content.Participants[index].Name)"></MudTextField>
+                    <MudStep Text="Participantes">
+                        <MudGrid>
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <div class="contenedor-Participants">
+                                    <div class="Title-paticipantes">
+                                        <div><span class="Title">Participantes de la resolucion</span></div>
+                                        <div class="icono" @onclick="@(addParticipant)">
+                                            <MudIcon Icon="add_circle_outline"></MudIcon>
+                                        </div>
+                                    </div>
+                                    @for (int i = 0; i < resolutionRegister.Participants.Count; i++)
+                                    {
+                                        int index = i;
+                                        <div class="single-textfield-container">
+                                            <div class="field-container base-field input-group-2 @(() => resolutionRegister.Participants[index].Name)">
+                                                <MudTextField @bind-Value="@resolutionRegister.Participants[index].Name" Class="text-field-style"
+                                                      Label="Ingrese una observación"
+                                                      For="@(()=>resolutionRegister.Participants[index].Name)"></MudTextField>
+                                            </div>
+                                            <div class="base-icon" @onclick="@(() => removeParticipant(index))">
+                                                <MudIcon Icon="remove_circle_outline"></MudIcon>
+                                            </div>
+                                        </div>
+                                    }
                                 </div>
-                                <div class="base-icon" @onclick="@(() => removeParticipant(index))">
-                                    <MudIcon Icon="remove_circle_outline"></MudIcon>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                </MudTabPanel>
-                <MudTabPanel Text="Subir Anexo">
-                    <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
-                        <DocumentAnnex Annexes="annexes"></DocumentAnnex>
-                    </MudItem>
-                    <div class="field-container">
-                        <MudButton Color="Color.Success" Class="rounded-pill" OnClick="@(async() => await RegisterRequestAsync())">Registrar Ahora</MudButton>
-                    </div>
-                </MudTabPanel>
-            </MudTabs>
+                            </MudItem>
+                        </MudGrid>
+                    </MudStep>
+                    <MudStep Text="Subir Anexo">
+                        <MudGrid>
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <DocumentAnnex Annexes="annexes"></DocumentAnnex>
+                            </MudItem>
+                        </MudGrid>
+                    </MudStep>
+                </MudStepper>
+            </MudCardContent>
         </MudForm>
-    }
-</div>
+    </MudCard>
+}

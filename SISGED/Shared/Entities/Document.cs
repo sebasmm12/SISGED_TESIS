@@ -297,7 +297,7 @@ namespace SISGED.Shared.Entities
         [BsonElement("idnotario")]
         public string SolicitorId { get; set; } = default!;
         [BsonElement("idfiscal")]
-        public string FiscalId { get; set; } = default!;
+        public string ProsecutorId { get; set; } = default!;
         [BsonElement("nombredenunciante")] 
         public string ComplainantName { get; set; } = default!;
         [BsonElement("titulo")]
@@ -327,6 +327,19 @@ namespace SISGED.Shared.Entities
     {
         [BsonElement("contenido")]
         public DisciplinaryOpennessContent Content { get; set; } = default!;
+
+        public DisciplinaryOpenness(DisciplinaryOpennessContent content, string state, List<string> urls)
+        {
+            Content = content;
+            State = state;
+            AttachedUrls = urls;
+            Type = "AperturamientoDisciplinario";
+            ContentsHistory = new();
+            ProcessesHistory = new();
+
+        }
+
+        public DisciplinaryOpenness() { }
     }
 
     public class SolicitorDossierRequestContent
@@ -352,6 +365,19 @@ namespace SISGED.Shared.Entities
     {
         [BsonElement("contenido")]
         public SolicitorDossierRequestContent Content { get; set; } = new();
+
+        public SolicitorDossierRequest(SolicitorDossierRequestContent content, string state, List<string> urls)
+        {
+            Content = content;
+            State = state;
+            AttachedUrls = urls;
+            Type = "SolicitudExpedienteNotario";
+            ContentsHistory = new();
+            ProcessesHistory = new();
+
+        }
+
+        public SolicitorDossierRequest() { }
     }
 
     public class DictumContent
@@ -414,6 +440,19 @@ namespace SISGED.Shared.Entities
         public Evaluation Evaluation { get; set; } = default!;
         [BsonElement("contenido")]
         public ResolutionContent Content { get; set; } = default!;
+
+        public Resolution(ResolutionContent content, string state, List<string> urls)
+        {
+            Content = content;
+            State = state;
+            AttachedUrls = urls;
+            Type = "Resolucion";
+            ContentsHistory = new();
+            ProcessesHistory = new();
+
+        }
+
+        public Resolution() { }
     }
     public class AppealContent
     {

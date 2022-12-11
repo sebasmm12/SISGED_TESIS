@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SISGED.Shared.DTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,11 +11,20 @@ namespace SISGED.Shared.Models.Responses.Document
     {
         public string State { get; set; } = default!;
         public DisciplinaryOpennessResponseContent Content { get; set; } = new DisciplinaryOpennessResponseContent();
+        public List<MediaRegisterDTO> URLAnnex { get; set; } = default!;
+
+        public DisciplinaryOpennessResponse(DisciplinaryOpennessResponseContent content, List<MediaRegisterDTO> urlAnnexes)
+        {
+            Content = content;
+            URLAnnex = urlAnnexes;
+        }
+
+        public DisciplinaryOpennessResponse() { }
     }
 
     public class DisciplinaryOpennessResponseContent
     {
-        public Entities.Solicitor SolicitorId { get; set; } = default!;
+        public string SolicitorId { get; set; } = default!;
         public string ProsecutorId { get; set; } = default!;
         public string Complainant { get; set; } = default!;
         public string Title { get; set; } = default!;
@@ -25,7 +35,6 @@ namespace SISGED.Shared.Models.Responses.Document
         public string AudienceLocation { get; set; } = default!;
         public List<Deed> ChargedDeeds { get; set; } = new List<Deed>();
         public string URL { get; set; } = default!;
-        public List<string> URLAnnex { get; set; } = new List<string>();
     }
 
     public class Participant

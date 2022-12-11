@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SISGED.Shared.DTOs;
+using SISGED.Shared.Models.Responses.Document;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +10,17 @@ namespace SISGED.Shared.Models.Responses.Dossier
 {
     public class SolicitorDossierRequestResponse : Entities.Document
     {
-        public SolicitorDossierRequestResponseContent Content { get; set; } = new SolicitorDossierRequestResponseContent();
+        public SolicitorDossierRequestResponseContent Content { get; set; } = default!;
+
+        public List<MediaRegisterDTO> URLAnnex { get; set; } = default!;
+
+        public SolicitorDossierRequestResponse(SolicitorDossierRequestResponseContent content, List<MediaRegisterDTO> urlAnnexes)
+        {
+            Content = content;
+            URLAnnex = urlAnnexes;
+        }
+
+        public SolicitorDossierRequestResponse() { }
     }
 
     public class SolicitorDossierRequestResponseContent
@@ -16,7 +28,6 @@ namespace SISGED.Shared.Models.Responses.Dossier
         public string Title { get; set; } = default!;
         public string Description { get; set; } = default!;
         public DateTime DateIssue { get; set; } = default!;
-        public Entities.Solicitor SolicitorId { get; set; } = default!;
-        public List<string> URLAnnex { get; set; } = new List<string>();
+        public string SolicitorId { get; set; } = default!;
     }
 }

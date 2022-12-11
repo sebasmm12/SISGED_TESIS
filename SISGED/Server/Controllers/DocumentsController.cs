@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SISGED.Server.Services.Contracts;
+using SISGED.Server.Services.Repositories;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Queries.Document;
@@ -45,7 +46,7 @@ namespace SISGED.Server.Controllers
 
         private readonly string _containerName = "solicitudesiniciales";
 
-        public DocumentsController(IDocumentService documentService, IDossierService dossierService, ITrayService trayService, 
+        public DocumentsController(IDocumentService documentService, IDossierService dossierService, ITrayService trayService,
             IPublicDeedsService publicDeedsService, IFileStorageService fileStorage, IAssistantService assistantService, IMapper mapper,
             IMediaService mediaService, IUserService userService)
         {
@@ -249,13 +250,13 @@ namespace SISGED.Server.Controllers
                 //var user = await _userService.GetUserByIdAsync("5ef9f9c1afdbc540d868b3ce");
 
                 var initialRequest = await RegisterInitialRequestAsync(document, user);
-                
+
                 var dossier = await RegisterInitialDossierAsync(document, initialRequest);
 
                 string receiveUserId = await _trayService.RegisterUserInputTrayAsync(dossier.Id, initialRequest.Id, "MesaPartes");
 
                 await _documentService.UpdateDocumentProcessAsync(new(user.Id, receiveUserId, "derivado"), initialRequest.Id);
-                
+
                 // TODO: Implement the assistant service when creating the initial request
                 //var assistant = new Assistant();
                 //assistant.DossierId = dossier.Id;
@@ -263,7 +264,7 @@ namespace SISGED.Server.Controllers
                 //assistant.Steps.DossierName = "Solicitud";
 
                 //await _assistantService.CreateAsync(assistant);
-                
+
                 var dossierDocumentResponse = new DossierDocumentInitialRequestResponse(dossier, initialRequest);
 
                 return Ok(dossierDocumentResponse);
@@ -311,41 +312,48 @@ namespace SISGED.Server.Controllers
             }
         }
 
-        [HttpPost("documentoad")]
+        [HttpPost("disciplinary-openness")]
         public async Task<ActionResult<DisciplinaryOpenness>> DisciplinaryOpennessDocumentRegister(DossierWrapper dossierWrapper)
         {
             try
             {
-                //Deserealizacion de objeto de tipo AperturamientoDisciplinario
-                DisciplinaryOpennessResponse DTO = new DisciplinaryOpennessResponse();
-                var json = JsonConvert.SerializeObject(dossierWrapper.Document);
-                DTO = JsonConvert.DeserializeObject<DisciplinaryOpennessResponse>(json)!;
-                List<string> url2 = new List<string>();
-                string urlData2 = "";
-                foreach (string u in DTO.Content.URLAnnex)
-                {
-                    if (!string.IsNullOrWhiteSpace(u))
-                    {
-                        var solicitudBytes2 = Convert.FromBase64String(u);
-                        FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "aperturamientodiciplinario");
-                        urlData2 = await _fileService.SaveFileAsync(file) ?? string.Empty;
-                        url2.Add(urlData2);
-                    }
-                }
-                //Almacenando el pdf en el servidor de archivos y obtencion de la url
-                string urlData = "";
-                if (!string.IsNullOrWhiteSpace(DTO.Content.URL))
-                {
-                    var solicitudBytes = Convert.FromBase64String(DTO.Content.URL);
-                    FileRegisterDTO file = new FileRegisterDTO(solicitudBytes, "pdf", "aperturamientodiciplinario");
-                    urlData = await _fileService.SaveFileAsync(file) ?? string.Empty;
-                }
+                var document = DeserializeDocument<DisciplinaryOpennessResponse>(dossierWrapper.Document);
 
-                var disciplinaryOpenness = await _documentService.DisciplinaryOpennessRegisterAsync(DTO, urlData, url2, dossierWrapper.CurrentUserId, dossierWrapper.Id, dossierWrapper.InputDocument);
+                //var user = await GetUserAsync("userId");
+                var user = await _userService.GetUserByIdAsync("5eeaf61e8ca4ff53a0b791e6");
+
+                var disciplinaryOpenness = await RegisterDisciplinaryOpennessDocumentAsync(document, user);
+
+                var updatedDossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "AperturamientoDisciplinario", disciplinaryOpenness.Id, "En proceso"));
+
                 return Ok(disciplinaryOpenness);
             }
             catch (Exception ex)
             {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost("solicitor-dossier-request")]
+        public async Task<ActionResult<SolicitorDossierRequest>> SolicitorDossierRequestRegister(DossierWrapper dossierWrapper)
+        {
+            try
+            {
+                var document = DeserializeDocument<SolicitorDossierRequestResponse>(dossierWrapper.Document);
+
+                //var user = await GetUserAsync("userId");
+                var user = await _userService.GetUserByIdAsync("5eeaf61e8ca4ff53a0b791e6");
+
+                var solicitorDossierRequest = await RegisterSolicitorDossierRequestDocumentAsync(document, user);
+
+                var updatedDossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "SolicitudExpedienteNotario", solicitorDossierRequest.Id, "En proceso"));
+
+                return Ok(solicitorDossierRequest);
+            }
+            catch (Exception ex)
+            {
+
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
@@ -379,40 +387,21 @@ namespace SISGED.Server.Controllers
             }
         }
 
-        [HttpPost("documentor")]
+        [HttpPost("resolution")]
         public async Task<ActionResult<Resolution>> ResolutionDocumentRegister(DossierWrapper dossierWrapper)
         {
             try
             {
-                ResolutionResponse DTO = new ResolutionResponse();
-                var json = JsonConvert.SerializeObject(dossierWrapper.Document);
-                DTO = JsonConvert.DeserializeObject<ResolutionResponse>(json)!;
-                List<string> url2 = new List<string>();
-                string urlData2 = "";
-                foreach (string u in DTO.Content.UrlAnnex)
-                {
-                    if (!string.IsNullOrWhiteSpace(u))
-                    {
-                        var solicitudBytes2 = Convert.FromBase64String(u);
-                        FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "resolucion");
-                        urlData2 = await _fileService.SaveFileAsync(file) ?? string.Empty;
-                        url2.Add(urlData2);
-                    }
-                }
-                //Almacenando el pdf en el servidor de archivos y obtencion de la url
-                string urlData = "";
-                if (!string.IsNullOrWhiteSpace(DTO.Content.Data))
-                {
-                    var solicitudBytes = Convert.FromBase64String(DTO.Content.Data);
-                    FileRegisterDTO file = new FileRegisterDTO(solicitudBytes, "pdf", "resolucion");
-                    urlData = await _fileService.SaveFileAsync(file) ?? string.Empty;
-                }
+                var document = DeserializeDocument<ResolutionResponse>(dossierWrapper.Document);
 
-                DossierResponse expedientePorConsultar = await _dossierService.GetDossierByIdAsync(dossierWrapper.Id);
-                DossierDocument documentRequest = expedientePorConsultar.Documents.Find(x => x.Type == "SolicitudInicial")!;
+                //var user = await GetUserAsync("userId");
+                var user = await _userService.GetUserByIdAsync("5eeaf61e8ca4ff53a0b791e6");
 
-                var resolution = await _documentService.ResolutionRegisterAsync(DTO, urlData, url2, dossierWrapper.CurrentUserId, dossierWrapper.Id, dossierWrapper.InputDocument, documentRequest.DocumentId);
-                return Ok(resolution);
+                var resolutionDocument = await RegisterResolutionDocumentAsync(document, user);
+
+                var updatedDossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Resolucion", resolutionDocument.Id, "Finalizado"));
+
+                return Ok(resolutionDocument);
             }
             catch (Exception ex)
             {
@@ -612,11 +601,11 @@ namespace SISGED.Server.Controllers
                 DTO = JsonConvert.DeserializeObject<DisciplinaryOpennessResponse>(json)!;
                 List<string> url2 = new List<string>();
                 string urlData2 = "";
-                foreach (string u in DTO.Content.URLAnnex)
+                foreach (MediaRegisterDTO u in DTO.URLAnnex)
                 {
-                    if (!string.IsNullOrWhiteSpace(u))
+                    if (!string.IsNullOrWhiteSpace(u.Content))
                     {
-                        var solicitudBytes2 = Convert.FromBase64String(u);
+                        var solicitudBytes2 = Convert.FromBase64String(u.Content);
                         FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "aperturamientodiciplinario");
                         urlData2 = await _fileService.SaveFileAsync(file) ?? string.Empty;
                         url2.Add(urlData2);
@@ -729,11 +718,11 @@ namespace SISGED.Server.Controllers
                 string urlData = "";
                 List<string> url2 = new List<string>();
                 string urlData2 = "";
-                foreach (string u in DTO.Content.UrlAnnex)
+                foreach (MediaRegisterDTO u in DTO.URLAnnex)
                 {
-                    if (!string.IsNullOrWhiteSpace(u))
+                    if (!string.IsNullOrWhiteSpace(u.Content))
                     {
-                        var solicitudBytes2 = Convert.FromBase64String(u);
+                        var solicitudBytes2 = Convert.FromBase64String(u.Content);
                         FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "resolucion");
                         urlData2 = await _fileService.SaveFileAsync(file) ?? string.Empty;
                         url2.Add(urlData2);
@@ -1140,7 +1129,7 @@ namespace SISGED.Server.Controllers
 
             return dossier;
         }
-        
+
         private async Task<Dossier> UpdateDossierByDocumentAsync(DossierUpdateDTO dossierUpdateDTO)
         {
             var dossier = new Dossier(dossierUpdateDTO.DossierWrapper.Id!, dossierUpdateDTO.DossierType, dossierUpdateDTO.DossierState);
@@ -1164,7 +1153,7 @@ namespace SISGED.Server.Controllers
 
             return user;
         }
-        
+
         private string GetUserClaimValue(string claimType)
         {
             var userClaim = User.Claims.FirstOrDefault(c => c.Type == claimType);
@@ -1172,7 +1161,40 @@ namespace SISGED.Server.Controllers
             if (userClaim is null) throw new Exception("Información no especificada en la cabecera de la petición");
 
             return userClaim.Value;
-            
+
+        }
+
+        public async Task<DisciplinaryOpenness> RegisterDisciplinaryOpennessDocumentAsync(DisciplinaryOpennessResponse document, User user)
+        {
+            var urls = await _mediaService.SaveFilesAsync(document.URLAnnex, _containerName);
+
+            var DisciplinaryOpennessContent = _mapper.Map<DisciplinaryOpennessContent>(document.Content);
+            var DisciplinaryOpenness = new DisciplinaryOpenness(DisciplinaryOpennessContent, "En proceso", urls.ToList());
+            DisciplinaryOpenness.AddProcess(new Process(user.Id, user.Id, "En proceso"));
+
+            return await _documentService.DisciplinaryOpennessRegisterAsync(DisciplinaryOpenness);
+        }
+        
+        public async Task<SolicitorDossierRequest> RegisterSolicitorDossierRequestDocumentAsync(SolicitorDossierRequestResponse document, User user)
+        {
+            var urls = await _mediaService.SaveFilesAsync(document.URLAnnex, _containerName);
+
+            var solicitorDossierRequestContent = _mapper.Map<SolicitorDossierRequestContent>(document.Content);
+            var SolicitorDossierRequest = new SolicitorDossierRequest(solicitorDossierRequestContent, "En proceso", urls.ToList());
+            SolicitorDossierRequest.AddProcess(new Process(user.Id, user.Id, "En proceso"));
+
+            return await _documentService.SolicitorDossierRequestRegisterAsync(SolicitorDossierRequest);
+        }
+        
+        public async Task<Resolution> RegisterResolutionDocumentAsync(ResolutionResponse document, User user)
+        {
+            var urls = await _mediaService.SaveFilesAsync(document.URLAnnex, _containerName);
+
+            var resolutionContent = _mapper.Map<ResolutionContent>(document.Content);
+            var resolution = new Resolution(resolutionContent, "En proceso", urls.ToList());
+            resolution.AddProcess(new Process(user.Id, user.Id, "En proceso"));
+
+            return await _documentService.ResolutionRegisterAsync(resolution);
         }
         
 

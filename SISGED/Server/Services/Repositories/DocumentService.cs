@@ -555,54 +555,22 @@ namespace SISGED.Server.Services.Repositories
             return documentoDF;
         }
 
-        public async Task<DisciplinaryOpenness> DisciplinaryOpennessRegisterAsync(DisciplinaryOpennessResponse DTO,
-            string urlData, List<string> url2, string userId, string dossierID, string inputDocId)
+        public async Task<DisciplinaryOpenness> DisciplinaryOpennessRegisterAsync(DisciplinaryOpenness disciplinaryOpenness)
         {
-            //Creacionde le objeto de AperturamientoDisciplinario y registro en la coleccion documentos
-            DisciplinaryOpennessContent contenidoAD = new DisciplinaryOpennessContent()
-            {
-                Code = "",
-                SolicitorId = DTO.Content.SolicitorId.Id,
-                FiscalId = DTO.Content.ProsecutorId,
-                ComplainantName = DTO.Content.Complainant,
-                Title = DTO.Content.Title,
-                Description = DTO.Content.Description,
-                AudienceStartDate = DTO.Content.AudienceStartDate,
-                AudienceEndDate = DTO.Content.AudienceEndDate,
-                Participants = DTO.Content.Participants.Select(x => x.Name).ToList(),
-                AudiencePlace = DTO.Content.AudienceLocation,
-                ImputedFacts = DTO.Content.ChargedDeeds.Select(x => x.Description).ToList(),
-                Url = urlData,
-                Sign = ""
-            };
-            DisciplinaryOpenness disciplinaryOpenness = new DisciplinaryOpenness()
-            {
-                Type = "AperturamientoDisciplinario",
-                Content = contenidoAD,
-                ContentsHistory = new List<ContentVersion>(),
-                ProcessesHistory = new List<Process>(),
-                AttachedUrls = url2,
-                State = "creado"
-            };
             await _documentsCollection.InsertOneAsync(disciplinaryOpenness);
 
-            //Actualizacion del expediente
-            Dossier dossier = new Dossier();
-            DossierDocument dossierDocument = new DossierDocument();
-            dossierDocument.Index = 8;
-            dossierDocument.DocumentId = disciplinaryOpenness.Id;
-            dossierDocument.Type = "AperturamientoDisciplinario";
-            dossierDocument.CreationDate = DateTime.UtcNow.AddHours(-5);
-            dossierDocument.ExcessDate = DateTime.UtcNow.AddHours(-5).AddDays(5);
-            dossierDocument.DelayDate = null;
-            dossier = await UpdateDossierAsync(dossierDocument, dossierID);
+            if (disciplinaryOpenness.Id is null) throw new Exception($"No se pudo registrar el aperturamiento disciplinario {disciplinaryOpenness.Content.Title}");
 
-            //Actulizar el documento anterior a revisado
-            var filter = Builders<Document>.Filter.Eq("id", inputDocId);
-            var update = Builders<Document>.Update
-                .Set("estado", "revisado");
-            await _documentsCollection.UpdateOneAsync(filter, update);
             return disciplinaryOpenness;
+        }
+        
+        public async Task<SolicitorDossierRequest> SolicitorDossierRequestRegisterAsync(SolicitorDossierRequest solicitorDossierRequest)
+        {
+            await _documentsCollection.InsertOneAsync(solicitorDossierRequest);
+
+            if (solicitorDossierRequest.Id is null) throw new Exception($"No se pudo registrar la solicitud de expediente de notario {solicitorDossierRequest.Content.Title}");
+
+            return solicitorDossierRequest;
         }
 
         public async Task<Dossier> UpdateDossierAsync(DossierDocument dossierDocument, string dossierId)
@@ -676,65 +644,13 @@ namespace SISGED.Server.Services.Repositories
             return dictum;
         }
 
-        public async Task<Resolution> ResolutionRegisterAsync(ResolutionResponse DTO,
-            string urlData, List<string> url2, string userId, string dossierId, string inputDocId, string documentRequestId)
+        public async Task<Resolution> ResolutionRegisterAsync(Resolution resolution)
         {
-            //Creacionde le objeto de AperturamientoDisciplinario y registro en la coleccion documentos
-            ResolutionContent contenidoResolucion = new ResolutionContent()
-            {
-                Code = "",
-                Title = DTO.Content.Title,
-                Description = DTO.Content.Description,
-                AudienceStartDate = DTO.Content.AudienceStartDate,
-                AudienceEndDate = DTO.Content.AudienceEndDate,
-                Participants = DTO.Content.Participants.Select(x => x.Name).ToList(),
-                Sanction = DTO.Content.Penalty,
-                Url = urlData,
-                Sign = ""
-            };
-            Resolution resolucion = new Resolution()
-            {
-                Type = "Resolucion",
-                Content = contenidoResolucion,
-                ContentsHistory = new List<ContentVersion>(),
-                ProcessesHistory = new List<Process>(),
-                AttachedUrls = url2,
-                Evaluation = new Evaluation()
-                {
-                    Result = "pendiente",
-                    Evaluations = new List<IndividualEvaluation>()
-                },
-                State = "creado"
-            };
-            await _documentsCollection.InsertOneAsync(resolucion);
+            await _documentsCollection.InsertOneAsync(resolution);
 
-            //Actualizacion del expediente
-            Dossier dossier = new Dossier();
-            DossierDocument dossierDocument = new DossierDocument();
-            dossierDocument.Index = 8;
-            dossierDocument.DocumentId = resolucion.Id;
-            dossierDocument.Type = "Resolucion";
-            dossierDocument.CreationDate = DateTime.UtcNow.AddHours(-5);
-            dossierDocument.ExcessDate = DateTime.UtcNow.AddHours(-5).AddDays(5);
-            dossierDocument.DelayDate = null;
-            dossier = await UpdateDossierAsync(dossierDocument, dossierId);
+            if (resolution.Id is null) throw new Exception($"No se pudo registrar la resolución {resolution.Content.Title}");
 
-            //Actulizar el documento anterior a revisado
-            var filter = Builders<Document>.Filter.Eq("id", inputDocId);
-            var update = Builders<Document>.Update
-                .Set("estado", "revisado");
-            await _documentsCollection.UpdateOneAsync(filter, update);
-
-            //Actualizar el documento de solicitud inicial a finalizado
-            if (!String.IsNullOrEmpty(documentRequestId))
-            {
-                var filterS = Builders<Document>.Filter.Eq("id", documentRequestId);
-                var updateS = Builders<Document>.Update
-                       .Set("estado", "finalizado");
-
-                await _documentsCollection.UpdateOneAsync(filterS, updateS);
-            }
-            return resolucion;
+            return resolution;
         }
 
         public async Task<BPNResult> BPNResultRegisterAsync(BPNResultResponse DTO, List<string> url2,
@@ -981,8 +897,8 @@ namespace SISGED.Server.Services.Repositories
                 Description = DTO.Content.Description,
                 ComplainantName = DTO.Content.Complainant,
                 AudiencePlace = DTO.Content.AudienceLocation,
-                SolicitorId = DTO.Content.SolicitorId.Id,
-                FiscalId = DTO.Content.ProsecutorId,
+                SolicitorId = DTO.Content.SolicitorId,
+                ProsecutorId = DTO.Content.ProsecutorId,
                 Participants = participantsList,
                 ImputedFacts = chargedDeedsList,
                 AudienceStartDate = DTO.Content.AudienceStartDate,
@@ -996,7 +912,7 @@ namespace SISGED.Server.Services.Repositories
                 .Set("contenido.nombredenunciante", content.ComplainantName)
                 .Set("contenido.lugaraudiencia", content.AudiencePlace)
                 .Set("contenido.idnotario", content.SolicitorId)
-                .Set("contenido.idfiscal", content.FiscalId)
+                .Set("contenido.idfiscal", content.ProsecutorId)
                 .Set("contenido.participantes", content.Participants)
                 .Set("contenido.hechosimputados", content.ImputedFacts)
                 .Set("contenido.fechainicioaudiencia", content.AudienceStartDate)
@@ -1177,7 +1093,7 @@ namespace SISGED.Server.Services.Repositories
             {
                 Title = DTO.Content.Title,
                 Description = DTO.Content.Description,
-                SolicitorId = DTO.Content.SolicitorId.Id
+                SolicitorId = DTO.Content.SolicitorId
             };
 
             var filter = Builders<Document>.Filter.Eq("id", DTO.Id);

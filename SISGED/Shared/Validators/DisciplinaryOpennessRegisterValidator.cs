@@ -4,47 +4,47 @@ using SISGED.Shared.Models.Responses.Document;
 
 namespace SISGED.Shared.Validators
 {
-    public class DisciplinaryOpennessRegisterValidator : AbstractValidator<DisciplinaryOpennessResponse>
+    public class DisciplinaryOpennessRegisterValidator : AbstractValidator<DisciplinaryOpennessRegisterDTO>
     {
         public DisciplinaryOpennessRegisterValidator()
         {
-            RuleFor(x => x.Content.Title)
+            RuleFor(x => x.Title)
                 .NotEmpty()
                 .WithMessage("Debe ingresar el título de la solicitud");
 
-            RuleFor(x => x.Content.Description)
+            RuleFor(x => x.Description)
                 .NotEmpty()
                 .WithMessage("Debe ingresar la descripción de la solicitud");
             
-            RuleFor(x => x.Content.Complainant)
+            RuleFor(x => x.Complainant)
                 .NotEmpty()
                 .WithMessage("Debe ingresar el nombre del denunciante");
             
-            RuleFor(x => x.Content.AudienceLocation)
+            RuleFor(x => x.AudienceLocation)
                 .NotEmpty()
                 .WithMessage("Debe ingresar el lugar de la audiencia");
 
-            RuleFor(x => x.Content.AudienceStartDate)
+            RuleFor(x => x.AudienceStartDate)
                 .NotEmpty()
                 .WithMessage("Debe ingresar la fecha de inicio de audiencia");
 
-            RuleFor(x => x.Content.AudienceEndDate)
+            RuleFor(x => x.AudienceEndDate)
                 .NotEmpty()
                 .WithMessage("Debe ingresar la fecha de fin de audiencia");
 
-            RuleFor(x => x.Content.SolicitorId)
+            RuleFor(x => x.Solicitor)
                 .NotEmpty()
                 .WithMessage("Debe ingresar el nombre del notario");
 
-            RuleFor(x => x.Content.ProsecutorId)
+            RuleFor(x => x.ProsecutorId)
                 .NotEmpty()
                 .WithMessage("Debe ingresar el nombre del fiscal");
         }
 
         public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>
         {
-            var result = await ValidateAsync(ValidationContext<DisciplinaryOpennessResponse>
-                    .CreateWithOptions((DisciplinaryOpennessResponse)model, x => x.IncludeProperties(propertyName)));
+            var result = await ValidateAsync(ValidationContext<DisciplinaryOpennessRegisterDTO>
+                    .CreateWithOptions((DisciplinaryOpennessRegisterDTO)model, x => x.IncludeProperties(propertyName)));
 
             if (result.IsValid)
                 return Array.Empty<string>();

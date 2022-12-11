@@ -89,6 +89,25 @@ namespace SISGED.Server.Helpers.Infrastructure
             // Complaint Type Mapper
             CreateMap<ComplaintRequestResponseContent, ComplaintRequestContent>();
 
+            // Disciplinary Openness Type Mapper
+            CreateMap<DisciplinaryOpennessResponse, DisciplinaryOpenness>();
+            CreateMap<DisciplinaryOpennessResponseContent, DisciplinaryOpennessContent>()
+                .ForMember(disciplinaryContent => disciplinaryContent.ComplainantName, options => options.MapFrom(disciplinaryResponse => disciplinaryResponse.Complainant))
+                .ForMember(disciplinaryContent => disciplinaryContent.AudiencePlace, options => options.MapFrom(disciplinaryResponse => disciplinaryResponse.AudienceLocation))
+                .ForMember(disciplinaryContent => disciplinaryContent.ImputedFacts, options => options.MapFrom(disciplinaryResponse => disciplinaryResponse.ChargedDeeds))
+                .ForMember(disciplinaryContent => disciplinaryContent.Url, options => options.MapFrom(disciplinaryResponse => disciplinaryResponse.URL));
+            
+            // Solicitor Dossier Request Type Mapper
+            CreateMap<SolicitorDossierRequestResponse, SolicitorDossierRequest>();
+            CreateMap<SolicitorDossierRequestResponseContent, SolicitorDossierRequestContent>()
+                .ForMember(solicitorContent => solicitorContent.IssueDate, options => options.MapFrom(solicitorResponse => solicitorResponse.DateIssue));
+            
+            // Resolution Type Mapper
+            CreateMap<ResolutionResponse, Resolution>();
+            CreateMap<ResolutionResponseContent, ResolutionContent>()
+                .ForMember(resolutionContent => resolutionContent.Sanction, options => options.MapFrom(resolutionResponse => resolutionResponse.Penalty));
+
+
         }
 
         private string MapStepDocumentRequestUID(StepDocument stepDocument, StepGenericModel.StepDocument stepDocumentRequest)

@@ -27,6 +27,17 @@ namespace SISGED.Client.Helpers
                 .ForMember(complaintRequest => complaintRequest.ComplaintType, options => options.MapFrom(complaintRequestRegister => complaintRequestRegister.ComplaintType.Id))
                 .ForMember(complaintRequest => complaintRequest.DeliveryDate, options => options.MapFrom(_ => DateTime.UtcNow.AddHours(-5)));
 
+            // Disciplinary Openness Mapper
+            CreateMap<DisciplinaryOpennessRegisterDTO, DisciplinaryOpennessResponseContent>()
+                .ForMember(complaintRequest => complaintRequest.SolicitorId, options => options.MapFrom(complaintRequestRegister => complaintRequestRegister.Solicitor.Id));
+            
+            // Solicitor Dossier Request Mapper
+            CreateMap<SolicitorDossierRequestRegisterDTO, SolicitorDossierRequestResponseContent>()
+                .ForMember(complaintRequest => complaintRequest.SolicitorId, options => options.MapFrom(complaintRequestRegister => complaintRequestRegister.Solicitor.Id));
+
+            // Resolution Request Mapper
+            CreateMap<ResolutionRegisterDTO, ResolutionResponseContent>();
+
             CreateMap<DossierTrayResponse, Item>()
                 .ForMember(item => item.Name, options => options.MapFrom(dossierTray => dossierTray.Type))
                 .ForMember(item => item.ItemStatus, options => options.MapFrom(dossierTray => dossierTray.Document!.State))

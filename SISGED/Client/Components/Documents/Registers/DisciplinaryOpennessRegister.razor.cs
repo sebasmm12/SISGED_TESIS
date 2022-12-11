@@ -1,35 +1,20 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
-using System.Net.Http;
-using System.Net.Http.Json;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.Web.Virtualization;
-using Microsoft.AspNetCore.Components.WebAssembly.Http;
-using Microsoft.JSInterop;
-using SISGED.Client;
-using SISGED.Client.Generics;
-using SISGED.Client.Shared;
 using SISGED.Client.Helpers;
-using SISGED.Client.Components.WorkEnvironments;
-using SISGED.Shared.Models.Responses.Tray;
 using SISGED.Shared.Models.Responses.DossierTray;
-using SISGED.Shared.Models.Responses.PublicDeed;
 using SISGED.Shared.Models.Responses.User;
-using SISGED.Shared.Models.Responses.Document.UserRequest;
 using MudBlazor;
 using SISGED.Shared.Models.Responses.Document;
 using SISGED.Client.Services.Contracts;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Requests.Documents;
 using SISGED.Shared.Models.Responses.Account;
-using Newtonsoft.Json;
+using System.Text.Json;
 using SISGED.Shared.Validators;
 using SISGED.Shared.DTOs;
+using AutoMapper;
+using SISGED.Shared.Models.Responses.Solicitor;
+using MudExtensions;
+using MudExtensions.Utilities;
 
 namespace SISGED.Client.Components.Documents.Registers
 {
@@ -41,71 +26,35 @@ namespace SISGED.Client.Components.Documents.Registers
         private ISwalFireRepository swalFireRepository { get; set; } = default!;
         [Inject]
         public DisciplinaryOpennessRegisterValidator disciplinaryOpennessRegisterValidator { get; set; } = default!;
+        [Inject]
+        public IMapper Mapper { get; set; } = default!;
+        [Inject]
+        public IDialogContentRepository dialogContentRepository { get; set; } = default!;
 
         private MudForm? requestForm = default!;
+        private MudStepper? requestStepper;
 
         //Variables de sesion
-        [CascadingParameter] WorkEnvironment workspace { get; set; }
-        [CascadingParameter(Name = "SesionUsuario")] protected SessionAccountResponse session { get; set; }
+        [CascadingParameter(Name = "WorkPlaceItems")]
+        public List<Item> WorkPlaceItems { get; set; } = default!;
+        [CascadingParameter(Name = "SessionAccount")] protected SessionAccountResponse SessionAccount { get; set; }
+        
         //Datos del formulario
-        [Parameter] public EventCallback<DossierTrayResponse> increaseTray { get; set; }
-        private DisciplinaryOpennessResponse disciplinaryOpenness = new DisciplinaryOpennessResponse();
+        private DisciplinaryOpennessRegisterDTO disciplinaryOpennessRegister = new DisciplinaryOpennessRegisterDTO();
 
-        private bool loadProcess = false;
         private bool pageLoading = false;
-        int step = 0;
-        int substep = 0;
         String typeDocument = "AperturamientoDisciplinario";
-        private List<MediaRegisterDTO> files = new();
         private List<MediaRegisterDTO> annexes = new();
+        private string dossierId = default!;
 
         List<ProsecutorUserInfoResponse> prosecutors { get; set; } = new List<ProsecutorUserInfoResponse>();
 
         protected override async Task OnInitializedAsync()
         {
-            disciplinaryOpenness.Content.Participants = new List<Participant>() { new Participant() { Index = 0, Name = "" } };
-            disciplinaryOpenness.Content.ChargedDeeds = new List<Deed>() { new Deed() { Index = 0, Description = "" } };
-            disciplinaryOpenness.Content.URLAnnex = new List<string>();
+            disciplinaryOpennessRegister.Participants = new List<Participant>() { new Participant() { Index = 0, Name = "" } };
+            disciplinaryOpennessRegister.ChargedDeeds = new List<Deed>() { new Deed() { Index = 0, Description = "" } };
 
-            foreach (string u in disciplinaryOpenness.Content.URLAnnex)
-            {
-                if (!string.IsNullOrWhiteSpace(u))
-                {
-                    disciplinaryOpenness.Content.URLAnnex = null;
-                }
-            }
-            if (!string.IsNullOrEmpty(disciplinaryOpenness.Content.URL))
-            {
-                disciplinaryOpenness.Content.URL = null;
-            }
-            var httpResponse = await httpRepository.GetAsync<List<ProsecutorUserInfoResponse>>("api/users/prosecutors");
-            if (!httpResponse.Error)
-            {
-                prosecutors = httpResponse.Response!;
-            }
-            else
-            {
-                Console.WriteLine("Ocurrio un error");
-            }
-            //substep = 1;
-            //String message = "";
-
-            //if (typeDocument != workspace.asistente.tipodocumento)
-            //{
-            //    message = "El documento que ha elegido no es el indicado para el expediente";
-            //}
-            //else
-            //{
-            //    message = workspace.asistente.pasos.documentos.Find(x => x.tipo == workspace.asistente.tipodocumento).pasos.ElementAt(step).subpaso.ElementAt(substep).descripcion;
-
-            //    await workspace.UpdatePasoAndSubPasoNormal(step, substep, workspace.asistente.tipodocumento);
-            //}
-
-            //Task voiceMessage = workspace.VoiceMessage(message);
-
-            //workspace.ChangeMessage(message);
-
-            //await voiceMessage;
+            await GetUserRequestInformationAsync();
 
             pageLoading = false;
 
@@ -113,147 +62,139 @@ namespace SISGED.Client.Components.Documents.Registers
 
         private void addParticipant()
         {
-            disciplinaryOpenness.Content.Participants.Add(new Participant() { Index = (disciplinaryOpenness.Content.Participants.Count) });
+            disciplinaryOpennessRegister.Participants.Add(new Participant() { Index = (disciplinaryOpennessRegister.Participants.Count) });
             StateHasChanged();
         }
 
         private void removeParticipant(int index)
         {
-            disciplinaryOpenness.Content.Participants.RemoveAt(index);
+            disciplinaryOpennessRegister.Participants.RemoveAt(index);
             StateHasChanged();
         }
         private void addDeed()
         {
-            disciplinaryOpenness.Content.ChargedDeeds.Add(new Deed() { Index = (disciplinaryOpenness.Content.ChargedDeeds.Count) });
+            disciplinaryOpennessRegister.ChargedDeeds.Add(new Deed() { Index = (disciplinaryOpennessRegister.ChargedDeeds.Count) });
             StateHasChanged();
         }
         private void removeDeed(int index)
         {
-            disciplinaryOpenness.Content.ChargedDeeds.RemoveAt(index);
+            disciplinaryOpennessRegister.ChargedDeeds.RemoveAt(index);
             StateHasChanged();
         }
 
-        //Consulta de notarios
-        private async Task<IEnumerable<Solicitor>> Match(string searchtext)
+        private DossierWrapper GetDocumentRegister()
         {
-            var httpResponse = await httpRepository.GetAsync<List<Solicitor>>($"api/solicitors/filter?term={searchtext}");
-            if (httpResponse.Error)
-            {
-                return new List<Solicitor>();
-            }
-            else
-            {
-                return httpResponse.Response!;
-            }
+            var disciplinaryOpennessContent = Mapper.Map<DisciplinaryOpennessResponseContent>(disciplinaryOpennessRegister);
+            var disciplinaryOpenness = new DisciplinaryOpennessResponse(disciplinaryOpennessContent, annexes);
+
+            var documentRegister = new DossierWrapper(dossierId, disciplinaryOpenness);
+
+            return documentRegister;
         }
 
-        public async Task HandleValidSubmit()
+        private async Task<DisciplinaryOpenness?> ShowLoadingDialogAsync(DossierWrapper documentRegister)
         {
-            loadProcess = true;
-            if (disciplinaryOpenness.Content.URL != "" && disciplinaryOpenness.Content.URL != null)
-            {
-                DossierWrapper dossierWrapper = new DossierWrapper();
-                dossierWrapper.Document = disciplinaryOpenness;
-                dossierWrapper.Id = workspace.SelectedTray.DossierId;
-                dossierWrapper.CurrentUserId = session.User.Id;
-                dossierWrapper.InputDocument = workspace.SelectedTray.Document!.Id;
+            string dialogTitle = $"Realizando el registro de su aperturamiento disciplinario, por favor espere...";
 
-                var httpResponse = await httpRepository.PostAsync<DossierWrapper, DisciplinaryOpenness>($"api/documents/documentoad", dossierWrapper);
-                if (!httpResponse.Error)
+            var toRegister = () => RegisterDisciplinaryOpennessRequestAsync(documentRegister);
+
+            return await dialogContentRepository.ShowLoadingDialogAsync(toRegister, dialogTitle);
+
+        }
+
+        private async Task RegisterDisciplinaryOpennessRequestAsync()
+        {
+            var documentRegister = GetDocumentRegister();
+
+            var registeredDisciplinary = await ShowLoadingDialogAsync(documentRegister);
+
+            if (registeredDisciplinary is null) return;
+
+            await swalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo registrar el aperturamiento disciplinario de manera satisfactoria");
+        }
+
+        private async Task<DisciplinaryOpenness?> RegisterDisciplinaryOpennessRequestAsync(DossierWrapper documentRegister)
+        {
+            try
+            {
+                var disciplinaryResponse = await httpRepository.PostAsync<DossierWrapper, DisciplinaryOpenness>("api/documents/disciplinary-openness", documentRegister);
+
+                if (disciplinaryResponse.Error)
                 {
-                    DossierTrayResponse dossierTray = new DossierTrayResponse();
-                    dossierTray = workspace.SelectedTray;
-                    DisciplinaryOpenness updateDisciplinaryOpenness = new DisciplinaryOpenness();
-                    updateDisciplinaryOpenness = httpResponse.Response!;
-                    dossierTray.Document.Id = updateDisciplinaryOpenness!.Id;
-                    dossierTray.Document.Type = updateDisciplinaryOpenness.Type;
-                    dossierTray.Document.ContentsHistory = updateDisciplinaryOpenness.ContentsHistory;
-                    dossierTray.Document.ProcessesHistory = updateDisciplinaryOpenness.ProcessesHistory;
-                    dossierTray.Document.Content = updateDisciplinaryOpenness.Content;
-                    dossierTray.Document.State = updateDisciplinaryOpenness.State;
-
-                    //SISGED.Shared.Models.Item outItem = new SISGED.Shared.Models.Item()
-                    //{
-                    //    Name = dossierTray.Type!,
-                    //    Value = dossierTray,
-                    //    Icon = "alarm_add",
-                    //    Description = ((DocumentResponse)dossierTray.Document).Type,
-                    //    CurrentPlace = "workspace",
-                    //    OriginPlace = "inputs",
-                    //    Client = dossierTray.Client!,
-                    //    ItemStatus = "registrado"
-                    //};
-                    //workspace.UpdateRegisteredDocument(outItem);
-                    //workspace.UpdateTools("Registrar Documento");
-                    DocumentResponse documentRequest = new DocumentResponse();
-                    documentRequest.Id = updateDisciplinaryOpenness.Id;
-                    documentRequest.Type = updateDisciplinaryOpenness.Type;
-                    documentRequest.State = updateDisciplinaryOpenness.State;
-                    documentRequest.Content = JsonConvert.SerializeObject(updateDisciplinaryOpenness.Content);
-                    documentRequest.ContentsHistory = updateDisciplinaryOpenness.ContentsHistory;
-                    documentRequest.ProcessesHistory = updateDisciplinaryOpenness.ProcessesHistory;
-                    documentRequest.UrlAnnex = updateDisciplinaryOpenness.AttachedUrls;
-
-                    var docdto = JsonConvert.SerializeObject(documentRequest);
-                    //Console.WriteLine(docdto);
-                    DocumentRequest doc = new DocumentRequest();
-                    doc = JsonConvert.DeserializeObject<DocumentRequest>(docdto)!;
-
-                    workspace.SelectedTray.DocumentObjects!.Add(documentRequest);
-                    workspace.SelectedTray.Document = documentRequest;
-                    StateHasChanged();
-
-                    await swalFireRepository.ShowSuccessfulSwalFireAsync("Aperturamiento Disciplinario registrado correctamente")!;
-                    substep = 2;
-
-                    Int32 pasoAntiguo = step;
-                    step = 1;
-                    substep = 0;
-                    //Enviar paso=0+0,subpaso=2,idexpediente
-
-                    /*String tipodocumentoantiguo = workspace.asistente.tipodocumento;
-
-                    await workspace.UpdatePasoAndSubPasoFinnally(step, substep, workspace.asistente.tipodocumento, pasoAntiguo, tipodocumentoantiguo);
-
-                    String messageFinal = workspace.asistente.pasos.documentos
-                            .Find(x => x.tipo == workspace.asistente.tipodocumento).pasos.ElementAt(step).descripcion;
-
-                    Task voiceMessage = workspace.VoiceMessage(messageFinal);
-
-                    workspace.ChangeMessage(messageFinal);
-
-                    await voiceMessage;*/
-                    //Enviar paso=0,subpaso=2, idexp
+                    await swalFireRepository.ShowErrorSwalFireAsync("No se pudo registar el aperturamiento disciplinario");
                 }
-                else
+
+                return disciplinaryResponse.Response!;
+            }
+            catch (Exception)
+            {
+
+                await swalFireRepository.ShowErrorSwalFireAsync("No se pudo registar el aperturamiento disciplinario");
+                return null;
+            }
+        }
+
+        private async Task<AutocompletedSolicitorResponse> GetSolicitorAsync(string solicitorId)
+        {
+            try
+            {
+                var solicitorResponse = await httpRepository.GetAsync<AutocompletedSolicitorResponse>($"api/solicitors/{solicitorId}");
+
+                if (solicitorResponse.Error)
                 {
-                    await swalFireRepository.ShowErrorSwalFireAsync("Error en el servidor. Intentelo de nuevo");
+                    await swalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los tipos de solicitudes del sistema");
                 }
+
+                return solicitorResponse.Response!;
             }
-            else
+            catch (Exception)
             {
-                await swalFireRepository.ShowErrorSwalFireAsync("Debe subir un PDF obligatoriamente");
+
+                await swalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los tipos de solicitudes del sistema");
+                return new();
             }
-            loadProcess = false;
         }
 
-        public void HandleInvalidSubmit()
+        private async Task GetUserRequestInformationAsync()
         {
-            loadProcess = false;
-            swalFireRepository.ShowErrorSwalFireAsync("Por favor, verifique los Datos Ingresados");
+            var userTray = WorkPlaceItems.First(workItem => workItem.OriginPlace != "tools");
+
+            disciplinaryOpennessRegister.Client = userTray.Client;
+
+            var dossierTray = userTray.Value as DossierTrayResponse;
+
+            //var documentContent = JsonSerializer.Deserialize<InitialRequestContentDTO>(JsonSerializer.Serialize(dossierTray!.Document!.Content));
+
+            //disciplinaryOpenness.Solicitor = await GetSolicitorAsync(documentContent!.SolicitorId);
+            dossierId = dossierTray!.DossierId;
         }
 
-        private async Task RegisterRequestAsync()
+        private void GetSolicitorResponse(AutocompletedSolicitorResponse AutocompletedSolicitorResponse)
         {
-            await requestForm!.Validate();
+            disciplinaryOpennessRegister.Solicitor = AutocompletedSolicitorResponse;
+        }
 
-            if (!requestForm.IsValid)
+        private static StepperLocalizedStrings GetRegisterLocalizedStrings()
+        {
+            return new() { Completed = "Completado", Finish = "Registrar", Next = "Siguiente", Previous = "Anterior" };
+        }
+
+        private bool CheckRegisterAsync()
+        {
+            if (requestStepper!.GetActiveIndex() != 2) return false;
+
+            requestForm!.Validate().GetAwaiter().GetResult();
+
+            if (!requestForm!.IsValid)
             {
-                HandleInvalidSubmit();
-                return;
+                swalFireRepository.ShowErrorSwalFireAsync("No se puede registrar el aperturamiento disciplinario, por favor verifique los datos ingresados").GetAwaiter();
+
+                return true;
             }
 
-            await HandleValidSubmit();
+            RegisterDisciplinaryOpennessRequestAsync().GetAwaiter();
+
+            return false;
         }
     }
 }

@@ -12,6 +12,7 @@ using SISGED.Shared.Models.Responses.Document.SolicitorDossierRequest;
 using SISGED.Shared.Models.Responses.Document.SolicitorDossierShipment;
 using SISGED.Shared.Models.Responses.Document.UserRequest;
 using SISGED.Shared.Models.Responses.Statistic;
+using System.Threading.Tasks;
 
 namespace SISGED.Server.Services.Contracts
 {
@@ -43,9 +44,10 @@ namespace SISGED.Server.Services.Contracts
         Task<SignExpeditionRequest> RegisterSignExpeditionRequestAsync(DossierWrapper expedientewrapper, List<string> url2, string urlData);
         Task<InitialRequest> InitialRequestRegisterAsync(InitialRequest documentIR);
         Task<SignConclusion> singConclusionERegisterAsync(DossierWrapper dossierWrapper, List<string> url2, string documentId);
-        Task<DisciplinaryOpenness> DisciplinaryOpennessRegisterAsync(DisciplinaryOpennessResponse DTO, string urlData, List<string> url2, string userId, string dossierID, string inputDocId);
+        Task<DisciplinaryOpenness> DisciplinaryOpennessRegisterAsync(DisciplinaryOpenness disciplinaryOpenness);
+        Task<SolicitorDossierRequest> SolicitorDossierRequestRegisterAsync(SolicitorDossierRequest solicitorDossierRequest);
         Task<Dictum> DictumRegisterAsync(DictumResponse dTO, DossierWrapper expedientewrapper, List<string> url2);
-        Task<Resolution> ResolutionRegisterAsync(ResolutionResponse DTO, string urldata, List<string> url2, string idusuario, string idexpediente, string iddocentrada, string iddocumentoSolicitud);
+        Task<Resolution> ResolutionRegisterAsync(Resolution resolution);
         Task<BPNResult> BPNResultRegisterAsync(BPNResultResponse DTO, List<string> url2, string UserId, string dossierId, string inputDocId, string documentRequestId);
         Task<SolicitorDossierShipment> SolicitorDossierShipmentRegisterAsync(SolicitorDossierShipmentResponse DTO, DossierWrapper expedientewrapper, List<string> url2);
         Task<Document> ModifyStateAsync(Evaluation document, string docId);

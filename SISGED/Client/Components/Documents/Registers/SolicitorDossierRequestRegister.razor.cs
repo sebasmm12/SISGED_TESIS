@@ -1,26 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
-using System.Net.Http;
-using System.Net.Http.Json;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.Web.Virtualization;
-using Microsoft.AspNetCore.Components.WebAssembly.Http;
-using Microsoft.JSInterop;
-using SISGED.Client;
-using SISGED.Client.Generics;
-using SISGED.Client.Shared;
-using SISGED.Client.Helpers;
 using SISGED.Client.Components.WorkEnvironments;
-using SISGED.Shared.Models.Responses.Tray;
 using SISGED.Shared.Models.Responses.DossierTray;
-using SISGED.Shared.Models.Responses.PublicDeed;
-using SISGED.Shared.Models.Responses.User;
-using SISGED.Shared.Models.Responses.Document.UserRequest;
 using MudBlazor;
 using SISGED.Shared.Models.Responses.Account;
 using SISGED.Shared.Models.Responses.Dossier;
@@ -31,6 +11,11 @@ using SISGED.Shared.Models.Responses.Document;
 using Newtonsoft.Json;
 using SISGED.Shared.Validators;
 using SISGED.Shared.DTOs;
+using AutoMapper;
+using SISGED.Client.Helpers;
+using MudExtensions;
+using MudExtensions.Utilities;
+using SISGED.Shared.Models.Responses.Solicitor;
 
 namespace SISGED.Client.Components.Documents.Registers
 {
@@ -42,167 +27,149 @@ namespace SISGED.Client.Components.Documents.Registers
         private ISwalFireRepository swalFireRepository { get; set; } = default!;
         [Inject]
         public SolicitorDossierRequestRegisterValidator SolicitorDossierRequestRegisterValidator { get; set; } = default!;
-
-        //Variables de sesion
-        [CascadingParameter] WorkEnvironment workspace { get; set; }
-        [CascadingParameter(Name = "SesionUsuario")] protected SessionAccountResponse session { get; set; }
+        [Inject]
+        public IMapper Mapper { get; set; } = default!;
+        [Inject]
+        public IDialogContentRepository dialogContentRepository { get; set; } = default!;
 
         private MudForm? requestForm = default!;
+        private MudStepper? requestStepper;
+
+        //Variables de sesion
+        [CascadingParameter(Name = "WorkPlaceItems")]
+        public List<Item> WorkPlaceItems { get; set; } = default!;
+        [CascadingParameter(Name = "SessionAccount")] protected SessionAccountResponse SessionAccount { get; set; }
+
 
         //Datos del formulario
-        [Parameter] public EventCallback<DossierTrayResponse> increaseTray { get; set; }
-        private SolicitorDossierRequestResponse solicitorDossierRequest = new SolicitorDossierRequestResponse();
-        List<string> names = new List<string>();
-        private List<MediaRegisterDTO> files = new();
-        private bool loadprocess = false;
+        private SolicitorDossierRequestRegisterDTO solicitorDossierRequestRegister = default!;
+        private List<MediaRegisterDTO> annexes = new();
         private bool pageLoading = true;
-        int step = 0;
-        int substep = 0;
+        private string dossierId = default!;
+
         String typeDocument = "SolicitudExpedienteNotario";
 
         protected override async Task OnInitializedAsync()
         {
-            solicitorDossierRequest.Content.URLAnnex = new List<string>();
-            foreach (string u in solicitorDossierRequest.Content.URLAnnex)
-            {
-                if (!string.IsNullOrWhiteSpace(u))
-                {
-                    solicitorDossierRequest.Content.URLAnnex = null;
-                }
-            }
-            substep = 1;
+            await GetUserRequestInformationAsync();
 
-            //Enviar paso=0, subpaso=1, idex
-            String message = "";
-
-            //if (typeDocument != workspace.asistente.tipodocumento)
-            //{
-            //    message = "El documento que ha elegido no es el indicado para el expediente";
-            //}
-            //else
-            //{
-            //    message = workspace.asistente.pasos.documentos.Find(x => x.tipo == workspace.asistente.tipodocumento).pasos.ElementAt(step).subpaso.ElementAt(substep).descripcion;
-
-            //    await workspace.UpdatePasoAndSubPasoNormal(step, substep, workspace.asistente.tipodocumento);
-            //}
-
-            //Task voiceMessage = workspace.VoiceMessage(message);
-
-            //workspace.ChangeMessage(message);
-
-            //await voiceMessage;
             pageLoading = false;
         }
 
-        public async Task HandleValidSubmit()
+
+        private DossierWrapper GetDocumentRegister()
         {
-            loadprocess = true;
-            DossierWrapper dossierWrapper = new DossierWrapper();
-            dossierWrapper.Document = solicitorDossierRequest;
-            dossierWrapper.Id = workspace.SelectedTray.DossierId;
-            dossierWrapper.CurrentUserId = session.User.Id;
-            dossierWrapper.InputDocument = workspace.SelectedTray.Document!.Id;
+            var solicitorDossierRequestContent = Mapper.Map<SolicitorDossierRequestResponseContent>(solicitorDossierRequestRegister);
+            var solicitorDossier = new SolicitorDossierRequestResponse(solicitorDossierRequestContent, annexes);
 
-            var httpResponse = await httpRepository.PostAsync<DossierWrapper, SolicitorDossierRequest>($"api/document/documentoSEN", dossierWrapper);
-            if (!httpResponse.Error)
-            {
-                DossierTrayResponse dossierTray = new DossierTrayResponse();
-                dossierTray = workspace.SelectedTray;
-                SolicitorDossierRequest updateSolicitorDossierRequest = new SolicitorDossierRequest();
-                updateSolicitorDossierRequest = httpResponse.Response;
-                dossierTray.Document.Id = updateSolicitorDossierRequest.Id;
-                dossierTray.Document.Type = updateSolicitorDossierRequest.Type;
-                dossierTray.Document.ContentsHistory = updateSolicitorDossierRequest.ContentsHistory;
-                dossierTray.Document.ProcessesHistory = updateSolicitorDossierRequest.ProcessesHistory;
-                dossierTray.Document.Content = updateSolicitorDossierRequest.Content;
-                dossierTray.Document.State = updateSolicitorDossierRequest.State;
-                //expedientebandeja.documentosobj.Add(expedientebandeja.documento);
-                //SISGED.Shared.Models.Item itemSalida = new SISGED.Shared.Models.Item()
-                //{
-                //    Name = dossierTray.Type,
-                //    Value = dossierTray,
-                //    Icon = "alarm_add",
-                //    Description = ((DocumentResponse)dossierTray.Document).Type,
-                //    CurrentPlace = "workspace",
-                //    OriginPlace = "inputs",
-                //    Client = dossierTray.Client,
-                //    ItemStatus = "registrado"
-                //};
+            var documentRegister = new DossierWrapper(dossierId, solicitorDossier);
 
-                //workspace.UpdateRegisteredDocument(itemSalida);
-                //workspace.UpdateTools("Registrar Documento");
-
-                DocumentResponse doc = new DocumentResponse();
-                doc.Id = updateSolicitorDossierRequest.Id;
-                doc.Type = updateSolicitorDossierRequest.Type;
-                doc.State = updateSolicitorDossierRequest.State;
-                doc.Content = JsonConvert.SerializeObject(updateSolicitorDossierRequest.Content);
-                doc.ContentsHistory = updateSolicitorDossierRequest.ContentsHistory;
-                doc.ProcessesHistory = updateSolicitorDossierRequest.ProcessesHistory;
-                doc.UrlAnnex = updateSolicitorDossierRequest.AttachedUrls;
-
-                workspace.SelectedTray.DocumentObjects.Add(doc);
-                workspace.SelectedTray.Document = doc;
-
-                StateHasChanged();
-                //workspace.UpdateComponentBandeja(itemSalida);
-                await swalFireRepository.ShowSuccessfulSwalFireAsync("Solicitud de expediente de notario registrado correctamente");
-                substep = 2;
-                //Enviar paso=0, subpaso=2, idexp
-                Int32 pasoAntiguo = step;
-                step = 1;
-                substep = 0;
-                //Enviar paso=0+0,subpaso=2,idexpediente
-                /*String tipodocumentoantiguo = workspace.asistente.tipodocumento;
-
-                await workspace.UpdatePasoAndSubPasoFinnally(step, substep, workspace.asistente.tipodocumento, pasoAntiguo, tipodocumentoantiguo);
-
-                String messageFinal = workspace.asistente.pasos.documentos
-                        .Find(x => x.tipo == workspace.asistente.tipodocumento).pasos.ElementAt(step).descripcion;
-
-                Task voiceMessage = workspace.VoiceMessage(messageFinal);
-
-                workspace.ChangeMessage(messageFinal);
-
-                await voiceMessage;*/
-            }
-            else
-            {
-                await swalFireRepository.ShowErrorSwalFireAsync("Error en el servidor. Intentelo de nuevo");
-            }
-            loadprocess = false;
+            return documentRegister;
         }
 
-        private async Task<IEnumerable<Solicitor>> Match(string searchtext)
+        private async Task<SolicitorDossierRequest?> ShowLoadingDialogAsync(DossierWrapper documentRegister)
         {
-            var httpResponse = await httpRepository.GetAsync<List<Solicitor>>($"api/Solicitor/filter?term={searchtext}");
-            if (httpResponse.Error)
+            string dialogTitle = $"Realizando el registro de su solicitud de expediente de notario, por favor espere...";
+
+            var toRegister = () => RegisterSolicitorDossierRequestAsync(documentRegister);
+
+            return await dialogContentRepository.ShowLoadingDialogAsync(toRegister, dialogTitle);
+
+        }
+
+        private async Task RegisterSolicitorDossierRequestAsync()
+        {
+            var documentRegister = GetDocumentRegister();
+
+            var registeredSolicitorDossier = await ShowLoadingDialogAsync(documentRegister);
+
+            if (registeredSolicitorDossier is null) return;
+
+            await swalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo registrar la solicitud de expediente de notario de manera satisfactoria");
+        }
+
+        private async Task<SolicitorDossierRequest?> RegisterSolicitorDossierRequestAsync(DossierWrapper documentRegister)
+        {
+            try
             {
-                return new List<Solicitor>();
+                var solicitorDossierResponse = await httpRepository.PostAsync<DossierWrapper, SolicitorDossierRequest>("api/documents/solicitor-dossier-request", documentRegister);
+
+                if (solicitorDossierResponse.Error)
+                {
+                    await swalFireRepository.ShowErrorSwalFireAsync("No se pudo registar la solicitud de expediente de notario");
+                }
+
+                return solicitorDossierResponse.Response!;
             }
-            else
+            catch (Exception)
             {
-                return httpResponse.Response!;
+
+                await swalFireRepository.ShowErrorSwalFireAsync("No se pudo registar la solicitud de expediente de notario");
+                return null;
             }
         }
 
-        public void HandleInvalidSubmit()
+        private async Task<AutocompletedSolicitorResponse> GetSolicitorAsync(string solicitorId)
         {
-            loadprocess = false;
-            swalFireRepository.ShowErrorSwalFireAsync("Por favor, Verifique los Datos Ingresados");
+            try
+            {
+                var solicitorResponse = await httpRepository.GetAsync<AutocompletedSolicitorResponse>($"api/solicitors/{solicitorId}");
+
+                if (solicitorResponse.Error)
+                {
+                    await swalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los tipos de solicitudes del sistema");
+                }
+
+                return solicitorResponse.Response!;
+            }
+            catch (Exception)
+            {
+
+                await swalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los tipos de solicitudes del sistema");
+                return new();
+            }
         }
 
-        private async Task RegisterRequestAsync()
+        private async Task GetUserRequestInformationAsync()
         {
-            await requestForm!.Validate();
+            var userTray = WorkPlaceItems.First(workItem => workItem.OriginPlace != "tools");
 
-            if (!requestForm.IsValid)
+            solicitorDossierRequestRegister.Client = userTray.Client;
+
+            var dossierTray = userTray.Value as DossierTrayResponse;
+
+            //var documentContent = JsonSerializer.Deserialize<InitialRequestContentDTO>(JsonSerializer.Serialize(dossierTray!.Document!.Content));
+
+            //solicitorDossierRequestRegister.Solicitor = await GetSolicitorAsync(documentContent!.SolicitorId);
+            dossierId = dossierTray!.DossierId;
+        }
+
+        private void GetSolicitorResponse(AutocompletedSolicitorResponse AutocompletedSolicitorResponse)
+        {
+            solicitorDossierRequestRegister.Solicitor = AutocompletedSolicitorResponse;
+        }
+
+        private static StepperLocalizedStrings GetRegisterLocalizedStrings()
+        {
+            return new() { Completed = "Completado", Finish = "Registrar", Next = "Siguiente", Previous = "Anterior" };
+        }
+
+        private bool CheckRegisterAsync()
+        {
+            if (requestStepper!.GetActiveIndex() != 1) return false;
+
+            requestForm!.Validate().GetAwaiter().GetResult();
+
+            if (!requestForm!.IsValid)
             {
-                HandleInvalidSubmit();
-                return;
+                swalFireRepository.ShowErrorSwalFireAsync("No se puede registrar la solicitud de expediente de notario, por favor verifique los datos ingresados").GetAwaiter();
+
+                return true;
             }
 
-            await HandleValidSubmit();
+            RegisterSolicitorDossierRequestAsync().GetAwaiter();
+
+            return false;
         }
     }
 }
