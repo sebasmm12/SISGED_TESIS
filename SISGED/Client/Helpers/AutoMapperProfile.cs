@@ -3,6 +3,7 @@ using SISGED.Client.Components.Documents.Registers;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Responses.Document;
+using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.DossierTray;
 using SISGED.Shared.Models.Responses.Solicitor;
 

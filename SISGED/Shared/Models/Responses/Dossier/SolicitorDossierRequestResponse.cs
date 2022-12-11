@@ -1,10 +1,4 @@
 ﻿using SISGED.Shared.DTOs;
-using SISGED.Shared.Models.Responses.Document;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SISGED.Shared.Models.Responses.Dossier
 {
