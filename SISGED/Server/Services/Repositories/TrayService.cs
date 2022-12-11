@@ -71,6 +71,18 @@ namespace SISGED.Server.Services.Repositories
 
         }
 
+        public async Task RegisterOutputTrayAsync(OutPutTrayDTO outPutTrayDTO)
+        {
+            var currentDocumentTray = new DocumentTray(outPutTrayDTO.DossierId, outPutTrayDTO.CurrentDocumentId);
+            var newDocumentTray = new DocumentTray(outPutTrayDTO.DossierId, outPutTrayDTO.NewDocumentId);
+
+            var inputTrayUpdate = PullDocumentTrayAsync(new(currentDocumentTray, outPutTrayDTO.UserId, "bandejaentrada"));
+
+            var outputTrayUpdate = PushDocumentTrayAsync(new(newDocumentTray, outPutTrayDTO.UserId, "bandejasalida"));
+
+            await Task.WhenAll(inputTrayUpdate, outputTrayUpdate);
+        }
+
         public async Task<string> RegisterUserInputTrayAsync(string dossierId, string documentId, string type)
         {
             var documentTray = new DocumentTray(dossierId, documentId);
@@ -81,7 +93,6 @@ namespace SISGED.Server.Services.Repositories
 
             return userTray.User;
         }
-
 
         #region private methods
         private async Task<Tray> GetUserTrayWithLessInputTrayAsync(string type)

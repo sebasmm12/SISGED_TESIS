@@ -19,6 +19,7 @@ using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Responses.Document;
 using SISGED.Client.Generics;
 using SISGED.Client.Services.Repositories;
+using SISGED.Client.Components.WorkEnvironments;
 
 namespace SISGED.Client.Components.Documents.Registers
 {
@@ -40,8 +41,8 @@ namespace SISGED.Client.Components.Documents.Registers
         [CascadingParameter(Name = "SessionAccount")]
         public SessionAccountResponse SessionAccount { get; set; } = default!;
 
-        [CascadingParameter(Name = "WorkPlaceItems")]
-        public List<Item> WorkPlaceItems { get; set; } = default!;
+        [CascadingParameter(Name = "WorkEnvironment")]
+        public WorkEnvironment WorkEnvironment { get; set; } = default!;
 
 
         private bool pageLoading = true;
@@ -73,8 +74,33 @@ namespace SISGED.Client.Components.Documents.Registers
             var registeredComplaint = await ShowLoadingDialogAsync(documentRegister);
 
             if (registeredComplaint is null) return;
-            
+
             await SwalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo registrar la denuncia de manera satisfactoria");
+
+            UpdateRegisteredDocument(registeredComplaint);
+        }
+
+        private void UpdateRegisteredDocument(ComplaintRequest complaintRequest)
+        {
+            var inputItem = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace == "inputs");
+
+            ProcessWorkItemInfo(inputItem!, complaintRequest);
+
+            WorkEnvironment.UpdateRegisteredDocument(inputItem!);
+
+        }
+
+        private void ProcessWorkItemInfo(Item item, ComplaintRequest complaintRequest)
+        {
+            if (item.Value is not DossierTrayResponse dossierTray) return;
+
+            var documentResponse = Mapper.Map<DocumentResponse>(complaintRequest);
+
+            dossierTray.DocumentObjects!.Add(documentResponse);
+            dossierTray.Document = documentResponse;
+            dossierTray.Type = "Denuncia";
+
+            Mapper.Map(dossierTray, item);
         }
 
         private bool CheckComplaintRegisterAsync()
@@ -97,7 +123,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
         private async Task GetUserRequestInformationAsync()
         {
-            var userTray = WorkPlaceItems.First(workItem => workItem.OriginPlace != "tools");
+            var userTray = WorkEnvironment.workPlaceItems.First(workItem => workItem.OriginPlace != "tools");
 
             complaintRequest.Client = userTray.Client;
 

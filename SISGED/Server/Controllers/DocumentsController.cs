@@ -181,7 +181,9 @@ namespace SISGED.Server.Controllers
 
                 var complaintRequest = await RegisterComplaintRequestAsync(document, user);
 
-                var updatedDossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia", complaintRequest.Id, "En proceso"));
+                var dossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia", complaintRequest.Id, "En proceso"));
+
+                await RegisterOutPutTrayAsync(complaintRequest, user, dossier);
 
                 return Ok(complaintRequest);
             }
@@ -1107,6 +1109,15 @@ namespace SISGED.Server.Controllers
             return await _documentService.InitialRequestRegisterAsync(initialRequest);
         }
 
+        private async Task RegisterOutPutTrayAsync(ComplaintRequest complaintRequest, User user, Dossier dossier)
+        {
+            var currentDocumentId = dossier.Documents[^2];
+
+            var outputTrayDTO = new OutPutTrayDTO(dossier.Id, currentDocumentId.DocumentId, complaintRequest.Id, user.Id);
+
+            await _trayService.RegisterOutputTrayAsync(outputTrayDTO);
+        }
+
         private async Task<ComplaintRequest> RegisterComplaintRequestAsync(ComplaintRequestResponse document, User user)
         {
             var urls = await _mediaService.SaveFilesAsync(document.URLAnnex, _containerName);
@@ -1163,6 +1174,7 @@ namespace SISGED.Server.Controllers
             return userClaim.Value;
             
         }
+        
 
         #endregion
 

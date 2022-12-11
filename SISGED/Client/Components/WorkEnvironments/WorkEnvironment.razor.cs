@@ -21,7 +21,7 @@ namespace SISGED.Client.Components.WorkEnvironments
         public DossierTrayResponse SelectedTray { get; set; } = default!;
         private List<Item> Items { get; set; } = new();
         private bool isRendered = false;
-        private readonly List<Item> workPlaceItems = new();
+        public readonly List<Item> workPlaceItems = new();
 
         private bool CanReorder => workPlaceItems.Count > 0;
 
@@ -77,22 +77,26 @@ namespace SISGED.Client.Components.WorkEnvironments
             if (item.DropzoneIdentifier == "workplace") workPlaceItems.Add(item.Item);
         }
 
-        //public void UpdateTools(string name)
-        //{
-        //    var tool = SessionAccount.UsableTools.SingleOrDefault(x => x.Name == name);
-        //    tool.CurrentPlace = "tools";
-        //    SessionAccount.UsableTools[SessionAccount.UsableTools.FindIndex(ind => ind.Name.Equals(name))] = tool;
-        //    StateHasChanged();
-        //}
+        public void UpdateRegisteredDocument(Item item)
+        {
+            ChangeToolPlace(new("inputs", "outputs", item));
+            ChangeToolPlace(new("tools", "tools"));
 
-        //public void UpdateRegisteredDocument(SISGED.Shared.Models.Item newItem)
-        //{
-        //    SessionAccount.Inputs[SessionAccount.Inputs.FindIndex(ind =>
-        //    ind.OriginPlace == "inputs" &&
-        //    ind.CurrentPlace == "workspace")] = newItem;
-        //    //sesion.herramientasutilizables[sesion.listaentradas.FindIndex(ind => ind.currentPlace == "workspace")].currentPlace = "tools";
-        //    StateHasChanged();
-        //}
+            workPlaceItems.Clear();
+
+            StateHasChanged();
+        }
+
+        private void ChangeToolPlace(WorkToolPlace workToolPlace)
+        {
+            var item = workToolPlace.Item;
+
+            if (workToolPlace.Item is null) item = workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace == workToolPlace.CurrentPlace);
+
+            var itemDropInfo = new MudItemDropInfo<Item>(item!, workToolPlace.NewPlace, 0);
+
+            UpdateItem(itemDropInfo);
+        }
 
         private async Task<InputOutputTrayResponse> GetUserTrayAsync(string userId)
         {

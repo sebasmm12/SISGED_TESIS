@@ -34,7 +34,7 @@ else {
                                     }
                                 </ChildContent>
                                 <ItemRenderer Context="item">
-                                    <CascadingValue Value="workPlaceItems" Name="WorkPlaceItems">
+                                    <CascadingValue Value="this" Name="WorkEnvironment">
                                         <WorkItem Item="item"></WorkItem>
                                         @if (item.OriginPlace == "tools")
                                         {

@@ -10,5 +10,6 @@ namespace SISGED.Server.Services.Contracts
         Task RegisterUserTrayAsync(string type, string userId);
         Task UpdateTrayForDerivationAsync(UpdateTrayDTO updateTrayDTO);
         Task<string> RegisterUserInputTrayAsync(string dossierId, string documentId, string type);
+        Task RegisterOutputTrayAsync(OutPutTrayDTO outPutTrayDTO);
     }
 }
