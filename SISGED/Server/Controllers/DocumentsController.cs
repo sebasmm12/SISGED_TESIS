@@ -320,7 +320,7 @@ namespace SISGED.Server.Controllers
                 var document = DeserializeDocument<DisciplinaryOpennessResponse>(dossierWrapper.Document);
 
                 //var user = await GetUserAsync("userId");
-                var user = await _userService.GetUserByIdAsync("5eeaf61e8ca4ff53a0b791e6");
+                var user = await _userService.GetUserByIdAsync("5f2bd8600fa0bc67c45f9866");
 
                 var disciplinaryOpenness = await RegisterDisciplinaryOpennessDocumentAsync(document, user);
 
@@ -343,7 +343,7 @@ namespace SISGED.Server.Controllers
                 var document = DeserializeDocument<SolicitorDossierRequestResponse>(dossierWrapper.Document);
 
                 //var user = await GetUserAsync("userId");
-                var user = await _userService.GetUserByIdAsync("5eeaf61e8ca4ff53a0b791e6");
+                var user = await _userService.GetUserByIdAsync("5ef29f2e48b4b5290c3763af");
 
                 var solicitorDossierRequest = await RegisterSolicitorDossierRequestDocumentAsync(document, user);
 
@@ -395,7 +395,7 @@ namespace SISGED.Server.Controllers
                 var document = DeserializeDocument<ResolutionResponse>(dossierWrapper.Document);
 
                 //var user = await GetUserAsync("userId");
-                var user = await _userService.GetUserByIdAsync("5eeaf61e8ca4ff53a0b791e6");
+                var user = await _userService.GetUserByIdAsync("5f2bd8600fa0bc67c45f9866");
 
                 var resolutionDocument = await RegisterResolutionDocumentAsync(document, user);
 
