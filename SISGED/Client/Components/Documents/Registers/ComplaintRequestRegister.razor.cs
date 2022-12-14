@@ -1,32 +1,27 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using MudBlazor;
 using MudExtensions;
 using MudExtensions.Utilities;
+using SISGED.Client.Components.WorkEnvironments;
 using SISGED.Client.Helpers;
 using SISGED.Client.Services.Contracts;
 using SISGED.Shared.DTOs;
-using Entities = SISGED.Shared.Entities;
+using SISGED.Shared.Entities;
+using SISGED.Shared.Models.Requests.Documents;
 using SISGED.Shared.Models.Responses.Account;
+using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.DocumentType;
 using SISGED.Shared.Models.Responses.DossierTray;
 using SISGED.Shared.Models.Responses.Solicitor;
 using SISGED.Shared.Validators;
 using System.Text.Json;
-using SISGED.Shared.Models.Requests.Documents;
-using AutoMapper;
-using SISGED.Shared.Entities;
-using SISGED.Shared.Models.Responses.Document;
-using SISGED.Client.Generics;
-using SISGED.Client.Services.Repositories;
-using SISGED.Client.Components.WorkEnvironments;
+using Entities = SISGED.Shared.Entities;
 
 namespace SISGED.Client.Components.Documents.Registers
 {
     public partial class ComplaintRequestRegister
     {
-        [Inject]
-        private IJSRuntime JSRuntime { get; set; } = default!;
         [Inject]
         private IHttpRepository HttpRepository { get; set; } = default!;
         [Inject]
@@ -105,7 +100,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
         private bool CheckComplaintRegisterAsync()
         {
-            if (complaintRequestStepper!.GetActiveIndex() != 2) return false;
+            if (complaintRequestStepper!.GetActiveIndex() != complaintRequestStepper!.Steps.Count - 1) return false;
 
             complaintRequestForm!.Validate().GetAwaiter().GetResult();
 
@@ -209,7 +204,7 @@ namespace SISGED.Client.Components.Documents.Registers
             try
             {
                 var complaintResponse = await HttpRepository.PostAsync<DossierWrapper, ComplaintRequest>("api/documents/complaint-requests", documentRegister);
-                
+
                 if (complaintResponse.Error)
                 {
                     await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo registar la solicitud de denuncia");

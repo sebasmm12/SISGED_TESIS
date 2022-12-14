@@ -384,10 +384,10 @@ namespace SISGED.Shared.Entities
     {
         [BsonElement("codigo")]
         public string Code { get; set; } = default!;
-        [BsonElement("nombredenunciante")]
-        public string ComplainantName { get; set; }=  default!;
-        [BsonElement("descripcion")]
-        public string Description { get; set; } =  default!;
+        [BsonElement("iddenunciante")]
+        public string ComplaintId { get; set; }=  default!;
+        [BsonElement("idnotario")]
+        public string SolicitorId { get; set; } = default!;
         [BsonElement("titulo")]
         public string Title { get; set; } = default!;
         [BsonElement("observaciones")]
@@ -405,6 +405,19 @@ namespace SISGED.Shared.Entities
     [BsonDiscriminator("Dictamen")]
     public class Dictum : Document
     {
+        public Dictum(DictumContent content, string state, List<string> urls)
+        {
+            Content = content;
+            State = state;
+            AttachedUrls = urls;
+            Type = "Dictamen";
+            ContentsHistory = new();
+            ProcessesHistory = new();
+
+        }
+
+        public Dictum() { }
+
         [BsonElement("contenido")]
         public DictumContent Content { get; set; } = new();
     }

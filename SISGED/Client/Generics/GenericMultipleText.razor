@@ -1,0 +1,14 @@
+﻿<div class="d-flex gap-1 mb-1">
+    <div class="mud-grid-item-sm-11 mud-grid-item-md-11 mud-grid-item-lg-11">
+        <MudTextField @bind-Value="TextField.Description" Label="@TextLabel" Variant="Variant.Outlined"
+                      Adornment="Adornment.End" AdornmentIcon="@($"fas { TextFieldIcon }")" AdornmentColor="Color.Primary"
+                      For="@(() => TextField.Description)"></MudTextField>
+    </div>
+    <div class="mud-grid-item-sm-1 mud-grid-item-md-1 mud-grid-item-lg-1 d-flex justify-center align-center">
+        <MudIconButton Icon="@TextIcon.Icon" Variant="Variant.Filled"
+                    Color="TextIcon.Color" Size="Size.Large" Class="rounded-circle"
+                       OnClick="@(() => ExecuteAsync())"></MudIconButton>
+    </div>
+</div>
+
+

@@ -581,66 +581,12 @@ namespace SISGED.Server.Services.Repositories
             return dossier;
         }
 
-        public async Task<Dictum> DictumRegisterAsync(DictumResponse DTO, DossierWrapper dossierWrapper, List<string> url2)
+        public async Task<Dictum> RegisterDictumAsync(Dictum dictum)
         {
-            //Obtenemos los datos del expedientewrapper
-
-            var json = JsonConvert.SerializeObject(dossierWrapper.Document);
-            DTO = JsonConvert.DeserializeObject<DictumResponse>(json)!;
-
-            //creacion del Objeto de tipo Dictamen y el registro en la coleccion Dictamen
-            DictumContent content = new DictumContent()
-            {
-                Code = "",
-                Title = DTO.Content.Title,
-                Description = DTO.Content.Description,
-                ComplainantName = DTO.Content.ComplainantName,
-                Conclusion = DTO.Content.Conclusion,
-                Observations = DTO.Content.Observations.Select(x => x.Description).ToList(),
-                Recommendations = DTO.Content.Recomendations.Select(x => x.Description).ToList(),
-                Sign = ""
-                //fecha           
-            };
-            Dictum dictum = new Dictum()
-            {
-                Type = "Dictamen",
-                Content = content,
-                ContentsHistory = new List<ContentVersion>(),
-                ProcessesHistory = new List<Process>(),
-                State = "creado",
-                AttachedUrls = url2
-            };
             await _documentsCollection.InsertOneAsync(dictum);
 
-            //actualizacion de expediente
-            Dossier dossier = new Dossier();
-            DossierDocument dossierDocument = new DossierDocument();
-            dossierDocument.Index = 8;
-            dossierDocument.DocumentId = dictum.Id;
-            dossierDocument.Type = "Dictamen";
-            dossierDocument.CreationDate = DateTime.UtcNow.AddHours(-5);
-            dossierDocument.ExcessDate = DateTime.UtcNow.AddHours(-5).AddDays(5);
-            dossierDocument.DelayDate = null;
-            dossier = await UpdateDossierAsync(dossierDocument, dossierWrapper.Id);
-
-            //actualizando Bandeja salida
-            /*BandejaDocumento bandejaDocumento = new BandejaDocumento();
-            bandejaDocumento.idexpediente = expediente.id;
-            bandejaDocumento.iddocumento = documentoExpediente.iddocumento;
-            UpdateDefinition<Bandeja> updateBandeja = Builders<Bandeja>.Update.Push("bandejasalida", bandejaDocumento);
-            _bandejas.UpdateOne(band => band.usuario == expedientewrapper.idusuarioactual, updateBandeja);*/
-
-            //actualizando Bandeja Entrada
-            /*UpdateDefinition<Bandeja> updateBandejaEntrada =
-               Builders<Bandeja>.Update.PullFilter("bandejaentrada",
-                 Builders<BandejaDocumento>.Filter.Eq("iddocumento", expedientewrapper.documentoentrada));
-            _bandejas.UpdateOne(band => band.usuario == expedientewrapper.idusuarioactual, updateBandejaEntrada);*/
-
-            //Actulizar el documento anterior a revisado
-            var filter = Builders<Document>.Filter.Eq("id", dossierWrapper.InputDocument);
-            var update = Builders<Document>.Update
-                .Set("estado", "revisado");
-            await _documentsCollection.UpdateOneAsync(filter, update);
+            if (dictum.Id is null) throw new Exception($"No se pudo registrar el dictamen { dictum.Content.Title }");
+            
             return dictum;
         }
 
@@ -961,35 +907,35 @@ namespace SISGED.Server.Services.Repositories
 
             //Listas de participantes a string
             List<String> observationsList = new List<string>();
-            foreach (Observations obs in DTO.Content.Observations)
-            {
-                observationsList.Add(obs.Description);
-            }
+            //foreach (Observations obs in DTO.Content.Observations)
+            //{
+            //    observationsList.Add(obs.Description);
+            //}
 
-            //Listas de hechos a string
-            List<String> recomendationsList = new List<string>();
-            foreach (Recomendations rec in DTO.Content.Recomendations)
-            {
-                recomendationsList.Add(rec.Description);
-            }
+            ////Listas de hechos a string
+            //List<String> recomendationsList = new List<string>();
+            //foreach (Recomendations rec in DTO.Content.Recomendations)
+            //{
+            //    recomendationsList.Add(rec.Description);
+            //}
 
             //Creacion de Obj y registro en coleccion de documentos 
             DictumContent contentD = new DictumContent()
             {
-                ComplainantName = DTO.Content.ComplainantName,
+                //ComplainantName = DTO.Content.ComplainantName,
                 Title = DTO.Content.Title,
-                Description = DTO.Content.Description,
+                //Description = DTO.Content.Description,
                 Conclusion = DTO.Content.Conclusion,
                 Observations = observationsList,
-                Recommendations = recomendationsList
+                //Recommendations = recomendationsList
             };
             Dictum dictum = new Dictum();
 
             var filter = Builders<Document>.Filter.Eq("id", DTO.Id);
             var update = Builders<Document>.Update
                 .Set("contenido.titulo", contentD.Title)
-                .Set("contenido.descripcion", contentD.Description)
-                .Set("contenido.nombredenunciante", contentD.ComplainantName)
+                //.Set("contenido.descripcion", contentD.Description)
+                //.Set("contenido.nombredenunciante", contentD.ComplainantName)
                 .Set("contenido.conclusion", contentD.Conclusion)
                 .Set("contenido.observaciones", contentD.Observations)
                 .Set("contenido.recomendaciones", contentD.Recommendations)

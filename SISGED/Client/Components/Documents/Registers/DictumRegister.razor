@@ -1,0 +1,62 @@
+﻿@if (pageLoading)
+{
+    <GenericToolLoader Body="Cargando los elementos para el registro del dictamen, por favor espere..."></GenericToolLoader>
+}
+else {
+    <MudCard Elevation="0">
+        <MudForm @ref="dictumForm" ValidationDelay="0" Model="dictum">
+            <MudCardContent>
+                <MudStepper @ref="dictumStepper" LocalizedStrings="GetRegisterLocalizedStrings()"
+                   Color="Color.Secondary" Variant="Variant.Filled" HeaderTextView="HeaderTextView.NewLine"
+                        PreventStepChange="@(() => CheckDictumRegisterAsync())">
+                   <MudStep Title="Datos generales">
+                       <MudGrid>
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                                <MudTextField @bind-Value="dictum.Title" Label="Título" Variant="Variant.Outlined"
+                                            Adornment="Adornment.End" AdornmentIcon="fas fa-pencil" AdornmentColor="Color.Primary" Immediate="true"
+                                            For="@(() => dictum.Title)"></MudTextField>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                                <MudTextField Value="dictum.Client.GetShortName()" Label="Nombre del Denunciante" Variant="Variant.Outlined"
+                                          Adornment="Adornment.End" AdornmentIcon="fas fa-user" AdornmentColor="Color.Primary" ReadOnly="true"></MudTextField>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="5" lg="5" xl="12">
+                                <MudTextField Value="@($"{ dictum.Solicitor.Name } { dictum.Solicitor.LastName }")" Label="Nombre del Cliente" Variant="Variant.Outlined"
+                                          Adornment="Adornment.End" AdornmentIcon="fas fa-user" AdornmentColor="Color.Primary" ReadOnly="true"></MudTextField>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="7" lg="7" xl="12">
+                                <MudTextField Value="dictum.Solicitor.Address" Label="Tipo de Documento" Variant="Variant.Outlined"
+                                          Adornment="Adornment.End" AdornmentColor="Color.Primary" AdornmentIcon="fas fa-location-dot" ReadOnly="true"></MudTextField>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <MudTextField @bind-Value="dictum.Conclusion" Label="Conclusión" Variant="Variant.Outlined"
+                                          Lines="3" Immediate="true" For="@(() => dictum.Conclusion)"></MudTextField>
+                            </MudItem>
+                       </MudGrid>
+                   </MudStep>
+                   <MudStep Title="Observaciones">
+                       <MudGrid>
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <GenericMultipleTexts TextFields="dictum.Observations" TextFieldIcon="fa-eye" TextLabel="Observaciones"></GenericMultipleTexts>
+                            </MudItem>
+                       </MudGrid>
+                   </MudStep>
+                   <MudStep Title="Recomendaciones">
+                       <MudGrid>
+                             <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <GenericMultipleTexts TextFields="dictum.Recommendations" TextFieldIcon="fa-magnifying-glass" TextLabel="Recomendaciones"></GenericMultipleTexts>
+                            </MudItem>
+                       </MudGrid>
+                   </MudStep>
+                   <MudStep Title="Anexos">
+                        <MudGrid>
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <DocumentAnnex Annexes="annexes" AnnexesHeight="280px"></DocumentAnnex>
+                            </MudItem>
+                        </MudGrid>
+                   </MudStep>
+                </MudStepper>
+            </MudCardContent>
+        </MudForm>
+    </MudCard>
+}

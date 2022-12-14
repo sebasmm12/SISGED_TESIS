@@ -69,6 +69,7 @@ namespace SISGED.Server.Helpers.Infrastructure
             // Dictum Mapper
             CreateMap<DictumContent, DictumContentInfo>();
             CreateMap<Dictum, DictumInfoResponse>();
+            CreateMap<DictumResponseContent, DictumContent>();
 
             // Resolution Mapper
             CreateMap<ResolutionContent, ResolutionContentInfo>();

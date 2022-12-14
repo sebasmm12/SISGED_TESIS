@@ -4,12 +4,12 @@ using SISGED.Client.Services.Contracts;
 
 namespace SISGED.Client.Services.Repositories
 {
-    public class ComplaintRequestDocument : IDocumentRender
+    public class DictumDocument : IDocumentRender
     {
-        public string DocumentType { get; set; } = "ComplaintRequest";
+        public string DocumentType { get; set; } = "Dictum";
         public RenderFragment RenderFragment { get; set; } = builder =>
         {
-            builder.OpenComponent(0, typeof(ComplaintRequestRegister));
+            builder.OpenComponent(0, typeof(DictumRegister));
             builder.CloseComponent();
         };
     }

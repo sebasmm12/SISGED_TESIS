@@ -24,6 +24,7 @@ using SISGED.Shared.Models.Responses.Document.SolicitorDossierShipment;
 using SISGED.Shared.Models.Responses.Document.UserRequest;
 using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.DossierDocument;
+using System.Net.WebSockets;
 using Json = System.Text.Json;
 
 namespace SISGED.Server.Controllers
@@ -182,7 +183,8 @@ namespace SISGED.Server.Controllers
 
                 var complaintRequest = await RegisterComplaintRequestAsync(document, user);
 
-                var dossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia", complaintRequest.Id, "En proceso"));
+                var dossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia" , "En proceso"
+                            , new(2, complaintRequest.Id, complaintRequest.Type, DateTime.UtcNow.AddHours(-5).AddDays(10))));
 
                 await RegisterOutPutTrayAsync(complaintRequest, user, dossier);
 
@@ -313,7 +315,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPost("disciplinary-openness")]
-        public async Task<ActionResult<DisciplinaryOpenness>> DisciplinaryOpennessDocumentRegister(DossierWrapper dossierWrapper)
+        public async Task<ActionResult<DisciplinaryOpenness>> DisciplinaryOpennessDocumentRegister([FromBody]DossierWrapper dossierWrapper)
         {
             try
             {
@@ -324,7 +326,10 @@ namespace SISGED.Server.Controllers
 
                 var disciplinaryOpenness = await RegisterDisciplinaryOpennessDocumentAsync(document, user);
 
-                var updatedDossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "AperturamientoDisciplinario", disciplinaryOpenness.Id, "En proceso"));
+                var updatedDossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia", "En proceso", 
+                    new(3, disciplinaryOpenness.Id, disciplinaryOpenness.Type, DateTime.UtcNow.AddHours(-5).AddDays(5))));
+
+                await RegisterOutPutTrayAsync(disciplinaryOpenness, user, updatedDossier);
 
                 return Ok(disciplinaryOpenness);
             }
@@ -336,7 +341,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPost("solicitor-dossier-request")]
-        public async Task<ActionResult<SolicitorDossierRequest>> SolicitorDossierRequestRegister(DossierWrapper dossierWrapper)
+        public async Task<ActionResult<SolicitorDossierRequest>> SolicitorDossierRequestRegister([FromBody] DossierWrapper dossierWrapper)
         {
             try
             {
@@ -347,7 +352,10 @@ namespace SISGED.Server.Controllers
 
                 var solicitorDossierRequest = await RegisterSolicitorDossierRequestDocumentAsync(document, user);
 
-                var updatedDossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "SolicitudExpedienteNotario", solicitorDossierRequest.Id, "En proceso"));
+                var updatedDossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia" , "En proceso", 
+                    new(4, solicitorDossierRequest.Id, solicitorDossierRequest.Type, DateTime.UtcNow.AddHours(-5).AddDays(5))));
+
+                await RegisterOutPutTrayAsync(solicitorDossierRequest, user, updatedDossier);
 
                 return Ok(solicitorDossierRequest);
             }
@@ -358,27 +366,23 @@ namespace SISGED.Server.Controllers
             }
         }
 
-        [HttpPost("documentod")]
-        public async Task<ActionResult<Dictum>> DictumDocumentRegister(DossierWrapper dossierWrapper)
+        [HttpPost("dictums")]
+        public async Task<ActionResult<Dictum>> RegisterDictumAsync(DossierWrapper dossierWrapper)
         {
             try
             {
-                DictumResponse DTO = new DictumResponse();
-                var json = JsonConvert.SerializeObject(dossierWrapper.Document);
-                DTO = JsonConvert.DeserializeObject<DictumResponse>(json)!;
-                List<string> url2 = new List<string>();
-                string urlData2 = "";
-                foreach (string u in DTO.Content.URLAnnex)
-                {
-                    if (!string.IsNullOrWhiteSpace(u))
-                    {
-                        var solicitudBytes2 = Convert.FromBase64String(u);
-                        FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "dictamen");
-                        urlData2 = await _fileService.SaveFileAsync(file) ?? string.Empty;
-                        url2.Add(urlData2);
-                    }
-                }
-                var dictum = await _documentService.DictumRegisterAsync(DTO, dossierWrapper, url2);
+                var document = DeserializeDocument<DictumResponse>(dossierWrapper.Document);
+
+                //var user = await GetUserAsync("userId");
+                var user = await _userService.GetUserByIdAsync("5f0ac7598ea569d19fe57a3e");
+
+                var dictum = await RegisterDictumAsync(document, user);
+
+                var dossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia", "En proceso",
+                    new(5, dictum.Id, "Dictamen", DateTime.UtcNow.AddHours(-5).AddDays(5))));
+
+                await RegisterOutPutTrayAsync(dictum, user, dossier);
+
                 return Ok(dictum);
             }
             catch (Exception ex)
@@ -387,7 +391,7 @@ namespace SISGED.Server.Controllers
             }
         }
 
-        [HttpPost("resolution")]
+        [HttpPost("resolutions")]
         public async Task<ActionResult<Resolution>> ResolutionDocumentRegister(DossierWrapper dossierWrapper)
         {
             try
@@ -399,7 +403,10 @@ namespace SISGED.Server.Controllers
 
                 var resolutionDocument = await RegisterResolutionDocumentAsync(document, user);
 
-                var updatedDossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Resolucion", resolutionDocument.Id, "Finalizado"));
+                var updatedDossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia", "Finalizado",
+                    new(7, resolutionDocument.Id, resolutionDocument.Type, DateTime.UtcNow.AddHours(-5).AddDays(5))));
+
+                await RegisterOutPutTrayAsync(resolutionDocument, user, updatedDossier);
 
                 return Ok(resolutionDocument);
             }
@@ -659,16 +666,16 @@ namespace SISGED.Server.Controllers
                 DTO = JsonConvert.DeserializeObject<DictumResponse>(json)!;
                 List<string> url2 = new List<string>();
                 string urlData2 = "";
-                foreach (string u in DTO.Content.URLAnnex)
-                {
-                    if (!string.IsNullOrWhiteSpace(u))
-                    {
-                        var solicitudBytes2 = Convert.FromBase64String(u);
-                        FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "dictamen");
-                        urlData2 = await _fileService.SaveFileAsync(file) ?? string.Empty;
-                        url2.Add(urlData2);
-                    }
-                }
+                //foreach (string u in DTO.Content.URLAnnex)
+                //{
+                //    if (!string.IsNullOrWhiteSpace(u))
+                //    {
+                //        var solicitudBytes2 = Convert.FromBase64String(u);
+                //        FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "dictamen");
+                //        urlData2 = await _fileService.SaveFileAsync(file) ?? string.Empty;
+                //        url2.Add(urlData2);
+                //    }
+                //}
 
                 return await _documentService.UpdateDictumDocumentAsync(dossierWrapper, url2);
             }
@@ -1098,7 +1105,7 @@ namespace SISGED.Server.Controllers
             return await _documentService.InitialRequestRegisterAsync(initialRequest);
         }
 
-        private async Task RegisterOutPutTrayAsync(ComplaintRequest complaintRequest, User user, Dossier dossier)
+        private async Task RegisterOutPutTrayAsync(Document complaintRequest, User user, Dossier dossier)
         {
             var currentDocumentId = dossier.Documents[^2];
 
@@ -1118,6 +1125,17 @@ namespace SISGED.Server.Controllers
             return await _documentService.RegisterComplaintRequestAsync(complaintRequest);
         }
 
+        private async Task<Dictum> RegisterDictumAsync(DictumResponse document, User user)
+        {
+            var urls = await _mediaService.SaveFilesAsync(document.URLAnnex, _containerName);
+
+            var dictumContent = _mapper.Map<DictumContent>(document.Content);
+            var dictum = new Dictum(dictumContent, "registrado", urls.ToList());
+            dictum.AddProcess(new Process(user.Id, user.Id, "registrado"));
+            
+            return await _documentService.RegisterDictumAsync(dictum);
+        }
+
         private async Task<Dossier> RegisterInitialDossierAsync(InitialRequestResponse document, InitialRequest initialRequest)
         {
             var client = new Shared.Entities.Client(document.ClientName, document.ClientLastName, document.DocumentNumber, document.DocumentType, document.ClientId);
@@ -1134,7 +1152,7 @@ namespace SISGED.Server.Controllers
         {
             var dossier = new Dossier(dossierUpdateDTO.DossierWrapper.Id!, dossierUpdateDTO.DossierType, dossierUpdateDTO.DossierState);
 
-            dossier.AddDocument(new DossierDocument(2, dossierUpdateDTO.DocumentId, "SolicitudDenuncia", DateTime.UtcNow.AddHours(-5).AddDays(10)));
+            dossier.AddDocument(dossierUpdateDTO.DossierDocument);
 
             return await _dossierService.UpdateDossierForInitialRequestAsync(dossier);
         }
@@ -1155,7 +1173,7 @@ namespace SISGED.Server.Controllers
         }
 
         private string GetUserClaimValue(string claimType)
-        {
+        {   
             var userClaim = User.Claims.FirstOrDefault(c => c.Type == claimType);
 
             if (userClaim is null) throw new Exception("Información no especificada en la cabecera de la petición");
@@ -1164,7 +1182,7 @@ namespace SISGED.Server.Controllers
 
         }
 
-        public async Task<DisciplinaryOpenness> RegisterDisciplinaryOpennessDocumentAsync(DisciplinaryOpennessResponse document, User user)
+        private async Task<DisciplinaryOpenness> RegisterDisciplinaryOpennessDocumentAsync(DisciplinaryOpennessResponse document, User user)
         {
             var urls = await _mediaService.SaveFilesAsync(document.URLAnnex, _containerName);
 
@@ -1175,7 +1193,7 @@ namespace SISGED.Server.Controllers
             return await _documentService.DisciplinaryOpennessRegisterAsync(DisciplinaryOpenness);
         }
         
-        public async Task<SolicitorDossierRequest> RegisterSolicitorDossierRequestDocumentAsync(SolicitorDossierRequestResponse document, User user)
+        private async Task<SolicitorDossierRequest> RegisterSolicitorDossierRequestDocumentAsync(SolicitorDossierRequestResponse document, User user)
         {
             var urls = await _mediaService.SaveFilesAsync(document.URLAnnex, _containerName);
 
@@ -1186,7 +1204,7 @@ namespace SISGED.Server.Controllers
             return await _documentService.SolicitorDossierRequestRegisterAsync(SolicitorDossierRequest);
         }
         
-        public async Task<Resolution> RegisterResolutionDocumentAsync(ResolutionResponse document, User user)
+        private async Task<Resolution> RegisterResolutionDocumentAsync(ResolutionResponse document, User user)
         {
             var urls = await _mediaService.SaveFilesAsync(document.URLAnnex, _containerName);
 
