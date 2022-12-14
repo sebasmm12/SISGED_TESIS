@@ -149,7 +149,7 @@ namespace SISGED.Client.Components.Documents.Registers
         {
             try
             {
-                var resolutionResponse = await httpRepository.PostAsync<DossierWrapper, Resolution>("api/documents/resolution", documentRegister);
+                var resolutionResponse = await httpRepository.PostAsync<DossierWrapper, Resolution>("api/documents/resolutions", documentRegister);
 
                 if (resolutionResponse.Error)
                 {
