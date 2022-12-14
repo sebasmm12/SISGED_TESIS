@@ -36,6 +36,9 @@ static void ConfigureServices(IServiceCollection services)
 
     services.AddTransient<UserRequestRegisterValidator>();
     services.AddTransient<ComplaintRequestValidator>();
+    services.AddTransient<ResolutionRegisterValidator>();
+    services.AddTransient<DisciplinaryOpennessRegisterValidator>();
+    services.AddTransient<SolicitorDossierRequestRegisterValidator>();
 }
 
     
