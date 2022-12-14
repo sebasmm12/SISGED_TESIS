@@ -55,8 +55,8 @@ namespace SISGED.Client.Components.Documents.Registers
         private MudStepper? requestStepper;
 
         //Variables de sesion
-        [CascadingParameter(Name = "WorkPlaceItems")]
-        public List<Item> WorkPlaceItems { get; set; } = default!;
+        [CascadingParameter(Name = "WorkEnvironment")]
+        public WorkEnvironment WorkEnvironment { get; set; } = default!;
         [CascadingParameter(Name = "SessionAccount")] protected SessionAccountResponse SessionAccount { get; set; }
 
         //Datos del formulario
@@ -118,6 +118,31 @@ namespace SISGED.Client.Components.Documents.Registers
             if (registeredResolution is null) return;
 
             await swalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo registrar la resolución de manera satisfactoria");
+
+            UpdateRegisteredDocument(registeredResolution);
+        }
+
+        private void UpdateRegisteredDocument(Resolution resolution)
+        {
+            var inputItem = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace == "inputs");
+
+            ProcessWorkItemInfo(inputItem!, resolution);
+
+            WorkEnvironment.UpdateRegisteredDocument(inputItem!);
+
+        }
+
+        private void ProcessWorkItemInfo(Item item, Resolution resolution)
+        {
+            if (item.Value is not DossierTrayResponse dossierTray) return;
+
+            var documentResponse = Mapper.Map<DocumentResponse>(resolution);
+
+            dossierTray.DocumentObjects!.Add(documentResponse);
+            dossierTray.Document = documentResponse;
+            dossierTray.Type = typeDocument;
+
+            Mapper.Map(dossierTray, item);
         }
 
         private async Task<Resolution?> RegisterResolutionAsync(DossierWrapper documentRegister)
@@ -145,7 +170,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
         private async Task GetUserRequestInformationAsync()
         {
-            var userTray = WorkPlaceItems.First(workItem => workItem.OriginPlace != "tools");
+            var userTray = WorkEnvironment.workPlaceItems.First(workItem => workItem.OriginPlace != "tools");
 
             //resolutionRegister.Client = userTray.Client;
 

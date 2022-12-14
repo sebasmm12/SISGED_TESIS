@@ -36,8 +36,8 @@ namespace SISGED.Client.Components.Documents.Registers
         private MudStepper? requestStepper;
 
         //Variables de sesion
-        [CascadingParameter(Name = "WorkPlaceItems")]
-        public List<Item> WorkPlaceItems { get; set; } = default!;
+        [CascadingParameter(Name = "WorkEnvironment")]
+        public WorkEnvironment WorkEnvironment { get; set; } = default!;
         [CascadingParameter(Name = "SessionAccount")] protected SessionAccountResponse SessionAccount { get; set; }
 
 
@@ -86,6 +86,31 @@ namespace SISGED.Client.Components.Documents.Registers
             if (registeredSolicitorDossier is null) return;
 
             await swalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo registrar la solicitud de expediente de notario de manera satisfactoria");
+
+            UpdateRegisteredDocument(registeredSolicitorDossier);
+        }
+
+        private void UpdateRegisteredDocument(SolicitorDossierRequest solicitorDossierRequest)
+        {
+            var inputItem = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace == "inputs");
+
+            ProcessWorkItemInfo(inputItem!, solicitorDossierRequest);
+
+            WorkEnvironment.UpdateRegisteredDocument(inputItem!);
+
+        }
+
+        private void ProcessWorkItemInfo(Item item, SolicitorDossierRequest solicitorDossierRequest)
+        {
+            if (item.Value is not DossierTrayResponse dossierTray) return;
+
+            var documentResponse = Mapper.Map<DocumentResponse>(solicitorDossierRequest);
+
+            dossierTray.DocumentObjects!.Add(documentResponse);
+            dossierTray.Document = documentResponse;
+            dossierTray.Type = typeDocument;
+
+            Mapper.Map(dossierTray, item);
         }
 
         private async Task<SolicitorDossierRequest?> RegisterSolicitorDossierRequestAsync(DossierWrapper documentRegister)
@@ -132,7 +157,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
         private async Task GetUserRequestInformationAsync()
         {
-            var userTray = WorkPlaceItems.First(workItem => workItem.OriginPlace != "tools");
+            var userTray = WorkEnvironment.workPlaceItems.First(workItem => workItem.OriginPlace != "tools");
 
             solicitorDossierRequestRegister.Client = userTray.Client;
 

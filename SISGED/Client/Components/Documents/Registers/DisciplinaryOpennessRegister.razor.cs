@@ -15,6 +15,7 @@ using AutoMapper;
 using SISGED.Shared.Models.Responses.Solicitor;
 using MudExtensions;
 using MudExtensions.Utilities;
+using SISGED.Client.Components.WorkEnvironments;
 
 namespace SISGED.Client.Components.Documents.Registers
 {
@@ -35,8 +36,8 @@ namespace SISGED.Client.Components.Documents.Registers
         private MudStepper? requestStepper;
 
         //Variables de sesion
-        [CascadingParameter(Name = "WorkPlaceItems")]
-        public List<Item> WorkPlaceItems { get; set; } = default!;
+        [CascadingParameter(Name = "WorkEnvironment")]
+        public WorkEnvironment WorkEnvironment { get; set; } = default!;
         [CascadingParameter(Name = "SessionAccount")] protected SessionAccountResponse SessionAccount { get; set; }
         
         //Datos del formulario
@@ -111,6 +112,30 @@ namespace SISGED.Client.Components.Documents.Registers
             if (registeredDisciplinary is null) return;
 
             await swalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo registrar el aperturamiento disciplinario de manera satisfactoria");
+            UpdateRegisteredDocument(registeredDisciplinary);
+        }
+
+        private void UpdateRegisteredDocument(DisciplinaryOpenness disciplinaryOpenness)
+        {
+            var inputItem = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace == "inputs");
+
+            ProcessWorkItemInfo(inputItem!, disciplinaryOpenness);
+
+            WorkEnvironment.UpdateRegisteredDocument(inputItem!);
+
+        }
+
+        private void ProcessWorkItemInfo(Item item, DisciplinaryOpenness disciplinaryOpenness)
+        {
+            if (item.Value is not DossierTrayResponse dossierTray) return;
+
+            var documentResponse = Mapper.Map<DocumentResponse>(disciplinaryOpenness);
+
+            dossierTray.DocumentObjects!.Add(documentResponse);
+            dossierTray.Document = documentResponse;
+            dossierTray.Type = typeDocument;
+
+            Mapper.Map(dossierTray, item);
         }
 
         private async Task<DisciplinaryOpenness?> RegisterDisciplinaryOpennessRequestAsync(DossierWrapper documentRegister)
@@ -157,7 +182,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
         private async Task GetUserRequestInformationAsync()
         {
-            var userTray = WorkPlaceItems.First(workItem => workItem.OriginPlace != "tools");
+            var userTray = WorkEnvironment.workPlaceItems.First(workItem => workItem.OriginPlace != "tools");
 
             disciplinaryOpennessRegister.Client = userTray.Client;
 
