@@ -10,7 +10,7 @@ else
                 <MudStepper @ref="requestStepper" LocalizedStrings="GetRegisterLocalizedStrings()"
                         Color="Color.Secondary" Variant="Variant.Filled" HeaderTextView="HeaderTextView.NewLine"
                         PreventStepChange="@(() => CheckRegisterAsync())">
-                    <MudStep Text="Datos de la solicitud de expediente de notario">
+                    <MudStep Title="Datos de la solicitud de expediente de notario">
                         <MudGrid>
                             <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
                                 <MudTextField @bind-Value="@solicitorDossierRequestRegister.Title" Class="text-field-style"
@@ -29,7 +29,7 @@ else
                         </MudGrid>
 
                     </MudStep>
-                    <MudStep Text="Subir Anexo">
+                    <MudStep Title="Subir Anexo">
                         <MudGrid>
                             <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
                                 <DocumentAnnex Annexes="annexes"></DocumentAnnex>

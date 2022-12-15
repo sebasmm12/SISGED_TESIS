@@ -52,35 +52,10 @@ namespace SISGED.Client.Components.Documents.Registers
 
         protected override async Task OnInitializedAsync()
         {
-            disciplinaryOpennessRegister.Participants = new List<Participant>() { new Participant() { Index = 0, Name = "" } };
-            disciplinaryOpennessRegister.ChargedDeeds = new List<Deed>() { new Deed() { Index = 0, Description = "" } };
-
             await GetUserRequestInformationAsync();
 
             pageLoading = false;
 
-        }
-
-        private void addParticipant()
-        {
-            disciplinaryOpennessRegister.Participants.Add(new Participant() { Index = (disciplinaryOpennessRegister.Participants.Count) });
-            StateHasChanged();
-        }
-
-        private void removeParticipant(int index)
-        {
-            disciplinaryOpennessRegister.Participants.RemoveAt(index);
-            StateHasChanged();
-        }
-        private void addDeed()
-        {
-            disciplinaryOpennessRegister.ChargedDeeds.Add(new Deed() { Index = (disciplinaryOpennessRegister.ChargedDeeds.Count) });
-            StateHasChanged();
-        }
-        private void removeDeed(int index)
-        {
-            disciplinaryOpennessRegister.ChargedDeeds.RemoveAt(index);
-            StateHasChanged();
         }
 
         private DossierWrapper GetDocumentRegister()

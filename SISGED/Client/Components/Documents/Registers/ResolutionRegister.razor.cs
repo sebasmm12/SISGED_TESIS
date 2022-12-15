@@ -71,22 +71,9 @@ namespace SISGED.Client.Components.Documents.Registers
 
         protected override async Task OnInitializedAsync()
         {
-            resolutionRegister.Participants = new List<Participant>() { new Participant() { Index = 0, Name = "" } };
             await GetUserRequestInformationAsync();
 
             pageLoading = false;
-        }
-
-        private void addParticipant()
-        {
-            resolutionRegister.Participants.Add(new Participant() { Index = (resolutionRegister.Participants.Count) });
-            StateHasChanged();
-        }
-
-        private void removeParticipant(int index)
-        {
-            resolutionRegister.Participants.RemoveAt(index);
-            StateHasChanged();
         }
 
         private DossierWrapper GetDocumentRegister()

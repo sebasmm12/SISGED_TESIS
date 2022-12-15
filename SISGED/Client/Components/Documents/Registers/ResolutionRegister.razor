@@ -10,7 +10,7 @@ else
                 <MudStepper @ref="requestStepper" LocalizedStrings="GetRegisterLocalizedStrings()"
                         Color="Color.Secondary" Variant="Variant.Filled" HeaderTextView="HeaderTextView.NewLine"
                         PreventStepChange="@(() => CheckRegisterAsync())">
-                    <MudStep Text="General">
+                    <MudStep Title="General">
                         <MudGrid>
                             <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
                                 <MudTextField @bind-Value="@resolutionRegister.Title" Class="text-field-style"
@@ -29,47 +29,25 @@ else
                             </MudItem>
 
                             <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
-
-                                <MudDatePicker Label="Fecha de Inicio" @bind-Value="@resolutionRegister.AudienceStartDate" For="@(()=>resolutionRegister.AudienceStartDate)"></MudDatePicker>
+                                <MudDatePicker Label="Fecha de Inicio" @bind-Date="@resolutionRegister.AudienceStartDate" For="@(()=>resolutionRegister.AudienceStartDate)" ></MudDatePicker>
                             </MudItem>
 
                             <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
-                                <MudDatePicker AllowInput=" false" Label="Fecha de Fin" @bind-Value="@resolutionRegister.AudienceEndDate" For="@(()=>resolutionRegister.AudienceEndDate)">
+                                <MudDatePicker AllowInput=" false" Label="Fecha de Fin" @bind-Date="@resolutionRegister.AudienceEndDate" For="@(()=>resolutionRegister.AudienceEndDate)">
                                 </MudDatePicker>
                             </MudItem>
 
                         </MudGrid>
                     </MudStep>
 
-                    <MudStep Text="Participantes">
+                    <MudStep Title="Participantes">
                         <MudGrid>
                             <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
-                                <div class="contenedor-Participants">
-                                    <div class="Title-paticipantes">
-                                        <div><span class="Title">Participantes de la resolucion</span></div>
-                                        <div class="icono" @onclick="@(addParticipant)">
-                                            <MudIcon Icon="add_circle_outline"></MudIcon>
-                                        </div>
-                                    </div>
-                                    @for (int i = 0; i < resolutionRegister.Participants.Count; i++)
-                                    {
-                                        int index = i;
-                                        <div class="single-textfield-container">
-                                            <div class="field-container base-field input-group-2 @(() => resolutionRegister.Participants[index].Name)">
-                                                <MudTextField @bind-Value="@resolutionRegister.Participants[index].Name" Class="text-field-style"
-                                                      Label="Ingrese una observación"
-                                                      For="@(()=>resolutionRegister.Participants[index].Name)"></MudTextField>
-                                            </div>
-                                            <div class="base-icon" @onclick="@(() => removeParticipant(index))">
-                                                <MudIcon Icon="remove_circle_outline"></MudIcon>
-                                            </div>
-                                        </div>
-                                    }
-                                </div>
+                                <GenericMultipleTexts TextFields="resolutionRegister.Participants" TextFieldIcon="fa-eye" TextLabel="Participantes"></GenericMultipleTexts>
                             </MudItem>
                         </MudGrid>
                     </MudStep>
-                    <MudStep Text="Subir Anexo">
+                    <MudStep Title="Subir Anexo">
                         <MudGrid>
                             <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
                                 <DocumentAnnex Annexes="annexes"></DocumentAnnex>

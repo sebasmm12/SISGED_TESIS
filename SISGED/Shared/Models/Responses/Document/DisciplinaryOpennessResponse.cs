@@ -31,9 +31,9 @@ namespace SISGED.Shared.Models.Responses.Document
         public string Description { get; set; } = default!;
         public DateTime AudienceStartDate { get; set; } = default!;
         public DateTime AudienceEndDate { get; set; } = default!;
-        public List<Participant> Participants { get; set; } = new List<Participant>();
+        public List<string> Participants { get; set; } = default!;
         public string AudienceLocation { get; set; } = default!;
-        public List<Deed> ChargedDeeds { get; set; } = new List<Deed>();
+        public List<string> ChargedDeeds { get; set; } = default!;
         public string URL { get; set; } = default!;
     }
 

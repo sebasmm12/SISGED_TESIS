@@ -8,7 +8,6 @@ using SISGED.Shared.Models.Requests.Documents;
 using SISGED.Client.Services.Contracts;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Responses.Document;
-using Newtonsoft.Json;
 using SISGED.Shared.Validators;
 using SISGED.Shared.DTOs;
 using AutoMapper;
@@ -16,6 +15,7 @@ using SISGED.Client.Helpers;
 using MudExtensions;
 using MudExtensions.Utilities;
 using SISGED.Shared.Models.Responses.Solicitor;
+using System.Text.Json;
 
 namespace SISGED.Client.Components.Documents.Registers
 {
@@ -42,7 +42,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
 
         //Datos del formulario
-        private SolicitorDossierRequestRegisterDTO solicitorDossierRequestRegister = default!;
+        private SolicitorDossierRequestRegisterDTO solicitorDossierRequestRegister = new SolicitorDossierRequestRegisterDTO();
         private List<MediaRegisterDTO> annexes = new();
         private bool pageLoading = true;
         private string dossierId = default!;
@@ -149,7 +149,6 @@ namespace SISGED.Client.Components.Documents.Registers
             }
             catch (Exception)
             {
-
                 await swalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los tipos de solicitudes del sistema");
                 return new();
             }
@@ -157,16 +156,15 @@ namespace SISGED.Client.Components.Documents.Registers
 
         private async Task GetUserRequestInformationAsync()
         {
-            var userTray = WorkEnvironment.workPlaceItems.First(workItem => workItem.OriginPlace != "tools");
+                var userTray = WorkEnvironment.workPlaceItems.First(workItem => workItem.OriginPlace != "tools");
 
-            solicitorDossierRequestRegister.Client = userTray.Client;
+                var dossierTray = userTray.Value as DossierTrayResponse;
 
-            var dossierTray = userTray.Value as DossierTrayResponse;
+                var documentContent = JsonSerializer.Deserialize<ComplaintRequestContentDTO>(JsonSerializer.Serialize(dossierTray!.Document!.Content));
 
-            //var documentContent = JsonSerializer.Deserialize<InitialRequestContentDTO>(JsonSerializer.Serialize(dossierTray!.Document!.Content));
-
-            //solicitorDossierRequestRegister.Solicitor = await GetSolicitorAsync(documentContent!.SolicitorId);
-            dossierId = dossierTray!.DossierId;
+                //solicitorDossierRequestRegister.Solicitor = await GetSolicitorAsync(documentContent!.SolicitorId);
+                
+                dossierId = dossierTray!.DossierId;
         }
 
         private void GetSolicitorResponse(AutocompletedSolicitorResponse AutocompletedSolicitorResponse)
