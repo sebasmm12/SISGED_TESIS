@@ -204,7 +204,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
         private bool CheckRegisterAsync()
         {
-            if (requestStepper!.GetActiveIndex() != 2) return false;
+            if (requestStepper!.GetActiveIndex() != requestStepper!.Steps.Count - 1) return false;
 
             requestForm!.Validate().GetAwaiter().GetResult();
 
