@@ -54,6 +54,8 @@ namespace SISGED.Client.Components.Documents.Registers
         {
             await GetUserRequestInformationAsync();
 
+           prosecutors = await GetProsecutorInformationAsync();
+
             pageLoading = false;
 
         }
@@ -167,6 +169,27 @@ namespace SISGED.Client.Components.Documents.Registers
 
             //disciplinaryOpenness.Solicitor = await GetSolicitorAsync(documentContent!.SolicitorId);
             dossierId = dossierTray!.DossierId;
+        }
+
+        private async Task<List<ProsecutorUserInfoResponse>> GetProsecutorInformationAsync()
+        {
+            try
+            {
+                var solicitorResponse = await httpRepository.GetAsync<List<ProsecutorUserInfoResponse>>($"api/users/prosecutors");
+
+                if (solicitorResponse.Error)
+                {
+                    await swalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los fiscales del sistema");
+                }
+
+                return solicitorResponse.Response!;
+            }
+            catch (Exception)
+            {
+
+                await swalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los fiscales del sistema");
+                return new();
+            }
         }
 
         private void GetSolicitorResponse(AutocompletedSolicitorResponse AutocompletedSolicitorResponse)
