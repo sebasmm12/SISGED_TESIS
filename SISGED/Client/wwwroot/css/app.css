@@ -192,3 +192,7 @@ a, .btn-link {
 .register-content {
     width: 90%;
 }
+
+.text-end {
+    text-align: end !important;
+}

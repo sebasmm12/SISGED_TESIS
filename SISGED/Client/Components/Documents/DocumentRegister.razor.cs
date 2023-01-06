@@ -24,7 +24,7 @@ namespace SISGED.Client.Components.Documents
         protected override void OnInitialized()
         {
             // TODO: Implement logic to get the userRoles based on the authenticated user
-            userRole = Roles.Fiscal;
+            userRole = Roles.TramiteDocumentario;
 
             documentOptions = DocumentRepository.GetDocumentTypesWithDossier().Where(document => document.Rol == userRole);
         }

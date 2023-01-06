@@ -1,0 +1,8 @@
+﻿<MudBadge Icon="@badgePreview.Icon" Color="badgePreview.Color" Overlap="true" Bordered="true" 
+          OnClick="@(async() => await AddOrDeleteSolicitorDossierAsync())" BadgeClass="pointer badge-preview">
+    <MudPaper Elevation="5" class="text-center pa-2">
+        <MudIcon Class="@($"fas { SolicitorDossierVisalization.Icon } { SolicitorDossierVisalization.Color }")" Size="Size.Large"></MudIcon>
+        <MudText Typo="Typo.body1">@SolicitorDossier.DocumentName</MudText>
+    </MudPaper>
+</MudBadge>
+

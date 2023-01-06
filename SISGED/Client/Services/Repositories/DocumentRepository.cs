@@ -22,12 +22,12 @@ namespace SISGED.Client.Services.Repositories
                 new("Conclusión de Firma - Rechazo Notarial", "RechazoConclusionFirma", Roles.ArchivosExnotarios),
                 new("Pago de Entrega de Testimonio", "PagoTestimonio", Roles.ArchivosExnotarios),
                 new("Conclusión de Firma - Aprobación Notarial", "AprobacionConclusionFirma", Roles.ArchivosExnotarios),
-                new("Solicitud de Denuncia", "ComplaintRequest", Roles.MesaPartes), // Implemented by Sebastian
-                new("Aperturamiento Disciplinario", "DisciplinaryOpennessRequest", Roles.TribunalHonor), // Implemented by Fede
-                new("Solicitud de Expediente de Notario", "SolicitorDossierRequest", Roles.Fiscal), // Implemented by Fede
-                new("Entrega de Expediente de Notario", "EntregaExpedienteNotario", Roles.TramiteDocumentario), // To be implemented by Sebastian
-                new("Dictamen", "Dictum", Roles.Fiscal), //  To be implemented by Sebastian
-                new("Resolución", "Resolution", Roles.TribunalHonor), // Implemented by Fede
+                new("Solicitud de Denuncia", "ComplaintRequest", Roles.MesaPartes), 
+                new("Aperturamiento Disciplinario", "DisciplinaryOpennessRequest", Roles.TribunalHonor),
+                new("Solicitud de Expediente de Notario", "SolicitorDossierRequest", Roles.Fiscal), 
+                new("Entrega de Expediente de Notario", "SolicitorDossierShipment", Roles.TramiteDocumentario), // To be implemented by Sebastian
+                new("Dictamen", "Dictum", Roles.Fiscal), 
+                new("Resolución", "Resolution", Roles.TribunalHonor),
             };
         }
     }

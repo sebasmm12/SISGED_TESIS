@@ -18,7 +18,7 @@ namespace SISGED.Client.Shared
         private bool drawerOpen = false;
         private readonly string organizationMainPageUrl = "https://www.notarios.org.pe";
         private IJSObjectReference mainLayoutModule = default!;
-        private readonly string userName = "Elber";
+        private readonly string userName = "ale";
 
         private void ToogleDrawer()
         {

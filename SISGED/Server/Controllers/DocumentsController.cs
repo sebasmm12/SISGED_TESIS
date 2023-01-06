@@ -171,7 +171,6 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPost("complaint-requests")]
-        //public async Task<ActionResult<ExpedienteBandejaDTO>> RegistrarDocumentoSolicitudDenuncia(ExpedienteWrapper expedientewrapper)
         public async Task<ActionResult<ComplaintRequest>> ComplaintRequestDocumentRegister(DossierWrapper dossierWrapper)
         {
             try
@@ -373,13 +372,13 @@ namespace SISGED.Server.Controllers
             {
                 var document = DeserializeDocument<DictumResponse>(dossierWrapper.Document);
 
-                //var user = await GetUserAsync("userId");
-                var user = await _userService.GetUserByIdAsync("5f0ac7598ea569d19fe57a3e");
+                var user = await GetUserAsync("userId");
+                //var user = await _userService.GetUserByIdAsync("5f0ac7598ea569d19fe57a3e");
 
                 var dictum = await RegisterDictumAsync(document, user);
 
                 var dossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia", "En proceso",
-                    new(5, dictum.Id, "Dictamen", DateTime.UtcNow.AddHours(-5).AddDays(5))));
+                    new(6, dictum.Id, "Dictamen", DateTime.UtcNow.AddHours(-5).AddDays(5))));
 
                 await RegisterOutPutTrayAsync(dictum, user, dossier);
 
@@ -451,27 +450,31 @@ namespace SISGED.Server.Controllers
             }
         }
 
-        [HttpPost("documentoEntregaExpedienteNotario")]
-        public async Task<ActionResult<SolicitorDossierShipment>> RegistrarDocumentoEntregaExpedienteNotario(DossierWrapper dossierWrapper)
+        [HttpPost("solicitor-dossier-shipments")]
+        public async Task<ActionResult<SolicitorDossierShipment>> RegisterSolicitorDossierShipmentAsync(DossierWrapper dossierWrapper)
         {
-            //Deserealizacion de objeto de tipo C
-            SolicitorDossierShipmentResponse DTO = new SolicitorDossierShipmentResponse();
-            var json = JsonConvert.SerializeObject(dossierWrapper.Document);
-            DTO = JsonConvert.DeserializeObject<SolicitorDossierShipmentResponse>(json)!;
-
-            List<string> url2 = new List<string>();
-            string urlData2 = "";
-            foreach (string u in DTO.Content.URLAnnex)
+            try
             {
-                if (!string.IsNullOrWhiteSpace(u))
-                {
-                    var solicitudBytes2 = Convert.FromBase64String(u);
-                    FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "entregaexpedientenotario");
-                    urlData2 = await _fileService.SaveFileAsync(file) ?? string.Empty;
-                    url2.Add(urlData2);
-                }
+                var document = DeserializeDocument<SolicitorDossierShipmentResponse>(dossierWrapper.Document);
+
+                //var user = await GetUserAsync("userId");
+                var user = await _userService.GetUserByIdAsync("5f100d53de645e30f4bf2ef0");
+
+                var solicitorDossierShipment = await RegisterSolicitorDossierShipmentAsync(document, user);
+
+                var dossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia", "En proceso",
+                        new(5, solicitorDossierShipment.Id, "EntregaExpedienteNotario", DateTime.UtcNow.AddHours(-5).AddDays(5))));
+
+                await RegisterOutPutTrayAsync(solicitorDossierShipment, user, dossier);
+
+                return Ok(solicitorDossierShipment);
             }
-            return await _documentService.SolicitorDossierShipmentRegisterAsync(DTO, dossierWrapper, url2);
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+            
         }
 
         #endregion
@@ -1134,6 +1137,17 @@ namespace SISGED.Server.Controllers
             dictum.AddProcess(new Process(user.Id, user.Id, "registrado"));
             
             return await _documentService.RegisterDictumAsync(dictum);
+        }
+
+        private async Task<SolicitorDossierShipment> RegisterSolicitorDossierShipmentAsync(SolicitorDossierShipmentResponse document, User user)
+        {
+            var urls = await _mediaService.SaveFilesAsync(document.URLAnnex, _containerName);
+
+            var solicitorDossierShipmentContent = _mapper.Map<SolicitorDossierShipmentContent>(document.Content);
+            var solicitorDossierShipment = new SolicitorDossierShipment(solicitorDossierShipmentContent, "registrado", urls.ToList());
+            solicitorDossierShipment.AddProcess(new Process(user.Id, user.Id, "registrado"));
+
+            return await _documentService.RegisterSolicitorDossierShipmentAsync(solicitorDossierShipment);
         }
 
         private async Task<Dossier> RegisterInitialDossierAsync(InitialRequestResponse document, InitialRequest initialRequest)

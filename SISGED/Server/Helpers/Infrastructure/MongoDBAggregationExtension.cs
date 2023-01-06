@@ -123,6 +123,11 @@ namespace SISGED.Server.Helpers.Infrastructure
             return new BsonDocument("$in", new BsonArray().Add(value).Add(values));
         }
 
+        public static BsonDocument In<T>(IEnumerable<T> values)
+        {
+            return new BsonDocument("$in", new BsonArray().AddRange(values));
+        }
+
         public static BsonDocument NotIn(IEnumerable<BsonValue> valuesToExclude)
         {
             return new BsonDocument("$nin", new BsonArray().AddRange(valuesToExclude));
@@ -190,6 +195,21 @@ namespace SISGED.Server.Helpers.Infrastructure
         public static BsonDocument UnSet(BsonValue bsonElement)
         {
             return new BsonDocument("$unset", bsonElement);
+        }
+
+        public static BsonDocument Year(BsonValue date)
+        {
+            return new BsonDocument("$year", date);
+        }
+
+        public static BsonDocument AddToSet(BsonValue value)
+        {
+            return new BsonDocument("$addToSet", value);
+        }
+
+        public static BsonDocument Count(BsonValue value)
+        {
+            return new BsonDocument("$count", value);
         }
     }
 }

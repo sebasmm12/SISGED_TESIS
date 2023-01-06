@@ -1,0 +1,51 @@
+﻿@if(pageLoading) {
+    <GenericToolLoader Body="Cargando los elementos para el registro de la entrega del expediente del notario, por favor espere..."></GenericToolLoader>
+}
+else {
+    <MudCard Elevation="0">
+        <MudForm @ref="solicitorDossierShipmentForm" ValidationDelay="0" Model="solicitorDossierShipment" Validation="@(SolicitorDossierShipmentValidator.ValidateValue)">
+            <MudCardContent>
+                <MudStepper @ref="solicitorDossierShipmentStepper" LocalizedStrings="GetRegisterLocalizedStrings()"
+                    Color="Color.Secondary" Variant="Variant.Filled" HeaderTextView="HeaderTextView.NewLine"
+                    PreventStepChange="@(() => CheckSolicitorDossierShipmentRegisterAsync())">
+                    <MudStep Title="Datos personales">
+                        <MudGrid>
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                                <MudTextField @bind-Value="solicitorDossierShipment.Title" Label="Título" Variant="Variant.Outlined"
+                                          Adornment="Adornment.End" AdornmentIcon="fas fa-pencil" AdornmentColor="Color.Primary" Immediate="true"
+                                          For="@(() => solicitorDossierShipment.Title)"></MudTextField>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                                <MudTextField Value="@($"{ solicitorDossierShipment.Solicitor.Name } { solicitorDossierShipment.Solicitor.LastName }")" Label="Notario asociado" Variant="Variant.Outlined"
+                                          Adornment="Adornment.End" AdornmentIcon="fas fa-user" AdornmentColor="Color.Primary" ReadOnly="true"></MudTextField>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <MudTextField Value="solicitorDossierShipment.Solicitor.Address" Label="Dirección del notario" Variant="Variant.Outlined"
+                                          Adornment="Adornment.End" AdornmentColor="Color.Primary" AdornmentIcon="fas fa-location-dot" ReadOnly="true"></MudTextField>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <MudTextField @bind-Value="solicitorDossierShipment.Description" Label="Conclusión" Variant="Variant.Outlined"
+                                          Lines="3" Immediate="true" For="@(() => solicitorDossierShipment.Description)"></MudTextField>
+                            </MudItem>
+                        </MudGrid>
+                    </MudStep>
+                    <MudStep Title="Expedientes">
+                        <MudGrid>
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <SolicitorDossiersList Years="years" SolicitorId="@solicitorDossierShipment.Solicitor.Id" PageSize="4"
+                                    SelectedSolicitorDossierIds="solicitorDossierShipment.SolicitorDossiers"></SolicitorDossiersList>
+                            </MudItem>
+                        </MudGrid>
+                    </MudStep>
+                    <MudStep Title="Anexos">
+                    <MudGrid>
+                        <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                            <DocumentAnnex Annexes="annexes" AnnexesHeight="280px"></DocumentAnnex>
+                        </MudItem>
+                        </MudGrid>
+                    </MudStep>
+                </MudStepper>
+            </MudCardContent>
+        </MudForm>
+    </MudCard>
+}

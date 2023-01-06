@@ -1,0 +1,47 @@
+﻿<MudGrid>
+    <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+        <MudSelect T="int" AdornmentIcon="fas fa-calendar" AdornmentColor="Color.Primary"
+            Label="Años del Expediente" Dense="true" Variant="Variant.Outlined" MultiSelection="true" SelectAll="true"
+            SelectAllText="Seleccionar todo"
+            @bind-SelectedValues="selectedYears">
+            @foreach(int year in Years)
+            {
+                <MudSelectItem T="int" Value="@year">@year</MudSelectItem>
+            }
+        </MudSelect>
+    </MudItem>
+    <MudItem xs="12" sm="12" md="12" lg="12" xl="12" Class="text-end">
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(() => SearchSolicitorDossiersAsync())">
+            @if (solicitorDossierSearchLoading)
+            {
+                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"></MudProgressCircular>
+                <MudText Class="ms-2">Procesando</MudText>
+            }
+            else
+            {
+                <MudText>Buscar</MudText>
+            }
+        </MudButton>
+    </MudItem>
+    <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+        @if (solicitorDossiersLoading)
+        {
+            <GenericToolLoader Body="Buscando los expedientes del notario..."></GenericToolLoader>
+        }
+        else
+        {
+            <MudGrid>
+                @foreach (var solicitorDossier in paginatedSolicitorDosiers.SolicitorDossiers)
+                {
+                     <MudItem xs="12" sm="6" md="4" lg="3" xl="12">
+                        <SolicitorDossierVisualization SolicitorDossier="solicitorDossier" SolicitorDossierVisalization="GetSolicitorDossierPreview(solicitorDossier.Url)"
+                        AddOrDeleteSolicitorDossier="AddOrDeleteSolicitorDossier" Selected="IsSelected(solicitorDossier.Id)" @key="solicitorDossier"></SolicitorDossierVisualization>
+                    </MudItem>
+                }
+            </MudGrid>
+            <div class="text-end mt-6">
+                <MudPagination Count="TotalSolicitorDossiers" MiddleCount="5" SelectedChanged="ChangePage" Class="pa-3" />
+            </div>
+        }
+    </MudItem>
+</MudGrid>

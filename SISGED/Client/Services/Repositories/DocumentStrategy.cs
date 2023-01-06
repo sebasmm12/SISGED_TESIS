@@ -13,7 +13,8 @@ namespace SISGED.Client.Services.Repositories
             new ComplaintRequestDocument(),
             new DisciplinaryOpennessRequestDocument(),
             new SolicitorDossierRequestDocument(),
-            new DictumDocument()
+            new DictumDocument(),
+            new SolicitorDossierShipmentDocument()
         };
 
         public IDocumentRender GetDocument(string documentType)
