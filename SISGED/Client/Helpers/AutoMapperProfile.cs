@@ -30,8 +30,11 @@ namespace SISGED.Client.Helpers
 
             // Disciplinary Openness Mapper
             CreateMap<DisciplinaryOpennessRegisterDTO, DisciplinaryOpennessResponseContent>()
-                .ForMember(complaintRequest => complaintRequest.SolicitorId, options => options.MapFrom(complaintRequestRegister => complaintRequestRegister.Solicitor.Id));
-            
+                .ForMember(disciplinaryOpenness => disciplinaryOpenness.SolicitorId, options => options.MapFrom(disciplinaryRegister => disciplinaryRegister.Solicitor.Id))
+                .ForMember(disciplinaryOpenness => disciplinaryOpenness.Participants, options => options.MapFrom(disciplinaryRegister => disciplinaryRegister.Participants.Select(participant => participant.Description).ToList()))
+                .ForMember(disciplinaryOpenness => disciplinaryOpenness.ChargedDeeds, options => options.MapFrom(disciplinaryRegister => disciplinaryRegister.ChargedDeeds.Select(participant => participant.Description).ToList()));
+
+
             // Solicitor Dossier Request Mapper
             CreateMap<SolicitorDossierRequestRegisterDTO, SolicitorDossierRequestResponseContent>()
                 .ForMember(complaintRequest => complaintRequest.SolicitorId, options => options.MapFrom(complaintRequestRegister => complaintRequestRegister.Solicitor.Id));
@@ -44,7 +47,8 @@ namespace SISGED.Client.Helpers
                 .ForMember(dictumContent => dictumContent.Recomendations, options => options.MapFrom(dictumRegister => dictumRegister.Recommendations.Select(recommendation => recommendation.Description).ToList()));
 
             // Resolution Request Mapper
-            CreateMap<ResolutionRegisterDTO, ResolutionResponseContent>();
+            CreateMap<ResolutionRegisterDTO, ResolutionResponseContent>()
+                .ForMember(resolutionContent => resolutionContent.Participants, options => options.MapFrom(resolutionRegister => resolutionRegister.Participants.Select(participant => participant.Description).ToList()));
 
             // Solicitor Dossier Shipment
             CreateMap<SolicitorDossierShipmentRegisterDTO, SolicitorDossierShipmentResponseContent>()

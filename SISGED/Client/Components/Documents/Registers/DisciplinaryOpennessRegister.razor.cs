@@ -52,35 +52,12 @@ namespace SISGED.Client.Components.Documents.Registers
 
         protected override async Task OnInitializedAsync()
         {
-            disciplinaryOpennessRegister.Participants = new List<Participant>() { new Participant() { Index = 0, Name = "" } };
-            disciplinaryOpennessRegister.ChargedDeeds = new List<Deed>() { new Deed() { Index = 0, Description = "" } };
-
             await GetUserRequestInformationAsync();
+
+           prosecutors = await GetProsecutorInformationAsync();
 
             pageLoading = false;
 
-        }
-
-        private void addParticipant()
-        {
-            disciplinaryOpennessRegister.Participants.Add(new Participant() { Index = (disciplinaryOpennessRegister.Participants.Count) });
-            StateHasChanged();
-        }
-
-        private void removeParticipant(int index)
-        {
-            disciplinaryOpennessRegister.Participants.RemoveAt(index);
-            StateHasChanged();
-        }
-        private void addDeed()
-        {
-            disciplinaryOpennessRegister.ChargedDeeds.Add(new Deed() { Index = (disciplinaryOpennessRegister.ChargedDeeds.Count) });
-            StateHasChanged();
-        }
-        private void removeDeed(int index)
-        {
-            disciplinaryOpennessRegister.ChargedDeeds.RemoveAt(index);
-            StateHasChanged();
         }
 
         private DossierWrapper GetDocumentRegister()
@@ -194,6 +171,27 @@ namespace SISGED.Client.Components.Documents.Registers
             dossierId = dossierTray!.DossierId;
         }
 
+        private async Task<List<ProsecutorUserInfoResponse>> GetProsecutorInformationAsync()
+        {
+            try
+            {
+                var solicitorResponse = await httpRepository.GetAsync<List<ProsecutorUserInfoResponse>>($"api/users/prosecutors");
+
+                if (solicitorResponse.Error)
+                {
+                    await swalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los fiscales del sistema");
+                }
+
+                return solicitorResponse.Response!;
+            }
+            catch (Exception)
+            {
+
+                await swalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los fiscales del sistema");
+                return new();
+            }
+        }
+
         private void GetSolicitorResponse(AutocompletedSolicitorResponse AutocompletedSolicitorResponse)
         {
             disciplinaryOpennessRegister.Solicitor = AutocompletedSolicitorResponse;
@@ -206,7 +204,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
         private bool CheckRegisterAsync()
         {
-            if (requestStepper!.GetActiveIndex() != 2) return false;
+            if (requestStepper!.GetActiveIndex() != requestStepper!.Steps.Count - 1) return false;
 
             requestForm!.Validate().GetAwaiter().GetResult();
 

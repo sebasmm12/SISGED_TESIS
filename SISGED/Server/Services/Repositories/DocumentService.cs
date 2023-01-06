@@ -786,18 +786,11 @@ namespace SISGED.Server.Services.Repositories
             DTO = JsonConvert.DeserializeObject<DisciplinaryOpennessResponse>(json)!;
 
             //Listas de participantes a string
-            List<String> participantsList = new List<string>();
-            foreach (Participant part in DTO.Content.Participants)
-            {
-                participantsList.Add(part.Name);
-            }
+            List<String> participantsList = DTO.Content.Participants;
+
 
             //Listas de hechos a string
-            List<String> chargedDeedsList = new List<string>();
-            foreach (Deed part in DTO.Content.ChargedDeeds)
-            {
-                chargedDeedsList.Add(part.Description);
-            }
+            List<String> chargedDeedsList = DTO.Content.ChargedDeeds;
 
             //Creacion de Obj y registro en coleccion de documentos
             DisciplinaryOpennessContent content = new DisciplinaryOpennessContent()
@@ -957,11 +950,7 @@ namespace SISGED.Server.Services.Repositories
             DTO = JsonConvert.DeserializeObject<ResolutionResponse>(json)!;
 
             //Listas de participantes a string
-            List<String> listaParticipantes = new List<string>();
-            foreach (Participant part in DTO.Content.Participants)
-            {
-                listaParticipantes.Add(part.Name);
-            }
+            List<String> listaParticipantes = DTO.Content.Participants;
 
             //Creacion de Obj y registro en coleccion de documentos 
             ResolutionContent content = new ResolutionContent()

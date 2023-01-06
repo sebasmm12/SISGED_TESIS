@@ -15,6 +15,8 @@ namespace SISGED.Client.Services.Repositories
             new SolicitorDossierRequestDocument(),
             new DictumDocument(),
             new SolicitorDossierShipmentDocument()
+            new DictumDocument(),
+            new ResolutionDocument()
         };
 
         public IDocumentRender GetDocument(string documentType)

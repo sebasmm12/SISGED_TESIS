@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using SISGED.Client.Components.Documents.Registers;
 using SISGED.Client.Services.Contracts;
 
 namespace SISGED.Client.Services.Repositories
@@ -8,7 +9,7 @@ namespace SISGED.Client.Services.Repositories
         public string DocumentType { get; set; } = "SolicitorDossierRequest";
         public RenderFragment RenderFragment { get; set; } = builder =>
         {
-            builder.OpenComponent(0, typeof(SolicitorDossierRequestDocument));
+            builder.OpenComponent(0, typeof(SolicitorDossierRequestRegister));
             builder.CloseComponent();
         };
     }

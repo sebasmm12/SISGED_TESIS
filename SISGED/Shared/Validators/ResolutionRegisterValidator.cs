@@ -30,10 +30,12 @@ namespace SISGED.Shared.Validators
                 .WithMessage("Debe ingresar los participantes de la resolución");
 
             RuleFor(x => x.AudienceStartDate)
+                .NotNull()
                 .NotEmpty()
                 .WithMessage("Debe ingresar la fecha de inicio de audiencia");
 
             RuleFor(x => x.AudienceEndDate)
+                .NotNull()
                 .NotEmpty()
                 .WithMessage("Debe ingresar la fecha de fin de audiencia");
         }

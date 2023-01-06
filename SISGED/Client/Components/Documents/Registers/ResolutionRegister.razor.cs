@@ -71,22 +71,9 @@ namespace SISGED.Client.Components.Documents.Registers
 
         protected override async Task OnInitializedAsync()
         {
-            resolutionRegister.Participants = new List<Participant>() { new Participant() { Index = 0, Name = "" } };
             await GetUserRequestInformationAsync();
 
             pageLoading = false;
-        }
-
-        private void addParticipant()
-        {
-            resolutionRegister.Participants.Add(new Participant() { Index = (resolutionRegister.Participants.Count) });
-            StateHasChanged();
-        }
-
-        private void removeParticipant(int index)
-        {
-            resolutionRegister.Participants.RemoveAt(index);
-            StateHasChanged();
         }
 
         private DossierWrapper GetDocumentRegister()
@@ -149,7 +136,7 @@ namespace SISGED.Client.Components.Documents.Registers
         {
             try
             {
-                var resolutionResponse = await httpRepository.PostAsync<DossierWrapper, Resolution>("api/documents/resolution", documentRegister);
+                var resolutionResponse = await httpRepository.PostAsync<DossierWrapper, Resolution>("api/documents/resolutions", documentRegister);
 
                 if (resolutionResponse.Error)
                 {
@@ -189,7 +176,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
         private bool CheckRegisterAsync()
         {
-            if (requestStepper!.GetActiveIndex() != 2) return false;
+            if (requestStepper!.GetActiveIndex() != requestStepper!.Steps.Count - 1) return false;
 
             requestForm!.Validate().GetAwaiter().GetResult();
 

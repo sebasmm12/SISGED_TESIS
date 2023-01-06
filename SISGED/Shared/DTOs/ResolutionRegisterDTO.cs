@@ -11,9 +11,9 @@ namespace SISGED.Shared.DTOs
     {
         public string Title { get; set; } = default!;
         public string Description { get; set; } = default!;
-        public DateTime AudienceStartDate { get; set; } = default!;
-        public DateTime AudienceEndDate { get; set; } = default!;
-        public List<Participant> Participants { get; set; } = new List<Participant>();
+        public DateTime? AudienceStartDate { get; set; } = default!;
+        public DateTime? AudienceEndDate { get; set; } = default!;
+        public List<TextFieldDTO> Participants { get; set; } =  new() { new(string.Empty, 0) };
         public string Penalty { get; set; } = default!;
     }
 }
