@@ -192,6 +192,11 @@ namespace SISGED.Client.Components.Documents.Registers
             dossierId = dossierTray!.DossierId;
         }
 
+        private void GetSolicitorResponse(AutocompletedSolicitorResponse AutocompletedSolicitorResponse)
+        {
+            resolutionRegister.Solicitor = AutocompletedSolicitorResponse;
+        }
+
         private async Task<AutocompletedSolicitorResponse> GetSolicitorAsync(string solicitorId)
         {
             try

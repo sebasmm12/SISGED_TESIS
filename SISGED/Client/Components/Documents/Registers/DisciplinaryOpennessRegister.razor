@@ -52,6 +52,11 @@ else
                             </MudItem>
 
                             <MudItem xs="12" sm="12" md="7" lg="7" xl="12">
+                                <MudTextField Value="disciplinaryOpennessRegister.Solicitor.Address" Label="Dirección" Variant="Variant.Outlined"
+                                          Adornment="Adornment.End" AdornmentColor="Color.Primary" AdornmentIcon="fas fa-location-dot" ReadOnly="true"></MudTextField>
+                            </MudItem>
+
+                            <MudItem xs="12" sm="12" md="7" lg="7" xl="12">
                                 <MudSelect @bind-Value="@disciplinaryOpennessRegister.ProsecutorId" Class="text-field-style" Label="Seleccione un Fiscal" For="@(()=>disciplinaryOpennessRegister.ProsecutorId)" Clearable="true"
                                        Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary" Variant="Variant.Outlined">
                                     @foreach (ProsecutorUserInfoResponse prosecutor in prosecutors)

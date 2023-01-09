@@ -29,6 +29,20 @@ else
                                 </MudSelect>
                             </MudItem>
 
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                                <MudTextField Value="resolutionRegister.Client.GetShortName()" Label="Nombre del Denunciante" Variant="Variant.Outlined"
+                                          Adornment="Adornment.End" AdornmentIcon="fas fa-user" AdornmentColor="Color.Primary" ReadOnly="true"></MudTextField>
+                            </MudItem>
+
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                                <GenericSolicitorAutocomplete Solicitor="resolutionRegister.Solicitor" SolicitorResponse="GetSolicitorResponse"></GenericSolicitorAutocomplete>
+                            </MudItem>
+
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <MudTextField Value="resolutionRegister.Solicitor.Address" Label="Dirección" Variant="Variant.Outlined"
+                                          Adornment="Adornment.End" AdornmentColor="Color.Primary" AdornmentIcon="fas fa-location-dot" ReadOnly="true"></MudTextField>
+                            </MudItem>
+
                             <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
                                 <MudTextField @bind-Value="@resolutionRegister.Description" Class="text-field-style" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"
                                           Label="Descripcion" For="@(()=>resolutionRegister.Description)"></MudTextField>
