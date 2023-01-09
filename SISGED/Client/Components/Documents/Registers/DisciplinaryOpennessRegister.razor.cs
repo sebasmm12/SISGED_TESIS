@@ -165,10 +165,11 @@ namespace SISGED.Client.Components.Documents.Registers
 
             var dossierTray = userTray.Value as DossierTrayResponse;
 
-            //var documentContent = JsonSerializer.Deserialize<InitialRequestContentDTO>(JsonSerializer.Serialize(dossierTray!.Document!.Content));
+            var documentContent = JsonSerializer.Deserialize<InitialRequestContentDTO>(JsonSerializer.Serialize(dossierTray!.Document!.Content)); //ComplaintRequestContentDTO
 
-            //disciplinaryOpenness.Solicitor = await GetSolicitorAsync(documentContent!.SolicitorId);
+            disciplinaryOpennessRegister.Solicitor = await GetSolicitorAsync(documentContent!.SolicitorId);
             dossierId = dossierTray!.DossierId;
+            disciplinaryOpennessRegister.Complainant = disciplinaryOpennessRegister.Client.Name;
         }
 
         private async Task<List<ProsecutorUserInfoResponse>> GetProsecutorInformationAsync()

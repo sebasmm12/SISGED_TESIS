@@ -23,5 +23,6 @@ namespace SISGED.Shared.Models.Responses.Dossier
         public string Description { get; set; } = default!;
         public DateTime DateIssue { get; set; } = default!;
         public string SolicitorId { get; set; } = default!;
+        public string ClientId { get; set; } = default!;
     }
 }

@@ -27,7 +27,7 @@ else
 
                             <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
                                 <MudTextField @bind-Value="@disciplinaryOpennessRegister.Description" Class="text-field-style"
-                                          Label="Description del aperturamiento" For="@(()=>disciplinaryOpennessRegister.Description)" Variant="Variant.Outlined"
+                                          Label="Descripción del aperturamiento" For="@(()=>disciplinaryOpennessRegister.Description)" Variant="Variant.Outlined"
                                           Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"></MudTextField>
                             </MudItem>
 
@@ -52,7 +52,8 @@ else
                             </MudItem>
 
                             <MudItem xs="12" sm="12" md="7" lg="7" xl="12">
-                                <MudSelect @bind-Value="@disciplinaryOpennessRegister.ProsecutorId" Label="Seleccione un Fiscal" class="text-field-style custom-select" For="@(()=>disciplinaryOpennessRegister.ProsecutorId)" Clearable="true">
+                                <MudSelect @bind-Value="@disciplinaryOpennessRegister.ProsecutorId" Class="text-field-style" Label="Seleccione un Fiscal" For="@(()=>disciplinaryOpennessRegister.ProsecutorId)" Clearable="true"
+                                       Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary" Variant="Variant.Outlined">
                                     @foreach (ProsecutorUserInfoResponse prosecutor in prosecutors)
                                     {
                                         <MudSelectItem Value="@prosecutor.Id">@prosecutor.Name @prosecutor.LastName</MudSelectItem>

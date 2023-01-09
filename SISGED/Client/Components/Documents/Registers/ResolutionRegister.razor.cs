@@ -27,7 +27,6 @@ using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.Account;
 using SISGED.Shared.Models.Requests.Documents;
-using Newtonsoft.Json;
 using SISGED.Shared.Validators;
 using SISGED.Shared.DTOs;
 using AutoMapper;
@@ -35,6 +34,9 @@ using MudExtensions;
 using MudExtensions.Utilities;
 using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.Solicitor;
+using SISGED.Shared.Models.Responses.DocumentType;
+using SISGED.Client.Services.Repositories;
+using System.Text.Json;
 
 namespace SISGED.Client.Components.Documents.Registers
 {
@@ -61,7 +63,8 @@ namespace SISGED.Client.Components.Documents.Registers
 
         //Datos del formulario
         private ResolutionRegisterDTO resolutionRegister = new ResolutionRegisterDTO();
-        
+        private IEnumerable<DocumentTypeInfoResponse> documentTypes = default!;
+
         private List<MediaRegisterDTO> annexes = new();
         List<string> names = new List<string>();
         private bool pageLoading = true;
@@ -71,6 +74,8 @@ namespace SISGED.Client.Components.Documents.Registers
 
         protected override async Task OnInitializedAsync()
         {
+            documentTypes = await GetDocumentTypesAsync();
+
             await GetUserRequestInformationAsync();
 
             pageLoading = false;
@@ -153,20 +158,59 @@ namespace SISGED.Client.Components.Documents.Registers
             }
         }
 
+        private async Task<IEnumerable<DocumentTypeInfoResponse>> GetDocumentTypesAsync()
+        {
+            try
+            {
+                var documentTypesResponse = await httpRepository.GetAsync<IEnumerable<DocumentTypeInfoResponse>>("api/documentTypes/sancion");
 
+                if (documentTypesResponse.Error)
+                {
+                    await swalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los tipos de sanciones del sistema");
+                }
+
+                return documentTypesResponse.Response!;
+            }
+            catch (Exception)
+            {
+                await swalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los tipos de sanciones del sistema");
+                return new List<DocumentTypeInfoResponse>();
+            }
+        }
 
         private async Task GetUserRequestInformationAsync()
         {
             var userTray = WorkEnvironment.workPlaceItems.First(workItem => workItem.OriginPlace != "tools");
 
-            //resolutionRegister.Client = userTray.Client;
+            resolutionRegister.Client = userTray.Client;
 
             var dossierTray = userTray.Value as DossierTrayResponse;
 
-            //var documentContent = JsonSerializer.Deserialize<InitialRequestContentDTO>(JsonSerializer.Serialize(dossierTray!.Document!.Content));
+            var documentContent = JsonSerializer.Deserialize<InitialRequestContentDTO>(JsonSerializer.Serialize(dossierTray!.Document!.Content));
 
-            //resolutionRegister.Solicitor = await GetSolicitorAsync(documentContent!.SolicitorId);
+            resolutionRegister.Solicitor = await GetSolicitorAsync(documentContent!.SolicitorId);
             dossierId = dossierTray!.DossierId;
+        }
+
+        private async Task<AutocompletedSolicitorResponse> GetSolicitorAsync(string solicitorId)
+        {
+            try
+            {
+                var solicitorResponse = await httpRepository.GetAsync<AutocompletedSolicitorResponse>($"api/solicitors/{solicitorId}");
+
+                if (solicitorResponse.Error)
+                {
+                    await swalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los tipos de solicitudes del sistema");
+                }
+
+                return solicitorResponse.Response!;
+            }
+            catch (Exception)
+            {
+
+                await swalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los tipos de solicitudes del sistema");
+                return new();
+            }
         }
 
         private static StepperLocalizedStrings GetRegisterLocalizedStrings()

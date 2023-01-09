@@ -320,6 +320,8 @@ namespace SISGED.Shared.Entities
         public string Sign { get; set; } = default!;
         [BsonElement("urlGenerado")]
         public string GeneratedUrl { get; set; } = default!;
+        [BsonElement("iddenunciante")]
+        public string ClientId { get; set; } = default!;
     }
 
     [BsonDiscriminator("AperturamientoDisciplinario")]
@@ -358,6 +360,8 @@ namespace SISGED.Shared.Entities
         public string Sign { get; set; } = default!;
         [BsonElement("urlGenerado")]
         public string GeneratedUrl { get; set; } = default!;
+        [BsonElement("iddenunciante")]
+        public string ClientId { get; set; } = default!;
     }
 
     [BsonDiscriminator("SolicitudExpedienteNotario")]
@@ -444,6 +448,10 @@ namespace SISGED.Shared.Entities
         public string Sign { get; set; } = default!;
         [BsonElement("urlGenerado")]
         public string GeneratedUrl { get; set; } = default!;
+        [BsonElement("iddenunciante")]
+        public string ClientId { get; set; } = default!;
+        [BsonElement("idnotario")]
+        public string SolicitorId { get; set; } = default!;
     }
 
     [BsonDiscriminator("Resolucion")]

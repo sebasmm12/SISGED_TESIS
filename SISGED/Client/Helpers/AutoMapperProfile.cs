@@ -31,13 +31,15 @@ namespace SISGED.Client.Helpers
             // Disciplinary Openness Mapper
             CreateMap<DisciplinaryOpennessRegisterDTO, DisciplinaryOpennessResponseContent>()
                 .ForMember(disciplinaryOpenness => disciplinaryOpenness.SolicitorId, options => options.MapFrom(disciplinaryRegister => disciplinaryRegister.Solicitor.Id))
+                .ForMember(disciplinaryOpenness => disciplinaryOpenness.ClientId, options => options.MapFrom(disciplinaryRegister => disciplinaryRegister.Client.ClientId))
                 .ForMember(disciplinaryOpenness => disciplinaryOpenness.Participants, options => options.MapFrom(disciplinaryRegister => disciplinaryRegister.Participants.Select(participant => participant.Description).ToList()))
                 .ForMember(disciplinaryOpenness => disciplinaryOpenness.ChargedDeeds, options => options.MapFrom(disciplinaryRegister => disciplinaryRegister.ChargedDeeds.Select(participant => participant.Description).ToList()));
 
 
             // Solicitor Dossier Request Mapper
             CreateMap<SolicitorDossierRequestRegisterDTO, SolicitorDossierRequestResponseContent>()
-                .ForMember(complaintRequest => complaintRequest.SolicitorId, options => options.MapFrom(complaintRequestRegister => complaintRequestRegister.Solicitor.Id));
+                .ForMember(solicitorRequest => solicitorRequest.SolicitorId, options => options.MapFrom(solicitorRequestRegister => solicitorRequestRegister.Solicitor.Id))
+                .ForMember(solicitorRequest => solicitorRequest.ClientId, options => options.MapFrom(solicitorRequestRegister => solicitorRequestRegister.Client.ClientId));
 
             // Dictum Mapper
             CreateMap<DictumRegisterDTO, DictumResponseContent>()
@@ -48,7 +50,10 @@ namespace SISGED.Client.Helpers
 
             // Resolution Request Mapper
             CreateMap<ResolutionRegisterDTO, ResolutionResponseContent>()
-                .ForMember(resolutionContent => resolutionContent.Participants, options => options.MapFrom(resolutionRegister => resolutionRegister.Participants.Select(participant => participant.Description).ToList()));
+                .ForMember(resolutionContent => resolutionContent.Participants, options => options.MapFrom(resolutionRegister => resolutionRegister.Participants.Select(participant => participant.Description).ToList()))
+                .ForMember(resolutionContent => resolutionContent.Penalty, options => options.MapFrom(resolutionRegister => resolutionRegister.Penalty.Id))
+                .ForMember(resolutionContent => resolutionContent.SolicitorId, options => options.MapFrom(resolutionRegister => resolutionRegister.Solicitor.Id))
+                .ForMember(resolutionContent => resolutionContent.ClientId, options => options.MapFrom(resolutionRegister => resolutionRegister.Client.ClientId));
 
             CreateMap<DossierTrayResponse, Item>()
                 .ForMember(item => item.Name, options => options.MapFrom(dossierTray => dossierTray.Type))

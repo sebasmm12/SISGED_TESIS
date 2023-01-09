@@ -156,15 +156,16 @@ namespace SISGED.Client.Components.Documents.Registers
 
         private async Task GetUserRequestInformationAsync()
         {
-                var userTray = WorkEnvironment.workPlaceItems.First(workItem => workItem.OriginPlace != "tools");
+            var userTray = WorkEnvironment.workPlaceItems.First(workItem => workItem.OriginPlace != "tools");
 
-                var dossierTray = userTray.Value as DossierTrayResponse;
+            var dossierTray = userTray.Value as DossierTrayResponse;
 
-                var documentContent = JsonSerializer.Deserialize<ComplaintRequestContentDTO>(JsonSerializer.Serialize(dossierTray!.Document!.Content));
+            var documentContent = JsonSerializer.Deserialize<InitialRequestContentDTO>(JsonSerializer.Serialize(dossierTray!.Document!.Content));//ComplaintRequestContentDTO
 
-                //solicitorDossierRequestRegister.Solicitor = await GetSolicitorAsync(documentContent!.SolicitorId);
-                
-                dossierId = dossierTray!.DossierId;
+            solicitorDossierRequestRegister.Client = userTray.Client;
+            solicitorDossierRequestRegister.Solicitor = await GetSolicitorAsync(documentContent!.SolicitorId);
+
+            dossierId = dossierTray!.DossierId;
         }
 
         private void GetSolicitorResponse(AutocompletedSolicitorResponse AutocompletedSolicitorResponse)

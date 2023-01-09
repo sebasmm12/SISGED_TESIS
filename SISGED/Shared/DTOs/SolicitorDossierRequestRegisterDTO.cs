@@ -13,7 +13,7 @@ namespace SISGED.Shared.DTOs
     {
         public string Title { get; set; } = default!;
         public string Description { get; set; } = default!;
-        //public Client Client { get; set; } = = default!;
+        public Client Client { get; set; } = default!;
         public AutocompletedSolicitorResponse Solicitor { get; set; } = default!;
     }
 }

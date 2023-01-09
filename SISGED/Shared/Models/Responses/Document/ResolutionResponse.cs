@@ -33,5 +33,7 @@ namespace SISGED.Shared.Models.Responses.Document
         public List<string> Participants { get; set; } = default!;
         public string Penalty { get; set; } = default!;
         public string Data { get; set; } = default!;
+        public string SolicitorId { get; set; } = default!;
+        public string ClientId { get; set; } = default!;
     }
 }

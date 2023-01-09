@@ -14,7 +14,7 @@ else
                         <MudGrid>
                             <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
                                 <MudTextField @bind-Value="@solicitorDossierRequestRegister.Title" Class="text-field-style"
-                                          Label="Titulo del Oficio" For="@(()=>solicitorDossierRequestRegister.Title)"></MudTextField>
+                                          Label="Titulo del Oficio" For="@(()=>solicitorDossierRequestRegister.Title)" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"></MudTextField>
                             </MudItem>
 
                             <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
@@ -23,7 +23,7 @@ else
 
                             <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
 
-                                <MudTextField @bind-Value="@solicitorDossierRequestRegister.Description" Class="text-field-style"
+                                <MudTextField @bind-Value="@solicitorDossierRequestRegister.Description" Class="text-field-style" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"
                                           Label="Descripción de la solicitud" For="@(()=>solicitorDossierRequestRegister.Description)"></MudTextField>
                             </MudItem>
                         </MudGrid>

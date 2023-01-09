@@ -13,27 +13,33 @@ else
                     <MudStep Title="General">
                         <MudGrid>
                             <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
-                                <MudTextField @bind-Value="@resolutionRegister.Title" Class="text-field-style"
+                                <MudTextField @bind-Value="@resolutionRegister.Title" Class="text-field-style" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"
                                           Label="Titulo de la resolución" For="@(()=>resolutionRegister.Title)"></MudTextField>
                             </MudItem>
 
 
                             <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
-                                <MudTextField @bind-Value="@resolutionRegister.Penalty" Class="text-field-style"
-                                          Label="Sancion" For="@(()=>resolutionRegister.Penalty)"></MudTextField>
+                                <MudSelect T="DocumentTypeInfoResponse" AdornmentIcon="fas fa-file-lines" AdornmentColor="Color.Primary"
+                                       Label="Tipo de Solicitud" Dense="true" Variant="Variant.Outlined" Clearable="true" @bind-Value="resolutionRegister.Penalty"
+                                       For="@(() => resolutionRegister.Penalty)">
+                                    @foreach (var documentType in documentTypes)
+                                    {
+                                        <MudSelectItem Value="documentType"></MudSelectItem>
+                                    }
+                                </MudSelect>
                             </MudItem>
 
                             <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
-                                <MudTextField @bind-Value="@resolutionRegister.Description" Class="text-field-style"
+                                <MudTextField @bind-Value="@resolutionRegister.Description" Class="text-field-style" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"
                                           Label="Descripcion" For="@(()=>resolutionRegister.Description)"></MudTextField>
                             </MudItem>
 
                             <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
-                                <MudDatePicker Label="Fecha de Inicio" @bind-Date="@resolutionRegister.AudienceStartDate" For="@(()=>resolutionRegister.AudienceStartDate)" ></MudDatePicker>
+                                <MudDatePicker Label="Fecha de Inicio" @bind-Date="@resolutionRegister.AudienceStartDate" For="@(()=>resolutionRegister.AudienceStartDate)" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"></MudDatePicker>
                             </MudItem>
 
                             <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
-                                <MudDatePicker AllowInput=" false" Label="Fecha de Fin" @bind-Date="@resolutionRegister.AudienceEndDate" For="@(()=>resolutionRegister.AudienceEndDate)">
+                                <MudDatePicker AllowInput=" false" Label="Fecha de Fin" @bind-Date="@resolutionRegister.AudienceEndDate" For="@(()=>resolutionRegister.AudienceEndDate)" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary">
                                 </MudDatePicker>
                             </MudItem>
 
