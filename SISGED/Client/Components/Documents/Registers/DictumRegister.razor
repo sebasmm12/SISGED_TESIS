@@ -4,7 +4,7 @@
 }
 else {
     <MudCard Elevation="0">
-        <MudForm @ref="dictumForm" ValidationDelay="0" Model="dictum">
+        <MudForm @ref="dictumForm" ValidationDelay="0" Model="dictum" Validation="@(DictumValidator.ValidateValue)">
             <MudCardContent>
                 <MudStepper @ref="dictumStepper" LocalizedStrings="GetRegisterLocalizedStrings()"
                    Color="Color.Secondary" Variant="Variant.Filled" HeaderTextView="HeaderTextView.NewLine"
@@ -21,11 +21,11 @@ else {
                                           Adornment="Adornment.End" AdornmentIcon="fas fa-user" AdornmentColor="Color.Primary" ReadOnly="true"></MudTextField>
                             </MudItem>
                             <MudItem xs="12" sm="12" md="5" lg="5" xl="12">
-                                <MudTextField Value="@($"{ dictum.Solicitor.Name } { dictum.Solicitor.LastName }")" Label="Nombre del Cliente" Variant="Variant.Outlined"
+                                <MudTextField Value="@($"{ dictum.Solicitor.Name } { dictum.Solicitor.LastName }")" Label="Notario denunciado" Variant="Variant.Outlined"
                                           Adornment="Adornment.End" AdornmentIcon="fas fa-user" AdornmentColor="Color.Primary" ReadOnly="true"></MudTextField>
                             </MudItem>
                             <MudItem xs="12" sm="12" md="7" lg="7" xl="12">
-                                <MudTextField Value="dictum.Solicitor.Address" Label="Tipo de Documento" Variant="Variant.Outlined"
+                                <MudTextField Value="dictum.Solicitor.Address" Label="Dirección del notario" Variant="Variant.Outlined"
                                           Adornment="Adornment.End" AdornmentColor="Color.Primary" AdornmentIcon="fas fa-location-dot" ReadOnly="true"></MudTextField>
                             </MudItem>
                             <MudItem xs="12" sm="12" md="12" lg="12" xl="12">

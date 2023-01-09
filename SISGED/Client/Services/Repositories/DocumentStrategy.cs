@@ -14,6 +14,8 @@ namespace SISGED.Client.Services.Repositories
             new DisciplinaryOpennessRequestDocument(),
             new SolicitorDossierRequestDocument(),
             new DictumDocument(),
+            new SolicitorDossierShipmentDocument()
+            new DictumDocument(),
             new ResolutionDocument()
         };
 

@@ -55,6 +55,11 @@ namespace SISGED.Client.Helpers
                 .ForMember(resolutionContent => resolutionContent.SolicitorId, options => options.MapFrom(resolutionRegister => resolutionRegister.Solicitor.Id))
                 .ForMember(resolutionContent => resolutionContent.ClientId, options => options.MapFrom(resolutionRegister => resolutionRegister.Client.ClientId));
 
+            // Solicitor Dossier Shipment
+            CreateMap<SolicitorDossierShipmentRegisterDTO, SolicitorDossierShipmentResponseContent>()
+                .ForMember(solicitorDossierShipmentContent => solicitorDossierShipmentContent.SolicitorId, options => options.MapFrom(solicitorDossierShipmentRegister => solicitorDossierShipmentRegister.Solicitor.Id));
+                
+
             CreateMap<DossierTrayResponse, Item>()
                 .ForMember(item => item.Name, options => options.MapFrom(dossierTray => dossierTray.Type))
                 .ForMember(item => item.ItemStatus, options => options.MapFrom(dossierTray => dossierTray.Document!.State))

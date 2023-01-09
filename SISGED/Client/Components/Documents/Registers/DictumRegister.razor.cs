@@ -14,14 +14,13 @@ using SISGED.Shared.Models.Responses.Account;
 using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.DossierTray;
 using SISGED.Shared.Models.Responses.Solicitor;
+using SISGED.Shared.Validators;
 using System.Text.Json;
 
 namespace SISGED.Client.Components.Documents.Registers
 {
     public partial class DictumRegister
     {
-        [Inject]
-        private IJSRuntime JSRuntime { get; set; } = default!;
         [Inject]
         private IHttpRepository HttpRepository { get; set; } = default!;
         [Inject]
@@ -30,6 +29,8 @@ namespace SISGED.Client.Components.Documents.Registers
         public IMapper Mapper { get; set; } = default!;
         [Inject]
         public IDialogContentRepository DialogContentRepository { get; set; } = default!;
+        [Inject]
+        public DictumValidator DictumValidator { get; set; } = default!;
 
         [CascadingParameter(Name = "SessionAccount")]
         public SessionAccountResponse SessionAccount { get; set; } = default!;
@@ -116,7 +117,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
         private async Task<Dictum?> ShowLoadingDialogAsync(DossierWrapper documentRegister)
         {
-            string dialogTitle = $"Realizando el registro de su denuncia, por favor espere...";
+            string dialogTitle = $"Realizando el registro de su dictamen, por favor espere...";
 
             var dictumToRegister = () => RegisterDictumAsync(documentRegister);
 

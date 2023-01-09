@@ -652,48 +652,11 @@ namespace SISGED.Server.Services.Repositories
             return bPNResult;
         }
 
-        public async Task<SolicitorDossierShipment> SolicitorDossierShipmentRegisterAsync(SolicitorDossierShipmentResponse DTO, DossierWrapper dossierWrapper, List<string> url2)
+        public async Task<SolicitorDossierShipment> RegisterSolicitorDossierShipmentAsync(SolicitorDossierShipment solicitorDossierShipment)
         {
-            //Obtenemos los datos del expedientewrapper
-            var json = JsonConvert.SerializeObject(dossierWrapper.Document);
-            DTO = JsonConvert.DeserializeObject<SolicitorDossierShipmentResponse>(json)!;
-
-            //creacion del Objeto
-            SolicitorDossierShipmentContent content = new SolicitorDossierShipmentContent()
-            {
-                Title = DTO.Content.Title,
-                Description = DTO.Content.Description,
-                Solicitor = DTO.Content.SolicitorId.Id
-            };
-
-            SolicitorDossierShipment solicitorDossierShipment = new SolicitorDossierShipment()
-            {
-                Type = "EntregaExpedienteNotario",
-                Content = content,
-                ContentsHistory = new List<ContentVersion>(),
-                ProcessesHistory = new List<Process>(),
-                State = "creado",
-                AttachedUrls = url2
-            };
-
             await _documentsCollection.InsertOneAsync(solicitorDossierShipment);
 
-            //actualizacion de expediente
-            Dossier dossier = new Dossier();
-            DossierDocument dossierDocument = new DossierDocument();
-            dossierDocument.Index = 7;
-            dossierDocument.DocumentId = solicitorDossierShipment.Id;
-            dossierDocument.Type = "EntregaExpedienteNotario";
-            dossierDocument.CreationDate = DateTime.UtcNow.AddHours(-5);
-            dossierDocument.ExcessDate = DateTime.UtcNow.AddHours(-5).AddDays(5);
-            dossierDocument.DelayDate = null;
-            dossier = await UpdateDossierAsync(dossierDocument, dossierWrapper.Id);
-
-            //Actulizar el documento anterior a revisado
-            var filter = Builders<Document>.Filter.Eq("id", dossierWrapper.InputDocument);
-            var update = Builders<Document>.Update
-                .Set("estado", "revisado");
-            await _documentsCollection.UpdateOneAsync(filter, update);
+            if (solicitorDossierShipment.Id is null) throw new Exception($"No se pudo registrar el envío de expediente de notario {solicitorDossierShipment.Content.Title}");
 
             return solicitorDossierShipment;
         }
@@ -1099,7 +1062,7 @@ namespace SISGED.Server.Services.Repositories
                 .Set("estado", "modificado")
                 .Set("contenido.titulo", DTO.Content.Title)
                 .Set("contenido.descripcion", DTO.Content.Description)
-                .Set("contenido.idnotario", DTO.Content.SolicitorId.Id);
+                .Set("contenido.idnotario", DTO.Content.SolicitorId);
 
             await _documentsCollection.UpdateOneAsync(filter, update);
         }

@@ -13,6 +13,7 @@ using SISGED.Shared.Models.Responses.DocumentType;
 using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.Role;
 using SISGED.Shared.Models.Responses.Solicitor;
+using SISGED.Shared.Models.Responses.SolicitorDossier;
 using SISGED.Shared.Models.Responses.Step;
 using SISGED.Shared.Models.Responses.User;
 using StepGenericModel = SISGED.Shared.Models.Generics.Step;
@@ -102,13 +103,17 @@ namespace SISGED.Server.Helpers.Infrastructure
             CreateMap<SolicitorDossierRequestResponse, SolicitorDossierRequest>();
             CreateMap<SolicitorDossierRequestResponseContent, SolicitorDossierRequestContent>()
                 .ForMember(solicitorContent => solicitorContent.IssueDate, options => options.MapFrom(solicitorResponse => solicitorResponse.DateIssue));
-            
+
+            // Solicitor Dossier Shipment Mapper
+            CreateMap<SolicitorDossierShipmentResponseContent, SolicitorDossierShipmentContent>();
+
             // Resolution Type Mapper
             CreateMap<ResolutionResponse, Resolution>();
             CreateMap<ResolutionResponseContent, ResolutionContent>()
                 .ForMember(resolutionContent => resolutionContent.Sanction, options => options.MapFrom(resolutionResponse => resolutionResponse.Penalty));
 
-
+            // Solicitor Dossier Mapper
+            CreateMap<SolicitorDossier, SolicitorDossierResponse>();
         }
 
         private string MapStepDocumentRequestUID(StepDocument stepDocument, StepGenericModel.StepDocument stepDocumentRequest)

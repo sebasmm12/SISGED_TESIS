@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using SISGED.Client.Helpers;
-using SISGED.Shared.DTOs;
 
 namespace SISGED.Client.Components.Documents
 {
@@ -19,7 +17,6 @@ namespace SISGED.Client.Components.Documents
 
         private async Task DeleteAnnexAsync()
         {
-           // Console.WriteLine(Position);
             await DeleteAnnex.InvokeAsync(AnnexName);
         }
     }

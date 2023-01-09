@@ -49,7 +49,7 @@ namespace SISGED.Server.Services.Contracts
         Task<Dictum> RegisterDictumAsync(Dictum dictum);
         Task<Resolution> ResolutionRegisterAsync(Resolution resolution);
         Task<BPNResult> BPNResultRegisterAsync(BPNResultResponse DTO, List<string> url2, string UserId, string dossierId, string inputDocId, string documentRequestId);
-        Task<SolicitorDossierShipment> SolicitorDossierShipmentRegisterAsync(SolicitorDossierShipmentResponse DTO, DossierWrapper expedientewrapper, List<string> url2);
+        Task<SolicitorDossierShipment> RegisterSolicitorDossierShipmentAsync(SolicitorDossierShipment solicitorDossierShipment);
         Task<Document> ModifyStateAsync(Evaluation document, string docId);
         Task<Document> GenerateDocumentAsync(GenerateDocumentRequest document);
         Task<Document> ModifyStateDocumentAsync(DocumentRequest document);

@@ -30,12 +30,15 @@ static void ConfigureServices(IServiceCollection services)
     services.AddScoped<ISolicitorRepository, SolicitorRepository>();
     services.AddScoped<IDialogContentRepository, DialogContentRepository>();
     services.AddScoped<IAnnexFactory, AnnexFactory>();
+    services.AddScoped<IBadgeFactory, BadgeFactory>();
 
     services.AddTransient<ToolWindowStrategy>();
     services.AddTransient<DocumentStrategy>();
 
     services.AddTransient<UserRequestRegisterValidator>();
     services.AddTransient<ComplaintRequestValidator>();
+    services.AddTransient<DictumValidator>();
+    services.AddTransient<SolicitorDossierShipmentValidator>();
     services.AddTransient<ResolutionRegisterValidator>();
     services.AddTransient<DisciplinaryOpennessRegisterValidator>();
     services.AddTransient<SolicitorDossierRequestRegisterValidator>();
