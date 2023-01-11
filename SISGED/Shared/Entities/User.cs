@@ -23,6 +23,8 @@ namespace SISGED.Shared.Entities
 
         [BsonElement("clave")]
         public string Password { get; set; } = default!;
+        [BsonElement("salt")]
+        public string Salt { get; set; } = default!;
 
         [BsonElement("datos")]
         public UserData Data { get; set; } = new UserData();

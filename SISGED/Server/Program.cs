@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
 using Serilog;
@@ -6,6 +8,7 @@ using SISGED.Server.Helpers.Infrastructure;
 using SISGED.Server.Helpers.Middlewares;
 using SISGED.Server.Services.Contracts;
 using SISGED.Server.Services.Repositories;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +24,20 @@ try
 
     builder.Services.AddControllersWithViews();
     builder.Services.AddRazorPages();
+
+    // Authentication Dependency Injection
+    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+           .AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters
+           {
+               ValidateIssuer = true,
+               ValidIssuer = builder.Configuration.GetValue<string>("jwt:issuer"),
+               ValidateAudience = true,
+               ValidAudience = builder.Configuration.GetValue<string>("jwt:audience"),
+               ValidateLifetime = true,
+               ClockSkew = TimeSpan.Zero,
+               ValidateIssuerSigningKey = true,
+               IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("jwt:key"))),
+           });
 
     // Infrastructure Dependency Injection
     builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
@@ -119,6 +136,8 @@ try
     app.UseStaticFiles();
 
     app.UseRouting();
+    app.UseAuthentication();
+    app.UseAuthorization();
 
     app.MapRazorPages();
     app.MapControllers();

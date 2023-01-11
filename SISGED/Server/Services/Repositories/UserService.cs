@@ -2,6 +2,7 @@
 using MongoDB.Driver;
 using SISGED.Server.Helpers.Infrastructure;
 using SISGED.Server.Services.Contracts;
+using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Queries.User;
 using SISGED.Shared.Models.Responses.User;
@@ -63,11 +64,13 @@ namespace SISGED.Server.Services.Repositories
             return user is not null;
         }
 
-        public async Task<bool> VerifyUserLoginAsync(string username, string password)
+        public async Task<User> VerifyUserLoginAsync(string username)
         {
-            var user = await _usersCollection.Find(user => user.UserName == username && user.Password == password).FirstOrDefaultAsync();
+            var user = await _usersCollection.Find(user => user.UserName == username).FirstOrDefaultAsync();
 
-            return user is not null;
+            if (user is null) throw new Exception("El usuario no existe en el sistema");
+
+            return user;
         }
 
         public async Task UpdateUserAsync(User user)
@@ -160,6 +163,26 @@ namespace SISGED.Server.Services.Repositories
 
             return totalUsers;
         }
+        
+        public async Task<UserValidationDTO> ValidateUserRegisterAsync(User user)
+        {
+            bool hasSameUserName = await _usersCollection.Find(userEntity => userEntity.UserName.ToLower() == user.UserName.ToLower()).AnyAsync();
+
+            if (hasSameUserName) return new(true, "El nombre de usuario ya se encuentra registrado en el sistema");
+
+            bool hasSameDocument = await _usersCollection.Find(userEntity =>
+                 userEntity.Data.DocumentType == user.Data.DocumentType &&
+                userEntity.Data.DocumentNumber == user.Data.DocumentNumber).AnyAsync();
+
+            if (hasSameDocument) return new(true, "El numero de documento ya se encuentra registrado en el sistema");
+
+            bool hasSameEmail = await _usersCollection.Find(userEntity => userEntity.Data.Email.ToLower() == user.Data.Email.ToLower()).AnyAsync();
+
+            if (hasSameEmail) return new(true, "El correo electronico ya se encuentra registrado en el sistema");
+
+            return new(false, string.Empty);
+        }
+        
 
         #region private methods
 

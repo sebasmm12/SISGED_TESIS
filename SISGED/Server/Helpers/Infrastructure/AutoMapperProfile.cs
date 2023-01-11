@@ -114,6 +114,9 @@ namespace SISGED.Server.Helpers.Infrastructure
 
             // Solicitor Dossier Mapper
             CreateMap<SolicitorDossier, SolicitorDossierResponse>();
+
+            // Accounts Mapper
+            CreateMap<UserRegisterRequest, User>();
         }
 
         private string MapStepDocumentRequestUID(StepDocument stepDocument, StepGenericModel.StepDocument stepDocumentRequest)

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using SISGED.Server.Services.Contracts;
@@ -9,6 +10,7 @@ using SISGED.Shared.Models.Requests.User;
 using SISGED.Shared.Models.Responses.Account;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace SISGED.Server.Controllers
@@ -40,16 +42,26 @@ namespace SISGED.Server.Controllers
             {
                 var user = _mapper.Map<User>(userRegisterRequest);
 
+                var userValidation = await _userService.ValidateUserRegisterAsync(user);
+
+                if (userValidation.Result) return BadRequest(userValidation.ErrorMessage);
+
+                var encryptedPassword = EncryptPassword(user.Password);
+
+                SetUserPassword(user, encryptedPassword);
+
                 await _userService.CreateUserAsync(user);
 
-                var usertoken = BuildToken(user, "");
+                var role = await _roleService.GetRoleByIdAsync(user.Rol);
+
+                var usertoken = BuildToken(user, role.Name);
 
                 return Ok(usertoken);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, "No se pudo registrar el usuario en el sistema");
             }
         }
 
@@ -109,24 +121,53 @@ namespace SISGED.Server.Controllers
         {
             try
             {
-                var result = await _userService.VerifyUserLoginAsync(userInfo.Username, userInfo.Password);
-                if (result)
-                {
-                    User user = await _userService.GetUserByNameAsync(userInfo.Username);
-                    Role role = await _roleService.GetRoleByIdAsync(user.Rol);
-                    var userToken = BuildToken(user, role.Name);
-                    return Ok(userToken);
-                }
-                else
-                {
-                    return BadRequest("Intento de inicio de sesión inválido.");
-                }
+
+                var user = await _userService.VerifyUserLoginAsync(userInfo.Username);
+
+                var encryptedPassword = EncryptPassword(user.Password, Convert.FromBase64String(user.Salt));
+
+                if (user.Password != encryptedPassword.Password) return BadRequest("Inicio de sesión inválido");
+                
+                var role = await _roleService.GetRoleByIdAsync(user.Rol);
+                var userToken = BuildToken(user, role.Name);
+                
+                return Ok(userToken);
+                
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+
+
+        #region private methods
+
+        private static void SetUserPassword(User user, EncryptedPasswordDTO encryptedPasswordDTO)
+        {
+            user.Salt = encryptedPasswordDTO.Salt;
+            user.Password = encryptedPasswordDTO.Password;
+        }
+
+        private static EncryptedPasswordDTO EncryptPassword(string password)
+        {
+            var salt = new byte[16];
+
+            using var random = RandomNumberGenerator.Create();
+            random.GetBytes(salt);
+
+            return EncryptPassword(password, salt);
+        }
+
+        private static EncryptedPasswordDTO EncryptPassword(string password, byte[] salt)
+        {
+            var derivatedKey = KeyDerivation.Pbkdf2(password, salt, KeyDerivationPrf.HMACSHA1, 1000, 32);
+
+            var newPassword = Convert.ToBase64String(derivatedKey);
+
+            return new(newPassword, Convert.ToBase64String(salt));
+        }
+
         private UserToken BuildToken(User user, string roleName)
         {
             var claims = new List<Claim>
@@ -141,20 +182,19 @@ namespace SISGED.Server.Controllers
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var expiration = DateTime.UtcNow.AddHours(-5).AddYears(1);
+            var expiration = DateTime.UtcNow.AddHours(8);
 
-            JwtSecurityToken token = new JwtSecurityToken(
-               issuer: null,
-               audience: null,
+            var token = new JwtSecurityToken(
+               issuer: _configuration.GetValue<string>("JWT:issuer"),
+               audience: _configuration.GetValue<string>("JWT:audience"),
                claims: claims,
                expires: expiration,
                signingCredentials: creds);
 
-            return new UserToken()
-            {
-                Token = new JwtSecurityTokenHandler().WriteToken(token),
-                Expiration = expiration
-            };
+            return new UserToken(new JwtSecurityTokenHandler().WriteToken(token), expiration);
         }
+        #endregion
+
+
     }
 }

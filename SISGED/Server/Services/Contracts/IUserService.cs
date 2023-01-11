@@ -1,4 +1,5 @@
-﻿using SISGED.Shared.Entities;
+﻿using SISGED.Shared.DTOs;
+using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Queries.User;
 using SISGED.Shared.Models.Responses.User;
 
@@ -18,7 +19,8 @@ namespace SISGED.Server.Services.Contracts
         Task UpdateUserAsync(User user);
         Task UpdateUserPasswordAsync(string userId, string password);
         Task UpdateUserStateAsync(string userId, string state);
+        Task<UserValidationDTO> ValidateUserRegisterAsync(User user);
         Task<bool> VerifyUserExistsAsync(string userId);
-        Task<bool> VerifyUserLoginAsync(string username, string password);
+        Task<User> VerifyUserLoginAsync(string username);
     }
 }
