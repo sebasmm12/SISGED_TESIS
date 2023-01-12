@@ -55,7 +55,7 @@ namespace SISGED.Client.Pages.Auth
         [Inject]
         public IDialogContentRepository dialogContentRepository { get; set; } = default!;
         [Inject]
-        private ILocalStorageRepository localStorageRepository { get; set; } = default!;
+        private ILoginRepository loginRepository { get; set; } = default!;
         [Inject]
         private NavigationManager navigationManager { get; set; } = default!;
 
@@ -83,7 +83,7 @@ namespace SISGED.Client.Pages.Auth
 
                 if (loggedUser is null) return;
 
-                await localStorageRepository.SetInLocalStorage("TOKENKEY", loggedUser.Token);
+                await loginRepository.Login(loggedUser.Token);
 
                 await swalFireRepository.ShowSuccessfulSwalFireAsync($"Se ha iniciado sesión.");
 

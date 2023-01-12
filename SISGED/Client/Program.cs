@@ -1,4 +1,5 @@
 using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
@@ -26,6 +27,8 @@ await builder.Build().RunAsync();
 
 static void ConfigureServices(IServiceCollection services)
 {
+    services.AddAuthorizationCore();
+
     services.AddScoped<ISwalFireRepository, SwalFireRepository>();
     services.AddScoped<IHttpRepository, HttpRepository>();
     services.AddScoped<IDocumentRepository, DocumentRepository>();
@@ -34,6 +37,10 @@ static void ConfigureServices(IServiceCollection services)
     services.AddScoped<IAnnexFactory, AnnexFactory>();
     services.AddScoped<IBadgeFactory, BadgeFactory>();
     services.AddScoped<ILocalStorageRepository, LocalStorageRepository>();
+
+    services.AddScoped<LoginRepository>();
+    services.AddScoped<AuthenticationStateProvider, LoginRepository>(l => l.GetRequiredService<LoginRepository>());
+    services.AddScoped<ILoginRepository, LoginRepository>(l => l.GetRequiredService<LoginRepository>());
 
     services.AddTransient<ToolWindowStrategy>();
     services.AddTransient<DocumentStrategy>();
