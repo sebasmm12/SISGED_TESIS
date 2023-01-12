@@ -54,12 +54,16 @@ namespace SISGED.Client.Pages.Auth
         public IMapper Mapper { get; set; } = default!;
         [Inject]
         public IDialogContentRepository dialogContentRepository { get; set; } = default!;
+        [Inject]
+        private ILocalStorageRepository localStorageRepository { get; set; } = default!;
+        [Inject]
+        private NavigationManager navigationManager { get; set; } = default!;
 
         private MudForm? requestForm = default!;
         private UserLoginDTO userLogin = new UserLoginDTO();
         private bool pageLoading = true;
 
-        private AccountLoginRequest GetFormRegister()
+        private AccountLoginRequest GetFormMapped()
         {
 
             var userCredentials = Mapper.Map<AccountLoginRequest>(new UserLoginDTO { Username = userLogin.Username, Password = EncryptPassword(userLogin.Password).Password });
@@ -73,13 +77,17 @@ namespace SISGED.Client.Pages.Auth
 
             if (requestForm!.IsValid)
             {
-                var accountLogin = GetFormRegister();
+                var accountLogin = GetFormMapped();
 
                 var loggedUser = await ShowLoadingDialogAsync(accountLogin);
 
                 if (loggedUser is null) return;
 
+                await localStorageRepository.SetInLocalStorage("TOKENKEY", loggedUser.Token);
+
                 await swalFireRepository.ShowSuccessfulSwalFireAsync($"Se ha iniciado sesión.");
+
+                navigationManager.NavigateTo("/");
             }
         }
 

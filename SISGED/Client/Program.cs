@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
@@ -18,6 +19,7 @@ ConfigureServices(builder.Services);
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 builder.Services.AddMudServices();
+builder.Services.AddBlazoredLocalStorage();
 
 await builder.Build().RunAsync();
 
@@ -31,6 +33,7 @@ static void ConfigureServices(IServiceCollection services)
     services.AddScoped<IDialogContentRepository, DialogContentRepository>();
     services.AddScoped<IAnnexFactory, AnnexFactory>();
     services.AddScoped<IBadgeFactory, BadgeFactory>();
+    services.AddScoped<ILocalStorageRepository, LocalStorageRepository>();
 
     services.AddTransient<ToolWindowStrategy>();
     services.AddTransient<DocumentStrategy>();
@@ -42,6 +45,7 @@ static void ConfigureServices(IServiceCollection services)
     services.AddTransient<ResolutionRegisterValidator>();
     services.AddTransient<DisciplinaryOpennessRegisterValidator>();
     services.AddTransient<SolicitorDossierRequestRegisterValidator>();
+    services.AddTransient<UserLoginValidator>();
 }
 
     
