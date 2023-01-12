@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
 using SISGED.Client.Services.Contracts;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
@@ -9,19 +10,22 @@ namespace SISGED.Client.Services.Repositories
 {
     public class LoginRepository : AuthenticationStateProvider, ILoginRepository
     {
-        [Inject]
         private HttpClient httpClient { get; set; } = default!;
-        [Inject]
-        private ILocalStorageRepository LocalStorageRepository { get; set; } = default!;
+        private readonly ILocalStorageRepository _localStorageRepository;
 
-        private static readonly string tokenKey = "TOKENKEY";
+        public LoginRepository(ILocalStorageRepository localStorageRepository)
+        {
+            _localStorageRepository = localStorageRepository;
+        }
+
+        private readonly string tokenKey = "TOKENKEY";
 
         private AuthenticationState anonymous => new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 
         public async override Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            var token = await LocalStorageRepository.GetFromLocalStorage(tokenKey);
-            if (string.IsNullOrEmpty(token))
+            var token = await _localStorageRepository.GetFromLocalStorage(tokenKey)!;
+            if (token is null)
             {
                 return anonymous;
             }
@@ -44,14 +48,14 @@ namespace SISGED.Client.Services.Repositories
         }
         public async Task Login(string token)
         {
-            await LocalStorageRepository.SetInLocalStorage(tokenKey, token);
+            await _localStorageRepository.SetInLocalStorage(tokenKey, token);
             var authState = BuildAuthenticationState(token);
             NotifyAuthenticationStateChanged(Task.FromResult(authState));
         }
 
         public async Task Logout()
         {
-            await LocalStorageRepository.RemoveItem(tokenKey);
+            await _localStorageRepository.RemoveItem(tokenKey);
             httpClient.DefaultRequestHeaders.Authorization = null;
             NotifyAuthenticationStateChanged(Task.FromResult(anonymous));
         }
