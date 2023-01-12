@@ -1,0 +1,85 @@
+﻿@page "/Login"
+
+@if (pageLoading)
+{
+    <GenericPageLoader Body="Cargando los elementos para el registro de la solicitud, por favor espere..."></GenericPageLoader>
+}
+else
+{
+    <MudCard Elevation="0">
+        <MudCardContent>
+            <div class="container">
+                <div class="center-block">
+                    <div class="col-lg-4 col-lg-offset-1 col-md-4 col-md-offset-1 col-sm-12 col-xs-12 no-padding" style="z-index:1">
+
+                        <div class="mlt-carousel">
+                            <div id="myCarousel" class="carousel slide carousel-fade" data-ride="carousel">
+                                <div class="carousel-inner" role="listbox">
+                                    <div class="item active">
+                                        <img class="img-responsive center-block" src="~/images/step2.png" alt="step1">
+                                        <div class="item-content">
+                                            <h3>SISGED</h3>
+                                            <p>Sistema de gestión documentaria</p>
+                                            <p> del Colegio de Notarios de Lima</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Login -->
+                    <div class="col-lg-6 col-lg-offset-right-1 col-md-6 col-md-offset-right-1 col-sm-12 col-xs-12 no-padding">
+                        <div class="mlt-content">
+                            <ul class="nav nav-tabs">
+                                <li class="active" style="margin:auto"><a href="#login" data-toggle="tab">Inicio de Sesión</a></li>
+                            </ul>
+                            <div id="myTabContent" class="tab-content">
+                                <div class="tab-pane fade in active" id="login">
+                                    <!--login form-->
+                                    <MudForm @ref="requestForm" ValidationDelay="0" Model="userLogin" Validation="@(userLoginValidator.ValidateValue)">
+
+
+                                        <div class="col-lg-10 col-lg-offset-1 col-lg-offset-right-1 col-md-10 col-md-offset-1 col-md-offset-right-1 col-sm-12 col-xs-12 pull-right ">
+                                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                                <MudTextField @bind-Value="@userLogin.Username" Class="text-field-style" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"
+                                                          Label="Nombre de usuario" For="@(()=>userLogin.Username)"></MudTextField>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-10 col-lg-offset-1 col-lg-offset-right-1 col-md-10 col-md-offset-1 col-md-offset-right-1 col-sm-12 col-xs-12 pull-right ">
+                                                <MudTextField @bind-Value="@userLogin.Password" InputType="InputType.Password" Class="text-field-style" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="fas fa-key" AdornmentColor="Color.Primary"
+                                                          Label="Contraseña" For="@(()=>userLogin.Password)"></MudTextField>
+                                        </div>
+
+                                        @*<div class="col-lg-10 col-lg-offset-1 col-lg-offset-right-1 col-md-10 col-md-offset-1 col-md-offset-right-1 col-sm-12 col-xs-12 pull-right ">
+                                            <div class="row">
+                                                <br>
+                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                                    <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="rememberPass">
+                                                        <input type="checkbox" id="rememberPass" class="mdl-switch__input">
+                                                        <span class="mdl-switch__label">Recordar</span>
+                                                    </label>
+
+                                                </div>
+                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style=" text-align:right;">
+                                                    <a href="/contrasena" type="" role="textbox">Cambiar contraseña</a>
+                                                </div>
+                                            </div>
+                                        </div>
+*@
+                                        <MudButton ButtonType="ButtonType.Button" Class="btn lt-register-btn" IconClass="icon-right" OnClick="async () => await LoginAsync()">Ingresar</MudButton>
+                                    </MudForm>
+                                    <!--login form-->
+                                </div>
+                            </div>
+                        </div>
+                        <!--Login-->
+                    </div>
+                    <!--center-block-->
+                </div>
+                <!--container-->
+            </div>
+        </MudCardContent>
+    </MudCard>
+}

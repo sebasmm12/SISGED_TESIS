@@ -2,6 +2,7 @@
 using SISGED.Client.Components.Documents.Registers;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
+using SISGED.Shared.Models.Requests.Account;
 using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.DossierTray;
@@ -66,6 +67,9 @@ namespace SISGED.Client.Helpers
                 .ForMember(item => item.OriginPlace, options => options.MapFrom(_ => "outputs"))
                 .ForMember(item => item.Value, options => options.MapFrom(dossierTray => dossierTray))
                 .ForMember(item => item.Description, options => options.MapFrom(dossierTray => dossierTray.Document!.Type));
+
+            // Login
+            CreateMap<UserLoginDTO, AccountLoginRequest>();
         }
     }
 }

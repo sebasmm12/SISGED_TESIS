@@ -1,0 +1,73 @@
+﻿body {
+    div .validation-message
+
+{
+    font-family: sans-serif !important;
+    font-size: 12px !important;
+    text-align: left !important;
+}
+
+.mdl-textfield__label {
+    margin-bottom: 0;
+    color: #d7dbdc;
+    font-weight: normal;
+}
+
+.mdl-textfield--floating-label.is-focused .mdl-textfield__label,
+.mdl-textfield--floating-label.is-dirty .mdl-textfield__label {
+    text-transform: uppercase
+}
+
+.has-feedback label ~ .form-control-feedback {
+    top: 15px;
+}
+
+.mdl-textfield {
+    width: 100%;
+}
+
+.mdl-checkbox__label {
+    cursor: text;
+    font-size: 13px;
+    float: left;
+    color: #b0b3b4;
+    font-weight: normal;
+}
+
+.mdl-checkbox__box-outline {
+    border: 1px solid #b0b3b4;
+}
+
+.mdl-textfield__input {
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, .12);
+    display: block;
+    font-size: 16px;
+    margin: 0;
+    padding: 4px 0;
+    width: 100%;
+    background: 0 0;
+    text-align: left;
+    color: inherit;
+    font-weight: bold;
+}
+
+.mdl-switch__label {
+    float: left;
+    font-weight: normal;
+    color: #b0b3b4;
+    font-size: 14px;
+}
+
+.item {
+    background-color: #20a270;
+}
+
+.lt-register-btn {
+    background-color: #20a270;
+}
+
+.mlt-content .nav-tabs > li.active > a {
+    border-bottom: 2px solid #20a270;
+    color: #20a270;
+}
