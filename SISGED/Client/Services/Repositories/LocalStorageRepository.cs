@@ -24,7 +24,7 @@ namespace SISGED.Client.Services.Repositories
 
         public async Task SetInLocalStorage(string key, string content)
         {
-            await _localStorage.GetItemAsStringAsync(key, CancellationToken.None);
+            await _localStorage.SetItemAsStringAsync(key, content, CancellationToken.None);
         }
     }
 }

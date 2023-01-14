@@ -39,6 +39,7 @@ using SISGED.Client.Components.Documents.Registers;
 using static MudBlazor.CategoryTypes;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using System.Text.Json;
 
 namespace SISGED.Client.Pages.Auth
 {
@@ -58,15 +59,18 @@ namespace SISGED.Client.Pages.Auth
         private ILoginRepository loginRepository { get; set; } = default!;
         [Inject]
         private NavigationManager navigationManager { get; set; } = default!;
+        [Inject]
+        private IJSRuntime IJSRuntime { get; set; } = default!;
 
+        private IJSObjectReference loginModule = default!;
         private MudForm? requestForm = default!;
         private UserLoginDTO userLogin = new UserLoginDTO();
-        private bool pageLoading = true;
+        private bool pageLoading = false;
 
         private AccountLoginRequest GetFormMapped()
         {
 
-            var userCredentials = Mapper.Map<AccountLoginRequest>(new UserLoginDTO { Username = userLogin.Username, Password = EncryptPassword(userLogin.Password).Password });
+            var userCredentials = Mapper.Map<AccountLoginRequest>(userLogin);
 
             return userCredentials;
         }
@@ -87,7 +91,7 @@ namespace SISGED.Client.Pages.Auth
 
                 await swalFireRepository.ShowSuccessfulSwalFireAsync($"Se ha iniciado sesión.");
 
-                navigationManager.NavigateTo("/");
+                navigationManager.NavigateTo("/",true);
             }
         }
 
@@ -106,9 +110,11 @@ namespace SISGED.Client.Pages.Auth
             try
             {
                 var httpResponse = await httpRepository.PostAsync<AccountLoginRequest, UserToken>("api/accounts/login", accountLoginRequest);
+
                 if (httpResponse.Error)
                 {
-                    await swalFireRepository.ShowErrorSwalFireAsync($"{httpResponse.HttpResponseMessage}");
+                    var msg = await httpResponse.GetBodyAsync();
+                    await swalFireRepository.ShowErrorSwalFireAsync($"{msg}");
                 }
                 return httpResponse.Response!;
             }
@@ -118,25 +124,5 @@ namespace SISGED.Client.Pages.Auth
                 return null;
             }
         }
-
-        private static EncryptedPasswordDTO EncryptPassword(string password)
-        {
-            var salt = new byte[16];
-
-            using var random = RandomNumberGenerator.Create();
-            random.GetBytes(salt);
-
-            return EncryptPassword(password, salt);
-        }
-
-        private static EncryptedPasswordDTO EncryptPassword(string password, byte[] salt)
-        {
-            var derivatedKey = KeyDerivation.Pbkdf2(password, salt, KeyDerivationPrf.HMACSHA1, 1000, 32);
-
-            var newPassword = Convert.ToBase64String(derivatedKey);
-
-            return new(newPassword, Convert.ToBase64String(salt));
-        }
-
     }
 }

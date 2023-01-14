@@ -13,9 +13,10 @@ namespace SISGED.Client.Services.Repositories
         private HttpClient httpClient { get; set; } = default!;
         private readonly ILocalStorageRepository _localStorageRepository;
 
-        public LoginRepository(ILocalStorageRepository localStorageRepository)
+        public LoginRepository(ILocalStorageRepository localStorageRepository, HttpClient http)
         {
             _localStorageRepository = localStorageRepository;
+            httpClient = http;
         }
 
         private readonly string tokenKey = "TOKENKEY";
@@ -25,6 +26,7 @@ namespace SISGED.Client.Services.Repositories
         public async override Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             var token = await _localStorageRepository.GetFromLocalStorage(tokenKey)!;
+
             if (token is null)
             {
                 return anonymous;
@@ -43,6 +45,7 @@ namespace SISGED.Client.Services.Repositories
         private IEnumerable<Claim> ParseToken(string token)
         {
             var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
+            Console.WriteLine($"{token}");
             var deserializedToken = jwtSecurityTokenHandler.ReadJwtToken(token);
             return deserializedToken.Claims;
         }
