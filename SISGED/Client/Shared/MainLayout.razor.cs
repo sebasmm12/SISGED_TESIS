@@ -16,8 +16,6 @@ namespace SISGED.Client.Shared
         [Inject]
         private IHttpRepository HttpRepository { get; set; } = default!;
         [Inject]
-        private ILoginRepository LoginRepository { get; set; } = default!;
-        [Inject]
         private ISwalFireRepository SwalFireRepository { get; set; } = default!;
 
         public SessionAccountResponse SessionAccount { get; set; } = default!;
