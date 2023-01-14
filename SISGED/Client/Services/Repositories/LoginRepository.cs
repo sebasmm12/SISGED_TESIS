@@ -45,7 +45,6 @@ namespace SISGED.Client.Services.Repositories
         private IEnumerable<Claim> ParseToken(string token)
         {
             var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
-            Console.WriteLine($"{token}");
             var deserializedToken = jwtSecurityTokenHandler.ReadJwtToken(token);
             return deserializedToken.Claims;
         }
