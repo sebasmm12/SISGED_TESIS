@@ -4,7 +4,7 @@
         <MudList Clickable="true">
             <MudListSubheader>
                 <div class="d-flex flex-row gap-3">
-                    <MudImage Src="/images/default_profile_pic.jpg" Alt="User profile" Class="rounded-circle align-self-center" Width="50" Height="50"></MudImage>
+                    <MudImage Src="@SessionAccount.GetClient().Profile" Alt="Perfil de usuario" Class="rounded-circle align-self-center" Width="50" Height="50"></MudImage>
                     <div class="d-flex flex-column">
                         <MudText Typo="Typo.subtitle1">@SessionAccount.GetClient().Name</MudText>
                         <MudText Typo="Typo.caption">@SessionAccount.GetClient().Email</MudText>
