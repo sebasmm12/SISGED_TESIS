@@ -10,5 +10,13 @@ namespace SISGED.Shared.Entities
         public DateTime ModificationDate { get; set; } = DateTime.Now;
         [BsonElement("url")]
         public string Url { get; set; } = default!;
+
+        public ContentVersion() {  }
+
+        public ContentVersion(int version, string url)
+        {
+            Version = version;
+            Url = url;
+        }
     }
 }

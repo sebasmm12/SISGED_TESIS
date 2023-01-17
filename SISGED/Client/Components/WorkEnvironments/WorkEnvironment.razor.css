@@ -53,6 +53,12 @@ div.workspace {
 }
 
 
+::deep .workspace .mud-drop-item:last-child {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
 
 .common-box-style {
     border: 3px solid #25393D;

@@ -46,6 +46,7 @@ namespace SISGED.Server.Controllers
         private readonly IMediaService _mediaService;
 
         private readonly string _containerName = "solicitudesiniciales";
+        private readonly string _generatedContainerName = "documentosgenerados";
 
         public DocumentsController(IDocumentService documentService, IDossierService dossierService, ITrayService trayService,
             IPublicDeedsService publicDeedsService, IFileStorageService fileStorage, IAssistantService assistantService, IMapper mapper,
@@ -495,26 +496,16 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPut("generardocumento")]
-        public async Task<ActionResult<Document>> GenerateDocument(GenerateDocumentRequest document)
+        public async Task<ActionResult<Document>> GenerateDocument(GenerateDocumentRequest documentRequest)
         {
             try
             {
-                if (!string.IsNullOrWhiteSpace(document.Sign))
-                {
-                    var solicitudBytes2 = Convert.FromBase64String(document.Sign);
-                    FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "resultadobpn");
-                    document.Sign = await _fileService.SaveFileAsync(file) ?? string.Empty;
-
-                }
-                if (!string.IsNullOrWhiteSpace(document.GeneratedURL))
-                {
-                    var solicitudBytes2 = Convert.FromBase64String(document.GeneratedURL);
-                    FileRegisterDTO file = new FileRegisterDTO(solicitudBytes2, "pdf", "resultadobpn");
-                    document.GeneratedURL = await _fileService.SaveFileAsync(file) ?? string.Empty;
-                }
-
-                var generated = await _documentService.GenerateDocumentAsync(document);
-                return Ok(generated);
+                
+                var generatedDocument = await GetGeneratedDocumentAsync(documentRequest);
+                
+                var document = await _documentService.GenerateDocumentAsync(generatedDocument);
+                
+                return Ok(document);
             }
             catch (Exception ex)
             {
@@ -1201,8 +1192,8 @@ namespace SISGED.Server.Controllers
             var urls = await _mediaService.SaveFilesAsync(document.URLAnnex, _containerName);
 
             var DisciplinaryOpennessContent = _mapper.Map<DisciplinaryOpennessContent>(document.Content);
-            var DisciplinaryOpenness = new DisciplinaryOpenness(DisciplinaryOpennessContent, "En proceso", urls.ToList());
-            DisciplinaryOpenness.AddProcess(new Process(user.Id, user.Id, "En proceso"));
+            var DisciplinaryOpenness = new DisciplinaryOpenness(DisciplinaryOpennessContent, "registrado", urls.ToList());
+            DisciplinaryOpenness.AddProcess(new Process(user.Id, user.Id, "registrado"));
 
             return await _documentService.DisciplinaryOpennessRegisterAsync(DisciplinaryOpenness);
         }
@@ -1212,8 +1203,8 @@ namespace SISGED.Server.Controllers
             var urls = await _mediaService.SaveFilesAsync(document.URLAnnex, _containerName);
 
             var solicitorDossierRequestContent = _mapper.Map<SolicitorDossierRequestContent>(document.Content);
-            var SolicitorDossierRequest = new SolicitorDossierRequest(solicitorDossierRequestContent, "En proceso", urls.ToList());
-            SolicitorDossierRequest.AddProcess(new Process(user.Id, user.Id, "En proceso"));
+            var SolicitorDossierRequest = new SolicitorDossierRequest(solicitorDossierRequestContent, "registrado", urls.ToList());
+            SolicitorDossierRequest.AddProcess(new Process(user.Id, user.Id, "registrado"));
 
             return await _documentService.SolicitorDossierRequestRegisterAsync(SolicitorDossierRequest);
         }
@@ -1223,12 +1214,27 @@ namespace SISGED.Server.Controllers
             var urls = await _mediaService.SaveFilesAsync(document.URLAnnex, _containerName);
 
             var resolutionContent = _mapper.Map<ResolutionContent>(document.Content);
-            var resolution = new Resolution(resolutionContent, "En proceso", urls.ToList());
-            resolution.AddProcess(new Process(user.Id, user.Id, "En proceso"));
+            var resolution = new Resolution(resolutionContent, "registrado", urls.ToList());
+            resolution.AddProcess(new Process(user.Id, user.Id, "registrado"));
 
             return await _documentService.ResolutionRegisterAsync(resolution);
         }
         
+
+        private async Task<DocumentGenerationDTO> GetGeneratedDocumentAsync(GenerateDocumentRequest documentRequest)
+        {
+            var signTask = _mediaService.SaveFileAsync(documentRequest.Sign, _generatedContainerName);
+            var generatedUrlTask = _mediaService.SaveFileAsync(documentRequest.Sign, _generatedContainerName);
+
+            await Task.WhenAll(signTask, generatedUrlTask);
+
+            var documentGenerationDTO = _mapper.Map<DocumentGenerationDTO>(documentRequest);
+
+            documentGenerationDTO.Sign = await signTask;
+            documentGenerationDTO.GeneratedURL = await generatedUrlTask;
+
+            return documentGenerationDTO;
+        }
 
         #endregion
 

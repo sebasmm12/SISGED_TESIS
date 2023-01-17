@@ -1,4 +1,5 @@
-﻿using SISGED.Shared.Entities;
+﻿using SISGED.Shared.DTOs;
+using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Queries.Document;
 using SISGED.Shared.Models.Queries.Statistic;
 using SISGED.Shared.Models.Requests.Documents;
@@ -51,7 +52,7 @@ namespace SISGED.Server.Services.Contracts
         Task<BPNResult> BPNResultRegisterAsync(BPNResultResponse DTO, List<string> url2, string UserId, string dossierId, string inputDocId, string documentRequestId);
         Task<SolicitorDossierShipment> RegisterSolicitorDossierShipmentAsync(SolicitorDossierShipment solicitorDossierShipment);
         Task<Document> ModifyStateAsync(Evaluation document, string docId);
-        Task<Document> GenerateDocumentAsync(GenerateDocumentRequest document);
+        Task<Document> GenerateDocumentAsync(DocumentGenerationDTO document);
         Task<Document> ModifyStateDocumentAsync(DocumentRequest document);
         Task<SolicitorDesignationDocument> UpdateDocumentODNAsync(DossierWrapper dossierWrapper, List<string> url2);
         Task<Appeal> AppealDocumentUpdateAsync(DossierWrapper dossierWrapper, string urlData, List<string> url2);

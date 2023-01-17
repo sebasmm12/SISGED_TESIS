@@ -14,6 +14,8 @@ namespace SISGED.Shared.DTOs
         public string ClientId { get; set; } = default!;
         [JsonPropertyName("tipoDenuncia")]
         public string ComplaintType { get; set; } = default!;
-        
+        [JsonPropertyName("fechaentrega")]
+        public DateTime DeliveryDate { get; set; }
+
     }
 }

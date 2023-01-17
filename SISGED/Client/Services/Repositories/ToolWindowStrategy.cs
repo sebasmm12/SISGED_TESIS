@@ -7,7 +7,8 @@ namespace SISGED.Client.Services.Repositories
         private readonly IEnumerable<IToolWindowRender> toolWindows = new List<IToolWindowRender>()
         {
             new DocumentRegisterRender(),
-            new DocumentSendRender()
+            new DocumentSendRender(),
+            new DocumentGenerationRender()
         };
 
         public IToolWindowRender GetToolWindow(string toolName)

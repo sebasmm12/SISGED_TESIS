@@ -46,6 +46,7 @@ static void ConfigureServices(IServiceCollection services)
 
     services.AddTransient<ToolWindowStrategy>();
     services.AddTransient<DocumentStrategy>();
+    services.AddTransient<DocumentGeneratorStrategy>();
 
     services.AddTransient<UserRequestRegisterValidator>();
     services.AddTransient<ComplaintRequestValidator>();

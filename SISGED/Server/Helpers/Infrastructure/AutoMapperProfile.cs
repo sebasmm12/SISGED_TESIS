@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
+using SISGED.Shared.Models.Requests.Documents;
 using SISGED.Shared.Models.Requests.Step;
 using SISGED.Shared.Models.Requests.User;
 using SISGED.Shared.Models.Responses.Document;
@@ -117,6 +118,12 @@ namespace SISGED.Server.Helpers.Infrastructure
 
             // Accounts Mapper
             CreateMap<UserRegisterRequest, User>();
+
+            // Document Generation
+            CreateMap<GenerateDocumentRequest, DocumentGenerationDTO>()
+                .ForMember(documentGeneration => documentGeneration.Sign, options => options.MapFrom(_ => string.Empty))
+                .ForMember(documentGeneration => documentGeneration.GeneratedURL, options => options.MapFrom(_ => string.Empty));
+            
         }
 
         private string MapStepDocumentRequestUID(StepDocument stepDocument, StepGenericModel.StepDocument stepDocumentRequest)

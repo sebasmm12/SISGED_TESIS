@@ -23,8 +23,8 @@ else {
                                 </div>
                             </MudDropZone>
                         </div>
-                    <div class="workspace common-box-style mud-grid-item-sm-12 mud-grid-item-md-8 mud-grid-item-lg-8">
-                            <MudDropZone T="Item" Identifier="workplace" Class="h-100 border-2 border-solid mud-border-lines-default"
+                        <div class="workspace common-box-style mud-grid-item-sm-12 mud-grid-item-md-8 mud-grid-item-lg-8">
+                            <MudDropZone T="Item" Identifier="workplace" Class="h-100 border-2 border-solid mud-border-lines-default d-column"
                                  CanDrop="@((item) => CanDropToWorkZone(item, workPlaceItems))" AllowReorder="CanReorder">
                                 <ChildContent>
                                     @if(workPlaceItems.Count == 0) {
@@ -44,24 +44,24 @@ else {
                                 </ItemRenderer>
                             </MudDropZone>
                         </div>
-                    <div class="container-ot mud-grid-item-sm-12 mud-grid-item-md-2 mud-grid-item-lg-2">
-                             <div class="tools common-box-style">
-                              <MudDropZone T="Item" Identifier="outputs" Class="h-100 border-2 border-solid mud-border-lines-default" CanDrop="@((item) => item.OriginPlace == "outputs")">
-                                <div class="box-title-style">
-                                    <span>Bandeja de Salida</span>
+                        <div class="container-ot mud-grid-item-sm-12 mud-grid-item-md-2 mud-grid-item-lg-2">
+                                 <div class="tools common-box-style">
+                                  <MudDropZone T="Item" Identifier="outputs" Class="h-100 border-2 border-solid mud-border-lines-default" CanDrop="@((item) => item.OriginPlace == "outputs")">
+                                    <div class="box-title-style">
+                                        <span>Bandeja de Salida</span>
+                                    </div>
+                                 </MudDropZone>
                                 </div>
-                             </MudDropZone>
-                            </div>
-                            <div class="tools common-box-style">
+                                <div class="tools common-box-style">
 
-                            <MudDropZone T="Item" Identifier="tools" Class="h-100 border-2 border-solid mud-border-lines-default" CanDrop="@((item) => item.OriginPlace == "tools")">
-                                <div class="box-title-style">
-                                    <span>Herramientas</span>
+                                <MudDropZone T="Item" Identifier="tools" Class="h-100 border-2 border-solid mud-border-lines-default" CanDrop="@((item) => item.OriginPlace == "tools")">
+                                    <div class="box-title-style">
+                                        <span>Herramientas</span>
+                                    </div>
+                                </MudDropZone>
                                 </div>
-                            </MudDropZone>
                             </div>
                         </div>
-                    </div>
                 </ChildContent>
                 <ItemRenderer Context="item">
                     <WorkItem Item="item" ></WorkItem>

@@ -196,3 +196,33 @@ a, .btn-link {
 .text-end {
     text-align: end !important;
 }
+
+.text-start {
+    text-align: start !important;
+}
+
+.large-icon {
+    font-size: 4.5rem !important;
+}
+
+.tool-margin {
+    margin-left: 6px;
+    margin-right: 6px;
+}
+
+.mud-button-filled.mud-button-filled-secondary:hover, .mud-button-filled.mud-button-filled-secondary:focus-visible {
+    background-color: var(--mud-palette-secondary) !important;
+}
+
+.mud-fab-primary:hover, .mud-fab-primary:focus-visible {
+    background-color: var(--mud-palette-appbar-background) !important;
+}
+
+.d-none {
+    display: none !important;
+}
+
+.d-column {
+    display: flex;
+    flex-direction: column;
+}
