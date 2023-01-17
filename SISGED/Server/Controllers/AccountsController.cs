@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -98,6 +100,18 @@ namespace SISGED.Server.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
+        }
+
+        [HttpGet("renewToken")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<UserToken>> RenewToken()
+        {
+            var user = await _userService.VerifyUserLoginAsync(HttpContext.User.Identity!.Name!);
+            var role = await _roleService.GetRoleByIdAsync(user.Rol);
+
+            var userToken = BuildToken(user, role.Name);
+
+            return Ok(userToken);
         }
 
         [HttpGet("role/{roleId}")]

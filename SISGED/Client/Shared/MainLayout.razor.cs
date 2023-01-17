@@ -17,6 +17,8 @@ namespace SISGED.Client.Shared
         private IHttpRepository HttpRepository { get; set; } = default!;
         [Inject]
         private ISwalFireRepository SwalFireRepository { get; set; } = default!;
+        [Inject]
+        private ITokenRenewer TokenRenewer { get; set; } = default!;
 
         public SessionAccountResponse SessionAccount { get; set; } = default!;
         [CascadingParameter]
@@ -34,6 +36,8 @@ namespace SISGED.Client.Shared
 
         protected override async Task OnInitializedAsync()
         {
+            TokenRenewer.Start();
+
             mainLayoutModule = await IJSRuntime.InvokeAsync<IJSObjectReference>("import", "../js/main-layout.js");
 
             var authState = await authenticationState;

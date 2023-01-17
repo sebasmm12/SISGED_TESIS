@@ -42,6 +42,8 @@ static void ConfigureServices(IServiceCollection services)
     services.AddScoped<AuthenticationStateProvider, LoginRepository>();
     services.AddScoped<ILoginRepository, LoginRepository>();
 
+    services.AddScoped<ITokenRenewer, TokenRenewer>();
+
     services.AddTransient<ToolWindowStrategy>();
     services.AddTransient<DocumentStrategy>();
 

@@ -87,7 +87,7 @@ namespace SISGED.Client.Pages.Auth
 
                 if (loggedUser is null) return;
 
-                await loginRepository.Login(loggedUser.Token);
+                await loginRepository.Login(loggedUser);
 
                 await swalFireRepository.ShowSuccessfulSwalFireAsync($"Se ha iniciado sesión.");
 
