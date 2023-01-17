@@ -124,7 +124,7 @@ namespace SISGED.Server.Controllers
 
                 var user = await _userService.VerifyUserLoginAsync(userInfo.Username);
 
-                var encryptedPassword = EncryptPassword(user.Password, Convert.FromBase64String(user.Salt));
+                var encryptedPassword = EncryptPassword(userInfo.Password, Convert.FromBase64String(user.Salt));
 
                 if (user.Password != encryptedPassword.Password) return BadRequest("Inicio de sesión inválido");
                 
@@ -134,9 +134,9 @@ namespace SISGED.Server.Controllers
                 return Ok(userToken);
                 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, "Inicio de sesión inválido");
             }
         }
 

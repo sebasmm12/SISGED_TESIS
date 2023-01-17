@@ -3,6 +3,7 @@ using MongoDB.Driver;
 using Newtonsoft.Json;
 using SISGED.Server.Helpers.Infrastructure;
 using SISGED.Server.Services.Contracts;
+using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Queries.Document;
 using SISGED.Shared.Models.Queries.Statistic;
@@ -679,38 +680,30 @@ namespace SISGED.Server.Services.Repositories
             //_bandejas.UpdateOne(band => band.usuario == documento.idusuario, updateBandejaI);
         }
 
-        public async Task<Document> GenerateDocumentAsync(GenerateDocumentRequest document)
+        public async Task<Document> GenerateDocumentAsync(DocumentGenerationDTO documentGenerationDTO)
         {
-            Document doc = new Document();
-            DocumentTray documentTray = new DocumentTray();
-            documentTray.DossierId = document.DossierId;
-            //bandejaDocumento.iddocumento = documento.iddocumento;
-            documentTray.DocumentId = document.PreviousDocumentId;
+            var currentDocument = await GetDocumentAsync(documentGenerationDTO.DocumentId);
 
-            UpdateDefinition<Tray> updateTrayD = Builders<Tray>.Update.Pull("bandejaentrada", documentTray);
-            await _trayCollection.UpdateOneAsync(t => t.User == document.UserId, updateTrayD);
+            var contentVersion = new ContentVersion(currentDocument.ContentsHistory.Count + 1, documentGenerationDTO.GeneratedURL);
+            var process = new Process(documentGenerationDTO.UserId, documentGenerationDTO.UserId, "generado");
 
-            documentTray.DocumentId = document.DocumentId;
+            var updateFilter = Builders<Document>.Update
+                                                       .Set("contenido.codigo", documentGenerationDTO.Code)
+                                                       .Set("contenido.firma", documentGenerationDTO.Sign)
+                                                       .Set("contenido.urlGenerado", documentGenerationDTO.GeneratedURL)
+                                                       .Set("estado", "generado")
+                                                       .Push("historialcontenido", contentVersion)
+                                                       .Push("historialproceso", process);
+                                                       
 
-            UpdateDefinition<Tray> updateTrayI = Builders<Tray>.Update.Push("bandejasalida", documentTray);
-            await _trayCollection.UpdateOneAsync(t => t.User == document.UserId, updateTrayI);
+            var updateQuery = Builders<Document>.Filter.Eq("id", documentGenerationDTO.DocumentId);
 
-            ContentVersion contentVersion = new ContentVersion();
+            var document = await _documentsCollection.FindOneAndUpdateAsync(updateQuery, updateFilter, new() 
+            {
+                ReturnDocument = ReturnDocument.After
+            });
 
-            contentVersion.Version = 1;
-            contentVersion.Url = DateTime.UtcNow.AddHours(-5).ToString();
-
-            var UpdateFilter = Builders<Document>.Update
-                                                       .Set("contenido.codigo", document.Code)
-                                                       .Set("contenido.firma", document.Sign)
-                                                       .Set("contenido.urlGenerado", document.GeneratedURL)
-                                                       .Push("historialcontenido", contentVersion);
-
-            var UpdateQuery = Builders<Document>.Filter.Eq("id", document.DocumentId);
-
-            await _documentsCollection.UpdateOneAsync(UpdateQuery, UpdateFilter);
-
-            return doc;
+            return document;
         }
 
         public async Task<Document> ModifyStateDocumentAsync(DocumentRequest document)

@@ -1,0 +1,51 @@
+﻿@if(pageLoading)
+{
+    <GenericToolLoader Body="Cargando los elementos para la generación del documento, por favor espere..."></GenericToolLoader>
+}
+else
+{
+    <MudStack Class="document-register-wrapper">
+        <MudCard Elevation="0" Outlined="true" Class="tool-margin">
+            <MudCardContent>
+                <MudGrid>
+                    <MudItem xs="12" sm="12" md="5" lg="4" xl="12" Class="align-self-center">
+                        <MudIcon Class="fa-regular fa-file-pdf large-icon" Color="Color.Error"></MudIcon>
+                        <MudText Typo="Typo.body2">Previsualice el documento a generar, el cual estará adjuntada su firma.</MudText>
+                    </MudItem>
+                    <MudItem xs="12" sm="12" md="7" lg="8" xl="12">
+                        <MudGrid>
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                                <div class="text-start text-sm-center mb-2">
+                                    <MudText Typo="Typo.h6">Tipo de Documento</MudText>
+                                    <MudText Typo="Typo.body1">@documentType</MudText>
+                                </div>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                                <div class="text-start text-sm-center mb-2">
+                                    <MudText Typo="Typo.h6">Fecha de Generación</MudText>
+                                    <MudText Typo="Typo.body1">@documentGenerationCreation</MudText>
+                                </div>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <div class="text-start text-sm-center mb-2">
+                                    <MudText Typo="Typo.h6">Código del Documento</MudText>
+                                    <MudText Typo="Typo.body1">@generateDocumentRequest.Code</MudText>
+                                </div>
+                            </MudItem>
+                        </MudGrid>
+                    </MudItem>
+                    <MudItem xs="12" sm="12" md="12" lg="12" xl="12" Class="text-start">
+                        <GenericInputImage Label="Firma" SelectedImage="GetSignature"></GenericInputImage>
+                    </MudItem>
+                    <MudItem xs="12" sm="12" md="12" lg="12" xl="12" Class="text-end">
+                        <MudButton Color="Color.Secondary" Variant="Variant.Filled" Class="rounded-lg" OnClick="@(() => GenerateDocument())">Generar</MudButton>
+                    </MudItem>
+                </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudStack>
+    <CascadingValue Value="documentGenerator" Name="DocumentGenerator">
+        @ChildContent
+    </CascadingValue>
+}
+

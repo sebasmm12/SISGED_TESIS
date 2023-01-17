@@ -1,0 +1,22 @@
+﻿<InputFile id="image" OnChange="@(async (inputFile) => await UploadFiles(inputFile))" accept=".jph, .jpeg, .png" hidden="hidden"></InputFile>
+
+<MudFab HtmlTag="label"
+        Color="Color.Primary"
+        Icon="@Icon"
+        Label="@($"Cargar { Label }")"
+        Class="mt-1"
+        for="image">
+    
+</MudFab>
+
+<MudPaper Class="mt-1" Elevation="0">
+    @if(imagePreLoad is not null)
+    {
+        <MudImage Width="350" Height="210" Src="@($"data:image/jpeg;base64, { imagePreLoad }")" Alt="@Label" Class="rounded-lg"></MudImage>
+    }
+    @if(ImageUrl is not null)
+    {
+        <MudImage Width="350" Height="210" Src="@ImageUrl" Alt="@Label" Class="rounded-lg"></MudImage>
+    }
+</MudPaper>
+
