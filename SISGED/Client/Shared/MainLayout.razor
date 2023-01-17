@@ -23,12 +23,15 @@ else
             <MudMenu AnchorOrigin="@Origin.BottomCenter" TransformOrigin="@Origin.TopLeft" PopoverClass="standard-color">
                 <ActivatorContent>
                     <div class="user-profile-img">
-                        <div class="user-profile-name mr-1">Sebastian</div>
-                        <MudAvatar Color="Color.Info">S</MudAvatar>
+                        <div class="user-profile-name mr-1">@SessionAccount.GetClient().Name</div>
+                        @*<MudAvatar Color="Color.Info">S</MudAvatar>*@
+                        <MudAvatar Color="Color.Info" Image="@SessionAccount.GetClient().Profile" Alt="@SessionAccount.GetClient().Name.Substring(0)" />
                     </div>
                 </ActivatorContent>
                 <ChildContent>
-                    <UserMenu></UserMenu>
+                    <CascadingValue Value="@SessionAccount">
+                        <UserMenu></UserMenu>
+                    </CascadingValue>
                 </ChildContent>
             </MudMenu>
         </MudAppBar>

@@ -29,6 +29,7 @@ using MudBlazor;
 using MudExtensions;
 using MudExtensions.Enums;
 using SISGED.Client.Services.Contracts;
+using SISGED.Shared.Models.Responses.Account;
 
 namespace SISGED.Client.Shared
 {
@@ -38,6 +39,8 @@ namespace SISGED.Client.Shared
         private ILoginRepository LoginRepository { get; set; } = default!;
         [Inject]
         private NavigationManager navigationManager { get; set; } = default!;
+        [CascadingParameter]
+        public SessionAccountResponse SessionAccount { get; set; } = default!;
 
         private async Task LogOutAsync()
         {
