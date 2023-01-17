@@ -39,8 +39,8 @@ static void ConfigureServices(IServiceCollection services)
     services.AddScoped<ILocalStorageRepository, LocalStorageRepository>();
 
     services.AddScoped<LoginRepository>();
-    services.AddScoped<AuthenticationStateProvider, LoginRepository>(l => l.GetRequiredService<LoginRepository>());
-    services.AddScoped<ILoginRepository, LoginRepository>(l => l.GetRequiredService<LoginRepository>());
+    services.AddScoped<AuthenticationStateProvider, LoginRepository>();
+    services.AddScoped<ILoginRepository, LoginRepository>();
 
     services.AddTransient<ToolWindowStrategy>();
     services.AddTransient<DocumentStrategy>();
