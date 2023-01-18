@@ -28,6 +28,7 @@ namespace SISGED.Client.Shared
         private readonly string organizationMainPageUrl = "https://www.notarios.org.pe";
         private IJSObjectReference mainLayoutModule = default!;
         private string userName = "";
+        private bool _render;
 
         private void ToogleDrawer()
         {
@@ -52,6 +53,7 @@ namespace SISGED.Client.Shared
             }
 
             await mainLayoutModule.InvokeVoidAsync("hideCircularProgress");
+            _render = true;
         }
 
         private async Task<SessionAccountResponse> GetSessionAccountAsync()
