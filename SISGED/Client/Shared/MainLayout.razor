@@ -1,64 +1,68 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager navigationManager
 
-@if (SessionAccount is null)
+@if (_render)
 {
-    <MudDialogProvider />
-    <SISGED.Client.Pages.Auth.Login></SISGED.Client.Pages.Auth.Login>
-}
-else
-{
+    if (SessionAccount is null)
+    {
+        <MudThemeProvider />
+        <MudDialogProvider />
+        <SISGED.Client.Pages.Auth.Login></SISGED.Client.Pages.Auth.Login>
+    }
+    else
+    {
 
-    <MudThemeProvider />
-    <MudDialogProvider />
-    <MudSnackbarProvider />
+        <MudThemeProvider />
+        <MudDialogProvider />
+        <MudSnackbarProvider />
 
-    <MudLayout>
-        <MudAppBar Elevation="1">
-            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="(() =>ToogleDrawer())"></MudIconButton>
-            <MudHidden Breakpoint="Breakpoint.MdAndDown"><MudText Typo="Typo.body2">SISGED - Sistema de Gestión Documentario del <MudLink Target="_blank" Href="@organizationMainPageUrl" Color="Color.Secondary" Typo="Typo.body2"> Colegio de Notarios de Lima</MudLink></MudText></MudHidden>
-            <MudSpacer />
-            <MudMenu Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" MaxHeight="500">
-            </MudMenu>
-            <MudMenu AnchorOrigin="@Origin.BottomCenter" TransformOrigin="@Origin.TopLeft" PopoverClass="standard-color">
-                <ActivatorContent>
-                    <div class="user-profile-img">
-                        <div class="user-profile-name mr-1">@SessionAccount.GetClient().Name</div>
-                        <MudAvatar Color="Color.Info" Image="@SessionAccount.GetClient().Profile" Alt="@SessionAccount.GetClient().Name.Substring(0)" />
-                    </div>
-                </ActivatorContent>
-                <ChildContent>
-                    <CascadingValue Value="@SessionAccount">
-                        <UserMenu></UserMenu>
-                    </CascadingValue>
-                </ChildContent>
-            </MudMenu>
-        </MudAppBar>
-        <MudDrawer @bind-Open="@drawerOpen" Color="Color.Primary" Elevation="1" Anchor="@Anchor.Start" Variant="@DrawerVariant.Temporary">
-            <MudDrawerHeader Class="px-0">
-                @if (SessionAccount is not null)
-                {
-                    <NavMenu InterfacePermissions="SessionAccount.InterfacePermissions" />
-                }
-            </MudDrawerHeader>
+        <MudLayout>
+            <MudAppBar Elevation="1">
+                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="(() =>ToogleDrawer())"></MudIconButton>
+                <MudHidden Breakpoint="Breakpoint.MdAndDown"><MudText Typo="Typo.body2">SISGED - Sistema de Gestión Documentario del <MudLink Target="_blank" Href="@organizationMainPageUrl" Color="Color.Secondary" Typo="Typo.body2"> Colegio de Notarios de Lima</MudLink></MudText></MudHidden>
+                <MudSpacer />
+                <MudMenu Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" MaxHeight="500">
+                </MudMenu>
+                <MudMenu AnchorOrigin="@Origin.BottomCenter" TransformOrigin="@Origin.TopLeft" PopoverClass="standard-color">
+                    <ActivatorContent>
+                        <div class="user-profile-img">
+                            <div class="user-profile-name mr-1">@SessionAccount.GetClient().Name</div>
+                            <MudAvatar Color="Color.Info" Image="@SessionAccount.GetClient().Profile" Alt="@SessionAccount.GetClient().Name.Substring(0)" />
+                        </div>
+                    </ActivatorContent>
+                    <ChildContent>
+                        <CascadingValue Value="@SessionAccount">
+                            <UserMenu></UserMenu>
+                        </CascadingValue>
+                    </ChildContent>
+                </MudMenu>
+            </MudAppBar>
+            <MudDrawer @bind-Open="@drawerOpen" Color="Color.Primary" Elevation="1" Anchor="@Anchor.Start" Variant="@DrawerVariant.Temporary">
+                <MudDrawerHeader Class="px-0">
+                    @if (SessionAccount is not null)
+                    {
+                        <NavMenu InterfacePermissions="SessionAccount.InterfacePermissions" />
+                    }
+                </MudDrawerHeader>
 
-        </MudDrawer>
-        <MudMainContent Class="total-screen">
-            <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="h-100">
-                @if (SessionAccount is null)
-                {
-                    <MudPaper Elevation="0" Class="d-flex align-center justify-center h-100 w-100 standard-color">
-                        <MudProgressCircular Color="Color.Primary" Style="width: 100px;height: 100px"
+            </MudDrawer>
+            <MudMainContent Class="total-screen">
+                <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="h-100">
+                    @if (SessionAccount is null)
+                    {
+                        <MudPaper Elevation="0" Class="d-flex align-center justify-center h-100 w-100 standard-color">
+                            <MudProgressCircular Color="Color.Primary" Style="width: 100px;height: 100px"
                                      Indeterminate="true"></MudProgressCircular>
-                    </MudPaper>
-                }
-                else
-                {
-                    <CascadingValue Value="SessionAccount" Name="SessionAccount">
-                        @Body
-                    </CascadingValue>
-                }
-            </MudContainer>
-        </MudMainContent>
-    </MudLayout>
+                        </MudPaper>
+                    }
+                    else
+                    {
+                        <CascadingValue Value="SessionAccount" Name="SessionAccount">
+                            @Body
+                        </CascadingValue>
+                    }
+                </MudContainer>
+            </MudMainContent>
+        </MudLayout>
+    }
 }

@@ -88,7 +88,7 @@ form {
 }
 
     .input-div > div > h5 {
-        position: absolute;
+        /*position: absolute;*/
         left: 10px;
         top: 50%;
         transform: translateY(-50%);
@@ -99,7 +99,7 @@ form {
 
 .input-div:before, .input-div:after {
     content: '';
-    position: absolute;
+    /*position: absolute;*/
     bottom: -2px;
     width: 0%;
     height: 2px;
@@ -129,7 +129,7 @@ form {
 }
 
 .input-div > div > input {
-    position: absolute;
+    /*position: absolute;*/
     left: 0;
     top: 0;
     width: 100%;
