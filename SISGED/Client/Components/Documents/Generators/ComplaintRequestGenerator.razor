@@ -1,17 +1,87 @@
 ﻿<div class="d-none">
-    <table id="converted-pdf">
-        <tbody>
-            <tr>
-                <th colspan="7">@complaintRequestContent.Title</th>
-            </tr>
-            <tr><td colspan="7"> </td></tr>
-            <tr><td colspan="7">Código: @DocumentGenerator.DocumentCode</td></tr>
-            <tr><td colspan="7"> Fecha de entrega:  @complaintRequestContent.DeliveryDate.ToString("dd/MM/yyyy") </td></tr>
-            <tr><td colspan="7"> Nombre del cliente: </td></tr>
-            <tr><td colspan="7"> @complaintRequestContent.ClientId</td></tr>
-            <tr><td colspan="7">Descripción: </td></tr>
-            <tr><td colspan="7"> @complaintRequestContent.Description</td></tr>
-        </tbody>
-    </table>
+    @if (canShow)
+    {
+        <table id="converted-pdf">
+            <thead>
+                <tr>
+                    <th colspan="2" data-type="title">@complaintRequestContent.Title</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td colspan="2" data-type="section">I. Datos Generales</td></tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Código</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@DocumentGenerator.DocumentCode</td>
+                </tr>
+                <tr>
+                    <td data-type="subtitle">Tipo de Denuncia</td>
+                    <td data-type="subtitle">Fecha de Entrega</td>
+                </tr>
+                <tr>
+                    <td data-type="text">@complaintRequest.ComplaintType.Name</td>
+                    <td data-type="text">@complaintRequestContent.DeliveryDate.ToString("dd/MM/yyyy") </td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Descripción</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@complaintRequestContent.Description</td>
+                </tr>
+                <tr><td colspan="2" data-type="section">II. Participantes</td></tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Denunciante</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@complaintRequest.Client.Name @complaintRequest.Client.LastName</td>
+                </tr>
+                <tr>
+                    <td data-type="subtitle">Tipo de Documento</td>
+                    <td data-type="subtitle">Número de Documento</td>
+                </tr>
+                <tr>
+                    <td data-type="text">@complaintRequest.Client.DocumentType</td>
+                    <td data-type="text">@complaintRequest.Client.DocumentNumber</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Denunciado</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@complaintRequest.Solicitor.Name @complaintRequest.Solicitor.LastName</td>
+                </tr>
+                <tr>
+                    <td data-type="subtitle">Correo electrónico</td>
+                    <td data-type="subtitle">Notaría</td>
+                </tr>
+                <tr>
+                    <td data-type="text">@complaintRequest.Solicitor.Email</td>
+                    <td data-type="text">@complaintRequest.Solicitor.SolicitorOfficeName</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Dirección de Notaría</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@complaintRequest.Solicitor.Address</td>
+                </tr>
+                @if (DocumentGenerator.Document.UrlAnnex.Any())
+                {
+                    <tr>
+                        <td colspan="2" data-type="section">III. Anexos</td>
+                    </tr>
+                    @for (int i = 0; i < DocumentGenerator.Document.UrlAnnex.Count; i++)
+                    {
+                        string annex = DocumentGenerator.Document.UrlAnnex[i];
+
+                        <tr>
+                            <td>
+                                <a target="_blank" data-text="@($"Ver Anexo { i }")" href="@annex"></a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    }
 </div>
 

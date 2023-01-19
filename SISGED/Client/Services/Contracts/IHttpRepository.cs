@@ -9,5 +9,6 @@ namespace SISGED.Client.Services.Contracts
         Task<HttpResponseWrapper<object>> PostAsync<T>(string url, T body);
         Task<HttpResponseWrapper<TResponse>> PostAsync<TRequest, TResponse>(string url, TRequest body);
         Task<HttpResponseWrapper<object>> PutAsync<T>(string url, T body);
+        Task<HttpResponseWrapper<TResponse>> PutAsync<TRequest, TResponse>(string url, TRequest body);
     }
 }

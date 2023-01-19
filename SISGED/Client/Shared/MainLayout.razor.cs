@@ -22,7 +22,7 @@ namespace SISGED.Client.Shared
 
         public SessionAccountResponse SessionAccount { get; set; } = default!;
         [CascadingParameter]
-        public Task<AuthenticationState> authenticationState { get; set; } = default!;
+        public Task<AuthenticationState> AuthenticationState { get; set; } = default!;
 
         private bool drawerOpen = false;
         private readonly string organizationMainPageUrl = "https://www.notarios.org.pe";
@@ -40,7 +40,7 @@ namespace SISGED.Client.Shared
 
             mainLayoutModule = await IJSRuntime.InvokeAsync<IJSObjectReference>("import", "../js/main-layout.js");
 
-            var authState = await authenticationState;
+            var authState = await AuthenticationState;
             
             var user = authState.User;
 

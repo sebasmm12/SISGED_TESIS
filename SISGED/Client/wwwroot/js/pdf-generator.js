@@ -1,23 +1,36 @@
-﻿function generatePdf(image, nombre, documento) {
+﻿export function generatePdf(image, nombre, documento) {
     var doc = new jsPDF();
     var pageSize = doc.internal.pageSize;
     var pageHeight = pageSize.height ? pageSize.height : pageSize.getHeight();
     var pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth();
 
-
     doc.autoTable({
         html: '#converted-pdf',
         theme: 'plain',
         didParseCell: function (data) {
-            if (data.row.index === 0) {
-                data.cell.styles.fontSize = 20;
-                data.cell.styles.halign = 'center';
-            } else if (data.row.index === 2) {
-                data.cell.styles.fontSize = 13;
-                data.cell.styles.fontStyle = 'bold';
-            } else {
-                data.cell.styles.fontSize = 12;
+            if (data.cell.raw && data.cell.raw.attributes["data-type"]) {
+                let cellType = data.cell.raw.attributes["data-type"].nodeValue;
+                getCellFont(data, cellType);
             }
+            else {
+            }
+        },
+        didDrawCell: function (data) {
+            if (data.cell.raw && data.cell.raw.attributes["data-type"]) return;
+
+            let cell = data.cell.raw;
+
+            if (!cell) return;
+
+            let link = cell.getElementsByTagName("a")[0];
+
+            if (!link) return;
+
+            let textPosition = data.cell.textPos;
+
+            doc.setFontSize(14);
+            doc.textWithLink("- " +link.getAttribute("data-text"), textPosition.x, textPosition.y + 4, { url: link.getAttribute("href") });
+            
         },
         didDrawPage: function (data) {
             // Header
@@ -42,7 +55,7 @@
         }
     });
 
-    var imgData = 'data:image/jpeg;base64,' + image;
+    var imgData = `data:image/jpeg;base64,${image.content}`;
 
     if (doc.autoTableEndPosY() + 46 < pageHeight - 23) {
         doc.addImage(imgData, 'JPEG', (pageWidth / 2) - 27, doc.autoTableEndPosY() + 1, 55, 35);
@@ -62,13 +75,50 @@
         doc.line(0, 32, pageWidth, 32);
         // Footer
         var str = "Página " + doc.internal.getNumberOfPages()
-        doc.setFontSize(10);
+        doc.setFontSize(14);
         doc.text(str, pageWidth / 2, pageHeight - 10, 'center');
         doc.addImage(imgData, 'JPEG', (pageWidth / 2) - 27, 37, 55, 35);
-        doc.setFontSize(10);
+        doc.setFontSize(14);
         doc.text(nombre, pageWidth / 2, 77, 'center');
         doc.text(documento, pageWidth / 2, 82, 'center');
 
     }
     return doc.output('datauristring');
+}
+
+var cellTypes = [
+    { 
+        type: 'title',
+        executeStyle: function (data) {
+            data.cell.styles.fontSize = 18;
+        }
+    },
+    {
+        type: 'section',
+        executeStyle: function (data) {
+            data.cell.styles.fontSize = 17;
+            data.cell.styles.fontStyle = 'bold';
+        }
+    },
+    {
+        type: 'subtitle',
+        executeStyle: function (data) {
+            data.cell.styles.fontSize = 15;
+            data.cell.styles.fontStyle = 'bold';
+        }
+    },
+    {
+        type: 'text',
+        executeStyle: function (data) {
+            data.cell.styles.fontSize = 14;
+        }
+    }
+];
+
+function getCellFont(data, type) {
+
+    let cellType = cellTypes.find(cellType => cellType.type === type);
+
+    cellType.executeStyle(data);
+
 }

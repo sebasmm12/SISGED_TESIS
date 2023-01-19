@@ -696,7 +696,7 @@ namespace SISGED.Server.Services.Repositories
                                                        .Push("historialproceso", process);
                                                        
 
-            var updateQuery = Builders<Document>.Filter.Eq("id", documentGenerationDTO.DocumentId);
+            var updateQuery = Builders<Document>.Filter.Eq(document => document.Id, documentGenerationDTO.DocumentId);
 
             var document = await _documentsCollection.FindOneAndUpdateAsync(updateQuery, updateFilter, new() 
             {

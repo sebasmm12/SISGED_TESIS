@@ -172,14 +172,14 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPost("complaint-requests")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<ComplaintRequest>> ComplaintRequestDocumentRegister(DossierWrapper dossierWrapper)
         {
             try
             {
                 var document = DeserializeDocument<ComplaintRequestResponse>(dossierWrapper.Document);
 
-                //var user = await GetUserAsync("userId");
-                var user = await _userService.GetUserByIdAsync("5eeaf61e8ca4ff53a0b791e6");
+                var user = await GetUserAsync("userId");
 
                 var complaintRequest = await RegisterComplaintRequestAsync(document, user);
 
@@ -240,7 +240,7 @@ namespace SISGED.Server.Controllers
             }
         }
 
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost("user-requests")]
         public async Task<ActionResult<DossierDocumentInitialRequestResponse>> InitialRequestDocumentRegister(DossierWrapper dossierWrapper)
         {
@@ -315,14 +315,14 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPost("disciplinary-openness")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<DisciplinaryOpenness>> DisciplinaryOpennessDocumentRegister([FromBody]DossierWrapper dossierWrapper)
         {
             try
             {
                 var document = DeserializeDocument<DisciplinaryOpennessResponse>(dossierWrapper.Document);
 
-                //var user = await GetUserAsync("userId");
-                var user = await _userService.GetUserByIdAsync("5f2bd8600fa0bc67c45f9866");
+                var user = await GetUserAsync("userId");
 
                 var disciplinaryOpenness = await RegisterDisciplinaryOpennessDocumentAsync(document, user);
 
@@ -341,14 +341,14 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPost("solicitor-dossier-request")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<SolicitorDossierRequest>> SolicitorDossierRequestRegister([FromBody] DossierWrapper dossierWrapper)
         {
             try
             {
                 var document = DeserializeDocument<SolicitorDossierRequestResponse>(dossierWrapper.Document);
 
-                //var user = await GetUserAsync("userId");
-                var user = await _userService.GetUserByIdAsync("5ef29f2e48b4b5290c3763af");
+                var user = await GetUserAsync("userId");
 
                 var solicitorDossierRequest = await RegisterSolicitorDossierRequestDocumentAsync(document, user);
 
@@ -367,6 +367,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPost("dictums")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<Dictum>> RegisterDictumAsync(DossierWrapper dossierWrapper)
         {
             try
@@ -374,7 +375,6 @@ namespace SISGED.Server.Controllers
                 var document = DeserializeDocument<DictumResponse>(dossierWrapper.Document);
 
                 var user = await GetUserAsync("userId");
-                //var user = await _userService.GetUserByIdAsync("5f0ac7598ea569d19fe57a3e");
 
                 var dictum = await RegisterDictumAsync(document, user);
 
@@ -392,14 +392,14 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPost("resolutions")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<Resolution>> ResolutionDocumentRegister(DossierWrapper dossierWrapper)
         {
             try
             {
                 var document = DeserializeDocument<ResolutionResponse>(dossierWrapper.Document);
 
-                //var user = await GetUserAsync("userId");
-                var user = await _userService.GetUserByIdAsync("5f2bd8600fa0bc67c45f9866");
+                var user = await GetUserAsync("userId");
 
                 var resolutionDocument = await RegisterResolutionDocumentAsync(document, user);
 
@@ -452,14 +452,14 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPost("solicitor-dossier-shipments")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<SolicitorDossierShipment>> RegisterSolicitorDossierShipmentAsync(DossierWrapper dossierWrapper)
         {
             try
             {
                 var document = DeserializeDocument<SolicitorDossierShipmentResponse>(dossierWrapper.Document);
 
-                //var user = await GetUserAsync("userId");
-                var user = await _userService.GetUserByIdAsync("5f100d53de645e30f4bf2ef0");
+                var user = await GetUserAsync("userId");
 
                 var solicitorDossierShipment = await RegisterSolicitorDossierShipmentAsync(document, user);
 
@@ -495,13 +495,15 @@ namespace SISGED.Server.Controllers
             }
         }
 
-        [HttpPut("generardocumento")]
+        [HttpPut("generation")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<Document>> GenerateDocument(GenerateDocumentRequest documentRequest)
         {
             try
             {
-                
-                var generatedDocument = await GetGeneratedDocumentAsync(documentRequest);
+                var user = await GetUserAsync("userId");
+
+                var generatedDocument = await GetGeneratedDocumentAsync(documentRequest, user);
                 
                 var document = await _documentService.GenerateDocumentAsync(generatedDocument);
                 
@@ -1221,10 +1223,10 @@ namespace SISGED.Server.Controllers
         }
         
 
-        private async Task<DocumentGenerationDTO> GetGeneratedDocumentAsync(GenerateDocumentRequest documentRequest)
+        private async Task<DocumentGenerationDTO> GetGeneratedDocumentAsync(GenerateDocumentRequest documentRequest, User user)
         {
             var signTask = _mediaService.SaveFileAsync(documentRequest.Sign, _generatedContainerName);
-            var generatedUrlTask = _mediaService.SaveFileAsync(documentRequest.Sign, _generatedContainerName);
+            var generatedUrlTask = _mediaService.SaveFileAsync(documentRequest.GeneratedURL, _generatedContainerName);
 
             await Task.WhenAll(signTask, generatedUrlTask);
 
@@ -1232,6 +1234,7 @@ namespace SISGED.Server.Controllers
 
             documentGenerationDTO.Sign = await signTask;
             documentGenerationDTO.GeneratedURL = await generatedUrlTask;
+            documentGenerationDTO.UserId = user.Id;
 
             return documentGenerationDTO;
         }

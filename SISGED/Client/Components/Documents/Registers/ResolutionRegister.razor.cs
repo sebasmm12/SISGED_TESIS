@@ -162,7 +162,7 @@ namespace SISGED.Client.Components.Documents.Registers
         {
             try
             {
-                var documentTypesResponse = await httpRepository.GetAsync<IEnumerable<DocumentTypeInfoResponse>>("api/documentTypes/sancion");
+                var documentTypesResponse = await httpRepository.GetAsync<IEnumerable<DocumentTypeInfoResponse>>("api/documentTypes?type=sancion");
 
                 if (documentTypesResponse.Error)
                 {

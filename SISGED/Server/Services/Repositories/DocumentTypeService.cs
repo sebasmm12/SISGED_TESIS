@@ -22,5 +22,14 @@ namespace SISGED.Server.Services.Repositories
 
             return documentTypes;
         }
+
+        public async Task<DocumentType> GetDocumentTypeAsync(string id)
+        {
+            var documentType = await _documentTypesCollection.Find(documentType => documentType.Id == id).FirstOrDefaultAsync();
+
+            if (documentType is null) throw new Exception($"No se pudo obtener el tipo de documento mediante el id {id}");
+
+            return documentType;
+        }
     }
 }

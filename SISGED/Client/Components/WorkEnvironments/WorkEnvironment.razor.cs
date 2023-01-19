@@ -80,6 +80,18 @@ namespace SISGED.Client.Components.WorkEnvironments
         public void UpdateRegisteredDocument(Item item)
         {
             ChangeToolPlace(new("inputs", "outputs", item));
+            UpdateUsedTool();
+        }
+
+        public void UpdateGeneratedDocument()
+        {
+            ChangeToolPlace(new("outputs", "outputs"));
+
+            UpdateUsedTool();
+        }
+
+        private void UpdateUsedTool()
+        {
             ChangeToolPlace(new("tools", "tools"));
 
             workPlaceItems.Clear();

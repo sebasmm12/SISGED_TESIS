@@ -19,8 +19,8 @@ namespace SISGED.Server.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("{type}")]
-        public async Task<ActionResult<IEnumerable<DocumentTypeInfoResponse>>> GetDocumentTypesAsync(string type)
+        [HttpGet()]
+        public async Task<ActionResult<IEnumerable<DocumentTypeInfoResponse>>> GetDocumentTypesAsync([FromQuery] string type)
         {
             try
             {
@@ -35,7 +35,25 @@ namespace SISGED.Server.Controllers
 
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
-            
+
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<DocumentTypeInfoResponse>> GetDocumentTypeAsync([FromRoute] string id)
+        {
+            try
+            {
+                var documentType = await _documentTypeService.GetDocumentTypeAsync(id);
+
+                var documentTypeResponse = _mapper.Map<DocumentTypeInfoResponse>(documentType);
+
+                return Ok(documentTypeResponse);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
     }
 }

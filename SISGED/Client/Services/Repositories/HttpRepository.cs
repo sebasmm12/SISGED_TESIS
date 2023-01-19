@@ -71,6 +71,22 @@ namespace SISGED.Client.Services.Repositories
             return new HttpResponseWrapper<object>(null, !httpResponse.IsSuccessStatusCode, httpResponse);
         }
 
+        public async Task<HttpResponseWrapper<TResponse>> PutAsync<TRequest, TResponse>(string url, TRequest body)
+        {
+            var data = ConvertToStringContent(body);
+
+            var httpResponse = await _httpClient.PutAsync(url, data);
+
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                var response = await DeserializeResponseAsync<TResponse>(httpResponse, SerializerOptions);
+
+                return new HttpResponseWrapper<TResponse>(response, false, httpResponse);
+            }
+
+            return new HttpResponseWrapper<TResponse>(default, true, httpResponse);
+        }
+
         #region private methods
         private static async Task<T> DeserializeResponseAsync<T>(HttpResponseMessage httpResponse, JsonSerializerOptions jsonSerializerOptions)
         {

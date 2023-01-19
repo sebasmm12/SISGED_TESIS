@@ -44,5 +44,10 @@ namespace SISGED.Shared.Entities
         {
             return Data.Profile;
         }
+
+        public string GetFullName()
+        {
+            return Data.Name + " " + Data.LastName;
+        }
     }
 }
