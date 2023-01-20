@@ -1,3 +1,79 @@
-﻿<h3>SolicitorDossierRequestGenerator</h3>
+﻿<div class="d-none">
+    @if (canShow)
+    {
+        <table id="converted-pdf">
+            <thead>
+                <tr>
+                    <th colspan="2" data-type="title">@solicitorDossierRequestContent.Title</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td colspan="2" data-type="section">I. Datos Generales</td></tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Código</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@DocumentGenerator.DocumentCode</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Descripción</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@solicitorDossierRequestContent.Description</td>
+                </tr>
+                <tr><td colspan="2" data-type="section">II. Participantes</td></tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Cliente</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@solicitorDossierRequest.Client.Name @solicitorDossierRequest.Client.LastName</td>
+                </tr>
+                <tr>
+                    <td data-type="subtitle">Tipo de Documento</td>
+                    <td data-type="subtitle">Número de Documento</td>
+                </tr>
+                <tr>
+                    <td data-type="text">@solicitorDossierRequest.Client.DocumentType</td>
+                    <td data-type="text">@solicitorDossierRequest.Client.DocumentNumber</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Notario</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@solicitorDossierRequest.Solicitor.Name @solicitorDossierRequest.Solicitor.LastName</td>
+                </tr>
+                <tr>
+                    <td data-type="subtitle">Correo electrónico</td>
+                    <td data-type="subtitle">Notaría</td>
+                </tr>
+                <tr>
+                    <td data-type="text">@solicitorDossierRequest.Solicitor.Email</td>
+                    <td data-type="text">@solicitorDossierRequest.Solicitor.SolicitorOfficeName</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Dirección de Notaría</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@solicitorDossierRequest.Solicitor.Address</td>
+                </tr>
+                @if (DocumentGenerator.Document.UrlAnnex.Any())
+                {
+                    <tr>
+                        <td colspan="2" data-type="section">III. Anexos</td>
+                    </tr>
+                    @for (int i = 0; i < DocumentGenerator.Document.UrlAnnex.Count; i++)
+                    {
+                        string annex = DocumentGenerator.Document.UrlAnnex[i];
 
+                        <tr>
+                            <td>
+                                <a target="_blank" data-text="@($"Ver Anexo { i }")" href="@annex"></a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    }
+</div>
 

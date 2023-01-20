@@ -28,10 +28,60 @@ using SISGED.Shared.DTOs;
 using MudBlazor;
 using MudExtensions;
 using MudExtensions.Enums;
+using SISGED.Client.Services.Contracts;
+using System.Text.Json;
 
 namespace SISGED.Client.Components.Documents.Generators
 {
     public partial class SolicitorDossierRequestGenerator
     {
+        [Inject]
+        public IHttpRepository HttpRepository { get; set; } = default!;
+        [Inject]
+        public ISwalFireRepository SwalFireRepository { get; set; } = default!;
+
+        [CascadingParameter(Name = "DocumentGenerator")]
+        public DocumentGenerator DocumentGenerator { get; set; } = default!;
+
+        private SolicitorDossierRequestContentDTO solicitorDossierRequestContent = default!;
+        private SolicitorDossierRequestDTO solicitorDossierRequest = default!;
+        private bool canShow = false;
+
+        protected override async Task OnInitializedAsync()
+        {
+            solicitorDossierRequestContent = JsonSerializer.Deserialize<SolicitorDossierRequestContentDTO>(JsonSerializer.Serialize(DocumentGenerator.Document.Content))!;
+
+            await GetSolicitorDossierRequestInfoAsync();
+
+            canShow = true;
+        }
+
+        private async Task GetSolicitorDossierRequestInfoAsync()
+        {
+            var solicitor = await GetSolicitorAsync(solicitorDossierRequestContent.SolicitorId);
+
+            solicitorDossierRequest = new(DocumentGenerator.Dossier.Client!, solicitor);
+        }
+
+        private async Task<AutocompletedSolicitorResponse> GetSolicitorAsync(string solicitorId)
+        {
+            try
+            {
+                var solicitorResponse = await HttpRepository.GetAsync<AutocompletedSolicitorResponse>($"api/solicitors/{solicitorId}");
+
+                if (solicitorResponse.Error)
+                {
+                    await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener la información del notario");
+                }
+
+                return solicitorResponse.Response!;
+            }
+            catch (Exception)
+            {
+
+                await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener la información del notario");
+                return new();
+            }
+        }
     }
 }
