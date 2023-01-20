@@ -16,10 +16,6 @@ namespace SISGED.Shared.Validators
                 .NotEmpty()
                 .WithMessage("Debe ingresar la descripción de la solicitud");
             
-            RuleFor(x => x.Complainant)
-                .NotEmpty()
-                .WithMessage("Debe ingresar el nombre del denunciante");
-            
             RuleFor(x => x.AudienceLocation)
                 .NotEmpty()
                 .WithMessage("Debe ingresar el lugar de la audiencia");
@@ -33,10 +29,12 @@ namespace SISGED.Shared.Validators
                 .WithMessage("Debe ingresar la fecha de fin de audiencia");
 
             RuleFor(x => x.Solicitor)
+                .NotNull()
                 .NotEmpty()
                 .WithMessage("Debe ingresar el nombre del notario");
 
-            RuleFor(x => x.ProsecutorId)
+            RuleFor(x => x.Prosecutor)
+                .NotNull()
                 .NotEmpty()
                 .WithMessage("Debe ingresar el nombre del fiscal");
         }

@@ -20,9 +20,8 @@ else
                             </MudItem>
 
                             <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
-                                <MudTextField @bind-Value="@disciplinaryOpennessRegister.Complainant" Class="text-field-style"
-                                          Label="Nombre del denunciante" For="@(()=>disciplinaryOpennessRegister.Complainant)" Variant="Variant.Outlined"
-                                          Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"></MudTextField>
+                                <MudTextField Value="disciplinaryOpennessRegister.Client.GetShortName()" Label="Nombre del Cliente" Variant="Variant.Outlined"
+                                          Adornment="Adornment.End" AdornmentIcon="fas fa-user" AdornmentColor="Color.Primary" ReadOnly="true"></MudTextField>
                             </MudItem>
 
                             <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
@@ -57,11 +56,11 @@ else
                             </MudItem>
 
                             <MudItem xs="12" sm="12" md="7" lg="7" xl="12">
-                                <MudSelect @bind-Value="@disciplinaryOpennessRegister.ProsecutorId" Class="text-field-style" Label="Seleccione un Fiscal" For="@(()=>disciplinaryOpennessRegister.ProsecutorId)" Clearable="true"
+                                <MudSelect @bind-Value="@disciplinaryOpennessRegister.Prosecutor" Class="text-field-style" Label="Seleccione un Fiscal" For="@(()=>disciplinaryOpennessRegister.Prosecutor)" Clearable="true"
                                        Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary" Variant="Variant.Outlined">
                                     @foreach (ProsecutorUserInfoResponse prosecutor in prosecutors)
                                     {
-                                        <MudSelectItem Value="@prosecutor.Id">@prosecutor.Name @prosecutor.LastName</MudSelectItem>
+                                        <MudSelectItem Value="@prosecutor">@prosecutor.Name @prosecutor.LastName</MudSelectItem>
                                     }
                                 </MudSelect>
                             </MudItem>

@@ -1,3 +1,119 @@
-﻿<h3>DisciplinaryOpennessGenerator</h3>
+﻿<div class="d-none">
+    @if (canShow)
+    {
+        <table id="converted-pdf">
+            <thead>
+                <tr>
+                    <th colspan="2" data-type="title">@disciplinaryOpennessContent.Title</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td colspan="2" data-type="section">I. Datos Generales</td></tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Código</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@DocumentGenerator.DocumentCode</td>
+                </tr>
+                <tr>
+                    <td data-type="subtitle">Fecha de inicio de audiencia</td>
+                    <td data-type="subtitle">Fecha de fin de audiencia</td>
+                </tr>
+                <tr>
+                    <td data-type="text">@disciplinaryOpennessContent.AudienceStartDate.ToString("dd/MM/yyyy")</td>
+                    <td data-type="text">@disciplinaryOpennessContent.AudienceEndDate.ToString("dd/MM/yyyy") </td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Descripción</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@disciplinaryOpennessContent.Description</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Lugar de la Audiencia</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@disciplinaryOpennessContent.AudiencePlace</td>
+                </tr>
+                <tr><td colspan="2" data-type="section">II. Participantes</td></tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Cliente</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@disciplinaryOpenness.Client.Name @disciplinaryOpenness.Client.LastName</td>
+                </tr>
+                <tr>
+                    <td data-type="subtitle">Tipo de Documento</td>
+                    <td data-type="subtitle">Número de Documento</td>
+                </tr>
+                <tr>
+                    <td data-type="text">@disciplinaryOpenness.Client.DocumentType</td>
+                    <td data-type="text">@disciplinaryOpenness.Client.DocumentNumber</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Notario</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@disciplinaryOpenness.Solicitor.Name @disciplinaryOpenness.Solicitor.LastName</td>
+                </tr>
+                <tr>
+                    <td data-type="subtitle">Correo electrónico</td>
+                    <td data-type="subtitle">Notaría</td>
+                </tr>
+                <tr>
+                    <td data-type="text">@disciplinaryOpenness.Solicitor.Email</td>
+                    <td data-type="text">@disciplinaryOpenness.Solicitor.SolicitorOfficeName</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Dirección de Notaría</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@disciplinaryOpenness.Solicitor.Address</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Fiscal</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@disciplinaryOpenness.Prosecutor.Name @disciplinaryOpenness.Prosecutor.LastName</td>
+                </tr>
+                <tr><td colspan="2" data-type="section">III. Cargos</td></tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Participantes</td>
+                </tr>
+                @foreach (string item in disciplinaryOpennessContent.Participants)
+                {
+                    <tr>
+                        <td colspan="2" data-type="text">@item</td>
+                    </tr>
+                }
+                <tr>
+                    <td colspan="2" data-type="subtitle">Conclusiones</td>
+                </tr>
+                @foreach (string item in disciplinaryOpennessContent.ImputedFacts)
+                {
+                    <tr>
+                        <td colspan="2" data-type="text">@item</td>
+                    </tr>
+                }
 
+                @if (DocumentGenerator.Document.UrlAnnex.Any())
+                {
+                    <tr>
+                        <td colspan="2" data-type="section">IV. Anexos</td>
+                    </tr>
+                    @for (int i = 0; i < DocumentGenerator.Document.UrlAnnex.Count; i++)
+                    {
+                        string annex = DocumentGenerator.Document.UrlAnnex[i];
+
+                        <tr>
+                            <td>
+                                <a target="_blank" data-text="@($"Ver Anexo { i }")" href="@annex"></a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    }
+</div>
 
