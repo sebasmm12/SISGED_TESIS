@@ -12,8 +12,6 @@
                 let cellType = data.cell.raw.attributes["data-type"].nodeValue;
                 getCellFont(data, cellType);
             }
-            else {
-            }
         },
         didDrawCell: function (data) {
             if (data.cell.raw && data.cell.raw.attributes["data-type"]) return;

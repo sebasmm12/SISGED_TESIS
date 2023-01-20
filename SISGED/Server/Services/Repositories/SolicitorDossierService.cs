@@ -49,6 +49,18 @@ namespace SISGED.Server.Services.Repositories
 
             return solicitorDossierYears.Years;
         }
+        
+        public async Task<IEnumerable<SolicitorDossier>> GetSolicitorDossiersAsync(IEnumerable<string> solicitorDossierIds)
+        {
+            var filter = Builders<SolicitorDossier>.Filter.In(solicitorDossier => solicitorDossier.Id, solicitorDossierIds);
+            
+            var solicitorDossiers = await _solicitorDossierCollection.Find(filter)
+                                                                     .ToListAsync();
+
+            if (solicitorDossiers is null) throw new Exception($"No se pudo obtener los expedientes del notario en base a los identificador {solicitorDossierIds.Aggregate((first, second) => first + "," + second)}");
+
+            return solicitorDossiers;
+        }
 
         private static BsonDocument[] GetSolicitorDossierYearsPipeline(string solicitorId)
         {

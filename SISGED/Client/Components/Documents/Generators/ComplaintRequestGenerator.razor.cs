@@ -55,7 +55,7 @@ namespace SISGED.Client.Components.Documents.Generators
 
                 if (solicitorResponse.Error)
                 {
-                    await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los tipos de solicitudes del sistema");
+                    await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener la información del notario");
                 }
 
                 return solicitorResponse.Response!;
@@ -63,7 +63,7 @@ namespace SISGED.Client.Components.Documents.Generators
             catch (Exception)
             {
 
-                await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los tipos de solicitudes del sistema");
+                await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener la información del notario");
                 return new();
             }
         }

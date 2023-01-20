@@ -1,3 +1,94 @@
-﻿<h3>DictumGenerator</h3>
+﻿<div class="d-none">
+    @if (canShow)
+    {
+        <table id="converted-pdf">
+            <thead>
+                <tr>
+                    <th colspan="2" data-type="title">@dictumContent.Title</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td colspan="2" data-type="section">I. Datos Generales</td></tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Código</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@DocumentGenerator.DocumentCode</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Conclusión</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@dictumContent.Conclusion</td>
+                </tr>
+                <tr><td colspan="2" data-type="section">II. Participantes</td></tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Denunciante</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@dictum.Client.Name @dictum.Client.LastName</td>
+                </tr>
+                <tr>
+                    <td data-type="subtitle">Tipo de Documento</td>
+                    <td data-type="subtitle">Número de Documento</td>
+                </tr>
+                <tr>
+                    <td data-type="text">@dictum.Client.DocumentType</td>
+                    <td data-type="text">@dictum.Client.DocumentNumber</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Denunciado</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@dictum.Solicitor.Name @dictum.Solicitor.LastName</td>
+                </tr>
+                <tr>
+                    <td data-type="subtitle">Correo electrónico</td>
+                    <td data-type="subtitle">Notaría</td>
+                </tr>
+                <tr>
+                    <td data-type="text">@dictum.Solicitor.Email</td>
+                    <td data-type="text">@dictum.Solicitor.SolicitorOfficeName</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Dirección de Notaría</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@dictum.Solicitor.Address</td>
+                </tr>
+                <tr><td colspan="2" data-type="section">III. Observaciones</td></tr>
+                @foreach (var observation in dictumContent.Observations)
+                {
+                    <tr>
+                        <td colspan="2" data-type="text">- @observation</td>
+                    </tr>
+                }
+                <tr><td colspan="2" data-type="section">IV. Recomendaciones</td></tr>
+                @foreach (var recommendation in dictumContent.Recommendations)
+                {
+                    <tr>
+                        <td colspan="2" data-type="text">- @recommendation</td>
+                    </tr>
+                }
+                @if (DocumentGenerator.Document.UrlAnnex.Any())
+                {
+                    <tr>
+                        <td colspan="2" data-type="section">V. Anexos</td>
+                    </tr>
+                    @for (int i = 0; i < DocumentGenerator.Document.UrlAnnex.Count; i++)
+                    {
+                        string annex = DocumentGenerator.Document.UrlAnnex[i];
+
+                        <tr>
+                            <td>
+                                <a target="_blank" data-text="@($"Ver Anexo { i }")" href="@annex"></a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    }
+</div>
 
 
