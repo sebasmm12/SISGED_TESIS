@@ -10,12 +10,10 @@ using System.Threading.Tasks;
 
 namespace SISGED.Shared.DTOs
 {
-    public class DisciplinaryOpennessRegisterDTO
+    public class DisciplinaryOpennessRegisterDTO : DisciplinaryOpennessDTO
     {
         public string Title { get; set; } = default!;
         public string Description { get; set; } = default!;
-        public Client Client { get; set; } = default!;
-        public AutocompletedSolicitorResponse Solicitor { get; set; } = default!;
         public string ProsecutorId { get; set; } = default!;
         public string Complainant { get; set; } = default!;
         public DateTime? AudienceStartDate { get; set; } = default!;

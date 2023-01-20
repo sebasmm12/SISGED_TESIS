@@ -9,11 +9,9 @@ using System.Threading.Tasks;
 
 namespace SISGED.Shared.DTOs
 {
-    public class SolicitorDossierRequestRegisterDTO
+    public class SolicitorDossierRequestRegisterDTO : SolicitorDossierRequestDTO
     {
         public string Title { get; set; } = default!;
         public string Description { get; set; } = default!;
-        public Client Client { get; set; } = default!;
-        public AutocompletedSolicitorResponse Solicitor { get; set; } = default!;
     }
 }
