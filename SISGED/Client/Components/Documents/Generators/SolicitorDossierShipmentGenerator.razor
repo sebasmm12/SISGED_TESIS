@@ -1,3 +1,75 @@
-﻿<h3>SolicitorDossierShipmentGenerator</h3>
+﻿<div class="d-none">
+    @if (canShow)
+    {
+        <table id="converted-pdf">
+            <thead>
+                <tr>
+                    <th colspan="2" data-type="title">@solicitorDossierShipmentContent.Title</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td colspan="2" data-type="section">I. Datos Generales</td></tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Código</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@DocumentGenerator.DocumentCode</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Notario</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@solicitorDossierShipment.Solicitor.Name @solicitorDossierShipment.Solicitor.LastName</td>
+                </tr>
+                <tr>
+                    <td data-type="subtitle">Correo electrónico</td>
+                    <td data-type="subtitle">Notaría</td>
+                </tr>
+                <tr>
+                    <td data-type="text">@solicitorDossierShipment.Solicitor.Email</td>
+                    <td data-type="text">@solicitorDossierShipment.Solicitor.SolicitorOfficeName</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Dirección de Notaría</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@solicitorDossierShipment.Solicitor.Address</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Descripción</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@solicitorDossierShipmentContent.Description</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="section">II. Expedientes del Notario</td>
+                </tr>
+                @foreach (var solicitorDossierShipment in solicitorDossierShipment.SolicitorDossiers!)
+                {
+                    <tr>
+                        <td>
+                            <a target="_blank" data-text="@solicitorDossierShipment.DocumentName" href="@solicitorDossierShipment.Url"></a>
+                        </td>
+                    </tr>
+                }
+                @if (DocumentGenerator.Document.UrlAnnex.Any())
+                {
+                    <tr>
+                        <td colspan="2" data-type="section">III. Anexos</td>
+                    </tr>
+                    @for (int i = 0; i < DocumentGenerator.Document.UrlAnnex.Count; i++)
+                    {
+                        string annex = DocumentGenerator.Document.UrlAnnex[i];
 
+                        <tr>
+                            <td>
+                                <a target="_blank" data-text="@($"Ver Anexo { i }")" href="@annex"></a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    }
+</div>
 

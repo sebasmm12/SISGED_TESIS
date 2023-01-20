@@ -8,6 +8,7 @@ namespace SISGED.Server.Services.Contracts
     {
         Task<int> CountSolicitorDossiersAsync(SolicitorDossierPaginationQuery solicitorDossierPaginationQuery);
         Task<IEnumerable<int>> GetSolicitorDossierAvailableYearsAsync(string solicitorId);
+        Task<IEnumerable<SolicitorDossier>> GetSolicitorDossiersAsync(IEnumerable<string> solicitorDossierIds);
         Task<IEnumerable<SolicitorDossier>> GetSolicitorsDossiersAsync(SolicitorDossierPaginationQuery solicitorDossierPaginationQuery);
     }
 }

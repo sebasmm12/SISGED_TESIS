@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using SISGED.Server.Services.Contracts;
+using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Queries.SolicitorDossier;
 using SISGED.Shared.Models.Responses.SolicitorDossier;
 
@@ -51,6 +52,24 @@ namespace SISGED.Server.Controllers
                 var solicitorDossierYears = await _solicitorDossierService.GetSolicitorDossierAvailableYearsAsync(solicitorId);
 
                 return Ok(solicitorDossierYears);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet("identifiers")]
+        public async Task<ActionResult<IEnumerable<SolicitorDossierByIdsResponse>>> GetSolicitorDossierAsync([FromQuery] IEnumerable<string> solicitorDossierIds)
+        {
+            try
+            {
+                var solicitorDossiers = await _solicitorDossierService.GetSolicitorDossiersAsync(solicitorDossierIds);
+
+                var solicitorDossiersResponse = _mapper.Map<IEnumerable<SolicitorDossierByIdsResponse>>(solicitorDossiers);
+                
+                return Ok(solicitorDossiersResponse);
             }
             catch (Exception ex)
             {

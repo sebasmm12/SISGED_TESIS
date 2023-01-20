@@ -104,6 +104,7 @@ namespace SISGED.Server.Helpers.Infrastructure
             CreateMap<SolicitorDossierRequestResponse, SolicitorDossierRequest>();
             CreateMap<SolicitorDossierRequestResponseContent, SolicitorDossierRequestContent>()
                 .ForMember(solicitorContent => solicitorContent.IssueDate, options => options.MapFrom(solicitorResponse => solicitorResponse.DateIssue));
+            CreateMap<SolicitorDossier, SolicitorDossierByIdsResponse>();
 
             // Solicitor Dossier Shipment Mapper
             CreateMap<SolicitorDossierShipmentResponseContent, SolicitorDossierShipmentContent>();
