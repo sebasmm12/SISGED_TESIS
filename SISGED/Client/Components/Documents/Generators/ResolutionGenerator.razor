@@ -1,3 +1,107 @@
-﻿<h3>ResolutionGenerator</h3>
+﻿<div class="d-none">
+    @if (canShow)
+    {
+        <table id="converted-pdf">
+            <thead>
+                <tr>
+                    <th colspan="2" data-type="title">@resolutionContent.Title</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td colspan="2" data-type="section">I. Datos Generales</td></tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Código</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@DocumentGenerator.DocumentCode</td>
+                </tr>
+                <tr>
+                    <td data-type="subtitle">Fecha de inicio de audiencia</td>
+                    <td data-type="subtitle">Fecha de fin de audiencia</td>
+                </tr>
+                <tr>
+                    <td data-type="text">@resolutionContent.AudienceStartDate.ToString("dd/MM/yyyy")</td>
+                    <td data-type="text">@resolutionContent.AudienceEndDate.ToString("dd/MM/yyyy") </td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Descripción</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@resolutionContent.Description</td>
+                </tr>
+                <tr>
+                    <td data-type="subtitle">Tipo de Sanción</td>
+                    <td data-type="subtitle"></td>
+                </tr>
+                <tr>
+                    <td data-type="text">@resolution.Penalty.Name</td>
+                    <td data-type="text"></td>
+                </tr>
+                <tr><td colspan="2" data-type="section">II. Participantes</td></tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Denunciante</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@resolution.Client.Name @resolution.Client.LastName</td>
+                </tr>
+                <tr>
+                    <td data-type="subtitle">Tipo de Documento</td>
+                    <td data-type="subtitle">Número de Documento</td>
+                </tr>
+                <tr>
+                    <td data-type="text">@resolution.Client.DocumentType</td>
+                    <td data-type="text">@resolution.Client.DocumentNumber</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Denunciado</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@resolution.Solicitor.Name @resolution.Solicitor.LastName</td>
+                </tr>
+                <tr>
+                    <td data-type="subtitle">Correo electrónico</td>
+                    <td data-type="subtitle">Notaría</td>
+                </tr>
+                <tr>
+                    <td data-type="text">@resolution.Solicitor.Email</td>
+                    <td data-type="text">@resolution.Solicitor.SolicitorOfficeName</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="subtitle">Dirección de Notaría</td>
+                </tr>
+                <tr>
+                    <td colspan="2" data-type="text">@resolution.Solicitor.Address</td>
+                </tr>
+                @if (resolutionContent.Participants.Any())
+                {
+                    <tr>
+                        <td colspan="2" data-type="subtitle">Participantes</td>
+                    </tr>
+                    @foreach (string item in resolutionContent.Participants)
+                    {
+                        <tr>
+                            <td colspan="2" data-type="text">@item</td>
+                        </tr>
+                    }
+                }
+                @if (DocumentGenerator.Document.UrlAnnex.Any())
+                {
+                    <tr>
+                        <td colspan="2" data-type="section">III. Anexos</td>
+                    </tr>
+                    @for (int i = 0; i < DocumentGenerator.Document.UrlAnnex.Count; i++)
+                    {
+                        string annex = DocumentGenerator.Document.UrlAnnex[i];
 
+                        <tr>
+                            <td>
+                                <a target="_blank" data-text="@($"Ver Anexo { i }")" href="@annex"></a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    }
+</div>
 
