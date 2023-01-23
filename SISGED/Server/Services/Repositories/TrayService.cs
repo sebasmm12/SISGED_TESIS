@@ -176,7 +176,7 @@ namespace SISGED.Server.Services.Repositories
                 { "totalTrays", MongoDBAggregationExtension.Add(new List<BsonValue>() { MongoDBAggregationExtension.Size("$bandejaentrada"), MongoDBAggregationExtension.Size("$bandejasalida")  })   }
             });
 
-            var sortAggregation = MongoDBAggregationExtension.Sort(new BsonDocument("totalTrays", -1 ));
+            var sortAggregation = MongoDBAggregationExtension.Sort(new BsonDocument("totalTrays", 1 ));
 
             var lookupAggregation = GetWorkloadRolePipelineLookup();
 
