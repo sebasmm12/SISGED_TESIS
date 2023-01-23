@@ -189,7 +189,7 @@ namespace SISGED.Server.Services.Repositories
 
             var projectAggregation = MongoDBAggregationExtension.Project(new()
                 {
-                    { "UserId", "usuario" },
+                    { "UserId", "$usuario" },
                     {"UserName","$userInfo.datos.nombre" },
                     {"UserLastName","$userInfo.datos.apellido" },
                     { "Quantity", "$totalTrays" }
