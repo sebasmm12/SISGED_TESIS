@@ -7,6 +7,7 @@ namespace SISGED.Server.Services.Contracts
     {
         Task<InputOutputTrayResponse> GetAsync(string user);
         Task<InputTrayResponse> GetInputStrayAsync(string user);
+        Task<IEnumerable<UserTrayResponse>> GetWorkloadByRoleAsync(string role);
         Task RegisterUserTrayAsync(string type, string userId);
         Task UpdateTrayForDerivationAsync(UpdateTrayDTO updateTrayDTO);
         Task<string> RegisterUserInputTrayAsync(string dossierId, string documentId, string type);

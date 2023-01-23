@@ -57,6 +57,15 @@ namespace SISGED.Server.Services.Repositories
             return await _traysCollection.FindAsync(t => t.User == user).Result.FirstAsync();
         }
 
+        public async Task<IEnumerable<UserTrayResponse>> GetWorkloadByRoleAsync(string role)
+        {
+            var tray = await _traysCollection.Aggregate<UserTrayResponse>(GetWorkloadByRolePipeline(role)).ToListAsync();
+
+            if (tray is null) throw new Exception("No se ha podido encontrar la bandeja.");
+
+            return tray;
+        }
+
         public async Task UpdateTrayForDerivationAsync(UpdateTrayDTO updateTrayDTO)
         {
             var documentTray = new DocumentTray(updateTrayDTO.DossierId, updateTrayDTO.DocumentId);
@@ -86,9 +95,9 @@ namespace SISGED.Server.Services.Repositories
         public async Task<string> RegisterUserInputTrayAsync(string dossierId, string documentId, string type)
         {
             var documentTray = new DocumentTray(dossierId, documentId);
-            
+
             Tray userTray = await GetUserTrayWithLessInputTrayAsync(type);
-          
+
             await PushDocumentTrayAsync(new(documentTray, userTray.User, "bandejaentrada"));
 
             return userTray.User;
@@ -110,7 +119,7 @@ namespace SISGED.Server.Services.Repositories
 
             var addFieldAggregation = MongoDBAggregationExtension.AddFields(new()
             {
-                { "totalTrays", MongoDBAggregationExtension.Add(new List<BsonValue>() { MongoDBAggregationExtension.Size("$bandejaentrada"), MongoDBAggregationExtension.Size("$bandejasalida")  })   } 
+                { "totalTrays", MongoDBAggregationExtension.Add(new List<BsonValue>() { MongoDBAggregationExtension.Size("$bandejaentrada"), MongoDBAggregationExtension.Size("$bandejasalida")  })   }
             });
 
             var sortAggregation = MongoDBAggregationExtension.Sort(new BsonDocument("totalTrays", 1));
@@ -128,7 +137,7 @@ namespace SISGED.Server.Services.Repositories
 
             return usersTraysWithLessInputTray.Append(limitAggregation).ToArray();
         }
-        
+
 
         private PipelineDefinition<Tray, InputTrayResponse> GetInputTrayPipeline(string user)
         {
@@ -159,6 +168,36 @@ namespace SISGED.Server.Services.Repositories
             return new BsonDocument[] { userFilterMatchAggregation, unWindAggregation1, dossierInputLookupPipeline, unWindAggregation2, projectAggregation };
 
         }
+
+        private BsonDocument[] GetWorkloadByRolePipeline(string role)
+        {
+            var addFieldsAggregation = MongoDBAggregationExtension.AddFields(new()
+            {
+                { "totalTrays", MongoDBAggregationExtension.Add(new List<BsonValue>() { MongoDBAggregationExtension.Size("$bandejaentrada"), MongoDBAggregationExtension.Size("$bandejasalida")  })   }
+            });
+
+            var sortAggregation = MongoDBAggregationExtension.Sort(new BsonDocument("totalTrays", -1 ));
+
+            var lookupAggregation = GetWorkloadRolePipelineLookup();
+
+            var unwindAggregation = MongoDBAggregationExtension.UnWind(new("$userInfo"));
+
+            var matchAggregation = MongoDBAggregationExtension.Match(MongoDBAggregationExtension.Expr(MongoDBAggregationExtension
+                                                       .Eq(new BsonArray { "$userInfo.rol", role})));
+
+            var unsetAggregation = MongoDBAggregationExtension.UnSet("_id");
+
+            var projectAggregation = MongoDBAggregationExtension.Project(new()
+                {
+                    { "UserId", "usuario" },
+                    {"UserName","$userInfo.datos.nombre" },
+                    {"UserLastName","$userInfo.datos.apellido" },
+                    { "Quantity", "$totalTrays" }
+                });
+
+            return new BsonDocument[] { addFieldsAggregation, sortAggregation, lookupAggregation, unwindAggregation, matchAggregation, unsetAggregation, projectAggregation };
+        }
+
         private BsonDocument[] GetTrayPipeline(string user)
         {
             var dossierLookupPipeline = DossierLookUpPipeline();
@@ -364,6 +403,30 @@ namespace SISGED.Server.Services.Repositories
             return MongoDBAggregationExtension.Lookup(new("expedientes", letPipeline, lookUpPipeline, "bandejadocumento"));
         }
 
+        private static BsonDocument GetWorkloadRolePipelineLookup()
+        {
+            var letPipeline = new Dictionary<string, BsonValue>()
+            {
+                { "userObjId", MongoDBAggregationExtension.ObjectId("$usuario") }
+            };
+
+            var lookUpPipeline = new BsonArray()
+            {
+                  MongoDBAggregationExtension.Match(MongoDBAggregationExtension.Expr(MongoDBAggregationExtension
+                                                       .Eq(new BsonArray { "$_id", MongoDBAggregationExtension.ObjectId("$$userObjId") }))),
+                MongoDBAggregationExtension.Project(new()
+                {
+                    { "_id", 1 },
+                    {"datos.nombre",1 },
+                    {"datos.apellido",1 },
+                    { "rol", 1 }
+                })
+            };
+
+            return MongoDBAggregationExtension.Lookup(new("usuarios", letPipeline, lookUpPipeline, "userInfo"));
+
+        }
+
         private async Task PushDocumentTrayAsync(UpdateDocumentTrayDTO updateDocumentTrayDTO)
         {
             var updateDocumentTray = Builders<Tray>.Update.Push(updateDocumentTrayDTO.TrayType, updateDocumentTrayDTO.DocumentTray);
@@ -381,7 +444,6 @@ namespace SISGED.Server.Services.Repositories
 
             if (updateTray is null) throw new Exception($"No se pudo actualizar la bandeja del usuario con identificador {updateDocumentTrayDTO.UserId}");
         }
-
         #endregion
     }
 }

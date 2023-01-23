@@ -39,5 +39,21 @@ namespace SISGED.Server.Controllers
             var tray = await _trayService.GetInputStrayAsync(user);
             return Ok(tray);
         }
+
+        [HttpGet("workloadbyrole/{roleId}")]
+        public async Task<ActionResult<IEnumerable<UserTrayResponse>>> GetWorkLoadByRoleAsync(string roleId)
+        {
+            try
+            {
+                var tray = await _trayService.GetWorkloadByRoleAsync(roleId);
+                return Ok(tray);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+
+        }
     }
 }
