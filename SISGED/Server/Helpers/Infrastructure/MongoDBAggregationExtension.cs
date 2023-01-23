@@ -211,5 +211,10 @@ namespace SISGED.Server.Helpers.Infrastructure
         {
             return new BsonDocument("$count", value);
         }
+
+        public static BsonDocument Add(IEnumerable<BsonValue> values)
+        {
+            return new BsonDocument("$add", new BsonArray().AddRange(values));
+        }
     }
 }

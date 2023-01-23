@@ -1,0 +1,78 @@
+﻿@if(pageLoading)
+{
+    <GenericToolLoader Body="Cargando los elementos para la derivación del documento, por favor espere..."></GenericToolLoader>
+}
+else
+{
+    <MudStack Class="document-register-wrapper">
+        <MudCard Elevation="0" Outlined="true" Class="tool-margin">
+            <MudCardContent>
+                <MudGrid>
+                    <MudItem xs="12" sm="12" md="5" lg="4" xl="12" Class="align-self-center">
+                        <MudIcon Class="fa-solid fa-share-from-square large-icon" Color="Color.Primary"></MudIcon>
+                        <MudText Typo="Typo.body2">Seleccione el usuario al cuál será entregado el documento para su procesamiento.</MudText>
+                    </MudItem>
+                    <MudItem xs="12" sm="12" md="7" lg="8" xl="12">
+                        <MudGrid>
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                                <div class="text-start text-sm-center mb-2">
+                                    <MudText Typo="Typo.h6">Usuario</MudText>
+                                    <div class="d-flex">
+                                        <MudAvatar Color="Color.Info" Image="@SessionAccount.GetClient().Profile" Alt="@SessionAccount.GetClient().Name.Substring(0)" />
+                                        <MudText Typo="Typo.body1" Class="align-self-center pl-1">@SessionAccount.GetClient().Name @SessionAccount.GetClient().LastName</MudText>
+                                    </div>
+                                </div>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                                <div class="text-start text-sm-center mb-2">
+                                    <MudText Typo="Typo.h6">Rol</MudText>
+                                    <MudText Typo="Typo.body1">@userRole!.Label</MudText>
+                                </div>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <div class="text-start text-sm-center mb-2">
+                                    <MudText Typo="Typo.h6">Fecha de Derivación</MudText>
+                                    <MudText Typo="Typo.body1">@currentDate</MudText>
+                                </div>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                                <MudSelect T="UserTrayResponse" AdornmentIcon="fa-solid fa-user-tie" AdornmentColor="Color.Primary"
+                                    Label="Usuario receptor" Dense="true" Variant="Variant.Outlined" Clearable="true"
+                                       @bind-Value="userTray">
+                                    @foreach (var userTray in userTrays)
+                                    {
+                                        <MudSelectItem Value="@userTray">
+                                            <MudGrid>
+                                                <MudItem>
+                                                    <MudAvatar Color="Color.Secondary">@userTray.UserName.First()@@userTray.LastName.First()</MudAvatar>
+                                                </MudItem>
+                                                <MudItem>
+                                                    <MudItem>
+                                                        <MudText Typo="Typo.body1">@userTray.UserName</MudText>
+                                                    </MudItem>
+                                                    <MudItem>
+                                                        <MudText Typo="Typo.body2">@userTray.UserLastName</MudText>
+                                                    </MudItem>
+                                                    <MudItem>
+                                                        <MudText Typo="Typo.caption">@userTray.Quantity</MudText>
+                                                    </MudItem>
+                                                </MudItem>
+                                            </MudGrid>
+                                        </MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                                <div class="text-start text-sm-center mb-2">
+                                    <MudText Typo="Typo.h6">Rol</MudText>
+                                    <MudText Typo="Typo.body1">@receiverUserRole!.Label</MudText>
+                                </div>
+                            </MudItem>
+                        </MudGrid>
+                    </MudItem>
+                </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudStack>
+}
+

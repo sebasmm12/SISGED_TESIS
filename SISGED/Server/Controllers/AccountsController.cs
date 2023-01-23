@@ -114,7 +114,7 @@ namespace SISGED.Server.Controllers
             return Ok(userToken);
         }
 
-        [HttpGet("role/{roleId}")]
+        [HttpGet("roles/{roleId}")]
         public async Task<ActionResult<Role>> GetRoleByIdAsync([FromRoute] string roleId)
         {
             try

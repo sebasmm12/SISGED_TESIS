@@ -110,12 +110,12 @@ namespace SISGED.Server.Services.Repositories
 
             var addFieldAggregation = MongoDBAggregationExtension.AddFields(new()
             {
-                { "totalInputTrays", MongoDBAggregationExtension.Size("$bandejaentrada") } 
+                { "totalTrays", MongoDBAggregationExtension.Add(new List<BsonValue>() { MongoDBAggregationExtension.Size("$bandejaentrada"), MongoDBAggregationExtension.Size("$bandejasalida")  })   } 
             });
 
-            var sortAggregation = MongoDBAggregationExtension.Sort(new BsonDocument("totalInputTrays", 1));
+            var sortAggregation = MongoDBAggregationExtension.Sort(new BsonDocument("totalTrays", 1));
 
-            var unSetAggregation = MongoDBAggregationExtension.UnSet("totalInputTrays");
+            var unSetAggregation = MongoDBAggregationExtension.UnSet("totalTrays");
 
             return new BsonDocument[] { matchAggregation, addFieldAggregation, sortAggregation, unSetAggregation };
         }
