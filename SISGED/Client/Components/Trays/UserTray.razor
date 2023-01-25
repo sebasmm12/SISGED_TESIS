@@ -1,0 +1,17 @@
+﻿ <MudGrid>
+    <MudItem Class="user-tray-icon">
+        <MudAvatar Color="Color.Secondary">@UserTrayResponse.UserName.First()@UserTrayResponse.UserLastName.First()</MudAvatar>
+    </MudItem>
+    <MudItem Class="user-tray-info">
+        <MudItem Class="user-tray-name">
+            <MudText Typo="Typo.body1">@UserTrayResponse.UserName</MudText>
+        </MudItem>
+        <MudItem>
+            <MudText Typo="Typo.body2" Class="user-tray-last-name">@UserTrayResponse.UserLastName</MudText>
+        </MudItem>
+        <MudItem Class="user-tray-quantity">
+            <MudText Typo="Typo.caption">Documentos en su bandeja: @UserTrayResponse.Quantity</MudText>
+        </MudItem>
+    </MudItem>
+</MudGrid>
+

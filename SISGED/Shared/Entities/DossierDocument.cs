@@ -14,6 +14,11 @@ namespace SISGED.Shared.Entities
             ExcessDate = excessDate;
         }
 
+        public DossierDocument(string documentId)
+        {
+           DocumentId = documentId;
+        }
+
         [BsonElement("indice")]
         public int Index { get; set; }
         [BsonElement("iddocumento")]

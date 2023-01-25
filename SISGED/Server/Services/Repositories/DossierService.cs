@@ -20,7 +20,7 @@ namespace SISGED.Server.Services.Repositories
         private readonly IMongoCollection<Document> _documentsCollection;
         private readonly ITrayService _trayService;
 
-        public string DocumentsCollectionName => "documents";
+        public string DocumentsCollectionName => "documentos";
 
         public DossierService(IMongoDatabase mongoDatabase, ITrayService trayService)
         {
@@ -59,23 +59,21 @@ namespace SISGED.Server.Services.Repositories
 
         public async Task<DossierLastDocumentResponse> RegisterDerivationAsync(DossierLastDocumentRequest dossierLastDocumentRequest, string userId)
         {
-            Derivation dossierDerivation = dossierLastDocumentRequest.Derivations.FirstOrDefault()!;
+            Derivation dossierDerivation = dossierLastDocumentRequest.Derivation;
 
             dossierDerivation.ReceiverUser = userId;
 
-            await UpdateDossierDerivationsAsync(dossierDerivation, userId);
-
-            string documentId = dossierLastDocumentRequest.Documents.Last().DocumentId;
+            await UpdateDossierDerivationsAsync(dossierDerivation, dossierLastDocumentRequest.Id);
 
             var updateTrayDTO = new UpdateTrayDTO(dossierLastDocumentRequest.Id, userId,
                                                   dossierDerivation.SenderUser,
-                                                  documentId);
+                                                  dossierLastDocumentRequest.DocumentId);
 
             var usersTraysupdate = _trayService.UpdateTrayForDerivationAsync(updateTrayDTO);
 
-            var process = new Process(dossierDerivation.SenderUser, dossierDerivation.ReceiverUser, "derivado", dossierDerivation.OriginArea);
+            var process = new Process(dossierDerivation.SenderUser, dossierDerivation.ReceiverUser, "derivado", dossierLastDocumentRequest.Derivation.OriginArea);
 
-            var documentProcessupdate = UpdateDocumentProcessAsync(process, documentId);
+            var documentProcessupdate = UpdateDocumentProcessAsync(process, dossierLastDocumentRequest.DocumentId);
 
             await Task.WhenAll(usersTraysupdate, documentProcessupdate);
 
@@ -310,9 +308,12 @@ namespace SISGED.Server.Services.Repositories
 
         private async Task UpdateDocumentProcessAsync(Process proccess, string documentId)
         {
-            var updateDocumentProccess = Builders<Document>.Update.Push(document => document.ProcessesHistory, proccess);
+            var updateDocumentQuery = Builders<Document>.Filter.Eq(document => document.Id, documentId);
 
-            var updatedDocument = await _documentsCollection.UpdateOneAsync(document => document.Id == documentId, updateDocumentProccess);
+            var updateDocumentProccess = Builders<Document>.Update.Push("historialproceso", proccess)
+                                                                  .Set("estado", "derivado");
+
+            var updatedDocument = await _documentsCollection.FindOneAndUpdateAsync(updateDocumentQuery, updateDocumentProccess);
 
             if (updatedDocument is null) throw new Exception($"No se pudo actualizar el historial del proceso del documento con identificador {documentId}");
         }

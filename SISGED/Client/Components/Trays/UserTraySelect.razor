@@ -1,0 +1,15 @@
+﻿@if(!pageLoading)
+{
+    <MudSelect T="UserTrayResponse" AdornmentIcon="fa-solid fa-user-tie" AdornmentColor="Color.Primary"
+           Label="Usuario receptor" Dense="true" Variant="Variant.Outlined" Clearable="true"
+           ValueChanged="UpdateUserTray" Class="user-tray-select" For="UserTrayFor">
+        @foreach (var userTray in userTrays)
+        {       
+                <MudSelectItem Value="@userTray">
+                   <UserTray UserTrayResponse="userTray"></UserTray>
+                </MudSelectItem>
+        }
+    </MudSelect>
+}
+
+

@@ -685,7 +685,7 @@ namespace SISGED.Server.Services.Repositories
             var currentDocument = await GetDocumentAsync(documentGenerationDTO.DocumentId);
 
             var contentVersion = new ContentVersion(currentDocument.ContentsHistory.Count + 1, documentGenerationDTO.GeneratedURL);
-            var process = new Process(documentGenerationDTO.UserId, documentGenerationDTO.UserId, "generado");
+            var process = new Process(documentGenerationDTO.UserId, documentGenerationDTO.UserId, "generado", documentGenerationDTO.RoleId);
 
             var updateFilter = Builders<Document>.Update
                                                        .Set("contenido.codigo", documentGenerationDTO.Code)

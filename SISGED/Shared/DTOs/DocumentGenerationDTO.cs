@@ -9,5 +9,6 @@
         public string Code { get; set; } = default!;
         public string Sign { get; set; } = default!;
         public string GeneratedURL { get; set; } = default!;
+        public string RoleId { get; set; } = default!;
     }
 }

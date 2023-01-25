@@ -83,9 +83,9 @@ namespace SISGED.Client.Components.WorkEnvironments
             UpdateUsedTool();
         }
 
-        public void UpdateGeneratedDocument()
+        public void UpdateGeneratedDocument(Item item)
         {
-            ChangeToolPlace(new("outputs", "outputs"));
+            ChangeToolPlace(new("outputs", "outputs", item));
 
             UpdateUsedTool();
         }
@@ -97,6 +97,14 @@ namespace SISGED.Client.Components.WorkEnvironments
             workPlaceItems.Clear();
 
             StateHasChanged();
+        }
+
+        public void SendDocument(Item item)
+        {
+            // TODO: Implement the logic the send the document into the receiver user tray by the signalR Hub
+            Items.Remove(item);
+
+            UpdateUsedTool();
         }
 
         private void ChangeToolPlace(WorkToolPlace workToolPlace)

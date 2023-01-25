@@ -33,11 +33,21 @@ namespace SISGED.Server.Controllers
 
         }
 
-        [HttpGet("bandejaentrada/{user}")]
-        public async Task<ActionResult<List<InputTrayResponse>>> GetInputStrayAsync(string user)
+        [HttpGet("inputs/{user}")]
+        public async Task<ActionResult<InputTrayResponse>> GetInputStrayAsync(string user)
         {
-            var tray = await _trayService.GetInputStrayAsync(user);
-            return Ok(tray);
+            try
+            {
+                var tray = await _trayService.GetInputStrayAsync(user);
+                return Ok(tray);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+
+            
         }
 
         [HttpGet("workloadbyrole/{roleId}")]

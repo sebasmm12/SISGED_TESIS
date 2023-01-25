@@ -1,0 +1,21 @@
+﻿.user-tray-select .user-tray-icon {
+    display: none;
+}
+
+.user-tray-select .user-tray-quantity {
+    display: none;
+}
+
+.user-tray-select .user-tray-info {
+    display: flex;
+}
+
+.user-tray-select .user-tray-name {
+    margin-right: 5px;
+}
+
+.user-tray-select .user-tray-last-name {
+    font-size: var(--mud-typography-body1-size);
+}
+
+

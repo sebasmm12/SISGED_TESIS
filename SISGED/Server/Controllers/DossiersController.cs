@@ -56,7 +56,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpPost("derivations/{userId}")]
-        public async Task<ActionResult<IEnumerable<DossierLastDocumentResponse>>> RegisterDerivationAsync([FromBody] DossierLastDocumentRequest dossierLastDocumentRequest, [FromRoute] string userId)
+        public async Task<ActionResult<DossierLastDocumentResponse>> RegisterDerivationAsync([FromBody] DossierLastDocumentRequest dossierLastDocumentRequest, [FromRoute] string userId)
         {
             try
             {

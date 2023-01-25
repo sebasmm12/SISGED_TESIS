@@ -7,11 +7,21 @@ namespace SISGED.Shared.Models.Requests.Dossier
     {
         [Required(ErrorMessage = "Debe ingresar el identificador del expediente")]
         public string Id { get; set; } = default!;
-        [Required(ErrorMessage = "No existe documentos para registrarlo en el expediente")]
-        [MinLength(1, ErrorMessage = "Debe registrar por lo menos un documento para registrarlo en el expediente")]
-        public List<DossierDocument> Documents { get; set; } = default!;
+        [Required(ErrorMessage = "Debe especificar el identificador del documento")]
+        public string DocumentId { get; set; } = default!;
         [Required(ErrorMessage = "No existe derivación para registrarlo en el expediente")]
-        [MinLength(1, ErrorMessage = "Debe registrar por lo menos un registro de deribación para registrarlo en el expediente")]
-        public List<Derivation> Derivations { get; set; } = default!;
+        public Derivation Derivation { get; set; } = default!;
+
+        public DossierLastDocumentRequest()
+        {
+            
+        }
+
+        public DossierLastDocumentRequest(string id, string documentId, Derivation derivation)
+        {
+            Id = id;
+            DocumentId = documentId;
+            Derivation = derivation;
+        }
     }
 }

@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
@@ -11,6 +12,7 @@ using SISGED.Shared.Models.Requests.Documents;
 using SISGED.Shared.Models.Responses.Account;
 using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.DossierTray;
+using static MudBlazor.CategoryTypes;
 
 namespace SISGED.Client.Components.Documents
 {
@@ -28,6 +30,8 @@ namespace SISGED.Client.Components.Documents
         public IHttpRepository HttpRepository { get; set; } = default!;
         [Inject]
         public IDialogContentRepository DialogContentRepository { get; set; } = default!;
+        [Inject]
+        public IMapper Mapper { get; set; } = default!;
 
         [CascadingParameter(Name = "WorkEnvironment")]
         public WorkEnvironment WorkEnvironment { get; set; } = default!;
@@ -136,11 +140,11 @@ namespace SISGED.Client.Components.Documents
 
             if (result.Cancelled) return;
 
-            await ShowLoadingDialogAsync(generateDocumentRequest);
+            var document = await ShowLoadingDialogAsync(generateDocumentRequest);
 
             await SwalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo generar la denuncia de manera satisfactoria");
 
-            UpdateGeneratedDocument();
+            UpdateGeneratedDocument(document!);
         }
         
         private async Task<DialogResult> ShowPdfPrevisualization(string generatedUrl)
@@ -189,7 +193,7 @@ namespace SISGED.Client.Components.Documents
 
         private async Task<Document?> ShowLoadingDialogAsync(GenerateDocumentRequest generateDocumentRequest)
         {
-            string dialogTitle = $"Realizando la generación de su denuncia, por favor espere...";
+            string dialogTitle = $"Realizando la generación del documento, por favor espere...";
 
             var complaintToRegister = () => GenerateDocumentAsync(generateDocumentRequest);
 
@@ -209,9 +213,26 @@ namespace SISGED.Client.Components.Documents
             return new(content, extension, fileName);
         }
 
-        private void UpdateGeneratedDocument()
+        private void UpdateGeneratedDocument(Document generatedDocument)
         {
-            WorkEnvironment.UpdateGeneratedDocument();
+            var item = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace != "tools");
+
+            ProcessWorkItemInfo(item!, generatedDocument);
+            
+            WorkEnvironment.UpdateGeneratedDocument(item!);
+        }
+
+        private void ProcessWorkItemInfo(Helpers.Item item, Document generatedDocument)
+        {
+            if (item.Value is not DossierTrayResponse dossierTray) return;
+
+            var documentResponse = Mapper.Map<DocumentResponse>(generatedDocument);
+
+            dossierTray.Document = documentResponse;
+            dossierTray.DocumentObjects!.RemoveAt(dossierTray.DocumentObjects.Count - 1);
+            dossierTray.DocumentObjects.Add(dossierTray.Document);
+
+            Mapper.Map(dossierTray, item);
         }
     }
 }

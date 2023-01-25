@@ -1,11 +1,19 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
 using SISGED.Client.Components.WorkEnvironments;
 using SISGED.Client.Services.Contracts;
+using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
+using SISGED.Shared.Models.Requests.Documents;
+using SISGED.Shared.Models.Requests.Dossier;
 using SISGED.Shared.Models.Responses.Account;
+using SISGED.Shared.Models.Responses.Document;
+using SISGED.Shared.Models.Responses.Dossier;
+using SISGED.Shared.Models.Responses.DossierTray;
 using SISGED.Shared.Models.Responses.Tray;
+using SISGED.Shared.Validators;
 
 namespace SISGED.Client.Components.Documents
 {
@@ -21,6 +29,10 @@ namespace SISGED.Client.Components.Documents
         public ISwalFireRepository SwalFireRepository { get; set; } = default!;
         [Inject]
         public IDialogContentRepository DialogContentRepository { get; set; } = default!;
+        [Inject]
+        public DocumentDerivationValidator DocumentDerivationValidator { get; set; } = default!;
+        [Inject]
+        public IMapper Mapper { get; set; } = default!;
 
         [CascadingParameter(Name = "WorkEnvironment")]
         public WorkEnvironment WorkEnvironment { get; set; } = default!;
@@ -32,18 +44,20 @@ namespace SISGED.Client.Components.Documents
         private readonly string currentDate = DateTime.UtcNow.AddHours(-5).ToString("dd/MM/yyyy");
         // TODO: Get the roleId based on the derivation step from the helper
         private string roleId = "5eeaf8d58ca4ff53a0b791ea";
-        private Role? receiverUserRole = default!;
-        private List<UserTrayResponse> userTrays = default!;
-        private UserTrayResponse userTray = default!;
+        private DocumentDerivationDTO documentDerivation = new();
+        private MudForm? documentDerivationForm = default!;
 
 
         protected override async Task OnInitializedAsync()
         {
             await GetUserInformationAsync();
 
-            userTrays = await GetUserTraysAsync(receiverUserRole!.Name);
-
             pageLoading = false;
+        }
+
+        private void UpdateUserTray(UserTrayResponse userTrayResponse)
+        {
+            documentDerivation.UserTray = userTrayResponse;
         }
 
         private async Task GetUserInformationAsync()
@@ -54,7 +68,7 @@ namespace SISGED.Client.Components.Documents
             await Task.WhenAll(userRoleTask, receiverUserRoleTask);
 
             userRole = await userRoleTask;
-            receiverUserRole = await receiverUserRoleTask;
+            documentDerivation.ReceiverUserRole = await receiverUserRoleTask;
         }
 
 
@@ -79,27 +93,96 @@ namespace SISGED.Client.Components.Documents
             }
         }
 
-        private async Task<List<UserTrayResponse>> GetUserTraysAsync(string trayType)
+        private async Task SendDocumentAsync()
         {
-            // TODO: Implement the endpoint to get the sorted user trays
+            await documentDerivationForm!.Validate();
 
+            if (!documentDerivationForm.IsValid) return;
+
+            var documentDerivationRequest = GetDossierLasDocument();
+
+            var dossierDocument = await ShowLoadingDialogAsync(documentDerivationRequest, documentDerivation.UserTray.UserId);
+
+            if (dossierDocument is null) return;
+
+            await SwalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo derivar el documento de manera satisfactoria");
+
+            UpdateSentDocument(dossierDocument);
+        }
+
+        private void UpdateSentDocument(DossierLastDocumentResponse dossierDocument)
+        {
+            var item = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace != "tools");
+
+            ProcessWorkItemInfo(item!, dossierDocument);
+
+            WorkEnvironment.SendDocument(item!);
+        }
+
+        private void ProcessWorkItemInfo(Helpers.Item item, DossierLastDocumentResponse dossierDocument)
+        {
+            if (item.Value is not DossierTrayResponse dossierTray) return;
+
+            var documentResponse = Mapper.Map<DocumentResponse>(dossierDocument.LastDocument);
+
+            dossierTray.Document = documentResponse;
+            dossierTray.DocumentObjects!.RemoveAt(dossierTray.DocumentObjects.Count - 1);
+            dossierTray.DocumentObjects.Add(dossierTray.Document);
+
+            Mapper.Map(dossierTray, item);
+        }
+
+
+        private DossierLastDocumentRequest GetDossierLasDocument()
+        {
+            var dossierTray = GetDossierTray();
+            
+            var derivation = new Derivation(userRole!.Id, documentDerivation.ReceiverUserRole!.Id,
+                                            SessionAccount.User.Id, "derivado", dossierTray.Document!.Type);
+
+            return new(dossierTray.DossierId, dossierTray.Document!.Id, derivation);
+        }
+
+        private DossierTrayResponse GetDossierTray()
+        {
+            var userTray = WorkEnvironment.workPlaceItems.First(workItem => workItem.OriginPlace != "tools");
+
+            var dossierTray = userTray.Value as DossierTrayResponse;
+
+            return dossierTray!;
+        }
+
+        private async Task<DossierLastDocumentResponse?> ShowLoadingDialogAsync(DossierLastDocumentRequest dossierLastDocumentRequest, string userId)
+        {
+            string dialogTitle = $"Realizando la derivación del documento, por favor espere...";
+
+            var complaintToRegister = () => RegisterDerivationAsync(dossierLastDocumentRequest, userId);
+
+            return await DialogContentRepository.ShowLoadingDialogAsync(complaintToRegister, dialogTitle);
+
+        }
+
+        private async Task<DossierLastDocumentResponse?> RegisterDerivationAsync(DossierLastDocumentRequest dossierLastDocumentRequest, string userId)
+        {
             try
             {
-                var userTraysResponse = await HttpRepository.GetAsync<List<UserTrayResponse>>($"api/trays/{trayType}");
+                var documentDerivationResponse = await HttpRepository.PostAsync<DossierLastDocumentRequest, DossierLastDocumentResponse>($"api/dossiers/derivations/{userId}", dossierLastDocumentRequest);
 
-                if (userTraysResponse.Error)
+                if (documentDerivationResponse.Error)
                 {
-                    await SwalFireRepository.ShowErrorSwalFireAsync($"No se pudo obtener información de los usuarios para la derivación");
+                    await SwalFireRepository.ShowErrorSwalFireAsync($"No se pudo derivar el documento");
                 }
 
-                return userTraysResponse.Response!;
+                return documentDerivationResponse.Response!;
             }
             catch (Exception)
             {
 
-                await SwalFireRepository.ShowErrorSwalFireAsync($"No se pudo obtener información de los usuarios para la derivación");
-                return new();
+                await SwalFireRepository.ShowErrorSwalFireAsync($"No se realizar la derivación del documento");
+                return null;
             }
         }
+
+
     }
 }

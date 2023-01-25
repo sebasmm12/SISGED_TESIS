@@ -257,7 +257,7 @@ namespace SISGED.Server.Controllers
 
                 string receiveUserId = await _trayService.RegisterUserInputTrayAsync(dossier.Id, initialRequest.Id, "MesaPartes");
 
-                await _documentService.UpdateDocumentProcessAsync(new(user.Id, receiveUserId, "derivado"), initialRequest.Id);
+                await _documentService.UpdateDocumentProcessAsync(new(user.Id, receiveUserId, "derivado", user.Rol), initialRequest.Id);
 
                 // TODO: Implement the assistant service when creating the initial request
                 //var assistant = new Assistant();
@@ -1096,7 +1096,7 @@ namespace SISGED.Server.Controllers
 
             var initialRequestContent = _mapper.Map<InitialRequestContent>(document.Content);
             var initialRequest = new InitialRequest(initialRequestContent, "registrado", urls.ToList());
-            initialRequest.AddProcess(new Process(user.Id, user.Id, "registrado"));
+            initialRequest.AddProcess(new Process(user.Id, user.Id, "registrado", user.Rol));
 
             return await _documentService.InitialRequestRegisterAsync(initialRequest);
         }
@@ -1116,7 +1116,7 @@ namespace SISGED.Server.Controllers
 
             var complaintRequestContent = _mapper.Map<ComplaintRequestContent>(document.Content);
             var complaintRequest = new ComplaintRequest(complaintRequestContent, "registrado", urls.ToList());
-            complaintRequest.AddProcess(new Process(user.Id, user.Id, "registrado"));
+            complaintRequest.AddProcess(new Process(user.Id, user.Id, "registrado", user.Rol));
 
             return await _documentService.RegisterComplaintRequestAsync(complaintRequest);
         }
@@ -1127,7 +1127,7 @@ namespace SISGED.Server.Controllers
 
             var dictumContent = _mapper.Map<DictumContent>(document.Content);
             var dictum = new Dictum(dictumContent, "registrado", urls.ToList());
-            dictum.AddProcess(new Process(user.Id, user.Id, "registrado"));
+            dictum.AddProcess(new Process(user.Id, user.Id, "registrado", user.Rol));
             
             return await _documentService.RegisterDictumAsync(dictum);
         }
@@ -1138,7 +1138,7 @@ namespace SISGED.Server.Controllers
 
             var solicitorDossierShipmentContent = _mapper.Map<SolicitorDossierShipmentContent>(document.Content);
             var solicitorDossierShipment = new SolicitorDossierShipment(solicitorDossierShipmentContent, "registrado", urls.ToList());
-            solicitorDossierShipment.AddProcess(new Process(user.Id, user.Id, "registrado"));
+            solicitorDossierShipment.AddProcess(new Process(user.Id, user.Id, "registrado", user.Rol));
 
             return await _documentService.RegisterSolicitorDossierShipmentAsync(solicitorDossierShipment);
         }
@@ -1195,7 +1195,7 @@ namespace SISGED.Server.Controllers
 
             var DisciplinaryOpennessContent = _mapper.Map<DisciplinaryOpennessContent>(document.Content);
             var DisciplinaryOpenness = new DisciplinaryOpenness(DisciplinaryOpennessContent, "registrado", urls.ToList());
-            DisciplinaryOpenness.AddProcess(new Process(user.Id, user.Id, "registrado"));
+            DisciplinaryOpenness.AddProcess(new Process(user.Id, user.Id, "registrado", user.Rol));
 
             return await _documentService.DisciplinaryOpennessRegisterAsync(DisciplinaryOpenness);
         }
@@ -1206,7 +1206,7 @@ namespace SISGED.Server.Controllers
 
             var solicitorDossierRequestContent = _mapper.Map<SolicitorDossierRequestContent>(document.Content);
             var SolicitorDossierRequest = new SolicitorDossierRequest(solicitorDossierRequestContent, "registrado", urls.ToList());
-            SolicitorDossierRequest.AddProcess(new Process(user.Id, user.Id, "registrado"));
+            SolicitorDossierRequest.AddProcess(new Process(user.Id, user.Id, "registrado", user.Rol));
 
             return await _documentService.SolicitorDossierRequestRegisterAsync(SolicitorDossierRequest);
         }
@@ -1217,7 +1217,7 @@ namespace SISGED.Server.Controllers
 
             var resolutionContent = _mapper.Map<ResolutionContent>(document.Content);
             var resolution = new Resolution(resolutionContent, "registrado", urls.ToList());
-            resolution.AddProcess(new Process(user.Id, user.Id, "registrado"));
+            resolution.AddProcess(new Process(user.Id, user.Id, "registrado", user.Rol));
 
             return await _documentService.ResolutionRegisterAsync(resolution);
         }
@@ -1235,6 +1235,7 @@ namespace SISGED.Server.Controllers
             documentGenerationDTO.Sign = await signTask;
             documentGenerationDTO.GeneratedURL = await generatedUrlTask;
             documentGenerationDTO.UserId = user.Id;
+            documentGenerationDTO.RoleId = user.Rol;
 
             return documentGenerationDTO;
         }
