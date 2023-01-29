@@ -1,0 +1,79 @@
+﻿@if(pageLoading)
+{
+    <GenericToolLoader Body="Cargando los elementos para la evaluación del documento, por favor espere..."></GenericToolLoader>
+}
+else
+{
+    <MudStack Class="document-register-wrapper">
+        <MudCard Elevation="0" Outlined="true" Class="tool-margin">
+            <MudCardContent>
+                <MudForm Model="documentEvaluation" @ref="documentEvaluationForm" ValidationDelay="0" Validation="@(DocumentEvaluationValidator.ValidateValue)">
+                    <MudGrid>
+                        <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                            <div class="text-start text-sm-center mb-2">
+                                <MudText Typo="Typo.h6">Tipo de Expediente</MudText>
+                                <MudText Typo="Typo.body1">@dossierTray.Type</MudText>
+                            </div>
+                        </MudItem>
+                        <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                            <div class="text-start text-sm-center mb-2">
+                                <MudText Typo="Typo.h6">Título del Documento</MudText>
+                                <MudText Typo="Typo.body1">@documentContent.Title</MudText>
+                            </div>
+                        </MudItem>
+                        <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                            <div class="text-start text-sm-center mb-2">
+                                <MudText Typo="Typo.h6">Código del Documento</MudText>
+                                <MudText Typo="Typo.body1">@documentContent.Code</MudText>
+                            </div>
+                        </MudItem>
+                        <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                            <div class="text-start text-sm-center mb-2">
+                                <MudText Typo="Typo.h6">Tipo de Documento</MudText>
+                                <MudText Typo="Typo.body1">@dossierTray.Document!.Type</MudText>
+                            </div>
+                        </MudItem>
+                        <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                            <div class="text-start text-sm-center mb-2">
+                                <MudText Typo="Typo.h6">Usuario creador</MudText>
+                                <MudText Typo="Typo.body1">@user!.Data.Name @user!.Data.LastName</MudText>
+                            </div>
+                        </MudItem>
+                        <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                            <div class="text-start text-sm-center mb-2">
+                                <MudText Typo="Typo.h6">Rol</MudText>
+                                <MudText Typo="Typo.body1">@userRole!.Label</MudText>
+                            </div>
+                        </MudItem>
+                        <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                            <MudButton Color="Color.Primary" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AprroveDocumentAsync())">Aprobar</MudButton>
+                        </MudItem>
+                        <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                            <MudButton Color="Color.Error" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => RejectDocumentAsync())">Rechazar</MudButton>
+                        </MudItem>
+                        @if (!isApproved)
+                        {
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <div class="d-flex">
+                                    <div class="align-self-center">
+                                        <MudAvatar Color="Color.Info" Image="@SessionAccount.GetClient().Profile" Alt="@SessionAccount.GetClient().Name.Substring(0)" />
+                                    </div>
+                                    <div class="speech">
+                                        <label for="comment">Comentario</label>
+                                        <MudTextField Class="evaluator-comment" Variant="Variant.Text" Lines="3" @bind-Value="documentEvaluation.EvaluatorComment"
+                                              id="comment" For="@(() => documentEvaluation.EvaluatorComment)" Immediate="true" AutoFocus="true"></MudTextField>
+                                    </div>
+                                </div>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12" Class="text-end">
+                                <MudButton Color="Color.Secondary" Variant="Variant.Filled" Class="rounded-lg" OnClick="@(() => ConfirmDocumentEvaluationAsync())">Confirmar</MudButton>
+                            </MudItem>
+                        }
+                    </MudGrid>
+                </MudForm>
+            </MudCardContent>
+        </MudCard>
+    </MudStack>
+}
+
+

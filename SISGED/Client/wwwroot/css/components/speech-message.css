@@ -1,0 +1,38 @@
+﻿.speech {
+    color: var(--mud-palette-secondary);
+    position: relative;
+    border-radius: 10px;
+    width: 100%;
+    margin-left: 20px;
+    height: 100px;
+    padding: 10px;
+    text-align: start !important;
+    background-color: #F2F2F2;
+}
+
+.speech label {
+    color: var(--mud-palette-secondary);
+    font-size: 15px;
+}
+
+.speech::after {
+    position: absolute;
+    content: '';
+    border: 20px solid transparent;
+    border-right-color: #F2F2F2;
+    border-left: 0;
+    left: -20px;
+    margin-top: -20px;
+    top: 50%;
+}
+
+.speech .evaluator-comment {
+    margin-top: 0px !important;
+}
+
+.speech .evaluator-comment .mud-input {
+    margin-top: 0px !important;
+}
+    .speech .evaluator-comment .mud-input::before, .speech .evaluator-comment .mud-input::after {
+        border: none !important
+    }

@@ -8,7 +8,8 @@ namespace SISGED.Client.Services.Repositories
         {
             new DocumentRegisterRender(),
             new DocumentSendRender(),
-            new DocumentGenerationRender()
+            new DocumentGenerationRender(),
+            new DocumentEvaluationRender()
         };
 
         public IToolWindowRender GetToolWindow(string toolName)

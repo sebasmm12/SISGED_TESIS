@@ -57,6 +57,7 @@ static void ConfigureServices(IServiceCollection services)
     services.AddTransient<SolicitorDossierRequestRegisterValidator>();
     services.AddTransient<UserLoginValidator>();
     services.AddTransient<DocumentDerivationValidator>();
+    services.AddTransient<DocumentEvaluationValidator>();
 }
 
     
