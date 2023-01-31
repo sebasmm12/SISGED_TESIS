@@ -490,6 +490,8 @@ namespace SISGED.Server.Controllers
                 var user = await GetUserAsync("userId");
                 var state = await _documentService.EvaluateDocumentAsync(documentEvaluationRequest, user);
 
+                await RegisterOutputTrayWithDocumentTrayAsync(state, user);
+
                 return Ok(state);
             }
             catch (Exception ex)
@@ -1111,6 +1113,13 @@ namespace SISGED.Server.Controllers
             var outputTrayDTO = new OutPutTrayDTO(dossier.Id, currentDocumentId.DocumentId, document.Id, user.Id);
 
             await _trayService.RegisterOutputTrayAsync(outputTrayDTO);
+        }
+
+        private async Task RegisterOutputTrayWithDocumentTrayAsync(Document document, User user)
+        {
+            var documentTray = await _trayService.GetDocumentTrayByUserIdDocumentIdAsync(user.Id, document.Id);
+
+            await _trayService.RegisterOutputTrayWithDocumentTrayAsync(documentTray, user);
         }
 
         private async Task<ComplaintRequest> RegisterComplaintRequestAsync(ComplaintRequestResponse document, User user)

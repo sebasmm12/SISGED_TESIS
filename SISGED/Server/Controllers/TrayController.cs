@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using SISGED.Server.Services.Contracts;
+using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Responses.Tray;
 
 namespace SISGED.Server.Controllers
@@ -40,6 +41,23 @@ namespace SISGED.Server.Controllers
             {
                 var tray = await _trayService.GetInputStrayAsync(user);
                 return Ok(tray);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+
+            
+        }
+        
+        [HttpGet("documenttray")]
+        public async Task<ActionResult<DocumentTray>> GetDocumentTrayByUserIdDocumentIdAsync(string userId, string documentId)
+        {
+            try
+            {
+                var doc = await _trayService.GetDocumentTrayByUserIdDocumentIdAsync(userId, documentId);
+                return Ok(doc);
             }
             catch (Exception ex)
             {
