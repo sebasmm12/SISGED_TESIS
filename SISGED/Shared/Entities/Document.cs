@@ -31,6 +31,8 @@ namespace SISGED.Shared.Entities
         public List<ContentVersion> ContentsHistory { get; set; } = new();
         [BsonElement("historialproceso")]
         public List<Process> ProcessesHistory { get; set; } = new();
+        [BsonElement("evaluaciones")]
+        public List<DocumentEvaluation> Evaluations { get; set; } = new();
         [BsonElement("urlanexo")]
         public List<string> AttachedUrls { get; set; } = new();
         [BsonElement("estado")]

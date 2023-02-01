@@ -481,12 +481,17 @@ namespace SISGED.Server.Controllers
         #endregion
 
         #region PUT
-        [HttpPut("cambiarestado")]
-        public async Task<ActionResult<Document>> ModifyState(Evaluation document, [FromQuery] string docId)
+        [HttpPut("evaluation")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<Document>> EvaluateDocument(DocumentEvaluationRequest documentEvaluationRequest)
         {
             try
             {
-                var state = await _documentService.ModifyStateAsync(document, docId);
+                var user = await GetUserAsync("userId");
+                var state = await _documentService.EvaluateDocumentAsync(documentEvaluationRequest, user);
+
+                await RegisterOutputTrayWithDocumentTrayAsync(state, user);
+
                 return Ok(state);
             }
             catch (Exception ex)
@@ -1101,13 +1106,20 @@ namespace SISGED.Server.Controllers
             return await _documentService.InitialRequestRegisterAsync(initialRequest);
         }
 
-        private async Task RegisterOutPutTrayAsync(Document complaintRequest, User user, Dossier dossier)
+        private async Task RegisterOutPutTrayAsync(Document document, User user, Dossier dossier)
         {
             var currentDocumentId = dossier.Documents[^2];
 
-            var outputTrayDTO = new OutPutTrayDTO(dossier.Id, currentDocumentId.DocumentId, complaintRequest.Id, user.Id);
+            var outputTrayDTO = new OutPutTrayDTO(dossier.Id, currentDocumentId.DocumentId, document.Id, user.Id);
 
             await _trayService.RegisterOutputTrayAsync(outputTrayDTO);
+        }
+
+        private async Task RegisterOutputTrayWithDocumentTrayAsync(Document document, User user)
+        {
+            var documentTray = await _trayService.GetDocumentTrayByUserIdDocumentIdAsync(user.Id, document.Id);
+
+            await _trayService.RegisterOutputTrayWithDocumentTrayAsync(documentTray, user);
         }
 
         private async Task<ComplaintRequest> RegisterComplaintRequestAsync(ComplaintRequestResponse document, User user)

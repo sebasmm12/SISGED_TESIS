@@ -52,6 +52,15 @@ namespace SISGED.Server.Services.Repositories
             return tray;
         }
 
+        public async Task<DocumentTray> GetDocumentTrayByUserIdDocumentIdAsync(string userId, string documentId)
+        {
+            var doc = await _traysCollection.Aggregate<DocumentTray>(GetTrayByUserIdDocumentIdPipeline(userId, documentId)).FirstOrDefaultAsync();
+
+            if (doc is null) throw new Exception("No se ha podido encontrar el documento en la bandeja.");
+
+            return doc;
+        }
+
         public async Task<Tray> GetTrayDocumentAsync(string user)
         {
             return await _traysCollection.FindAsync(t => t.User == user).Result.FirstAsync();
@@ -88,6 +97,15 @@ namespace SISGED.Server.Services.Repositories
             var inputTrayUpdate = PullDocumentTrayAsync(new(currentDocumentTray, outPutTrayDTO.UserId, "bandejaentrada"));
 
             var outputTrayUpdate = PushDocumentTrayAsync(new(newDocumentTray, outPutTrayDTO.UserId, "bandejasalida"));
+
+            await Task.WhenAll(inputTrayUpdate, outputTrayUpdate);
+        }
+        
+        public async Task RegisterOutputTrayWithDocumentTrayAsync(DocumentTray document, User user) { 
+
+            var inputTrayUpdate = PullDocumentTrayAsync(new(document, user.Id, "bandejaentrada"));
+
+            var outputTrayUpdate = PushDocumentTrayAsync(new(document, user.Id, "bandejasalida"));
 
             await Task.WhenAll(inputTrayUpdate, outputTrayUpdate);
         }
@@ -138,6 +156,20 @@ namespace SISGED.Server.Services.Repositories
             return usersTraysWithLessInputTray.Append(limitAggregation).ToArray();
         }
 
+        private BsonDocument[] GetTrayByUserIdDocumentIdPipeline(string userId, string documentId)
+        {
+            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("usuario", userId));
+            var unWindAggregation = MongoDBAggregationExtension.UnWind(new("$bandejaentrada"));
+            var matchAggregation2 = MongoDBAggregationExtension.Match(new BsonDocument("bandejaentrada.iddocumento", documentId));
+            var projectAggregation = MongoDBAggregationExtension.Project(new()
+                {
+                    { "_id", 0 },
+                    {"idexpediente","$bandejaentrada.idexpediente" },
+                    {"iddocumento","$bandejaentrada.iddocumento" }
+                });
+
+            return new BsonDocument[] { matchAggregation, unWindAggregation, matchAggregation2, projectAggregation};
+        }
 
         private PipelineDefinition<Tray, InputTrayResponse> GetInputTrayPipeline(string user)
         {

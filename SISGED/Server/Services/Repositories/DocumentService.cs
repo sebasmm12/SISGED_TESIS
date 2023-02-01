@@ -683,13 +683,34 @@ namespace SISGED.Server.Services.Repositories
             return solicitorDossierShipment;
         }
 
-        public async Task<Document> ModifyStateAsync(Evaluation document, string docId)
+        public async Task<Document> EvaluateDocumentAsync(DocumentEvaluationRequest documentEvaluationRequest, User user)
         {
-            var filter = Builders<Document>.Filter.Eq("id", docId);
-            var update = Builders<Document>.Update
-                .Set("evaluacion.resultado", document.Result)
-                .Set("evaluacion.evaluaciones", document.Evaluations);
-            return await _documentsCollection.FindOneAndUpdateAsync<Document>(filter, update);
+            //var filter = Builders<Document>.Filter.Eq("id", documentEvaluationRequest.DocumentId);
+            //var update = Builders<Document>.Update
+            //    .Set("evaluacion.resultado", document.Result)
+            //    .Set("evaluacion.evaluaciones", document.Evaluations);
+            //return await _documentsCollection.FindOneAndUpdateAsync<Document>(filter, update);
+
+            var currentDocument = await GetDocumentAsync(documentEvaluationRequest.DocumentId);
+            var eval = new DocumentEvaluation(user.Id, documentEvaluationRequest.IsApproved, documentEvaluationRequest.Comment, DateTime.UtcNow.AddHours(-5));
+            var process = new Process(user.Id, user.Id, "evaluado", user.Rol, DateTime.UtcNow.AddHours(-5), DateTime.UtcNow.AddHours(-5));
+
+            var updateFilter = Builders<Document>.Update
+                                                       .Set("estado", "evaluado")
+                                                       .Push("historialproceso", process)
+                                                       .Push("evaluaciones", eval);
+
+
+            var updateQuery = Builders<Document>.Filter.Eq(document => document.Id, documentEvaluationRequest.DocumentId);
+
+            var document = await _documentsCollection.FindOneAndUpdateAsync(updateQuery, updateFilter, new()
+            {
+                ReturnDocument = ReturnDocument.After
+            });
+
+            return document;
+
+
             //BandejaDocumento bandejaDocumento = new BandejaDocumento();
             //bandejaDocumento.idexpediente = documento.idexpediente;
             //bandejaDocumento.iddocumento = documento.id;
