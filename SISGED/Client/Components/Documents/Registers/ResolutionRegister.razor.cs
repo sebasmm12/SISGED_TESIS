@@ -66,7 +66,6 @@ namespace SISGED.Client.Components.Documents.Registers
         private IEnumerable<DocumentTypeInfoResponse> documentTypes = default!;
 
         private List<MediaRegisterDTO> annexes = new();
-        List<string> names = new List<string>();
         private bool pageLoading = true;
         private string dossierId = default!;
 

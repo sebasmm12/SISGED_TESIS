@@ -1,9 +1,7 @@
 ﻿@page "/redirect"
 @inject NavigationManager NavManager
 
-<h1>Redirect Page</h1>
-
-<p>Redirecting to Default Page</p>
+<GenericPageLoader Body="No se ha identificado autenticación. Redirigiendo al inicio de sesión."></GenericPageLoader>
 
 @code {
     protected override void OnInitialized()

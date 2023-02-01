@@ -4,6 +4,7 @@ using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Generics.Document;
 using SISGED.Shared.Models.Requests.Account;
+using SISGED.Shared.Models.Requests.User;
 using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.DossierTray;
@@ -61,7 +62,7 @@ namespace SISGED.Client.Helpers
             // Solicitor Dossier Shipment
             CreateMap<SolicitorDossierShipmentRegisterDTO, SolicitorDossierShipmentResponseContent>()
                 .ForMember(solicitorDossierShipmentContent => solicitorDossierShipmentContent.SolicitorId, options => options.MapFrom(solicitorDossierShipmentRegister => solicitorDossierShipmentRegister.Solicitor.Id));
-                
+
 
             CreateMap<DossierTrayResponse, Item>()
                 .ForMember(item => item.Name, options => options.MapFrom(dossierTray => dossierTray.Type))
@@ -77,6 +78,21 @@ namespace SISGED.Client.Helpers
 
             // Login
             CreateMap<UserLoginDTO, AccountLoginRequest>();
+
+            //User Self Register
+            CreateMap<UserSelfRegisterDTO, UserRegisterRequest>()
+
+                .ForMember(userRequest => userRequest.UserName, options => options.MapFrom(userSelfRegister => userSelfRegister.Username))
+                .ForMember(userRequest => userRequest.Data, options => options.MapFrom(userSelfRegister => new UserData
+                {
+                    Name = userSelfRegister.Name,
+                    LastName = userSelfRegister.LastName,
+                    DocumentNumber = userSelfRegister.DocumentNumber,
+                    DocumentType = userSelfRegister.DocumentType.Name,
+                    Address = userSelfRegister.Address,
+                    Email = userSelfRegister.Email
+                }))
+                .ForMember(userRequest => userRequest.Password, options => options.MapFrom(userSelfRegister => userSelfRegister.Password));
         }
     }
 }

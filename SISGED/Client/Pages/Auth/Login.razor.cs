@@ -59,10 +59,7 @@ namespace SISGED.Client.Pages.Auth
         private ILoginRepository loginRepository { get; set; } = default!;
         [Inject]
         private NavigationManager navigationManager { get; set; } = default!;
-        [Inject]
-        private IJSRuntime IJSRuntime { get; set; } = default!;
 
-        private IJSObjectReference loginModule = default!;
         private MudForm? requestForm = default!;
         private UserLoginDTO userLogin = new UserLoginDTO();
         private bool pageLoading = false;

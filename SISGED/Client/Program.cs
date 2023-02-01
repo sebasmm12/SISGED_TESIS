@@ -59,6 +59,7 @@ static void ConfigureServices(IServiceCollection services)
     services.AddTransient<UserLoginValidator>();
     services.AddTransient<DocumentDerivationValidator>();
     services.AddTransient<DocumentEvaluationValidator>();
+    services.AddTransient<UserSelfRegisterValidator>();
 }
 
     
