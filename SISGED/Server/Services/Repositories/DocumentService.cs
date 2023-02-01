@@ -7,6 +7,7 @@ using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Queries.Document;
 using SISGED.Shared.Models.Queries.Statistic;
+using SISGED.Shared.Models.Queries.UserDocument;
 using SISGED.Shared.Models.Requests.Documents;
 using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.Document.BPNDocument;
@@ -19,6 +20,8 @@ using SISGED.Shared.Models.Responses.Document.SolicitorDossierShipment;
 using SISGED.Shared.Models.Responses.Document.UserRequest;
 using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.Statistic;
+using SISGED.Shared.Models.Responses.UserDocument;
+using System.Linq;
 
 namespace SISGED.Server.Services.Repositories
 {
@@ -36,6 +39,24 @@ namespace SISGED.Server.Services.Repositories
             _trayCollection = mongoDatabase.GetCollection<Tray>(TrayCollectionName);
 
             _dossierService = dossierService;
+        }
+
+        public async Task<IEnumerable<UserDocumentResponse>> GetDocumentsByUserAsync(string userId, UserDocumentPaginationQuery userDocumentPaginationQuery)
+        {
+            var documents = await _documentsCollection.Aggregate<UserDocumentResponse>(GetPaginatedDocumentsByUserPipeline(userId, userDocumentPaginationQuery))
+                .ToListAsync();
+
+            if (documents is null) throw new Exception($"No se encontraron documentos del usuario con identificador {userId}");
+
+            return documents;
+        }
+
+        public async Task<int> CountDocumentsByUserAsync(string userId, UserDocumentPaginationQuery userDocumentPaginationQuery)
+        {
+            var totalDocumentsByUser = await _documentsCollection.Aggregate<UserDocumentCounterDTO>(GetTotalDocumentsByUserPipeline(userId, userDocumentPaginationQuery))
+                .FirstAsync();
+
+            return totalDocumentsByUser.Total;
         }
 
         public async Task<IEnumerable<UserRequestDocumentResponse>> GetUserRequestDocumentsAsync(string documentNumber)
@@ -426,7 +447,7 @@ namespace SISGED.Server.Services.Repositories
         {
             await _documentsCollection.InsertOneAsync(complaintRequest);
 
-            if(complaintRequest.Id is null) throw new Exception($"No se pudo registrar la solicitud de denuncia { complaintRequest.Content.Title }");
+            if (complaintRequest.Id is null) throw new Exception($"No se pudo registrar la solicitud de denuncia {complaintRequest.Content.Title}");
 
             return complaintRequest;
         }
@@ -564,7 +585,7 @@ namespace SISGED.Server.Services.Repositories
 
             return disciplinaryOpenness;
         }
-        
+
         public async Task<SolicitorDossierRequest> SolicitorDossierRequestRegisterAsync(SolicitorDossierRequest solicitorDossierRequest)
         {
             await _documentsCollection.InsertOneAsync(solicitorDossierRequest);
@@ -586,8 +607,8 @@ namespace SISGED.Server.Services.Repositories
         {
             await _documentsCollection.InsertOneAsync(dictum);
 
-            if (dictum.Id is null) throw new Exception($"No se pudo registrar el dictamen { dictum.Content.Title }");
-            
+            if (dictum.Id is null) throw new Exception($"No se pudo registrar el dictamen {dictum.Content.Title}");
+
             return dictum;
         }
 
@@ -694,11 +715,11 @@ namespace SISGED.Server.Services.Repositories
                                                        .Set("estado", "generado")
                                                        .Push("historialcontenido", contentVersion)
                                                        .Push("historialproceso", process);
-                                                       
+
 
             var updateQuery = Builders<Document>.Filter.Eq(document => document.Id, documentGenerationDTO.DocumentId);
 
-            var document = await _documentsCollection.FindOneAndUpdateAsync(updateQuery, updateFilter, new() 
+            var document = await _documentsCollection.FindOneAndUpdateAsync(updateQuery, updateFilter, new()
             {
                 ReturnDocument = ReturnDocument.After
             });
@@ -1077,6 +1098,227 @@ namespace SISGED.Server.Services.Repositories
             await _documentsCollection.UpdateOneAsync(filter, update);
         }
         #region private methods
+        private static BsonDocument[] GetPaginatedDocumentsByUserPipeline(string userId, UserDocumentPaginationQuery userDocumentPaginationQuery)
+        {
+            var aggregations = GetDocumentsByUserPipeline(userId, userDocumentPaginationQuery).ToList();
+
+            aggregations.Add(MongoDBAggregationExtension.Sort(new BsonDocument("fechacreacion", -1)));
+            aggregations.Add(MongoDBAggregationExtension.Skip(userDocumentPaginationQuery.Page * userDocumentPaginationQuery.PageSize));
+            aggregations.Add(MongoDBAggregationExtension.Limit(userDocumentPaginationQuery.PageSize));
+
+            return aggregations.ToArray();
+        }
+
+        private static BsonDocument[] GetTotalDocumentsByUserPipeline(string userId, UserDocumentPaginationQuery userDocumentPaginationQuery)
+        {
+            var aggregations = GetDocumentsByUserPipeline(userId, userDocumentPaginationQuery);
+
+            var countAggregation = MongoDBAggregationExtension.Count("total");
+
+            return aggregations.Concat(new BsonDocument[] { countAggregation }).ToArray();
+        }
+
+        private static BsonDocument[] GetDocumentsByUserPipeline(string userId, UserDocumentPaginationQuery userDocumentPaginationQuery)
+        {
+
+            var aggregations = new List<BsonDocument>()
+            {
+                 GetDocumentsByUserMatchAggregation(userId, userDocumentPaginationQuery),
+                 GetDossierLookUpPipeline(),
+                 MongoDBAggregationExtension.UnWind(new("$dossiers"))
+            };
+
+            aggregations.AddRange(GetDocumentsByUserPipelineAggregation(userDocumentPaginationQuery).ToList());
+
+            aggregations.Add(GetDocumentsByUserProjectPipeline());
+
+            return aggregations.ToArray();
+        }
+
+        private static BsonDocument GetDocumentsByUserProjectPipeline()
+        {
+            var projectAggregation = MongoDBAggregationExtension.Project(new()
+            {
+                { "tipo", 1 },
+                { "historialcontenido", 1 },
+                { "historialproceso", 1 },
+                { "urlanexo", 1 },
+                { "estado", 1 },
+                { "fechacreacion", 1 },
+                { "contenido", 1 },
+                { "cliente", "$dossiers.cliente" },
+                { "tipoExpediente", "$dossiers.tipo" }
+            });
+
+            return projectAggregation;
+        }
+
+        private static BsonDocument GetDocumentsByUserMatchAggregation(string userId, UserDocumentPaginationQuery userDocumentPaginationQuery)
+        {
+            var matchedElements = new Dictionary<string, BsonValue>()
+            {
+                { "historialproceso", MongoDBAggregationExtension.ElementMatch(new()
+                {
+                    { "estado", "registrado" },
+                    { "idemisor", userId }
+                })}
+            };
+
+            var conditions = GetDocumentsByUserConditions();
+
+            conditions.ForEach(condition =>
+            {
+                if (condition.Condition(userDocumentPaginationQuery)) matchedElements = condition.Result(matchedElements, userDocumentPaginationQuery);
+            });
+
+            var matchAggregation = MongoDBAggregationExtension.Match(matchedElements);
+
+            return matchAggregation;
+        }
+
+        private static BsonDocument[] GetDocumentsByUserPipelineAggregation(UserDocumentPaginationQuery userDocumentPaginationQuery)
+        {
+            var pipelines = new List<BsonDocument>().ToArray();
+
+            var conditions = GetDocumentsByUserPipelineConditions();
+
+            conditions.ForEach(condition =>
+            {
+                if (condition.Condition(userDocumentPaginationQuery)) pipelines = condition.Result(pipelines, userDocumentPaginationQuery);
+            });
+
+            return pipelines;
+        }
+        
+        private static List<FilterConditionDTO<UserDocumentPaginationQuery, BsonDocument[]>> GetDocumentsByUserPipelineConditions()
+        {
+            var documentsByUserConditions = new List<FilterConditionDTO<UserDocumentPaginationQuery, BsonDocument[]>>()
+            {
+                new()
+                {
+                    Condition = (userDocumentPaginationQuery) => !string.IsNullOrEmpty(userDocumentPaginationQuery.ClientName),
+                    Result = (documentsByUserPipelines, userDocumentPaginationQuery) =>
+                    {
+                        var clientPipelines = GetClientSearcherPipeline(userDocumentPaginationQuery.ClientName!);
+
+                        var result = documentsByUserPipelines.Concat(clientPipelines);
+
+                        return result.ToArray();
+                    }
+                    
+                },
+                new()
+                {
+                    Condition = (userDocumentPaginationQuery) => ! string.IsNullOrEmpty(userDocumentPaginationQuery.DossierType),
+                    Result = (documentsByUserPipelines, userDocumentPaginationQuery) =>
+                    {
+                        var dossierPipelines = GetDossierSearcherPipeline(userDocumentPaginationQuery.DossierType!);
+
+                        var result = documentsByUserPipelines.Concat(dossierPipelines);
+
+                        return result.ToArray();
+                    }
+                }
+            };
+
+            return documentsByUserConditions;
+        }
+        
+        private static BsonDocument[] GetDossierSearcherPipeline(string dossierType)
+        {
+            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("dossiers.tipo", dossierType));
+
+            return new BsonDocument[] { matchAggregation };
+        }
+
+        private static BsonDocument GetDossierLookUpPipeline()
+        {
+            var letPipeline = new Dictionary<string, BsonValue>()
+            {
+                { "documentId", MongoDBAggregationExtension.ToString("$_id") }
+            };
+
+            var lookUpPipeline = new BsonArray()
+            {
+                MongoDBAggregationExtension.Match(
+                    MongoDBAggregationExtension.Expr(MongoDBAggregationExtension.Eq(new() { MongoDBAggregationExtension.In("$$documentId", "$documentos.iddocumento"), true })))
+            };
+
+            return MongoDBAggregationExtension.Lookup(new("expedientes", letPipeline, lookUpPipeline, "dossiers"));
+        }
+
+        private static BsonDocument[] GetClientSearcherPipeline(string clientName)
+        {
+
+            var addFieldsAggregation = MongoDBAggregationExtension.AddFields(new()
+            {
+                { "fullName", MongoDBAggregationExtension.Concat(new List<BsonValue>() { "$dossiers.cliente.nombre", " ", "$dossiers.cliente.apellido" }) }
+            });
+
+            var matchDictionary = new Dictionary<string, BsonValue>()
+            {
+                { "fullName", MongoDBAggregationExtension.Regex(clientName.Trim().ToLower() + ".*", "i") }
+            };
+
+            var matchAggregation = MongoDBAggregationExtension.Match(matchDictionary);
+
+            var unsetAggregation = MongoDBAggregationExtension.UnSet(new List<BsonValue>() { "fullName" });
+
+
+            return new BsonDocument[] { addFieldsAggregation, matchAggregation, unsetAggregation };
+        }
+
+        private static List<FilterConditionDTO<UserDocumentPaginationQuery, Dictionary<string, BsonValue>>> GetDocumentsByUserConditions()
+        {
+            var documentByUserConditions = new List<FilterConditionDTO<UserDocumentPaginationQuery, Dictionary<string, BsonValue>>>()
+            {
+                new()
+                {
+                    Condition = (userDocumentPaginationQuery) => !string.IsNullOrEmpty(userDocumentPaginationQuery.Code),
+                    Result = (matchedElements, userDocumentPaginationQuery) => {
+
+                        string code = userDocumentPaginationQuery.Code!.Trim();
+                        
+                        matchedElements.Add("contenido.codigo", code);
+
+                        return matchedElements;
+                    } 
+                },
+                new()
+                {
+                    Condition = (userDocumentPaginationQuery) => !string.IsNullOrEmpty(userDocumentPaginationQuery.State),
+                    Result = (matchedElements, userDocumentPaginationQuery) => {
+
+                        matchedElements.Add("estado", userDocumentPaginationQuery.State);
+
+                        return matchedElements;
+                    }                 
+                },
+                new()
+                {
+                    Condition = (userDocumentPaginationQuery) => userDocumentPaginationQuery.StartDate.HasValue,
+                    Result = (matchedElements, userDocumentPaginationQuery) => {
+
+                        matchedElements.Add("fechacreacion", MongoDBAggregationExtension.GreaterThanEquals(new BsonDateTime(userDocumentPaginationQuery.StartDate!.Value)));
+
+                        return matchedElements;
+                    }                               
+                },
+                new()
+                {
+                    Condition = (userDocumentPaginationQuery) => userDocumentPaginationQuery.EndDate.HasValue,
+                    Result = (matchedElements, userDocumentPaginationQuery) => {
+
+                        matchedElements.Add("fechacreacion", MongoDBAggregationExtension.LessThanEquals(new BsonDateTime(userDocumentPaginationQuery.EndDate!.Value)));
+
+                        return matchedElements;
+                    }                                             
+                }
+            };
+
+            return documentByUserConditions;
+        }
+            
         private static BsonDocument[] GetDisciplinaryOpennessPipeline(string documentId)
         {
             var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("_id", new ObjectId(documentId)));

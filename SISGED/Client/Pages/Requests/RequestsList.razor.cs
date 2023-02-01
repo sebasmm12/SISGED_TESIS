@@ -27,9 +27,6 @@ namespace SISGED.Client.Pages.Requests
         private bool requestsLoading = true;
         private MudTable<UserRequestWithPublicDeedResponse> requestsList = default!;
 
-        // TODO: Get the information based on the session and not with this value
-        private readonly string documentNumber = "70477724";
-
 
         private int TotalUserRequests => (requestsList.GetFilteredItemsCount() + requestsList.RowsPerPage - 1) / requestsList.RowsPerPage;
 
@@ -109,7 +106,7 @@ namespace SISGED.Client.Pages.Requests
 
             userRequestQueries += $"page={System.Web.HttpUtility.UrlEncode(tableState.Page.ToString())}";
             userRequestQueries += $"&pagesize={System.Web.HttpUtility.UrlEncode(tableState.PageSize.ToString())}";
-            userRequestQueries += $"&documentNumber={System.Web.HttpUtility.UrlEncode(documentNumber)}";
+            userRequestQueries += $"&documentNumber={System.Web.HttpUtility.UrlEncode(SessionAccount.GetDocumentNumber())}";
 
             return userRequestQueries;
         }

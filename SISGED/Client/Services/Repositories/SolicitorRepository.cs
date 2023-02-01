@@ -3,7 +3,7 @@ using SISGED.Client.Services.Contracts;
 
 namespace SISGED.Client.Services.Repositories
 {
-    public class SolicitorRepository : ISolicitorRepository
+    public class SolicitorRepository: IFilterRepository<SolicitorFilter>
     {
         public Dictionary<string, object> ConvertToFilters(SolicitorFilter solicitorFilter)
         {
@@ -19,9 +19,9 @@ namespace SISGED.Client.Services.Repositories
             return filters;
         }
 
-        private static List<SolicitorFilterCondition<Dictionary<string, object>>> GetSolicitorConditions()
+        private static List<FilterCondition<SolicitorFilter, Dictionary<string, object>>> GetSolicitorConditions()
         {
-            var solicitorConditions = new List<SolicitorFilterCondition<Dictionary<string, object>>>()
+            var solicitorConditions = new List<FilterCondition<SolicitorFilter, Dictionary<string, object>>>()
             {
                 new()
                 {

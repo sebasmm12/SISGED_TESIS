@@ -2,6 +2,7 @@
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Queries.Document;
 using SISGED.Shared.Models.Queries.Statistic;
+using SISGED.Shared.Models.Queries.UserDocument;
 using SISGED.Shared.Models.Requests.Documents;
 using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.Document.BPNDocument;
@@ -13,6 +14,7 @@ using SISGED.Shared.Models.Responses.Document.SolicitorDossierRequest;
 using SISGED.Shared.Models.Responses.Document.SolicitorDossierShipment;
 using SISGED.Shared.Models.Responses.Document.UserRequest;
 using SISGED.Shared.Models.Responses.Statistic;
+using SISGED.Shared.Models.Responses.UserDocument;
 using System.Threading.Tasks;
 
 namespace SISGED.Server.Services.Contracts
@@ -68,5 +70,7 @@ namespace SISGED.Server.Services.Contracts
         Task UpdateInitialRequestStateAsync(DossierWrapper dossierWrapper);
         Task<long> CountUserRequestAsync(string documentNumber);
         Task<ComplaintRequest> RegisterComplaintRequestAsync(ComplaintRequest complaintRequest);
+        Task<IEnumerable<UserDocumentResponse>> GetDocumentsByUserAsync(string userId, UserDocumentPaginationQuery userDocumentPaginationQuery);
+        Task<int> CountDocumentsByUserAsync(string userId, UserDocumentPaginationQuery userDocumentPaginationQuery);
     }
 }

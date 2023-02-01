@@ -32,7 +32,8 @@ static void ConfigureServices(IServiceCollection services)
     services.AddScoped<ISwalFireRepository, SwalFireRepository>();
     services.AddScoped<IHttpRepository, HttpRepository>();
     services.AddScoped<IDocumentRepository, DocumentRepository>();
-    services.AddScoped<ISolicitorRepository, SolicitorRepository>();
+    services.AddScoped<IFilterRepository<SolicitorFilter>, SolicitorRepository>();
+    services.AddScoped<IFilterRepository<UserDocumentFilter>, UserDocumentRepository>();
     services.AddScoped<IDialogContentRepository, DialogContentRepository>();
     services.AddScoped<IAnnexFactory, AnnexFactory>();
     services.AddScoped<IBadgeFactory, BadgeFactory>();

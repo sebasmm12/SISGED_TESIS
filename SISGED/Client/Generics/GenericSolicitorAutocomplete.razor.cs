@@ -13,7 +13,7 @@ namespace SISGED.Client.Generics
         [Inject]
         public IHttpRepository HttpRepository { get; set; } = default!;
         [Inject]
-        public ISolicitorRepository SolicitorRepository { get; set; } = default!;
+        public IFilterRepository<SolicitorFilter> SolicitorRepository { get; set; } = default!;
 
         [Parameter]
         public bool? ExSolicitor { get; set; }

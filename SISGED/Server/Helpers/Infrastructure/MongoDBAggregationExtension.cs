@@ -128,6 +128,11 @@ namespace SISGED.Server.Helpers.Infrastructure
             return new BsonDocument("$in", new BsonArray().AddRange(values));
         }
 
+        public static BsonDocument In(BsonValue value, BsonValue values)
+        {
+           return new BsonDocument("$in", new BsonArray().Add(value).Add(values));
+        }
+
         public static BsonDocument NotIn(IEnumerable<BsonValue> valuesToExclude)
         {
             return new BsonDocument("$nin", new BsonArray().AddRange(valuesToExclude));
@@ -197,6 +202,11 @@ namespace SISGED.Server.Helpers.Infrastructure
             return new BsonDocument("$unset", bsonElement);
         }
 
+        public static BsonDocument UnSet(IEnumerable<BsonValue> elements)
+        {
+           return new BsonDocument("$unset", new BsonArray().AddRange(elements));
+        }
+
         public static BsonDocument Year(BsonValue date)
         {
             return new BsonDocument("$year", date);
@@ -215,6 +225,36 @@ namespace SISGED.Server.Helpers.Infrastructure
         public static BsonDocument Add(IEnumerable<BsonValue> values)
         {
             return new BsonDocument("$add", new BsonArray().AddRange(values));
+        }
+
+        public static BsonDocument ElementMatch(Dictionary<string, BsonValue> elementsToMatch)
+        {
+            return new BsonDocument("$elemMatch", new BsonDocument().AddRange(elementsToMatch));
+        }
+
+        public static BsonDocument GreaterThanEquals(BsonValue value)
+        {
+            return new BsonDocument("$gte", value);
+        }
+
+        public static BsonDocument GreaterThan(BsonValue value)
+        {
+            return new BsonDocument("$gt", value);
+        }
+
+        public static BsonDocument LessThanEquals(BsonValue value)
+        {
+            return new BsonDocument("$lte", value);
+        }
+
+        public static BsonDocument LessThan(BsonValue value)
+        {
+            return new BsonDocument("$lt", value);
+        }
+        
+        public static BsonDocument ToString(BsonValue value)
+        {
+            return new BsonDocument("$toString", value);
         }
     }
 }

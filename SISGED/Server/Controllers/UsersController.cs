@@ -4,6 +4,7 @@ using SISGED.Server.Services.Contracts;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Queries.User;
 using SISGED.Shared.Models.Requests.User;
+using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.User;
 
 namespace SISGED.Server.Controllers
