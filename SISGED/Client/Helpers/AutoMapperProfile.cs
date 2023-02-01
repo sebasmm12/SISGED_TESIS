@@ -90,7 +90,8 @@ namespace SISGED.Client.Helpers
                     DocumentNumber = userSelfRegister.DocumentNumber,
                     DocumentType = userSelfRegister.DocumentType.Name,
                     Address = userSelfRegister.Address,
-                    Email = userSelfRegister.Email
+                    Email = userSelfRegister.Email,
+                    BornDate = userSelfRegister.BornDate.GetValueOrDefault()
                 }))
                 .ForMember(userRequest => userRequest.Password, options => options.MapFrom(userSelfRegister => userSelfRegister.Password));
         }

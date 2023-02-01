@@ -16,6 +16,7 @@ namespace SISGED.Shared.DTOs
         public string Email  { get; set; } = default!;
         public string DocumentNumber  { get; set; } = default!;
         public string Address  { get; set; } = default!;
+        public DateTime? BornDate  { get; set; } = default!;
         public DocumentTypeInfoResponse DocumentType  { get; set; } = default!;
     }
 }

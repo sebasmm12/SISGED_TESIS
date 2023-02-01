@@ -46,6 +46,13 @@ namespace SISGED.Shared.Validators
             RuleFor(x => x.DocumentType)
                 .NotNull()
                 .WithMessage("Debe ingresar el tipo de documento.");
+            
+            RuleFor(x => x.BornDate)
+                .NotNull()
+                .WithMessage("Debe ingresar la fecha de nacimiento.")
+                .Must(BeAValidAge)
+                .WithMessage("Debe ser mayor de edad.");
+
 
             RuleFor(x => x.DocumentNumber)
                 .NotEmpty()
@@ -76,5 +83,23 @@ namespace SISGED.Shared.Validators
 
             return result.Errors.Select(error => error.ErrorMessage);
         };
+
+        protected bool BeAValidAge(DateTime? date)
+        {
+            DateTime current = DateTime.UtcNow.AddHours(-5).AddYears(-18);
+            DateTime birth = date.GetValueOrDefault();
+
+            if (birth == default)
+            {
+                return false;
+            }
+
+            if (current >= birth)
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 }
