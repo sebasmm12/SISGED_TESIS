@@ -7,6 +7,7 @@ using SISGED.Client;
 using SISGED.Client.Helpers;
 using SISGED.Client.Services.Contracts;
 using SISGED.Client.Services.Repositories;
+using SISGED.Shared.DTOs;
 using SISGED.Shared.Validators;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -32,8 +33,10 @@ static void ConfigureServices(IServiceCollection services)
     services.AddScoped<ISwalFireRepository, SwalFireRepository>();
     services.AddScoped<IHttpRepository, HttpRepository>();
     services.AddScoped<IDocumentRepository, DocumentRepository>();
+    services.AddScoped<IDossierRepository, DossierRepository>();
+    services.AddScoped<IDocumentStateRepository, DocumentStateRepository>();
     services.AddScoped<IFilterRepository<SolicitorFilter>, SolicitorRepository>();
-    services.AddScoped<IFilterRepository<UserDocumentFilter>, UserDocumentRepository>();
+    services.AddScoped<IFilterRepository<UserDocumentFilterDTO>, UserDocumentRepository>();
     services.AddScoped<IDialogContentRepository, DialogContentRepository>();
     services.AddScoped<IAnnexFactory, AnnexFactory>();
     services.AddScoped<IBadgeFactory, BadgeFactory>();
@@ -60,6 +63,7 @@ static void ConfigureServices(IServiceCollection services)
     services.AddTransient<DocumentDerivationValidator>();
     services.AddTransient<DocumentEvaluationValidator>();
     services.AddTransient<UserSelfRegisterValidator>();
+    services.AddTransient<UserDocumentValidator>();
 }
 
     

@@ -24,7 +24,7 @@ namespace SISGED.Shared.Models.Responses.Document
         [BsonElement("contenido")]
         public object Content { get; set; } = default!;
         [BsonElement("estado")]
-        public object State { get; set; } = default!;
+        public string State { get; set; } = default!;
         [BsonElement("evaluacion")]
         public object? Evaluation { get; set; } = default!;
         [BsonElement("fechacreacion")]

@@ -8,6 +8,8 @@
             Total = total;
         }
 
+        public PaginatedUserDocumentResponse() { }
+
         public IEnumerable<UserDocumentResponse> UserDocuments { get; set; } = default!;
         public int Total { get; set; }
     }

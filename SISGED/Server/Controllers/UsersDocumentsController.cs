@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SISGED.Server.Services.Contracts;
-using SISGED.Server.Services.Repositories;
 using SISGED.Shared.Models.Queries.UserDocument;
-using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.UserDocument;
 
 namespace SISGED.Server.Controllers
@@ -20,7 +18,7 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpGet("{userId}/documents")]
-        public async Task<ActionResult<PaginatedUserDocumentResponse>> GetDocumentsAsync([FromRoute] string userId, [FromQuery] UserDocumentPaginationQuery userDocumentPaginationQuery) 
+        public async Task<ActionResult<PaginatedUserDocumentResponse>> GetDocumentsAsync([FromRoute] string userId, [FromQuery] UserDocumentPaginationQuery userDocumentPaginationQuery)
         {
             try
             {

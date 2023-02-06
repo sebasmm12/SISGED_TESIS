@@ -222,7 +222,23 @@ a, .btn-link {
     display: none !important;
 }
 
+.mud-fab-secondary:hover, .mud-fab-secondary:focus-visible {
+    background-color: var(--mud-palette-secondary) !important;
+}
+
 .d-column {
     display: flex;
     flex-direction: column;
+}
+
+.gray-text {
+    color: #a7a8ae !important;
+}
+
+.d-block {
+    display: block;
+}
+
+.text-capitalize {
+    text-transform: capitalize;
 }

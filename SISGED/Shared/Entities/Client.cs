@@ -31,6 +31,16 @@ namespace SISGED.Shared.Entities
             return GetFirstName(Name) + " " + GetFirstName(LastName);
         }
 
+        public string GetAvatarName()
+        {
+            return GetFirstLetter(Name) + GetFirstLetter(LastName);
+        }
+        
+        private static string GetFirstLetter(string name)
+        {
+            return name.Trim().First().ToString();
+        }
+
         private static string GetFirstName(string name)
         {
             return name.Trim().Split(" ")[0];

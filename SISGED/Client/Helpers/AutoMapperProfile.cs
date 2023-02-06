@@ -9,6 +9,8 @@ using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.DossierTray;
 using SISGED.Shared.Models.Responses.Solicitor;
+using SISGED.Shared.Models.Responses.UserDocument;
+using System.Text.Json;
 
 namespace SISGED.Client.Helpers
 {
@@ -94,6 +96,17 @@ namespace SISGED.Client.Helpers
                     BornDate = userSelfRegister.BornDate.GetValueOrDefault()
                 }))
                 .ForMember(userRequest => userRequest.Password, options => options.MapFrom(userSelfRegister => userSelfRegister.Password));
+
+            // User Document List
+
+            CreateMap<UserDocumentResponse, UserDocumentDTO>()
+                .ForMember(userDocument => userDocument.Content, options => options.MapFrom(MapUserDocumentContent));
+            CreateMap<PaginatedUserDocumentResponse, PaginatedUserDocumentDTO>();
+        }
+
+        private DocumentContentDTO MapUserDocumentContent(UserDocumentResponse userDocumentResponse, UserDocumentDTO userDocumentDTO)
+        {
+            return JsonSerializer.Deserialize<DocumentContentDTO>(JsonSerializer.Serialize(userDocumentResponse.Content))!;
         }
     }
 }

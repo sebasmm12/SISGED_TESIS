@@ -1,18 +1,19 @@
 ﻿namespace SISGED.Client.Helpers
 {
-    public class DocumentOption : SelectOption
+    public class SelectOption
     {
-        public DocumentOption(string label, string value, Roles rol) : base(label, value)
+        public SelectOption(string label, string value)
         {
-            Rol = rol;
+            Label = label;
+            Value = value;
         }
 
-        public Roles Rol { get; set; }
-
+        public string Label { get; set; } = default!;
+        public string Value { get; set; } = default!;
 
         public override bool Equals(object? obj)
         {
-            var other = obj as DocumentOption;
+            var other = obj as SelectOption;
             return other?.Value == Value;
         }
 

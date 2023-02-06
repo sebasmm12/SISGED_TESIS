@@ -1,6 +1,6 @@
-﻿namespace SISGED.Client.Helpers
+﻿namespace SISGED.Shared.DTOs
 {
-    public class UserDocumentFilter
+    public class UserDocumentFilterDTO
     {
         public string? Code { get; set; }
         public DateTime? StartDate { get; set; }

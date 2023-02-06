@@ -84,7 +84,7 @@ namespace SISGED.Shared.Validators
             return result.Errors.Select(error => error.ErrorMessage);
         };
 
-        protected bool BeAValidAge(DateTime? date)
+        protected static bool BeAValidAge(DateTime? date)
         {
             DateTime current = DateTime.UtcNow.AddHours(-5).AddYears(-18);
             DateTime birth = date.GetValueOrDefault();

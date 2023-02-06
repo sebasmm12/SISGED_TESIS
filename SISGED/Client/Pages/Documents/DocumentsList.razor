@@ -2,16 +2,92 @@
 
 <PageTitle>Documentos</PageTitle>
 
-<GenericFormHeader HeaderIcon="fa-file-contract" HeaderTitle="Documentos" 
-    HeaderDescription="Visalice todas los documentos registrados por usted en el sistema"></GenericFormHeader>
-
 @if (documentsLoading)
 {
     <GenericToolLoader Body="Obteniendo los documentos registrados, por favor espere...."></GenericToolLoader>
 }
 else
 {
-    
+    <MudCard Elevation="5" Class="mt-3">
+        <MudCardContent>
+            <GenericFormHeader HeaderIcon="fa-file-contract" HeaderTitle="Documentos"
+                           HeaderDescription="Visalice todas los documentos registrados por usted en el sistema"></GenericFormHeader>
+        </MudCardContent>
+    </MudCard>
+    <MudCard Elevation="5" Class="mt-3">
+        <MudCardContent>
+            <MudForm @ref="documentSearcherForm" Model="userDocumentFilter" ValidationDelay="0" Validation="@(UserDocumentValidator.ValidateValue)">
+                <MudGrid>
+                    <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                        <MudTextField @bind-Value="userDocumentFilter.Code" Label="Código del Documento" Variant="Variant.Outlined"
+                            Adornment="Adornment.End" AdornmentIcon="fas fa-key" AdornmentColor="Color.Primary" Immediate="true"
+                            For="@(() => userDocumentFilter.Code)"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="12" sm="12" md="8" lg="8" xl="8">
+                        <MudTextField @bind-Value="userDocumentFilter.ClientName" Label="Nombre del Cliente" Variant="Variant.Outlined"
+                                  Adornment="Adornment.End" AdornmentIcon="fas fa-user" AdornmentColor="Color.Primary" Immediate="true"
+                                  For="@(() => userDocumentFilter.ClientName)"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
+                        <MudSelect AdornmentIcon="fas fa-file" AdornmentColor="Color.Primary" Label="Tipo de Expediente" Dense="true"
+                            Variant="Variant.Outlined" @bind-Value="userDocumentFilter.DossierType" Clearable="true">
+                            @foreach (var dossierType in dossiersTypes)
+                            {
+                                <MudSelectItem T="string" Value="@dossierType.Value">@dossierType.Label</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                     <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
+                        <MudDatePicker Label="Fecha de Inicio" @bind-Date="userDocumentFilter.StartDate" DateFormat="dd/MM/yyyy" HelperText="Creado desde"
+                                   AutoClose="true" Editable="true" For="@(() => userDocumentFilter.StartDate)" AdornmentColor="Color.Primary" Variant="Variant.Outlined">
+                        </MudDatePicker>
+                    </MudItem>
+                    <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
+                        <MudDatePicker Label="Fecha Fin" @bind-Date="userDocumentFilter.EndDate" DateFormat="dd/MM/yyyy" HelperText="Creado hasta"
+                                   AutoClose="true" Editable="true" For="@(() => userDocumentFilter.EndDate)" AdornmentColor="Color.Primary" Variant="Variant.Outlined">
+                        </MudDatePicker>
+                    </MudItem>
+                    <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
+                        <MudSelect AdornmentIcon="fas fa-file" AdornmentColor="Color.Primary" Label="Estado del Documento" Dense="true"
+                               Variant="Variant.Outlined" @bind-Value="userDocumentFilter.State" Clearable="true">
+                            @foreach (var documentState in documentStates)
+                            {
+                                <MudSelectItem T="string" Value="@documentState.Value">@documentState.Label</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                </MudGrid>
+            </MudForm>
+        </MudCardContent>
+        <MudCardActions>
+            <MudPaper Elevation="0" Class="ml-auto mr-2">
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(() => SearchDocumentsAsync())">
+                    @if (documentSearchLoading)
+                    {
+                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"></MudProgressCircular>
+                        <MudText Class="ms-2">Procesando</MudText>
+                    }
+                    else
+                    {
+                        <MudText>Buscar</MudText>
+                    }
+                </MudButton>
+            </MudPaper>
+        </MudCardActions>
+    </MudCard>
+    <MudCard Elevation="5" Class="mt-3">
+        <MudCardContent>
+            <MudGrid>
+                @foreach (var document in paginatedUserDocuments.UserDocuments)
+                {
+                    <DocumentInfo Document="document" @key="document"></DocumentInfo>
+                }
+            </MudGrid>
+            <div class="text-end mt-6">
+                <MudPagination Count="TotalSolicitorDocuments" MiddleCount="5" SelectedChanged="ChangePage" Class="pa-3" />
+            </div>
+        </MudCardContent>
+    </MudCard>
 }
 
 
