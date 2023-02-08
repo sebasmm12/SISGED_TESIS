@@ -10,8 +10,8 @@ else
 {
     <MudCard Elevation="5" Class="mt-3">
         <MudCardContent>
-            <GenericFormHeader HeaderIcon="fa-file-contract" HeaderTitle="Documentos"
-                           HeaderDescription="Visalice todas los documentos registrados por usted en el sistema"></GenericFormHeader>
+            <GenericFormHeader HeaderIcon="fa-box-archive" HeaderTitle="Expedientes"
+                           HeaderDescription="Visalice todos los expedientes en el sistema"></GenericFormHeader>
         </MudCardContent>
     </MudCard>
     <MudCard Elevation="5" Class="mt-3">
@@ -80,7 +80,7 @@ else
             <MudGrid>
                 @foreach (var dossier in paginatedUserDossiers.UserDossiers)
                 {
-                    <SISGED.Client.Components.Documents.Histories.DossierInfo Dossier="dossier" @key="dossier"></SISGED.Client.Components.Documents.Histories.DossierInfo>
+                    <SISGED.Client.Components.Documents.Histories.DossierInfo Dossier="dossier" DossierDerivationHistoryInfo="DossierDerivationHistoryInfo" DossierDocumentHistoryInfo="DossierDocumentHistoryInfo" @key="dossier"></SISGED.Client.Components.Documents.Histories.DossierInfo>
                 }
             </MudGrid>
             <div class="text-end mt-6">

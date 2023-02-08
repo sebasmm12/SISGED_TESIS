@@ -36,6 +36,7 @@ using SISGED.Shared.Validators;
 using SISGED.Client.Services.Repositories;
 using SISGED.Shared.Models.Responses.UserDocument;
 using SISGED.Shared.Models.Responses.UserDossier;
+using SISGED.Client.Components.Documents.Histories.DossierInfoDialog;
 
 namespace SISGED.Client.Pages.Dossiers
 {
@@ -150,6 +151,26 @@ namespace SISGED.Client.Pages.Dossiers
                 .Aggregate((current, keys) => $"{current}&{keys}");
 
             return userRequestQueries;
+        }
+
+        async Task DossierDerivationHistoryInfo(UserDossierDTO dossier)
+        {
+            var parameters = new DialogParameters { ["Derivations"] = dossier.Derivations };
+
+            var options = new DialogOptions() { FullScreen = true, CloseButton = true };
+
+            var dialog = DialogService.Show<DossierInfoDerivationsDialog>("Derivaciones", parameters, options);
+            _ = await dialog.Result;
+        }
+
+        async Task DossierDocumentHistoryInfo(UserDossierDTO dossier)
+        {
+            var parameters = new DialogParameters { ["Documents"] = dossier.Documents };
+
+            var options = new DialogOptions() { FullScreen = true, CloseButton = true };
+
+            var dialog = DialogService.Show<DossierInfoDocumentsDialog>("Línea de Tiempo de Documentos", parameters, options);
+            _ = await dialog.Result;
         }
     }
 }

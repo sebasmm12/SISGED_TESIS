@@ -18,6 +18,7 @@ using SISGED.Client.Helpers;
 using SISGED.Client.Components.WorkEnvironments;
 using SISGED.Client.Components.SolicitorDossier;
 using SISGED.Client.Components.Trays;
+using SISGED.Client.Components.Documents.Histories;
 using SISGED.Shared.Models.Responses.Tray;
 using SISGED.Shared.Models.Responses.DossierTray;
 using SISGED.Shared.Models.Responses.PublicDeed;
@@ -29,35 +30,20 @@ using SISGED.Shared.DTOs;
 using MudBlazor;
 using MudExtensions;
 using MudExtensions.Enums;
-using SISGED.Client.Services.Contracts;
+using SISGED.Shared.Entities;
 
-namespace SISGED.Client.Components.Documents.Histories
+namespace SISGED.Client.Components.Documents.Histories.DossierInfoDialog
 {
-    public partial class DossierInfo
+    public partial class DossierInfoDerivationsDialog
     {
-        [Inject]
-        public IDossierStateRepository DossierStateRepository { get; set; } = default!;
+        [CascadingParameter]
+        MudDialogInstance MudDialog { get; set; }
 
         [Parameter]
-        public UserDossierDTO Dossier { get; set; } = default!;
-        [Parameter]
-        public EventCallback<UserDossierDTO> DossierDerivationHistoryInfo { get; set; }
-        [Parameter]
-        public EventCallback<UserDossierDTO> DossierDocumentHistoryInfo { get; set; }
-
-        private Color GetDossierStateColor(string documentState)
+        public List<Derivation> Derivations { get; set; } = new List<Derivation>();
+        private void Cancel()
         {
-            return DossierStateRepository.GetDossierStateColor(documentState);
+            MudDialog.Cancel();
         }
-
-        private async Task ShowDossierDerivationAsync()
-        {
-            await DossierDerivationHistoryInfo.InvokeAsync(Dossier);
-        }
-        private async Task ShowDossierDocumentAsync()
-        {
-            await DossierDocumentHistoryInfo.InvokeAsync(Dossier);
-        }
-
     }
 }

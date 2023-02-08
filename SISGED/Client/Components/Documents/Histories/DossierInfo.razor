@@ -1,7 +1,7 @@
 ﻿<MudItem xs="12" sm="6" md="6" lg="3" xl="3">
     <MudCard Elevation="3">
         <MudCardContent Class="text-center">
-            <MudImage Src="../images/Documents.png" Alt="Expediente"></MudImage>
+            <MudImage Src="../images/dossier_flaticon.png" Alt="Expediente" Width="128" Height="128"></MudImage>
             <br />
             <MudChip Color="GetDossierStateColor(Dossier.State)" Class="text-capitalize">@Dossier.State</MudChip>
             <MudText Typo="Typo.h6">@Dossier.Id</MudText>
@@ -22,6 +22,9 @@
         <MudCardActions Class="justify-center gap-1">
             <MudTooltip Text="Ver Historial de Derivaciones">
                 <MudFab Color="Color.Primary" StartIcon="fas fa-code-compare" OnClick="@(() => ShowDossierDerivationAsync())"></MudFab>
+            </MudTooltip>
+            <MudTooltip Text="Ver Línea de Tiempo de Documentos">
+                <MudFab Color="Color.Primary" StartIcon="fas fa-timeline" OnClick="@(() => ShowDossierDocumentAsync())"></MudFab>
             </MudTooltip>
         </MudCardActions>
     </MudCard>
