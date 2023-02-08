@@ -39,6 +39,8 @@ namespace SISGED.Client.Components.Documents.Histories.DossierInfoDialog
         [CascadingParameter]
         MudDialogInstance MudDialog { get; set; }
 
+        int Contador = 1;
+
         [Parameter]
         public List<Derivation> Derivations { get; set; } = new List<Derivation>();
         private void Cancel()

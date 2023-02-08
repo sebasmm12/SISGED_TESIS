@@ -534,6 +534,7 @@ namespace SISGED.Server.Services.Repositories
             };
 
             aggregations.AddRange(GetDossierPipelineAggregation(paginationQuery).ToList());
+            aggregations.AddRange(DossierListDerivationsPipeline().ToList());
 
             return aggregations.ToArray();
         }
@@ -681,6 +682,134 @@ namespace SISGED.Server.Services.Repositories
             return new BsonDocument[] { addFieldsAggregation, matchAggregation, unsetAggregation };
         }
 
+        private static BsonDocument[] DossierListDerivationsPipeline()
+        {
+            var unwindAggregation = MongoDBAggregationExtension.UnWind(new("$derivaciones"));
+
+            var lookupAggregation1 = DossierListDerivationsSenderLookUpPipeline();
+            var lookupAggregation2 = DossierListDerivationsReceiverLookUpPipeline();
+            var lookupAggregation3 = DossierListDerivationsOriginLookUpPipeline();
+            var lookupAggregation4 = DossierListDerivationsTargetLookUpPipeline();
+
+            var setAggregation = MongoDBAggregationExtension.Set(new Dictionary<string, BsonValue>()
+            {
+                {"derivaciones.nombreUsuarioEmisor", MongoDBAggregationExtension.GetField("nombre", MongoDBAggregationExtension.First("$derivaciones.nombreUsuarioEmisor")) },
+                {"derivaciones.nombreUsuarioReceptor", MongoDBAggregationExtension.GetField("nombre", MongoDBAggregationExtension.First("$derivaciones.nombreUsuarioReceptor")) },
+                {"derivaciones.nombreAreaProcedencia", MongoDBAggregationExtension.GetField("label", MongoDBAggregationExtension.First("$derivaciones.nombreAreaProcedencia")) },
+                {"derivaciones.nombreAreaDestino", MongoDBAggregationExtension.GetField("label", MongoDBAggregationExtension.First("$derivaciones.nombreAreaDestino")) }
+            });
+
+            var projectAggregation = MongoDBAggregationExtension.Project(new()
+            {
+                { "tipo", "$tipo" },
+                { "cliente", "$cliente" },
+                { "fechainicio", "$fechainicio" },
+                { "fechafin", "$fechafin" },
+                { "documentos", "$documentos" },
+                { "derivaciones.areaprocedencia", "$derivaciones.nombreAreaProcedencia"},
+                { "derivaciones.areadestino", "$derivaciones.nombreAreaDestino"},
+                { "derivaciones.usuarioemisor", "$derivaciones.nombreUsuarioEmisor"},
+                { "derivaciones.usuarioreceptor", "$derivaciones.nombreUsuarioReceptor"},
+                { "derivaciones.fechaderivacion", "$derivaciones.fechaderivacion"},
+                { "derivaciones.estado", "$derivaciones.estado"},
+                { "derivaciones.tipo", "$derivaciones.tipo"},
+                { "estado", "$estado" }
+            });
+
+            var groupAggregation = MongoDBAggregationExtension.Group(new Dictionary<string, BsonValue>()
+            {
+                { "_id", "$_id"},
+                { "tipo", MongoDBAggregationExtension.First("$tipo")  },
+                { "cliente", MongoDBAggregationExtension.First("$cliente") },
+                { "fechainicio", MongoDBAggregationExtension.First("$fechainicio") },
+                { "fechafin", MongoDBAggregationExtension.First("$fechafin") },
+                { "documentos", MongoDBAggregationExtension.First("$documentos") },
+                { "derivaciones", MongoDBAggregationExtension.Push("$derivaciones") },
+                { "estado", MongoDBAggregationExtension.First("$estado") }
+            });
+
+            return new BsonDocument[] { unwindAggregation, lookupAggregation1, lookupAggregation2, lookupAggregation3, lookupAggregation4, setAggregation, projectAggregation, groupAggregation };
+        }
+
+        private static BsonDocument DossierListDerivationsSenderLookUpPipeline()
+        {
+            var letPipeline = new Dictionary<string, BsonValue>()
+            {
+                { "userObjId", MongoDBAggregationExtension.ObjectId("$derivaciones.usuarioemisor") }
+            };
+
+            var lookUpPipeline = new BsonArray()
+            {
+                MongoDBAggregationExtension.Match(
+                    MongoDBAggregationExtension.Expr(MongoDBAggregationExtension.Eq(new() { "$_id", "$$userObjId" }))),
+                MongoDBAggregationExtension.Project(new(){
+                { "_id", 0 },
+                { "nombre", MongoDBAggregationExtension.Concat(new List<BsonValue>(){ "$datos.nombre", " ","$datos.apellido"})}
+            })
+        };
+
+            return MongoDBAggregationExtension.Lookup(new("usuarios", letPipeline, lookUpPipeline, "derivaciones.nombreUsuarioEmisor"));
+        }
+
+        private static BsonDocument DossierListDerivationsReceiverLookUpPipeline()
+        {
+            var letPipeline = new Dictionary<string, BsonValue>()
+            {
+                { "userObjId", MongoDBAggregationExtension.ObjectId("$derivaciones.usuarioreceptor") }
+            };
+
+            var lookUpPipeline = new BsonArray()
+            {
+                MongoDBAggregationExtension.Match(
+                    MongoDBAggregationExtension.Expr(MongoDBAggregationExtension.Eq(new() { "$_id", "$$userObjId" }))),
+                MongoDBAggregationExtension.Project(new(){
+                { "_id", 0 },
+                { "nombre", MongoDBAggregationExtension.Concat(new List<BsonValue>(){ "$datos.nombre", " ","$datos.apellido"})}
+            })
+        };
+
+            return MongoDBAggregationExtension.Lookup(new("usuarios", letPipeline, lookUpPipeline, "derivaciones.nombreUsuarioReceptor"));
+        }
+
+        private static BsonDocument DossierListDerivationsOriginLookUpPipeline()
+        {
+            var letPipeline = new Dictionary<string, BsonValue>()
+            {
+                { "userObjId", MongoDBAggregationExtension.ObjectId("$derivaciones.areaprocedencia") }
+            };
+
+            var lookUpPipeline = new BsonArray()
+            {
+                MongoDBAggregationExtension.Match(
+                    MongoDBAggregationExtension.Expr(MongoDBAggregationExtension.Eq(new() { "$_id", "$$userObjId" }))),
+                MongoDBAggregationExtension.Project(new(){
+                { "_id", 0 },
+                { "label", 1}
+            })
+        };
+
+            return MongoDBAggregationExtension.Lookup(new("roles", letPipeline, lookUpPipeline, "derivaciones.nombreAreaProcedencia"));
+        }
+
+        private static BsonDocument DossierListDerivationsTargetLookUpPipeline()
+        {
+            var letPipeline = new Dictionary<string, BsonValue>()
+            {
+                { "userObjId", MongoDBAggregationExtension.ObjectId("$derivaciones.areadestino") }
+            };
+
+            var lookUpPipeline = new BsonArray()
+            {
+                MongoDBAggregationExtension.Match(
+                    MongoDBAggregationExtension.Expr(MongoDBAggregationExtension.Eq(new() { "$_id", "$$userObjId" }))),
+                MongoDBAggregationExtension.Project(new(){
+                { "_id", 0 },
+                { "label", 1}
+            })
+        };
+
+            return MongoDBAggregationExtension.Lookup(new("roles", letPipeline, lookUpPipeline, "derivaciones.nombreAreaDestino"));
+        }
         #endregion
     }
 }

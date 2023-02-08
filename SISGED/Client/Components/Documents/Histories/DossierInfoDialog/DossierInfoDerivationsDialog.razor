@@ -7,31 +7,33 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        @foreach (var item in Derivations)
-        {
-            <MudListItem Icon="@Icons.Material.Filled.ArrowRightAlt" Text="Derivacion" InitiallyExpanded="false">
-                <NestedList>
-                    <MudListItem Icon="@Icons.Material.Filled.CallMade">
-                        Área de procedencia: @item.OriginArea
-                    </MudListItem>
-                    <MudListItem Icon="@Icons.Material.Filled.AccountCircle">
-                        Usuario emisor: @item.SenderUser
-                    </MudListItem>
-                    <MudListItem Icon="@Icons.Material.Filled.CallReceived">
-                        Área de destino: @item.TargetArea
-                    </MudListItem>
-                    <MudListItem Icon="@Icons.Material.Filled.AccountCircle">
-                        Usuario receptor: @item.ReceiverUser
-                    </MudListItem>
-                    <MudListItem Icon="@Icons.Material.Filled.Info">
-                        Tipo: @item.Type
-                    </MudListItem>
-                    <MudListItem Icon="@Icons.Material.Filled.DateRange">
-                        Fecha de derivación: @item.DerivationDate
-                    </MudListItem>
-                </NestedList>
-            </MudListItem>
-        }
+        <MudContainer Style="max-height: 500px; overflow-y: scroll">
+            @foreach (var item in Derivations)
+            {
+                <MudListItem Icon="@Icons.Material.Filled.ArrowRightAlt" Text="@string.Concat("Derivación ",Contador++)" InitiallyExpanded="false">
+                    <NestedList>
+                        <MudListItem Icon="@Icons.Material.Filled.CallMade">
+                            Área de procedencia: @item.OriginArea
+                        </MudListItem>
+                        <MudListItem Icon="@Icons.Material.Filled.AccountCircle">
+                            Usuario emisor: @item.SenderUser
+                        </MudListItem>
+                        <MudListItem Icon="@Icons.Material.Filled.CallReceived">
+                            Área de destino: @item.TargetArea
+                        </MudListItem>
+                        <MudListItem Icon="@Icons.Material.Filled.AccountCircle">
+                            Usuario receptor: @item.ReceiverUser
+                        </MudListItem>
+                        <MudListItem Icon="@Icons.Material.Filled.Info">
+                            Tipo: @item.Type
+                        </MudListItem>
+                        <MudListItem Icon="@Icons.Material.Filled.DateRange">
+                            Fecha de derivación: @item.DerivationDate
+                        </MudListItem>
+                    </NestedList>
+                </MudListItem>
+            }
+        </MudContainer>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cerrar</MudButton>

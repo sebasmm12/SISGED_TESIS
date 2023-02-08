@@ -207,6 +207,16 @@ namespace SISGED.Server.Helpers.Infrastructure
            return new BsonDocument("$unset", new BsonArray().AddRange(elements));
         }
 
+        public static BsonDocument Set(Dictionary<string, BsonValue> valuesToSet)
+        {
+            return new BsonDocument("$set", new BsonDocument().AddRange(valuesToSet));
+        }
+
+        public static BsonDocument GetField(BsonValue field, BsonValue input)
+        {
+            return new BsonDocument("$getField", new BsonDocument().Add("field", field).Add("input",input));
+        }
+
         public static BsonDocument Year(BsonValue date)
         {
             return new BsonDocument("$year", date);
