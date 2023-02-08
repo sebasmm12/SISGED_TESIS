@@ -10,6 +10,7 @@ using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.DossierTray;
 using SISGED.Shared.Models.Responses.Solicitor;
 using SISGED.Shared.Models.Responses.UserDocument;
+using SISGED.Shared.Models.Responses.UserDossier;
 using System.Text.Json;
 
 namespace SISGED.Client.Helpers
@@ -102,6 +103,11 @@ namespace SISGED.Client.Helpers
             CreateMap<UserDocumentResponse, UserDocumentDTO>()
                 .ForMember(userDocument => userDocument.Content, options => options.MapFrom(MapUserDocumentContent));
             CreateMap<PaginatedUserDocumentResponse, PaginatedUserDocumentDTO>();
+
+            // User Dossier List
+
+            CreateMap<Dossier, UserDossierDTO>();
+            CreateMap<PaginatedUserDossierResponse, PaginatedUserDossierDTO>();
         }
 
         private DocumentContentDTO MapUserDocumentContent(UserDocumentResponse userDocumentResponse, UserDocumentDTO userDocumentDTO)

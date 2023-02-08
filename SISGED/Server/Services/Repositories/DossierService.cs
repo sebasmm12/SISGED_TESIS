@@ -7,10 +7,12 @@ using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Queries.Document;
 using SISGED.Shared.Models.Queries.Dossier;
 using SISGED.Shared.Models.Queries.Statistic;
+using SISGED.Shared.Models.Queries.UserDocument;
 using SISGED.Shared.Models.Requests.Dossier;
 using SISGED.Shared.Models.Responses.Document.UserRequest;
 using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.Statistic;
+using SISGED.Shared.Models.Responses.UserDocument;
 
 namespace SISGED.Server.Services.Repositories
 {
@@ -165,7 +167,24 @@ namespace SISGED.Server.Services.Repositories
 
             return totalRequests;
         }
-        
+        public async Task<IEnumerable<Dossier>> GetDossiersListAsync(UserDossierPaginationQuery paginationQuery)
+        {
+            var dossiers = await _dossiersCollection.Aggregate<Dossier>(GetPaginatedDossiersPipeline(paginationQuery))
+                .ToListAsync();
+
+            if (dossiers is null) throw new Exception($"No se encontraron expedientes.");
+
+            return dossiers;
+        }
+
+        public async Task<int> CountDossiersListAsync(UserDossierPaginationQuery paginationQuery)
+        {
+            var totalDossiers = await _dossiersCollection.Aggregate<UserDocumentCounterDTO>(GetTotalDossiersPipeline(paginationQuery))
+                .FirstAsync();
+
+            return totalDossiers.Total;
+        }
+
         #region private methods
         private static BsonDocument[] GetUserRequestsWithPublicDeedPipeline(UserRequestPaginationQuery userRequestPaginationQuery)
         {
@@ -484,6 +503,182 @@ namespace SISGED.Server.Services.Repositories
             });
 
             return projectAggregation;
+        }
+
+        private static BsonDocument[] GetPaginatedDossiersPipeline(UserDossierPaginationQuery paginationQuery)
+        {
+            var aggregations = GetDossiersPipeline(paginationQuery).ToList();
+
+            aggregations.Add(MongoDBAggregationExtension.Sort(new BsonDocument("fechainicio", -1)));
+            aggregations.Add(MongoDBAggregationExtension.Skip(paginationQuery.Page * paginationQuery.PageSize));
+            aggregations.Add(MongoDBAggregationExtension.Limit(paginationQuery.PageSize));
+
+            return aggregations.ToArray();
+        }
+
+        private static BsonDocument[] GetTotalDossiersPipeline(UserDossierPaginationQuery paginationQuery)
+        {
+            var aggregations = GetDossiersPipeline(paginationQuery);
+
+            var countAggregation = MongoDBAggregationExtension.Count("total");
+
+            return aggregations.Concat(new BsonDocument[] { countAggregation }).ToArray();
+        }
+
+        private static BsonDocument[] GetDossiersPipeline(UserDossierPaginationQuery paginationQuery)
+        {
+
+            var aggregations = new List<BsonDocument>()
+            {
+                 GetDossierMatchAggregation(paginationQuery)
+            };
+
+            aggregations.AddRange(GetDossierPipelineAggregation(paginationQuery).ToList());
+
+            return aggregations.ToArray();
+        }
+
+        private static BsonDocument[] GetDossierPipelineAggregation(UserDossierPaginationQuery paginationQuery)
+        {
+            var pipelines = new List<BsonDocument>().ToArray();
+
+            var conditions = GetDossiersPipelineConditions();
+
+            conditions.ForEach(condition =>
+            {
+                if (condition.Condition(paginationQuery)) pipelines = condition.Result(pipelines, paginationQuery);
+            });
+
+            return pipelines;
+        }
+
+        private static List<FilterConditionDTO<UserDossierPaginationQuery, BsonDocument[]>> GetDossiersPipelineConditions()
+        {
+            var documentsByUserConditions = new List<FilterConditionDTO<UserDossierPaginationQuery, BsonDocument[]>>()
+            {
+                new()
+                {
+                    Condition = (paginationQuery) => !string.IsNullOrEmpty(paginationQuery.ClientName),
+                    Result = (documentsByUserPipelines, paginationQuery) =>
+                    {
+                        var clientPipelines = GetClientSearcherPipeline(paginationQuery.ClientName!);
+
+                        var result = documentsByUserPipelines.Concat(clientPipelines);
+
+                        return result.ToArray();
+                    }
+
+                },
+                new()
+                {
+                    Condition = (paginationQuery) => ! string.IsNullOrEmpty(paginationQuery.Type),
+                    Result = (documentsByUserPipelines, paginationQuery) =>
+                    {
+                        var dossierPipelines = GetDossierSearcherPipeline(paginationQuery.Type!);
+
+                        var result = documentsByUserPipelines.Concat(dossierPipelines);
+
+                        return result.ToArray();
+                    }
+                }
+            };
+
+            return documentsByUserConditions;
+        }
+
+        private static BsonDocument GetDossierMatchAggregation(UserDossierPaginationQuery paginationQuery)
+        {
+            var matchedElements = new Dictionary<string, BsonValue>();
+
+            var conditions = GetDocumentsByUserConditions();
+
+            conditions.ForEach(condition =>
+            {
+                if (condition.Condition(paginationQuery)) matchedElements = condition.Result(matchedElements, paginationQuery);
+            });
+
+            var matchAggregation = MongoDBAggregationExtension.Match(matchedElements);
+
+            return matchAggregation;
+        }
+
+        private static List<FilterConditionDTO<UserDossierPaginationQuery, Dictionary<string, BsonValue>>> GetDocumentsByUserConditions()
+        {
+            var documentByUserConditions = new List<FilterConditionDTO<UserDossierPaginationQuery, Dictionary<string, BsonValue>>>()
+            {
+                new()
+                {
+                    Condition = (paginationQuery) => !string.IsNullOrEmpty(paginationQuery.Code),
+                    Result = (matchedElements, paginationQuery) => {
+
+                        string code = paginationQuery.Code!.Trim();
+
+                        matchedElements.Add("_id", code);
+
+                        return matchedElements;
+                    }
+                },
+                new()
+                {
+                    Condition = (paginationQuery) => !string.IsNullOrEmpty(paginationQuery.State),
+                    Result = (matchedElements, paginationQuery) => {
+
+                        matchedElements.Add("estado", paginationQuery.State);
+
+                        return matchedElements;
+                    }
+                },
+                new()
+                {
+                    Condition = (paginationQuery) => paginationQuery.StartDate.HasValue,
+                    Result = (matchedElements, paginationQuery) => {
+
+                        matchedElements.Add("fechainicio", MongoDBAggregationExtension.GreaterThanEquals(new BsonDateTime(paginationQuery.StartDate!.Value)));
+
+                        return matchedElements;
+                    }
+                },
+                new()
+                {
+                    Condition = (paginationQuery) => paginationQuery.EndDate.HasValue,
+                    Result = (matchedElements, paginationQuery) => {
+
+                        matchedElements.Add("fechainicio", MongoDBAggregationExtension.LessThanEquals(new BsonDateTime(paginationQuery.EndDate!.Value)));
+
+                        return matchedElements;
+                    }
+                }
+            };
+
+            return documentByUserConditions;
+        }
+
+        private static BsonDocument[] GetDossierSearcherPipeline(string dossierType)
+        {
+            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("tipo", dossierType));
+
+            return new BsonDocument[] { matchAggregation };
+        }
+
+        private static BsonDocument[] GetClientSearcherPipeline(string clientName)
+        {
+
+            var addFieldsAggregation = MongoDBAggregationExtension.AddFields(new()
+            {
+                { "fullName", MongoDBAggregationExtension.Concat(new List<BsonValue>() { "$cliente.nombre", " ", "$cliente.apellido" }) }
+            });
+
+            var matchDictionary = new Dictionary<string, BsonValue>()
+            {
+                { "fullName", MongoDBAggregationExtension.Regex(clientName.Trim().ToLower() + ".*", "i") }
+            };
+
+            var matchAggregation = MongoDBAggregationExtension.Match(matchDictionary);
+
+            var unsetAggregation = MongoDBAggregationExtension.UnSet(new List<BsonValue>() { "fullName" });
+
+
+            return new BsonDocument[] { addFieldsAggregation, matchAggregation, unsetAggregation };
         }
 
         #endregion

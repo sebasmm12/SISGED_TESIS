@@ -1,9 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using SISGED.Server.Services.Contracts;
+using SISGED.Server.Services.Repositories;
 using SISGED.Shared.Models.Queries.Dossier;
+using SISGED.Shared.Models.Queries.UserDocument;
 using SISGED.Shared.Models.Requests.Dossier;
 using SISGED.Shared.Models.Responses.Dossier;
+using SISGED.Shared.Models.Responses.UserDocument;
+using SISGED.Shared.Models.Responses.UserDossier;
 
 namespace SISGED.Server.Controllers
 {
@@ -81,6 +85,26 @@ namespace SISGED.Server.Controllers
                 var dossiersResponse = _mapper.Map<IEnumerable<DossierInfoResponse>>(filteredDossiers);
 
                 return Ok(dossiersResponse);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet("list")]
+        public async Task<ActionResult<PaginatedUserDossierResponse>> GetDossierListAsync([FromQuery] UserDossierPaginationQuery userDossierPaginationQuery)
+        {
+            try
+            {
+                var dossiers = await _dossierService.GetDossiersListAsync(userDossierPaginationQuery);
+
+                var totalDossiers = await _dossierService.CountDossiersListAsync(userDossierPaginationQuery);
+
+                var paginatedDocumentsResponse = new PaginatedUserDossierResponse(dossiers, totalDossiers);
+
+                return Ok(paginatedDocumentsResponse);
             }
             catch (Exception ex)
             {
