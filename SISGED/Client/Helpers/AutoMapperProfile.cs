@@ -106,7 +106,7 @@ namespace SISGED.Client.Helpers
 
             // User Dossier List
 
-            CreateMap<Dossier, UserDossierDTO>();
+            CreateMap<DossierListResponse, UserDossierDTO>();
             CreateMap<PaginatedUserDossierResponse, PaginatedUserDossierDTO>();
         }
 

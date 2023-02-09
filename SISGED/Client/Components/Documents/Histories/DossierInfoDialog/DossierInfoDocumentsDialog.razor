@@ -9,27 +9,14 @@
     <DialogContent>
         <MudContainer Style="max-height: 500px; overflow-y: scroll">
             <MudTimeline TimelineOrientation="TimelineOrientation.Vertical" TimelinePosition="TimelinePosition.Alternate" Reverse="false">
-                @foreach (var item in Documents)
+                @foreach (var document in Documents)
                 {
                     <MudTimelineItem Color="Color.Success" Variant="Variant.Filled">
                         <ItemContent>
-                            <MudCard Elevation="3">
-                                <MudCardContent Class="text-center">
-                                    <MudImage Src="../images/Documents.png" Alt="Documento"></MudImage>
-                                    <br />
-                                    <MudText Typo="Typo.h6">Titulo</MudText>
-                                    <MudText Typo="Typo.caption" Class="gray-text">@item.DocumentId</MudText> <span class="gray-text">-</span> <MudText Typo="Typo.caption" Class="gray-text">@item.CreationDate.ToString("dd/MM/yyyy")</MudText>
-                                    <MudGrid Class="mt-1 justify-center justify-md-start">
-                                        <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
-                                            <MudAvatar Color="Color.Secondary">C</MudAvatar>
-                                            <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mt-1">Cliente Generico</MudText>
-                                        </MudItem>
-                                    </MudGrid>
-                                </MudCardContent>
-                            </MudCard>
+                            <DocumentInfo Document="document" @key="document"></DocumentInfo>
                         </ItemContent>
                         <ItemOpposite>
-                            <MudText Color="Color.Success">@item.CreationDate</MudText>
+                            <MudText Color="Color.Success">@document.CreationDate</MudText>
                         </ItemOpposite>
                     </MudTimelineItem>
                 }

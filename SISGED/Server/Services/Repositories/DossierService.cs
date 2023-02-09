@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
+using MudBlazor;
 using SISGED.Server.Helpers.Infrastructure;
 using SISGED.Server.Services.Contracts;
 using SISGED.Shared.DTOs;
@@ -167,9 +168,9 @@ namespace SISGED.Server.Services.Repositories
 
             return totalRequests;
         }
-        public async Task<IEnumerable<Dossier>> GetDossiersListAsync(UserDossierPaginationQuery paginationQuery)
+        public async Task<IEnumerable<DossierListResponse>> GetDossiersListAsync(UserDossierPaginationQuery paginationQuery)
         {
-            var dossiers = await _dossiersCollection.Aggregate<Dossier>(GetPaginatedDossiersPipeline(paginationQuery))
+            var dossiers = await _dossiersCollection.Aggregate<DossierListResponse>(GetPaginatedDossiersPipeline(paginationQuery))
                 .ToListAsync();
 
             if (dossiers is null) throw new Exception($"No se encontraron expedientes.");
@@ -535,7 +536,7 @@ namespace SISGED.Server.Services.Repositories
 
             aggregations.AddRange(GetDossierPipelineAggregation(paginationQuery).ToList());
             aggregations.AddRange(DossierListDerivationsPipeline().ToList());
-
+            aggregations.AddRange(DossierListDocumentsPipeline().ToList());
             return aggregations.ToArray();
         }
 
@@ -730,6 +731,48 @@ namespace SISGED.Server.Services.Repositories
 
             return new BsonDocument[] { unwindAggregation, lookupAggregation1, lookupAggregation2, lookupAggregation3, lookupAggregation4, setAggregation, projectAggregation, groupAggregation };
         }
+        private static BsonDocument[] DossierListDocumentsPipeline()
+        {
+            var unwindAggregation = MongoDBAggregationExtension.UnWind(new("$documentos"));
+
+            var lookupAggregation = DossierListDocumentLookUpPipeline();
+
+            var setAggregation = MongoDBAggregationExtension.Set(new Dictionary<string, BsonValue>()
+            {
+                {"documentoInfo", MongoDBAggregationExtension.First("$documentoInfo") },
+            });
+
+            var addFieldAggregation = MongoDBAggregationExtension.AddFields(new()
+            {
+                {"documentoInfo.cliente", "$cliente" },
+                {"documentoInfo.tipoExpediente" , "$tipo" }
+            });
+
+            var projectAggregation = MongoDBAggregationExtension.Project(new()
+            {
+                { "tipo", 1 },
+                { "cliente", 1 },
+                { "fechainicio", 1 },
+                { "fechafin", 1 },
+                { "documentos", "$documentoInfo" },
+                { "derivaciones", 1 },
+                { "estado",  1}
+            });
+
+            var groupAggregation = MongoDBAggregationExtension.Group(new Dictionary<string, BsonValue>()
+            {
+                { "_id", "$_id"},
+                { "tipo", MongoDBAggregationExtension.First("$tipo")  },
+                { "cliente", MongoDBAggregationExtension.First("$cliente") },
+                { "fechainicio", MongoDBAggregationExtension.First("$fechainicio") },
+                { "fechafin", MongoDBAggregationExtension.First("$fechafin") },
+                { "documentos", MongoDBAggregationExtension.Push("$documentos") },
+                { "derivaciones", MongoDBAggregationExtension.First("$derivaciones") },
+                { "estado", MongoDBAggregationExtension.First("$estado") }
+            });
+
+            return new BsonDocument[] { unwindAggregation, lookupAggregation, setAggregation, addFieldAggregation, projectAggregation, groupAggregation };
+        }
 
         private static BsonDocument DossierListDerivationsSenderLookUpPipeline()
         {
@@ -749,6 +792,31 @@ namespace SISGED.Server.Services.Repositories
         };
 
             return MongoDBAggregationExtension.Lookup(new("usuarios", letPipeline, lookUpPipeline, "derivaciones.nombreUsuarioEmisor"));
+        }
+
+        private static BsonDocument DossierListDocumentLookUpPipeline()
+        {
+            var letPipeline = new Dictionary<string, BsonValue>()
+            {
+                { "userObjId", MongoDBAggregationExtension.ObjectId("$documentos.iddocumento") }
+            };
+
+            var lookUpPipeline = new BsonArray()
+            {
+                MongoDBAggregationExtension.Match(
+                    MongoDBAggregationExtension.Expr(MongoDBAggregationExtension.Eq(new() { "$_id", "$$userObjId" }))),
+                MongoDBAggregationExtension.Project(new(){
+                    { "tipo", 1 },
+                    {"historialcontenido", 1 },
+                    {"historialproceso", 1 },
+                    { "urlanexo", 1 },
+                    {"estado", 1 },
+                    { "fechacreacion", 1 },
+                    {"contenido", 1}
+            })
+        };
+
+            return MongoDBAggregationExtension.Lookup(new("documentos", letPipeline, lookUpPipeline, "documentoInfo"));
         }
 
         private static BsonDocument DossierListDerivationsReceiverLookUpPipeline()

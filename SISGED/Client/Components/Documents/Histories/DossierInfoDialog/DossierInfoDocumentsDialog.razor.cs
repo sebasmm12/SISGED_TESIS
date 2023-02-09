@@ -40,7 +40,7 @@ namespace SISGED.Client.Components.Documents.Histories.DossierInfoDialog
         MudDialogInstance MudDialog { get; set; }
 
         [Parameter]
-        public List<DossierDocument> Documents { get; set; } = new List<DossierDocument>();
+        public List<UserDocumentDTO> Documents { get; set; } = new List<UserDocumentDTO>();
         private void Cancel()
         {
             MudDialog.Cancel();

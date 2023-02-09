@@ -11,7 +11,7 @@ namespace SISGED.Shared.Models.Responses.UserDossier
 {
     public class PaginatedUserDossierResponse
     {
-        public PaginatedUserDossierResponse(IEnumerable<Entities.Dossier> userDossiers, int total)
+        public PaginatedUserDossierResponse(IEnumerable<DossierListResponse> userDossiers, int total)
         {
             UserDossiers = userDossiers;
             Total = total;
@@ -19,7 +19,7 @@ namespace SISGED.Shared.Models.Responses.UserDossier
 
         public PaginatedUserDossierResponse() { }
 
-        public IEnumerable<Entities.Dossier> UserDossiers { get; set; } = default!;
+        public IEnumerable<DossierListResponse> UserDossiers { get; set; } = default!;
         public int Total { get; set; }
     }
 }
