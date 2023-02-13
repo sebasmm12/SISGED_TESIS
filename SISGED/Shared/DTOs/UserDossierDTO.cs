@@ -12,7 +12,7 @@ namespace SISGED.Shared.DTOs
         public string Id { get; set; } = default!;
         public string Type { get; set; } = default!;
         public Client Client { get; set; } = default!;
-        public List<Derivation> Derivations { get; set; } = default!;
+        public List<UserDossierDerivationDTO> Derivations { get; set; } = default!;
         public List<UserDocumentDTO> Documents { get; set; } = default!;
         public string State { get; set; } = default!;
         public DateTime StartDate { get; set; } = default!;

@@ -12,7 +12,7 @@ namespace SISGED.Shared.Models.Responses.Dossier
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public List<Entities.DossierDocument> Documents { get; set; } = default!;
-        public List<Derivation> Derivations { get; set; } = default!;
+        public List<Entities.Derivation> Derivations { get; set; } = default!;
         public string State { get; set; } = default!;
     }
 }

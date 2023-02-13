@@ -692,13 +692,10 @@ namespace SISGED.Server.Services.Repositories
             var lookupAggregation3 = DossierListDerivationsOriginLookUpPipeline();
             var lookupAggregation4 = DossierListDerivationsTargetLookUpPipeline();
 
-            var setAggregation = MongoDBAggregationExtension.Set(new Dictionary<string, BsonValue>()
-            {
-                {"derivaciones.nombreUsuarioEmisor", MongoDBAggregationExtension.GetField("nombre", MongoDBAggregationExtension.First("$derivaciones.nombreUsuarioEmisor")) },
-                {"derivaciones.nombreUsuarioReceptor", MongoDBAggregationExtension.GetField("nombre", MongoDBAggregationExtension.First("$derivaciones.nombreUsuarioReceptor")) },
-                {"derivaciones.nombreAreaProcedencia", MongoDBAggregationExtension.GetField("label", MongoDBAggregationExtension.First("$derivaciones.nombreAreaProcedencia")) },
-                {"derivaciones.nombreAreaDestino", MongoDBAggregationExtension.GetField("label", MongoDBAggregationExtension.First("$derivaciones.nombreAreaDestino")) }
-            });
+            var unwindAggregation2 = MongoDBAggregationExtension.UnWind(new("$usuarioEmisor"));
+            var unwindAggregation3 = MongoDBAggregationExtension.UnWind(new("$usuarioReceptor"));
+            var unwindAggregation4 = MongoDBAggregationExtension.UnWind(new("$areaProcedencia"));
+            var unwindAggregation5 = MongoDBAggregationExtension.UnWind(new("$areaDestino"));
 
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
@@ -707,10 +704,12 @@ namespace SISGED.Server.Services.Repositories
                 { "fechainicio", "$fechainicio" },
                 { "fechafin", "$fechafin" },
                 { "documentos", "$documentos" },
-                { "derivaciones.areaprocedencia", "$derivaciones.nombreAreaProcedencia"},
-                { "derivaciones.areadestino", "$derivaciones.nombreAreaDestino"},
-                { "derivaciones.usuarioemisor", "$derivaciones.nombreUsuarioEmisor"},
-                { "derivaciones.usuarioreceptor", "$derivaciones.nombreUsuarioReceptor"},
+                { "derivaciones.areaprocedencia", "$areaProcedencia.label"},
+                { "derivaciones.areadestino", "$areaDestino.label"},
+                { "derivaciones.usuarioemisor", "$usuarioEmisor.nombre"},
+                { "derivaciones.imagenemisor", "$usuarioEmisor.imagen"},
+                { "derivaciones.usuarioreceptor", "$usuarioReceptor.nombre"},
+                { "derivaciones.imagenreceptor", "$usuarioReceptor.imagen"},
                 { "derivaciones.fechaderivacion", "$derivaciones.fechaderivacion"},
                 { "derivaciones.estado", "$derivaciones.estado"},
                 { "derivaciones.tipo", "$derivaciones.tipo"},
@@ -729,7 +728,7 @@ namespace SISGED.Server.Services.Repositories
                 { "estado", MongoDBAggregationExtension.First("$estado") }
             });
 
-            return new BsonDocument[] { unwindAggregation, lookupAggregation1, lookupAggregation2, lookupAggregation3, lookupAggregation4, setAggregation, projectAggregation, groupAggregation };
+            return new BsonDocument[] { unwindAggregation, lookupAggregation1, lookupAggregation2, lookupAggregation3, lookupAggregation4, unwindAggregation2, unwindAggregation3, unwindAggregation4, unwindAggregation5, projectAggregation, groupAggregation };
         }
         private static BsonDocument[] DossierListDocumentsPipeline()
         {
@@ -787,11 +786,12 @@ namespace SISGED.Server.Services.Repositories
                     MongoDBAggregationExtension.Expr(MongoDBAggregationExtension.Eq(new() { "$_id", "$$userObjId" }))),
                 MongoDBAggregationExtension.Project(new(){
                 { "_id", 0 },
-                { "nombre", MongoDBAggregationExtension.Concat(new List<BsonValue>(){ "$datos.nombre", " ","$datos.apellido"})}
+                { "nombre", MongoDBAggregationExtension.Concat(new List<BsonValue>(){ "$datos.nombre", " ","$datos.apellido"})},
+                {"imagen", "$datos.imagen" }
             })
         };
 
-            return MongoDBAggregationExtension.Lookup(new("usuarios", letPipeline, lookUpPipeline, "derivaciones.nombreUsuarioEmisor"));
+            return MongoDBAggregationExtension.Lookup(new("usuarios", letPipeline, lookUpPipeline, "usuarioEmisor"));
         }
 
         private static BsonDocument DossierListDocumentLookUpPipeline()
@@ -831,12 +831,13 @@ namespace SISGED.Server.Services.Repositories
                 MongoDBAggregationExtension.Match(
                     MongoDBAggregationExtension.Expr(MongoDBAggregationExtension.Eq(new() { "$_id", "$$userObjId" }))),
                 MongoDBAggregationExtension.Project(new(){
-                { "_id", 0 },
-                { "nombre", MongoDBAggregationExtension.Concat(new List<BsonValue>(){ "$datos.nombre", " ","$datos.apellido"})}
+                    { "_id", 0 },
+                    { "nombre", MongoDBAggregationExtension.Concat(new List<BsonValue>(){ "$datos.nombre", " ","$datos.apellido"})},
+                    {"imagen", "$datos.imagen" }
             })
         };
 
-            return MongoDBAggregationExtension.Lookup(new("usuarios", letPipeline, lookUpPipeline, "derivaciones.nombreUsuarioReceptor"));
+            return MongoDBAggregationExtension.Lookup(new("usuarios", letPipeline, lookUpPipeline, "usuarioReceptor"));
         }
 
         private static BsonDocument DossierListDerivationsOriginLookUpPipeline()
@@ -856,7 +857,7 @@ namespace SISGED.Server.Services.Repositories
             })
         };
 
-            return MongoDBAggregationExtension.Lookup(new("roles", letPipeline, lookUpPipeline, "derivaciones.nombreAreaProcedencia"));
+            return MongoDBAggregationExtension.Lookup(new("roles", letPipeline, lookUpPipeline, "areaProcedencia"));
         }
 
         private static BsonDocument DossierListDerivationsTargetLookUpPipeline()
@@ -876,7 +877,7 @@ namespace SISGED.Server.Services.Repositories
             })
         };
 
-            return MongoDBAggregationExtension.Lookup(new("roles", letPipeline, lookUpPipeline, "derivaciones.nombreAreaDestino"));
+            return MongoDBAggregationExtension.Lookup(new("roles", letPipeline, lookUpPipeline, "areaDestino"));
         }
         #endregion
     }

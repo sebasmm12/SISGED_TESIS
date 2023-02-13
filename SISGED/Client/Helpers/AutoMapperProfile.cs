@@ -5,6 +5,7 @@ using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Generics.Document;
 using SISGED.Shared.Models.Requests.Account;
 using SISGED.Shared.Models.Requests.User;
+using SISGED.Shared.Models.Responses.Derivation;
 using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.DossierTray;
@@ -106,6 +107,7 @@ namespace SISGED.Client.Helpers
 
             // User Dossier List
 
+            CreateMap<DossierListDerivationResponse, UserDossierDerivationDTO>();
             CreateMap<DossierListResponse, UserDossierDTO>();
             CreateMap<PaginatedUserDossierResponse, PaginatedUserDossierDTO>();
         }

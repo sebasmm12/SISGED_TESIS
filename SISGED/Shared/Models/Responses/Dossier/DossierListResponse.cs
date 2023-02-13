@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Models.Responses.UserDocument;
+using SISGED.Shared.Models.Responses.Derivation;
 
 namespace SISGED.Shared.Models.Responses.Dossier
 {
@@ -28,7 +29,7 @@ namespace SISGED.Shared.Models.Responses.Dossier
         [BsonElement("documentos")]
         public List<UserDocumentResponse> Documents { get; set; } = new();
         [BsonElement("derivaciones")]
-        public List<Derivation> Derivations { get; set; } = new();
+        public List<DossierListDerivationResponse> Derivations { get; set; } = new();
         [BsonElement("estado")]
         public string State { get; set; } = default!;
     }
