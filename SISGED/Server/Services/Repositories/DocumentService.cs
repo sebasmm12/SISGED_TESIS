@@ -1447,7 +1447,11 @@ namespace SISGED.Server.Services.Repositories
                 {
                     { "code", "$contenido.codigo" },
                     { "solicitor", "$solicitors" },
-                    { "prosecutor", "$prosecutors" },
+                    { "prosecutor", new BsonDocument(){
+                        { "id", "$prosecutors._id" },
+                        { "name", "$prosecutors.datos.nombre" },
+                        { "lastName", "$prosecutors.datos.apellido" } }
+                    },
                     { "complainantName", "$contenido.nombredenunciante" },
                     { "title", "$contenido.titulo" },
                     { "description", "$contenido.descripcion" },
@@ -1689,10 +1693,10 @@ namespace SISGED.Server.Services.Repositories
             var lookUpPipeline = new BsonArray()
             {
                 MongoDBAggregationExtension.Match(
-                    MongoDBAggregationExtension.Expr(MongoDBAggregationExtension.Eq(new() { "$_id", "$$solicitorId" })))
+                    MongoDBAggregationExtension.Expr(MongoDBAggregationExtension.Eq(new() { "$_id", "$$prosecutorId" })))
             };
 
-            return MongoDBAggregationExtension.Lookup(new("notarios", letPipeline, lookUpPipeline, "solicitors"));
+            return MongoDBAggregationExtension.Lookup(new("usuarios", letPipeline, lookUpPipeline, "prosecutors"));
         }
 
         private static BsonDocument GetClientLookUpPipeline()
