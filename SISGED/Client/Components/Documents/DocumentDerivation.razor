@@ -9,13 +9,13 @@ else
             <MudCardContent>
                 <MudForm Model="documentDerivation" ValidationDelay="0" @ref="documentDerivationForm" Validation="@(DocumentDerivationValidator.ValidateValue)">
                     <MudGrid>
-                        <MudItem xs="12" sm="12" md="5" lg="4" xl="12" Class="align-self-center">
+                        <MudItem xs="12" sm="12" md="5" lg="4" xl="4" Class="align-self-center">
                             <MudIcon Class="fa-solid fa-share-from-square large-icon" Color="Color.Primary"></MudIcon>
                             <MudText Typo="Typo.body2">Seleccione el usuario al cuál será entregado el documento para su procesamiento.</MudText>
                         </MudItem>
-                        <MudItem xs="12" sm="12" md="7" lg="8" xl="12">
+                        <MudItem xs="12" sm="12" md="7" lg="8" xl="8">
                             <MudGrid>
-                                <MudItem xs="12" sm="12" md="6" lg="7" xl="12">
+                                <MudItem xs="12" sm="12" md="6" lg="7" xl="7">
                                     <div class="text-start text-sm-center mb-2">
                                         <MudText Typo="Typo.h6">Usuario emisor</MudText>
                                         <div class="d-flex">
@@ -24,7 +24,7 @@ else
                                         </div>
                                     </div>
                                 </MudItem>
-                                <MudItem xs="12" sm="12" md="6" lg="5" xl="12">
+                                <MudItem xs="12" sm="12" md="6" lg="5" xl="5">
                                     <div class="text-start text-sm-center mb-2">
                                         <MudText Typo="Typo.h6">Rol</MudText>
                                         <MudText Typo="Typo.body1">@userRole!.Label</MudText>
@@ -36,11 +36,11 @@ else
                                         <MudText Typo="Typo.body1">@currentDate</MudText>
                                     </div>
                                 </MudItem>
-                                <MudItem xs="12" sm="12" md="6" lg="7" xl="12">
+                                <MudItem xs="12" sm="12" md="6" lg="7" xl="7">
                                     <UserTraySelect RoleId="@documentDerivation.ReceiverUserRole!.Id" UserTrayUpdate="UpdateUserTray"
                                                     UserTrayFor="@(() => documentDerivation.UserTray)"></UserTraySelect>
                                 </MudItem>
-                                <MudItem xs="12" sm="12" md="6" lg="5" xl="12">
+                                <MudItem xs="12" sm="12" md="6" lg="5" xl="5">
                                     <MudTextField Value="@documentDerivation.ReceiverUserRole!.Label" Label="Rol" Variant="Variant.Outlined"
                                               Adornment="Adornment.End" AdornmentIcon="fas fa-building" AdornmentColor="Color.Primary" ReadOnly="true"></MudTextField>
                                 </MudItem>

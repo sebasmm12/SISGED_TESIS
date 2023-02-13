@@ -2,13 +2,14 @@ using AutoMapper;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
+using SISGED.Client.Components.Documents.Histories;
 using SISGED.Client.Helpers;
 using SISGED.Client.Services.Contracts;
+using SISGED.Client.Services.Repositories;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Models.Responses.Account;
 using SISGED.Shared.Models.Responses.UserDocument;
 using SISGED.Shared.Validators;
-using System.Text.Json;
 
 namespace SISGED.Client.Pages.Documents
 {
@@ -21,13 +22,15 @@ namespace SISGED.Client.Pages.Documents
         [Inject]
         public ISwalFireRepository SwalFireRepository { get; set; } = default!;
         [Inject]
-        public IDialogService DialogService { get; set; } = default!;
+        public IDialogContentRepository DialogContentRepository { get; set; } = default!;
         [Inject]
         public IFilterRepository<UserDocumentFilterDTO> UserDocumentRepository { get; set; } = default!;
         [Inject]
         public IDossierRepository DossierRepository { get; set; } = default!;
         [Inject]
         public IDocumentStateRepository DocumentStateRepository { get; set; } = default!;
+        [Inject]
+        public IDocumentRepository DocumentRepository { get; set; } = default!;
         [Inject]
         public UserDocumentValidator UserDocumentValidator { get; set; } = default!;
         [Inject]
@@ -60,6 +63,30 @@ namespace SISGED.Client.Pages.Documents
             documentsLoading = false;
         }
 
+        private async Task ShowDocumentVersionHistoryAsync(UserDocumentDTO document)
+        {
+            var dialogParameters = new List<DialogParameter>() { new("DocumentId", document.Id), new("PageSize", 5) };
+
+            await DialogContentRepository.ShowDialogAsync<DocumentsVersion>(dialogParameters, "Historial de versiones");
+        }
+
+
+        private async Task ShowDocumentProcessHistoryAsync(UserDocumentDTO document)
+        {
+            var dialogParameters = new List<DialogParameter>() { new("DocumentId", document.Id), new("PageSize", 5) };
+
+            await DialogContentRepository.ShowDialogAsync<DocumentsProcess>(dialogParameters, "Historial de procesos");
+        }
+
+        private async Task ShowDocumentInfoAsync(UserDocumentDTO document)
+        {
+            var dialogParameters = new List<DialogParameter>() { new("DocumentId", document.Id) };
+
+            Type documentInfoType = DocumentRepository.GetDocumentInfoType(document.Type);
+            
+            await DialogContentRepository.ShowDialogAsync(documentInfoType, dialogParameters, "Información del Documento");
+        }
+
         private async Task ChangePage(int page)
         {
             currentPage = page - 1;
@@ -76,7 +103,7 @@ namespace SISGED.Client.Pages.Documents
             if (!documentSearcherForm.IsValid)
             {
                 documentSearchLoading = false;
-                
+
                 return;
             }
 
@@ -102,7 +129,7 @@ namespace SISGED.Client.Pages.Documents
                 var documents = Mapper.Map<PaginatedUserDocumentDTO>(response);
 
                 await JSRuntime.InvokeVoidAsync("console.log", documents);
-                
+
                 return documents;
             }
             catch (Exception)

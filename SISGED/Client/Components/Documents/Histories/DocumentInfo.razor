@@ -7,11 +7,11 @@
             <MudText Typo="Typo.h6">@Document.Content.Title</MudText>
             <MudText Typo="Typo.caption" Class="gray-text">@Document.Content.Code</MudText> <span class="gray-text">-</span> <MudText Typo="Typo.caption" Class="gray-text">@Document.CreationDate.ToString("dd/MM/yyyy")</MudText>
             <MudGrid Class="mt-1 justify-center justify-md-start">
-                <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
                     <MudAvatar Color="Color.Secondary">@Document.Client.GetAvatarName()</MudAvatar>
                     <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mt-1">@Document.Client.Name @Document.Client.LastName</MudText>
                 </MudItem>
-                <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
                     <MudAvatarGroup Spacing="4" Max="4" MaxColor="Color.Primary" Class="justify-center">
                         @foreach(var DocumentContent in Document.ContentsHistory)
                         {
@@ -23,14 +23,20 @@
             </MudGrid>
         </MudCardContent>
         <MudCardActions Class="justify-center gap-1">
-            <MudTooltip Text="Anular">
-                <MudFab Color="Color.Error" StartIcon="fas fa-file-circle-xmark" OnClick="@(() => AnnulDocumentAsync())"></MudFab>
-            </MudTooltip>
+            @if (!annulmentInValidStates.Contains(Document.State))
+            {
+                <MudTooltip Text="Anular">
+                    <MudFab Color="Color.Error" StartIcon="fas fa-file-circle-xmark" OnClick="@(() => AnnulDocumentAsync())"></MudFab>
+                </MudTooltip>
+            }
             <MudTooltip Text="Ver Historial de Versiones">
                 <MudFab Color="Color.Primary" StartIcon="fas fa-code-compare" OnClick="@(() => ShowDocumentVersionHistoryAsync())"></MudFab>
             </MudTooltip>
             <MudTooltip Text="Ver Historial de Acciones">
                 <MudFab Color="Color.Secondary" StartIcon="fas fa-file-contract" OnClick="@(() => ShowDocumentProcessHistoryAsync())"></MudFab>
+            </MudTooltip>
+            <MudTooltip Text="Ver Documento">
+                <MudFab Color="Color.Info" StartIcon="fas fa-eye" OnClick="@(() => ShowDocumentInfoAsync())"></MudFab>
             </MudTooltip>
         </MudCardActions>
     </MudCard>

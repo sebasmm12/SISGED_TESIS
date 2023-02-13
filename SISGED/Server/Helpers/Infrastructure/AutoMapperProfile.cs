@@ -11,6 +11,7 @@ using SISGED.Shared.Models.Responses.Document.Dictum;
 using SISGED.Shared.Models.Responses.Document.InitialRequest;
 using SISGED.Shared.Models.Responses.Document.Resolution;
 using SISGED.Shared.Models.Responses.DocumentType;
+using SISGED.Shared.Models.Responses.DocumentVersion;
 using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.Role;
 using SISGED.Shared.Models.Responses.Solicitor;
@@ -124,7 +125,9 @@ namespace SISGED.Server.Helpers.Infrastructure
             CreateMap<GenerateDocumentRequest, DocumentGenerationDTO>()
                 .ForMember(documentGeneration => documentGeneration.Sign, options => options.MapFrom(_ => string.Empty))
                 .ForMember(documentGeneration => documentGeneration.GeneratedURL, options => options.MapFrom(_ => string.Empty));
-            
+
+            // Document Version Mapper
+            CreateMap<ContentVersion, DocumentVersionInfo>();
         }
 
         private string MapStepDocumentRequestUID(StepDocument stepDocument, StepGenericModel.StepDocument stepDocumentRequest)

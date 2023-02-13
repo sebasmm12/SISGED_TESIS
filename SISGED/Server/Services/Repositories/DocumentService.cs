@@ -12,6 +12,7 @@ using SISGED.Shared.Models.Requests.Documents;
 using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.Document.BPNDocument;
 using SISGED.Shared.Models.Responses.Document.BPNResult;
+using SISGED.Shared.Models.Responses.Document.ComplaintRequest;
 using SISGED.Shared.Models.Responses.Document.DisciplinaryOpenness;
 using SISGED.Shared.Models.Responses.Document.SignConclusion;
 using SISGED.Shared.Models.Responses.Document.SolicitorDesignationDocument;
@@ -32,6 +33,8 @@ namespace SISGED.Server.Services.Repositories
         private readonly IDossierService _dossierService;
         public string CollectionName => "documentos";
         public string TrayCollectionName => "bandejas";
+        
+        private readonly IEnumerable<string> annulmentInValidStates = new List<string>() { "evaluado", "anulado" };
 
         public DocumentService(IMongoDatabase mongoDatabase, IDossierService dossierService)
         {
@@ -39,6 +42,26 @@ namespace SISGED.Server.Services.Repositories
             _trayCollection = mongoDatabase.GetCollection<Tray>(TrayCollectionName);
 
             _dossierService = dossierService;
+        }
+
+        public async Task AnnulDocumentAsync(string documentId, User user)
+        {
+            var annulmentProcess = new Process(user.Id, user.Id, "anulado", user.Rol);
+
+            var updateDocumentState = Builders<Document>.Update.Set("estado", "anulado")
+                                                               .Push("historialproceso", annulmentProcess);
+
+            var updatedDocument = await _documentsCollection.UpdateOneAsync(document => document.Id == documentId, updateDocumentState);
+
+            if (updatedDocument is null) throw new Exception($"No se pudo anular el documento con identificador { documentId }");
+
+        }
+
+        public async Task<bool> VerifyDocumentAnnulmentAsync(string documentId)
+        {
+            var document = await GetDocumentAsync(documentId);
+
+            return !annulmentInValidStates.Contains(document.State);
         }
 
         public async Task<IEnumerable<UserDocumentResponse>> GetDocumentsByUserAsync(string userId, UserDocumentPaginationQuery userDocumentPaginationQuery)
@@ -109,6 +132,16 @@ namespace SISGED.Server.Services.Repositories
             if (appealDocument is null) throw new Exception($"No se pudo obtener el recurso de apelación con el identificador {documentId}");
 
             return appealDocument;
+        }
+
+        public async Task<ComplaintRequestInfoResponse> GetComplaintRequestDocumentAsync(string documentId)
+        {
+            var complaintRequest = await _documentsCollection.Aggregate<ComplaintRequestInfoResponse>(GetComplaintRequestPipeline(documentId)).FirstAsync();
+
+            if (complaintRequest is null) throw new Exception($"No se pudo obtener la solicitud de denuncia con el identificador { documentId }");
+
+            return complaintRequest;
+
         }
 
         public async Task<DocumentResponse> GetDocumentAsync(string documentId)
@@ -685,11 +718,6 @@ namespace SISGED.Server.Services.Repositories
 
         public async Task<Document> EvaluateDocumentAsync(DocumentEvaluationRequest documentEvaluationRequest, User user)
         {
-            //var filter = Builders<Document>.Filter.Eq("id", documentEvaluationRequest.DocumentId);
-            //var update = Builders<Document>.Update
-            //    .Set("evaluacion.resultado", document.Result)
-            //    .Set("evaluacion.evaluaciones", document.Evaluations);
-            //return await _documentsCollection.FindOneAndUpdateAsync<Document>(filter, update);
 
             var currentDocument = await GetDocumentAsync(documentEvaluationRequest.DocumentId);
             var eval = new DocumentEvaluation(user.Id, documentEvaluationRequest.IsApproved, documentEvaluationRequest.Comment, DateTime.UtcNow.AddHours(-5));
@@ -709,17 +737,6 @@ namespace SISGED.Server.Services.Repositories
             });
 
             return document;
-
-
-            //BandejaDocumento bandejaDocumento = new BandejaDocumento();
-            //bandejaDocumento.idexpediente = documento.idexpediente;
-            //bandejaDocumento.iddocumento = documento.id;
-
-            //UpdateDefinition<Bandeja> updateBandejaD = Builders<Bandeja>.Update.Pull("bandejaentrada", bandejaDocumento);
-            //_bandejas.UpdateOne(band => band.usuario == documento.idusuario, updateBandejaD);
-
-            //UpdateDefinition<Bandeja> updateBandejaI = Builders<Bandeja>.Update.Push("bandejasalida", bandejaDocumento);
-            //_bandejas.UpdateOne(band => band.usuario == documento.idusuario, updateBandejaI);
         }
 
         public async Task<Document> GenerateDocumentAsync(DocumentGenerationDTO documentGenerationDTO)
@@ -1119,6 +1136,75 @@ namespace SISGED.Server.Services.Repositories
             await _documentsCollection.UpdateOneAsync(filter, update);
         }
         #region private methods
+        
+        private static BsonDocument[] GetComplaintRequestPipeline(string documentId)
+        {
+            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("_id", new ObjectId(documentId)));
+
+            var documentTypeLookUpAggregation = GetDocumentTypeLookUpPipeline();
+
+            var documentTypeUnwindAggregation = MongoDBAggregationExtension.UnWind(new("$documentTypes"));
+
+            var solicitorLookUpAggregation = GetSolicitorsLookUpPipeline();
+
+            var solicitorUnwindAggregation = MongoDBAggregationExtension.UnWind(new("$solicitors"));
+
+            var dossierLookUpPipelineAggregation = GetDossierLookUpPipeline();
+
+            var dossierUnwindAggregation = MongoDBAggregationExtension.UnWind(new("$dossiers"));
+
+            var projectAggregation = GetComplaintRequestProjectPipeline();
+
+            return new BsonDocument[] { matchAggregation, documentTypeLookUpAggregation, documentTypeUnwindAggregation, solicitorLookUpAggregation,
+               solicitorUnwindAggregation, dossierLookUpPipelineAggregation, dossierUnwindAggregation, projectAggregation  };
+        }
+        
+        private static BsonDocument GetComplaintRequestProjectPipeline()
+        {
+            var projectAggregation = MongoDBAggregationExtension.Project(new()
+            {
+                { "type", "$tipo"  },
+                { "contentsHistory", "$historialcontenido" },
+                { "processesHistory", "$historialproceso"  },
+                { "attachedUrls", "$urlanexo"  },
+                { "state", "$estado" },
+                { "content", new BsonDocument()
+                                .Add("code", "$contenido.codigo")
+                                .Add("title", "$contenido.titulo")
+                                .Add("description", "$contenido.descripcion")
+                                .Add("solicitor", new BsonDocument()
+                                                    .Add("_id", "$solicitors._id")
+                                                    .Add("name", "$solicitors.nombre")
+                                                    .Add("lastName", "$solicitors.apellido")
+                                                    .Add("solicitorOfficeName", "$solicitors.oficionotarial.nombre")
+                                                    .Add("email", "$solicitors.email")
+                                                    .Add("address", "$solicitors.direccion"))
+                                .Add("client", "$dossiers.cliente")
+                                .Add("complaintType", "$documentTypes.nombre")
+                                .Add("deliveryDate", "$contenido.fechaentrega")
+                },
+            });
+
+            return projectAggregation;
+        }
+
+        private static BsonDocument GetDocumentTypeLookUpPipeline()
+        {
+            var letPipeline = new Dictionary<string, BsonValue>()
+            {
+                { "documentTypeId", MongoDBAggregationExtension.ObjectId("$contenido.tipoDenuncia") }
+            };
+
+            var lookUpPipeline = new BsonArray()
+            {
+                MongoDBAggregationExtension.Match(
+                    MongoDBAggregationExtension.Expr(MongoDBAggregationExtension.Eq(new() { "$_id", "$$documentTypeId" })))
+            };
+
+            return MongoDBAggregationExtension.Lookup(new("tipoDocumentos", letPipeline, lookUpPipeline, "documentTypes"));
+        }
+
+
         private static BsonDocument[] GetPaginatedDocumentsByUserPipeline(string userId, UserDocumentPaginationQuery userDocumentPaginationQuery)
         {
             var aggregations = GetDocumentsByUserPipeline(userId, userDocumentPaginationQuery).ToList();

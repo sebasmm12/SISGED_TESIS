@@ -6,6 +6,6 @@ namespace SISGED.Client.Services.Contracts
     public interface IDocumentStateRepository
     {
         IEnumerable<SelectOption> GetDocumentStates();
-        Color GetDocumentStateColor(string documentState);
+        DocumentState GetDocumentState(string documentState);
     }
 }

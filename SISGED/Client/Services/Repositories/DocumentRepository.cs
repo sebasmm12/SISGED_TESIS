@@ -1,10 +1,16 @@
-﻿using SISGED.Client.Helpers;
+﻿using SISGED.Client.Components.Documents.Informations;
+using SISGED.Client.Helpers;
 using SISGED.Client.Services.Contracts;
 
 namespace SISGED.Client.Services.Repositories
 {
     public class DocumentRepository : IDocumentRepository
     {
+        private IDictionary<string, Type> _documentInfoComponents = new Dictionary<string, Type>()
+        {
+            { "SolicitudDenuncia", typeof(ComplaintRequestInfo) }
+        };
+
         public IEnumerable<DocumentOption> GetDocumentTypesWithDossier()
         {
             return new List<DocumentOption>()
@@ -22,13 +28,18 @@ namespace SISGED.Client.Services.Repositories
                 new("Conclusión de Firma - Rechazo Notarial", "RechazoConclusionFirma", Roles.ArchivosExnotarios),
                 new("Pago de Entrega de Testimonio", "PagoTestimonio", Roles.ArchivosExnotarios),
                 new("Conclusión de Firma - Aprobación Notarial", "AprobacionConclusionFirma", Roles.ArchivosExnotarios),
-                new("Solicitud de Denuncia", "ComplaintRequest", Roles.MesaPartes), 
+                new("Solicitud de Denuncia", "ComplaintRequest", Roles.MesaPartes),
                 new("Aperturamiento Disciplinario", "DisciplinaryOpennessRequest", Roles.TribunalHonor),
-                new("Solicitud de Expediente de Notario", "SolicitorDossierRequest", Roles.Fiscal), 
+                new("Solicitud de Expediente de Notario", "SolicitorDossierRequest", Roles.Fiscal),
                 new("Entrega de Expediente de Notario", "SolicitorDossierShipment", Roles.TramiteDocumentario), // To be implemented by Sebastian
-                new("Dictamen", "Dictum", Roles.Fiscal), 
+                new("Dictamen", "Dictum", Roles.Fiscal),
                 new("Resolución", "Resolution", Roles.TribunalHonor),
             };
+        }
+
+        public Type  GetDocumentInfoType(string documentType)
+        {
+            return _documentInfoComponents.FirstOrDefault(documentInfoComponent => documentInfoComponent.Key == documentType).Value;
         }
     }
 }

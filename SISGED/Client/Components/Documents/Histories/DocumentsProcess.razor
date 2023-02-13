@@ -1,0 +1,42 @@
+﻿<MudDialog>
+    <DialogContent>
+        @if(pageLoading)
+        {
+            <GenericPageLoader Body="Obteniendo el historial de acciones del documento, por favor espere..."></GenericPageLoader>
+        }
+        else
+        {
+            <MudCard Elevation="0" class="w-100">
+                <MudCardHeader>
+                    <GenericFormHeader HeaderIcon="fas fa-file-contract" HeaderTitle="Historial de Acciones" HeaderDescription="Visualice todas las acciones realizadas del documento"></GenericFormHeader>
+                </MudCardHeader>
+                <MudCardContent>
+                    @if(processesHistory.Any())
+                    {
+                        <MudGrid>
+                            @foreach (var process in paginatedProcessesHistory)
+                            {
+                               <DocumentProcess Process="process"></DocumentProcess>
+                            }
+                        </MudGrid>
+                        <div class="text-end mt-6">
+                            <MudPagination Count="TotalDocumentProcesses" MiddleCount="5" SelectedChanged="ChangePage" />
+                        </div> 
+                    }
+                    else
+                    {
+                        <MudGrid Justify="Justify.Center">
+                            <MudItem>
+                                <MudAlert Severity="Severity.Info" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Center">No se ha realizado ninguna acción al documento</MudAlert>
+                            </MudItem>
+                        </MudGrid>
+                    }
+                </MudCardContent>
+                <MudCardActions Class="justify-end pa-6">
+                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="rounded-pill" OnClick="@(() => Cancel())">Regresar</MudButton>
+                </MudCardActions>
+            </MudCard>
+        }
+    </DialogContent>
+</MudDialog>
+

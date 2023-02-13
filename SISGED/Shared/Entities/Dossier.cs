@@ -37,6 +37,8 @@ namespace SISGED.Shared.Entities
         public DateTime? EndDate { get; set; }
         [BsonElement("documentos")]
         public List<DossierDocument> Documents { get; set; } = new();
+        [BsonElement("historialdocumentos")]
+        public List<DossierDocument> DocumentsHistory { get; set; } = new();
         [BsonElement("derivaciones")]
         public List<Derivation> Derivations { get; set; } = new();
         [BsonElement("estado")]

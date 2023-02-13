@@ -32,6 +32,19 @@ namespace SISGED.Server.Services.Repositories
 
         public string CollectionName => "expedientes";
 
+        public async Task DeleteDossierDocumentAsync(string documentId)
+        {
+            var dossier = await GetDossierByDocumentAsync(documentId);
+
+            var dossierDocument = dossier.Documents.First(dossierDocument => dossierDocument.DocumentId == documentId);
+
+            var dossierUpdate = Builders<Dossier>.Update.Pull("documentos", dossierDocument);
+
+            var updatedDossier = await _dossiersCollection.UpdateOneAsync(dossier => dossier.Id == dossier.Id, dossierUpdate);
+
+            if (updatedDossier is null) throw new Exception($"No se pudo eliminar el documento con identificador { documentId } del expediente con identificador {dossier.Id}");
+        }
+
         public async Task CreateDossierAsync(Dossier dossier)
         {
             await _dossiersCollection.InsertOneAsync(dossier);
@@ -167,6 +180,19 @@ namespace SISGED.Server.Services.Repositories
         }
         
         #region private methods
+        private async Task<Dossier> GetDossierByDocumentAsync(string documentId)
+        {
+            var dossierDocumentBuilder = Builders<DossierDocument>.Filter.Eq(dosssierDocument => dosssierDocument.DocumentId, documentId);
+
+            var dossierBuilder = Builders<Dossier>.Filter.ElemMatch(dossier => dossier.Documents, dossierDocumentBuilder);
+
+            var dossier = await _dossiersCollection.Find(dossierBuilder).FirstOrDefaultAsync();
+
+            if (dossier is null) throw new Exception($"No se pudo encontrar el expediente que tiene el document con identificador { documentId } relacionado");
+
+            return dossier;
+        }
+
         private static BsonDocument[] GetUserRequestsWithPublicDeedPipeline(UserRequestPaginationQuery userRequestPaginationQuery)
         {
             var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("cliente.numerodocumento", userRequestPaginationQuery.DocumentNumber));

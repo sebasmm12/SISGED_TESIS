@@ -1,0 +1,15 @@
+﻿<MudItem xs="12" sm="6" md="6" lg="4" xl="4">
+    <MudCard Elevation="3">
+        <MudCardContent Class="text-center pb-0">
+            <MudImage Src="../images/version-control.png" Alt="Versión del Documento"></MudImage>
+            <br />
+            <MudText Typo="Typo.h6" Color="Color.Secondary">Versión N° @ContentVersion.Version</MudText>
+            <MudText Typo="Typo.caption" Class="gray-text">@ContentVersion.ModificationDate.ToString("dd/MM/yyyy HH:mm:ss")</MudText>
+        </MudCardContent>
+        <MudCardActions Class="justify-center gap-1">
+            <MudTooltip Text="Ver Versión">
+                <MudFab Color="Color.Info" StartIcon="fas fa-link" Link="@ContentVersion.Url" Target="_blank"></MudFab>
+            </MudTooltip>
+        </MudCardActions>
+    </MudCard>
+</MudItem>

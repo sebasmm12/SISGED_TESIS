@@ -58,7 +58,6 @@ namespace SISGED.Client.Shared
 
         private async Task<SessionAccountResponse> GetSessionAccountAsync()
         {
-            // TODO: Get the username of the session and put it into the url to get the real items.
             try
             {
                 var sessionAccountResponse = await HttpRepository.GetAsync<SessionAccountResponse>($"api/accounts/name/{userName}");
@@ -72,7 +71,6 @@ namespace SISGED.Client.Shared
             }
             catch (Exception)
             {
-                // TODO: Implement the logic to send the user a modal saying that we couldn't get the information of their items in the work environment
                 await SwalFireRepository.ShowErrorSwalFireAsync("Hubo un error con la sesión de usuario.");
                 return new();
             }

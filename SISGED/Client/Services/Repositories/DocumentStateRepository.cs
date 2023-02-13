@@ -6,21 +6,22 @@ namespace SISGED.Client.Services.Repositories
 {
     public class DocumentStateRepository : IDocumentStateRepository
     {
-        private readonly IDictionary<string, Color> _documentStateColors = new Dictionary<string, Color>
+        private readonly IDictionary<string, DocumentState> _documentStateColors = new Dictionary<string, DocumentState>
         {
-            { "registrado", Color.Primary },
-            { "modificado", Color.Warning },
-            { "generado", Color.Info },
-            { "derivado", Color.Success },
-            { "evaluado", Color.Secondary },
-            { "anulado", Color.Error },
+            { "registrado", new(Color.Primary, "Registro del Documento")   },
+            { "modificado", new(Color.Warning, "Modificación del Documento") },
+            { "generado",   new(Color.Info, "Generación del Documento") },
+            { "derivado",   new(Color.Success, "Derivación del Documento") },
+            { "evaluado",   new(Color.Secondary, "Evaluación del Documento") },
+            { "anulado",    new(Color.Error, "Anulación del Documento") },
         };
 
-        public Color GetDocumentStateColor(string documentState)
+        public DocumentState GetDocumentState(string documentState)
         {
             documentState = documentState.ToLower();
 
-            return _documentStateColors.FirstOrDefault(documentStateColor => documentStateColor.Key == documentState, new("defecto", Color.Dark)).Value;
+            return _documentStateColors.FirstOrDefault(documentStateColor => 
+                        documentStateColor.Key == documentState, new("defecto", new(Color.Dark, "Modificación del Documento"))).Value;
         }
 
         public IEnumerable<SelectOption> GetDocumentStates()

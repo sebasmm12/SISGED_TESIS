@@ -1,0 +1,42 @@
+﻿<MudDialog>
+    <DialogContent>
+        @if(pageLoading)
+        {
+            <GenericPageLoader Body="Obteniendo el historial de versiones del documento, por favor espere..."></GenericPageLoader>
+        }
+        else
+        {
+            <MudCard Elevation="0" class="w-100">
+                <MudCardHeader>
+                    <GenericFormHeader HeaderIcon="fas fa-code-compare" HeaderTitle="Historial de Versiones" HeaderDescription="Visualice todas las versiones generadas para el documento"></GenericFormHeader>
+                </MudCardHeader>
+                <MudCardContent>
+                    @if(contentVersions.Any())
+                    {
+                        <MudGrid>
+                            @foreach (var contentVersion in paginatedContentVersions)
+                            {
+                                <DocumentVersion ContentVersion="contentVersion"></DocumentVersion>
+                            }
+                        </MudGrid>
+                        <div class="text-end mt-6">
+                            <MudPagination Count="TotalDocumentVersions" MiddleCount="5" SelectedChanged="ChangePage" />
+                        </div>
+                    }
+                    else
+                    {
+                        <MudGrid Justify="Justify.Center">
+                            <MudItem>
+                                <MudAlert Severity="Severity.Info" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Center">No se ha generado ninguna versión para el documento</MudAlert>
+                            </MudItem>
+                        </MudGrid>
+                    }
+                </MudCardContent>
+                <MudCardActions Class="justify-end pa-6">
+                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="rounded-pill" OnClick="@(() => Cancel())">Regresar</MudButton>
+                </MudCardActions>
+            </MudCard>
+        }
+    </DialogContent>
+</MudDialog>
+

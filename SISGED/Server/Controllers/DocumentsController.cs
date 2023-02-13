@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SISGED.Server.Services.Contracts;
-using SISGED.Server.Services.Repositories;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Queries.Document;
@@ -13,6 +12,7 @@ using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.Document.Appeal;
 using SISGED.Shared.Models.Responses.Document.BPNDocument;
 using SISGED.Shared.Models.Responses.Document.BPNRequest;
+using SISGED.Shared.Models.Responses.Document.ComplaintRequest;
 using SISGED.Shared.Models.Responses.Document.Dictum;
 using SISGED.Shared.Models.Responses.Document.DisciplinaryOpenness;
 using SISGED.Shared.Models.Responses.Document.InitialRequest;
@@ -24,7 +24,6 @@ using SISGED.Shared.Models.Responses.Document.SolicitorDossierShipment;
 using SISGED.Shared.Models.Responses.Document.UserRequest;
 using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.DossierDocument;
-using System.Net.WebSockets;
 using Json = System.Text.Json;
 
 namespace SISGED.Server.Controllers
@@ -63,7 +62,7 @@ namespace SISGED.Server.Controllers
             _userService = userService;
         }
 
-        #region POST
+        #region POST Services
 
         [HttpPost("documentoodn")]
         public async Task<ActionResult<SolicitorDesignationDocument>> SolicitorDesignationOfficeRegister(DossierWrapper dossierWrapper)
@@ -183,7 +182,7 @@ namespace SISGED.Server.Controllers
 
                 var complaintRequest = await RegisterComplaintRequestAsync(document, user);
 
-                var dossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia" , "En proceso"
+                var dossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia", "En proceso"
                             , new(2, complaintRequest.Id, complaintRequest.Type, DateTime.UtcNow.AddHours(-5).AddDays(10))));
 
                 await RegisterOutPutTrayAsync(complaintRequest, user, dossier);
@@ -316,7 +315,7 @@ namespace SISGED.Server.Controllers
 
         [HttpPost("disciplinary-openness")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<DisciplinaryOpenness>> DisciplinaryOpennessDocumentRegister([FromBody]DossierWrapper dossierWrapper)
+        public async Task<ActionResult<DisciplinaryOpenness>> DisciplinaryOpennessDocumentRegister([FromBody] DossierWrapper dossierWrapper)
         {
             try
             {
@@ -326,7 +325,7 @@ namespace SISGED.Server.Controllers
 
                 var disciplinaryOpenness = await RegisterDisciplinaryOpennessDocumentAsync(document, user);
 
-                var updatedDossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia", "En proceso", 
+                var updatedDossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia", "En proceso",
                     new(3, disciplinaryOpenness.Id, disciplinaryOpenness.Type, DateTime.UtcNow.AddHours(-5).AddDays(5))));
 
                 await RegisterOutPutTrayAsync(disciplinaryOpenness, user, updatedDossier);
@@ -352,7 +351,7 @@ namespace SISGED.Server.Controllers
 
                 var solicitorDossierRequest = await RegisterSolicitorDossierRequestDocumentAsync(document, user);
 
-                var updatedDossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia" , "En proceso", 
+                var updatedDossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia", "En proceso",
                     new(4, solicitorDossierRequest.Id, solicitorDossierRequest.Type, DateTime.UtcNow.AddHours(-5).AddDays(5))));
 
                 await RegisterOutPutTrayAsync(solicitorDossierRequest, user, updatedDossier);
@@ -475,12 +474,12 @@ namespace SISGED.Server.Controllers
 
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
-            
+
         }
 
         #endregion
 
-        #region PUT
+        #region PUT Services
         [HttpPut("evaluation")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<Document>> EvaluateDocument(DocumentEvaluationRequest documentEvaluationRequest)
@@ -509,9 +508,9 @@ namespace SISGED.Server.Controllers
                 var user = await GetUserAsync("userId");
 
                 var generatedDocument = await GetGeneratedDocumentAsync(documentRequest, user);
-                
+
                 var document = await _documentService.GenerateDocumentAsync(generatedDocument);
-                
+
                 return Ok(document);
             }
             catch (Exception ex)
@@ -946,6 +945,22 @@ namespace SISGED.Server.Controllers
             }
         }
 
+        [HttpGet("complaint-requests/{documentId}")]
+        public async Task<ActionResult<ComplaintRequestInfoResponse>> GetComplaintRequestInfoAsync([FromRoute] string documentId)
+        {
+            try
+            {
+                var complainRequestResponse = await _documentService.GetComplaintRequestDocumentAsync(documentId);
+
+                return Ok(complainRequestResponse);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
         [HttpGet("{documentId}")]
         public async Task<ActionResult<DocumentResponse>> GetDocumentAsync([FromRoute] string documentId)
         {
@@ -1094,6 +1109,32 @@ namespace SISGED.Server.Controllers
 
         #endregion
 
+        #region DELETE Services
+        [HttpDelete("{documentId}")]
+        public async Task<IActionResult> AnnulDocumentAsync([FromRoute] string documentId)
+        {
+            try
+            {
+                var canAnnul = await _documentService.VerifyDocumentAnnulmentAsync(documentId);
+
+                if (!canAnnul) return Forbid("No se pudo anular el documento, verifique si en caso el documento no ha sido procesado por otra área");
+
+                var user = await GetUserAsync("userId");
+
+                await _documentService.AnnulDocumentAsync(documentId, user);
+
+                await _dossierService.DeleteDossierDocumentAsync(documentId);
+
+                return Ok();
+            }
+            catch (Exception)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, "No se pudo anular el documento, verifique si en caso el documento no ha sido procesado por otra área");
+            }
+        }
+        #endregion
+
         #region POST private methods
         private async Task<InitialRequest> RegisterInitialRequestAsync(InitialRequestResponse document, User user)
         {
@@ -1140,7 +1181,7 @@ namespace SISGED.Server.Controllers
             var dictumContent = _mapper.Map<DictumContent>(document.Content);
             var dictum = new Dictum(dictumContent, "registrado", urls.ToList());
             dictum.AddProcess(new Process(user.Id, user.Id, "registrado", user.Rol));
-            
+
             return await _documentService.RegisterDictumAsync(dictum);
         }
 
@@ -1192,7 +1233,7 @@ namespace SISGED.Server.Controllers
         }
 
         private string GetUserClaimValue(string claimType)
-        {   
+        {
             var userClaim = User.Claims.FirstOrDefault(c => c.Type == claimType);
 
             if (userClaim is null) throw new Exception("Información no especificada en la cabecera de la petición");
@@ -1211,7 +1252,7 @@ namespace SISGED.Server.Controllers
 
             return await _documentService.DisciplinaryOpennessRegisterAsync(DisciplinaryOpenness);
         }
-        
+
         private async Task<SolicitorDossierRequest> RegisterSolicitorDossierRequestDocumentAsync(SolicitorDossierRequestResponse document, User user)
         {
             var urls = await _mediaService.SaveFilesAsync(document.URLAnnex, _containerName);
@@ -1222,7 +1263,7 @@ namespace SISGED.Server.Controllers
 
             return await _documentService.SolicitorDossierRequestRegisterAsync(SolicitorDossierRequest);
         }
-        
+
         private async Task<Resolution> RegisterResolutionDocumentAsync(ResolutionResponse document, User user)
         {
             var urls = await _mediaService.SaveFilesAsync(document.URLAnnex, _containerName);
@@ -1233,7 +1274,7 @@ namespace SISGED.Server.Controllers
 
             return await _documentService.ResolutionRegisterAsync(resolution);
         }
-        
+
 
         private async Task<DocumentGenerationDTO> GetGeneratedDocumentAsync(GenerateDocumentRequest documentRequest, User user)
         {

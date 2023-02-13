@@ -34,7 +34,28 @@ namespace SISGED.Client.Services.Repositories
             return isChanged;
         }
 
+        public async Task ShowDialogAsync<T>(List<DialogParameter> dialogParameters, string dialogTitle) where T : ComponentBase
+        {
+            var parameters = GetDialogParameters(dialogParameters);
 
+            await InvokeDialogAsync<T>(dialogTitle, parameters, 
+                    new DialogOptions() { FullWidth = true, MaxWidth = MaxWidth.Large, Position = DialogPosition.Center, NoHeader = true });
+        }
+
+        public async Task ShowDialogAsync(Type component, List<DialogParameter> dialogParameters, string dialogTitle)
+        {
+            var parameters = GetDialogParameters(dialogParameters);
+
+            await InvokeDialogAsync(new(component, dialogTitle,
+                parameters, new DialogOptions()
+                {
+                    FullWidth = true,
+                    MaxWidth = MaxWidth.Large,
+                    Position = DialogPosition.Center,
+                    NoHeader = true
+                }));
+            
+        }
 
         private static DialogParameters GetDialogParameters(List<DialogParameter> dialogParameterDTOs)
         {
@@ -48,9 +69,21 @@ namespace SISGED.Client.Services.Repositories
             return dialogParameters;
         }
 
+        private async Task<DialogResult> InvokeDialogAsync<T>(string title, DialogParameters dialogParameters, DialogOptions dialogOptions) where T : ComponentBase
+        {
+            var dialogService = _dialogService.Show<T>(title, dialogParameters, dialogOptions);
+            return await dialogService.Result;
+        }
+
         private async Task<DialogResult> InvokeDialogAsync<T>(string title, DialogParameters dialogParameters) where T : ComponentBase
         {
             var dialogService = _dialogService.Show<T>(title, dialogParameters);
+            return await dialogService.Result;
+        }
+
+        private async Task<DialogResult> InvokeDialogAsync(DialogContent dialogContent)
+        {
+            var dialogService = _dialogService.Show(dialogContent.Component, dialogContent.Title, dialogContent.DialogParameters, dialogContent.DialogOptions);
             return await dialogService.Result;
         }
 

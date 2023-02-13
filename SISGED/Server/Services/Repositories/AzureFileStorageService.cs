@@ -31,7 +31,7 @@ namespace SISGED.Server.Services.Repositories
         {
             var client = await VerifyFileAsync(fileRegisterDTO.ContainerName);
 
-            client.SetAccessPolicy(Azure.Storage.Blobs.Models.PublicAccessType.Blob);
+            client.SetAccessPolicy(Azure.Storage.Blobs.Models.PublicAccessType.BlobContainer);
 
             string fileName = $"{Guid.NewGuid()}{fileRegisterDTO.Extension}";
 

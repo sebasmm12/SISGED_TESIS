@@ -7,6 +7,7 @@ using SISGED.Shared.Models.Requests.Documents;
 using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.Document.BPNDocument;
 using SISGED.Shared.Models.Responses.Document.BPNResult;
+using SISGED.Shared.Models.Responses.Document.ComplaintRequest;
 using SISGED.Shared.Models.Responses.Document.DisciplinaryOpenness;
 using SISGED.Shared.Models.Responses.Document.SignConclusion;
 using SISGED.Shared.Models.Responses.Document.SolicitorDesignationDocument;
@@ -72,5 +73,8 @@ namespace SISGED.Server.Services.Contracts
         Task<ComplaintRequest> RegisterComplaintRequestAsync(ComplaintRequest complaintRequest);
         Task<IEnumerable<UserDocumentResponse>> GetDocumentsByUserAsync(string userId, UserDocumentPaginationQuery userDocumentPaginationQuery);
         Task<int> CountDocumentsByUserAsync(string userId, UserDocumentPaginationQuery userDocumentPaginationQuery);
+        Task<ComplaintRequestInfoResponse> GetComplaintRequestDocumentAsync(string documentId);
+        Task<bool> VerifyDocumentAnnulmentAsync(string documentId);
+        Task AnnulDocumentAsync(string documentId, User user);
     }
 }

@@ -1,11 +1,6 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using SISGED.Shared.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SISGED.Shared.Models.Responses.Document
 {
@@ -25,11 +20,11 @@ namespace SISGED.Shared.Models.Responses.Document
         public object Content { get; set; } = default!;
         [BsonElement("estado")]
         public string State { get; set; } = default!;
-        [BsonElement("evaluacion")]
-        public object? Evaluation { get; set; } = default!;
+        [BsonElement("evaluaciones")]
+        public List<DocumentEvaluation> Evaluations { get; set; } = default!;
         [BsonElement("fechacreacion")]
         public DateTime CreationDate { get; set; } = default!;
         [BsonElement("urlanexo")]
-        public List<string> UrlAnnex { get; set; } =  default!;
+        public List<string> UrlAnnex { get; set; } = default!;
     }
 }

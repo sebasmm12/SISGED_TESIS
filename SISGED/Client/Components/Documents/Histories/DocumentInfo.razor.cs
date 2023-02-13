@@ -10,7 +10,7 @@ namespace SISGED.Client.Components.Documents.Histories
     {
         [Inject]
         public IDocumentStateRepository DocumentStateRepository { get; set; } = default!;
-
+    
         [Parameter]
         public UserDocumentDTO Document { get; set; } = default!;
         [Parameter]
@@ -19,10 +19,14 @@ namespace SISGED.Client.Components.Documents.Histories
         public EventCallback<UserDocumentDTO> DocumentVersionHistoryInfo { get; set; }
         [Parameter]
         public EventCallback<UserDocumentDTO> DocumentProcessHistoryInfo { get; set; }
+        [Parameter]
+        public EventCallback<UserDocumentDTO> DocumentVisualization { get; set; }
+
+        private IEnumerable<string> annulmentInValidStates = new List<string>() { "evaluado", "anulado" };
 
         private Color GetDocumentStateColor(string documentState)
         {
-            return DocumentStateRepository.GetDocumentStateColor(documentState);
+            return DocumentStateRepository.GetDocumentState(documentState).Color;
         }
 
         private async Task AnnulDocumentAsync()
@@ -38,6 +42,11 @@ namespace SISGED.Client.Components.Documents.Histories
         private async Task ShowDocumentProcessHistoryAsync()
         {
             await DocumentProcessHistoryInfo.InvokeAsync(Document);
+        }
+
+        private async Task ShowDocumentInfoAsync()
+        {
+            await DocumentVisualization.InvokeAsync(Document);
         }
 
     }

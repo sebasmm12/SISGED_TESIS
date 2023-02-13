@@ -1,0 +1,24 @@
+﻿<MudItem xs="12" sm="6" md="6" lg="4" xl="4">
+    <MudCard Elevation="3">
+        <MudCardContent Class="text-center pb-0">
+            <MudImage Src="../images/document-process.png" Alt="Acción del Documento"></MudImage>
+            <br />
+            <MudText Typo="Typo.h6" Color="Color.Secondary">@GetDocumentStateName(Process.State)</MudText>
+            <MudText Typo="Typo.caption" Class="gray-text">@Process.Area</MudText> <span class="gray-text">-</span> <MudText Typo="Typo.caption" Class="gray-text">@Process.ReceiptDate.ToString("dd/MM/yyyy HH:mm:ss")</MudText>
+            <MudGrid Justify="Justify.Center" Class="mt-1">
+                <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
+                    <MudAvatar Image="@Process.SenderUser.Image" Alt="Trabajador"></MudAvatar>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mt-1">@Process.SenderUser.FirstName @Process.SenderUser.LastName</MudText>
+                </MudItem>
+                @if (Process.SenderUser.UserId != Process.ReceiverUser.UserId)
+                {
+                    <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
+                        <MudAvatar Image="@Process.ReceiverUser.Image" Alt="Trabajador"></MudAvatar>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mt-1">@Process.ReceiverUser.FirstName @Process.ReceiverUser.LastName</MudText>
+                    </MudItem>
+                }
+            </MudGrid>
+        </MudCardContent>
+    </MudCard>
+</MudItem>
+
