@@ -35,8 +35,10 @@ static void ConfigureServices(IServiceCollection services)
     services.AddScoped<IDocumentRepository, DocumentRepository>();
     services.AddScoped<IDossierRepository, DossierRepository>();
     services.AddScoped<IDocumentStateRepository, DocumentStateRepository>();
+    services.AddScoped<IDossierStateRepository, DossierStateRepository>();
     services.AddScoped<IFilterRepository<SolicitorFilter>, SolicitorRepository>();
     services.AddScoped<IFilterRepository<UserDocumentFilterDTO>, UserDocumentRepository>();
+    services.AddScoped<IFilterRepository<UserDossierFilterDTO>, UserDossierRepository>();
     services.AddScoped<IDialogContentRepository, DialogContentRepository>();
     services.AddScoped<IAnnexFactory, AnnexFactory>();
     services.AddScoped<IBadgeFactory, BadgeFactory>();
@@ -64,6 +66,7 @@ static void ConfigureServices(IServiceCollection services)
     services.AddTransient<DocumentEvaluationValidator>();
     services.AddTransient<UserSelfRegisterValidator>();
     services.AddTransient<UserDocumentValidator>();
+    services.AddTransient<UserDossierValidator>();
 }
 
     

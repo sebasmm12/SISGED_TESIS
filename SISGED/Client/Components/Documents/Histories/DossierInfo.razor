@@ -1,0 +1,32 @@
+﻿<MudItem>
+    <MudCard Elevation="3">
+        <MudCardContent Class="text-center">
+            <MudImage Src="../images/dossier_flaticon.png" Alt="Expediente" Width="128" Height="128"></MudImage>
+            <br />
+            <MudChip Color="GetDossierStateColor(Dossier.State)" Class="text-capitalize">@Dossier.State</MudChip>
+            <MudText Typo="Typo.h6">@Dossier.Id</MudText>
+            @if(Dossier.EndDate is null)
+            {
+                <MudText Typo="Typo.caption" Class="gray-text">@Dossier.StartDate.ToString("dd/MM/yyyy")</MudText> <span class="gray-text">-</span> <MudText Typo="Typo.caption" Class="gray-text">Presente</MudText>
+            } else
+            {
+                <MudText Typo="Typo.caption" Class="gray-text">@Dossier.StartDate.ToString("dd/MM/yyyy")</MudText> <span class="gray-text">-</span> <MudText Typo="Typo.caption" Class="gray-text">@Dossier.EndDate.GetValueOrDefault().ToString("dd/MM/yyyy")</MudText>
+            }
+            <MudGrid Class="mt-1 justify-center justify-md-start">
+                <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                    <MudAvatar Color="Color.Secondary">@Dossier.Client.GetAvatarName()</MudAvatar>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mt-1">@Dossier.Client.Name @Dossier.Client.LastName</MudText>
+                </MudItem>
+            </MudGrid>
+        </MudCardContent>
+        <MudCardActions Class="justify-center gap-1">
+            <MudTooltip Text="Ver Historial de Derivaciones">
+                <MudFab Color="Color.Primary" StartIcon="fas fa-code-compare" OnClick="@(() => ShowDossierDerivationAsync())"></MudFab>
+            </MudTooltip>
+            <MudTooltip Text="Ver Línea de Tiempo de Documentos">
+                <MudFab Color="Color.Primary" StartIcon="fas fa-timeline" OnClick="@(() => ShowDossierDocumentAsync())"></MudFab>
+            </MudTooltip>
+        </MudCardActions>
+    </MudCard>
+</MudItem>
+

@@ -26,6 +26,8 @@ namespace SISGED.Server.Services.Contracts
         Task<IEnumerable<UserRequestWithPublicDeedResponse>> GetUserRequestsWithPublicDeedAsync(UserRequestPaginationQuery userRequestPaginationQuery);
         Task<Dossier> FindOneAndUpdateAsync(string Id, UpdateDefinition<Dossier> update);
         Task<long> CountUserRequestsAsync(string documentNumber);
+        Task<IEnumerable<DossierListResponse>> GetDossiersListAsync(UserDossierPaginationQuery paginationQuery);
+        Task<int> CountDossiersListAsync(UserDossierPaginationQuery paginationQuery);
         Task DeleteDossierDocumentAsync(string documentId);
     }
 }

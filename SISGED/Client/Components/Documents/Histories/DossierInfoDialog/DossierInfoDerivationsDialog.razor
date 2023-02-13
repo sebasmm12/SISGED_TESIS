@@ -1,0 +1,55 @@
+﻿
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.CompareArrows" Class="mr-3 mb-n1" />
+            Derivaciones
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudContainer Style="max-height: 500px; overflow-y: scroll">
+            @foreach (var item in Derivations)
+            {
+                <MudListItem Icon="@Icons.Material.Filled.ArrowRightAlt" Text="@string.Concat("Derivación: ",item.Type)" InitiallyExpanded="false">
+                    <NestedList>
+                        <MudTimeline TimelineOrientation="TimelineOrientation.Horizontal" TimelinePosition="TimelinePosition.Bottom">
+                            <MudTimelineItem>
+                                <MudCard Elevation="3">
+                                    <MudCardContent Class="text-center">
+                                        <MudAvatar Image="@item.SenderImage" />
+                                        <br />
+                                        <MudText Typo="Typo.h6">@item.SenderUser</MudText>
+                                        <MudText Typo="Typo.caption" Class="gray-text">@item.OriginArea</MudText>
+                                    </MudCardContent>
+                                </MudCard>
+                            </MudTimelineItem>
+                            <MudTimelineItem Color="Color.Info" Size="Size.Large" Variant="Variant.Filled" Elevation="0">
+                                <ItemDot>
+                                    <MudIcon Size="Size.Large" Icon="@Icons.Filled.ArrowRightAlt" />
+                                </ItemDot>
+                                <ItemContent>
+                                    <MudText Color="Color.Success" Align="Align.Center"  >@item.DerivationDate</MudText>
+                                </ItemContent>
+                            </MudTimelineItem>
+                            <MudTimelineItem>
+                                <MudCard Elevation="3">
+                                    <MudCardContent Class="text-center">
+                                        <MudAvatar Image="@item.ReceiverImage" />
+                                        <br />
+                                        <MudText Typo="Typo.h6">@item.ReceiverUser</MudText>
+                                        <MudText Typo="Typo.caption" Class="gray-text">@item.TargetArea</MudText>
+                                    </MudCardContent>
+                                </MudCard>
+                            </MudTimelineItem>
+                        </MudTimeline>
+                    </NestedList>
+                </MudListItem>
+            }
+        </MudContainer>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cerrar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
