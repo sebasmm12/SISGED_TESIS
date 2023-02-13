@@ -8,7 +8,10 @@ namespace SISGED.Client.Services.Repositories
     {
         private IDictionary<string, Type> _documentInfoComponents = new Dictionary<string, Type>()
         {
-            { "SolicitudDenuncia", typeof(ComplaintRequestInfo) }
+            { "SolicitudDenuncia", typeof(ComplaintRequestInfo) },
+            { "AperturamientoDisciplinario", typeof(DisciplinaryOpennessRequestInfo) },
+            { "SolicitudExpedienteNotario", typeof(SolicitorDossierRequestInfo) },
+            { "Resolucion", typeof(ResolutionInfo) }
         };
 
         public IEnumerable<DocumentOption> GetDocumentTypesWithDossier()

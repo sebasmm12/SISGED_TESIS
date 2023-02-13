@@ -1431,8 +1431,10 @@ namespace SISGED.Server.Services.Repositories
             var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("_id", new ObjectId(documentId)));
 
             var lookupAggregation = GetSolicitorsLookUpPipeline();
+            var lookupAggregation2 = GetProsecutorsLookUpPipeline();
 
             var unwinAggregation = MongoDBAggregationExtension.UnWind(new("$solicitors"));
+            var unwinAggregation2 = MongoDBAggregationExtension.UnWind(new("$prosecutors"));
 
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
@@ -1443,8 +1445,9 @@ namespace SISGED.Server.Services.Repositories
                 { "attachedUrls", "$urlanexo" },
                 { "content", new BsonDocument()
                 {
+                    { "code", "$contenido.codigo" },
                     { "solicitor", "$solicitors" },
-                    { "fiscalId", "$contenido.idfiscal" },
+                    { "prosecutor", "$prosecutors" },
                     { "complainantName", "$contenido.nombredenunciante" },
                     { "title", "$contenido.titulo" },
                     { "description", "$contenido.descripcion" },
@@ -1457,7 +1460,7 @@ namespace SISGED.Server.Services.Repositories
                 } }
             });
 
-            return new BsonDocument[] { matchAggregation, lookupAggregation, unwinAggregation, projectAggregation };
+            return new BsonDocument[] { matchAggregation, lookupAggregation, lookupAggregation2, unwinAggregation, unwinAggregation2, projectAggregation };
         }
 
         private static BsonDocument[] GetSignConclusionPipeline(string documentId)
@@ -1665,6 +1668,22 @@ namespace SISGED.Server.Services.Repositories
             var letPipeline = new Dictionary<string, BsonValue>()
             {
                 { "solicitorId", MongoDBAggregationExtension.ObjectId("$contenido.idnotario") }
+            };
+
+            var lookUpPipeline = new BsonArray()
+            {
+                MongoDBAggregationExtension.Match(
+                    MongoDBAggregationExtension.Expr(MongoDBAggregationExtension.Eq(new() { "$_id", "$$solicitorId" })))
+            };
+
+            return MongoDBAggregationExtension.Lookup(new("notarios", letPipeline, lookUpPipeline, "solicitors"));
+        }
+        
+        private static BsonDocument GetProsecutorsLookUpPipeline()
+        {
+            var letPipeline = new Dictionary<string, BsonValue>()
+            {
+                { "prosecutorId", MongoDBAggregationExtension.ObjectId("$contenido.idfiscal") }
             };
 
             var lookUpPipeline = new BsonArray()
