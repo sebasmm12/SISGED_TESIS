@@ -265,7 +265,8 @@ namespace SISGED.Server.Services.Repositories
 
         public async Task UpdateDocumentProcessAsync(Process proccess, string documentId)
         {
-            var updateDocumentProccess = Builders<Document>.Update.Push(document => document.ProcessesHistory, proccess);
+            var updateDocumentProccess = Builders<Document>.Update.Push(document => document.ProcessesHistory, proccess)
+                                                                  .Set("estado", proccess.State);
 
             var updatedDocument = await _documentsCollection.UpdateOneAsync(document => document.Id == documentId, updateDocumentProccess);
 
@@ -849,10 +850,8 @@ namespace SISGED.Server.Services.Repositories
             {
                 Title = DTO.Content.Title,
                 Description = DTO.Content.Description,
-                ComplainantName = DTO.Content.Complainant,
                 AudiencePlace = DTO.Content.AudienceLocation,
                 SolicitorId = DTO.Content.SolicitorId,
-                ProsecutorId = DTO.Content.ProsecutorId,
                 Participants = participantsList,
                 ImputedFacts = chargedDeedsList,
                 AudienceStartDate = DTO.Content.AudienceStartDate,
@@ -863,10 +862,8 @@ namespace SISGED.Server.Services.Repositories
             var update = Builders<Document>.Update
                 .Set("contenido.titulo", content.Title)
                 .Set("contenido.descripcion", content.Description)
-                .Set("contenido.nombredenunciante", content.ComplainantName)
                 .Set("contenido.lugaraudiencia", content.AudiencePlace)
                 .Set("contenido.idnotario", content.SolicitorId)
-                .Set("contenido.idfiscal", content.ProsecutorId)
                 .Set("contenido.participantes", content.Participants)
                 .Set("contenido.hechosimputados", content.ImputedFacts)
                 .Set("contenido.fechainicioaudiencia", content.AudienceStartDate)

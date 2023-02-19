@@ -27,7 +27,6 @@ namespace SISGED.Shared.Models.Responses.Document
         public string SolicitorId { get; set; } = default!;
         public string ProsecutorId { get; set; } = default!;
         public string ClientId { get; set; } = default!;
-        public string Complainant { get; set; } = default!;
         public string Title { get; set; } = default!;
         public string Description { get; set; } = default!;
         public DateTime AudienceStartDate { get; set; } = default!;

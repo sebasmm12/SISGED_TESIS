@@ -32,29 +32,22 @@ namespace SISGED.Client.Components.Documents.Registers
         [Inject]
         public IDialogContentRepository dialogContentRepository { get; set; } = default!;
 
-        private MudForm? requestForm = default!;
-        private MudStepper? requestStepper;
-
         //Variables de sesion
         [CascadingParameter(Name = "WorkEnvironment")]
         public WorkEnvironment WorkEnvironment { get; set; } = default!;
-        [CascadingParameter(Name = "SessionAccount")] protected SessionAccountResponse SessionAccount { get; set; }
         
         //Datos del formulario
-        private DisciplinaryOpennessRegisterDTO disciplinaryOpennessRegister = new DisciplinaryOpennessRegisterDTO();
-
-        private bool pageLoading = false;
-        String typeDocument = "AperturamientoDisciplinario";
+        private DisciplinaryOpennessRegisterDTO disciplinaryOpennessRegister = new();
+        private MudForm? requestForm = default!;
+        private MudStepper? requestStepper;
+        private bool pageLoading = true;
+        private readonly string typeDocument = "Denuncia";
         private List<MediaRegisterDTO> annexes = new();
         private string dossierId = default!;
-
-        List<ProsecutorUserInfoResponse> prosecutors { get; set; } = new List<ProsecutorUserInfoResponse>();
 
         protected override async Task OnInitializedAsync()
         {
             await GetUserRequestInformationAsync();
-
-           prosecutors = await GetProsecutorInformationAsync();
 
             pageLoading = false;
 
@@ -165,31 +158,11 @@ namespace SISGED.Client.Components.Documents.Registers
 
             var dossierTray = userTray.Value as DossierTrayResponse;
 
-            var documentContent = JsonSerializer.Deserialize<InitialRequestContentDTO>(JsonSerializer.Serialize(dossierTray!.Document!.Content)); //ComplaintRequestContentDTO
-
+            var documentContent = JsonSerializer.Deserialize<ComplaintRequestContentDTO>(JsonSerializer.Serialize(dossierTray!.Document!.Content)); //ComplaintRequestContentDTO
+            
             disciplinaryOpennessRegister.Solicitor = await GetSolicitorAsync(documentContent!.SolicitorId);
+            
             dossierId = dossierTray!.DossierId;
-        }
-
-        private async Task<List<ProsecutorUserInfoResponse>> GetProsecutorInformationAsync()
-        {
-            try
-            {
-                var solicitorResponse = await httpRepository.GetAsync<List<ProsecutorUserInfoResponse>>($"api/users/prosecutors");
-
-                if (solicitorResponse.Error)
-                {
-                    await swalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los fiscales del sistema");
-                }
-
-                return solicitorResponse.Response!;
-            }
-            catch (Exception)
-            {
-
-                await swalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los fiscales del sistema");
-                return new();
-            }
         }
 
         private void GetSolicitorResponse(AutocompletedSolicitorResponse AutocompletedSolicitorResponse)

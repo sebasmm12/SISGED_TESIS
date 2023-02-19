@@ -110,7 +110,8 @@ namespace SISGED.Server.Services.Repositories
             var filter = Builders<Dossier>.Filter.Eq(dossierToUpdate => dossierToUpdate.Id, dossier.Id);
             var update = Builders<Dossier>.Update.Set(dossierToUpdate => dossierToUpdate.Type, dossier.Type)
                                                  .Set(dossierToUpdate => dossierToUpdate.State, dossier.State)
-                                                 .Push(dossierToUpdate => dossierToUpdate.Documents, dossier.Documents.First());
+                                                 .Push(dossierToUpdate => dossierToUpdate.Documents, dossier.Documents.First())
+                                                 .Push(dossierToUpdate => dossierToUpdate.DocumentsHistory, dossier.DocumentsHistory.First());
 
             var updatedDossier = await _dossiersCollection.FindOneAndUpdateAsync(filter, update, new()
             {

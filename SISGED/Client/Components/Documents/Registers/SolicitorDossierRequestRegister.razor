@@ -12,37 +12,38 @@ else
                         PreventStepChange="@(() => CheckRegisterAsync())">
                     <MudStep Title="Datos de la solicitud de expediente de notario">
                         <MudGrid>
-                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
                                 <MudTextField @bind-Value="@solicitorDossierRequestRegister.Title" Class="text-field-style"
                                           Label="Titulo del Oficio" For="@(()=>solicitorDossierRequestRegister.Title)" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"></MudTextField>
                             </MudItem>
 
-                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
                                 <MudTextField Value="solicitorDossierRequestRegister.Client.GetShortName()" Label="Nombre del Denunciante" Variant="Variant.Outlined"
                                           Adornment="Adornment.End" AdornmentIcon="fas fa-user" AdornmentColor="Color.Primary" ReadOnly="true"></MudTextField>
                             </MudItem>
 
-                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                            <MudItem xs="12" sm="12" md="6" lg="5" xl="5">
                                 <GenericSolicitorAutocomplete Solicitor="solicitorDossierRequestRegister.Solicitor" SolicitorResponse="GetSolicitorResponse"></GenericSolicitorAutocomplete>
                             </MudItem>
 
-                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                            <MudItem xs="12" sm="12" md="12" lg="7" xl="7">
                                 <MudTextField Value="solicitorDossierRequestRegister.Solicitor.Address" Label="Dirección" Variant="Variant.Outlined"
                                           Adornment="Adornment.End" AdornmentColor="Color.Primary" AdornmentIcon="fas fa-location-dot" ReadOnly="true"></MudTextField>
                             </MudItem>
 
                             <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
 
-                                <MudTextField @bind-Value="@solicitorDossierRequestRegister.Description" Class="text-field-style" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"
-                                          Label="Descripción de la solicitud" For="@(()=>solicitorDossierRequestRegister.Description)"></MudTextField>
+                                <MudTextField @bind-Value="@solicitorDossierRequestRegister.Description" Class="text-field-style" Variant="Variant.Outlined"
+                                          Label="Descripción de la solicitud" For="@(()=>solicitorDossierRequestRegister.Description)"
+                                          Lines="5" Immediate="true"></MudTextField>
                             </MudItem>
                         </MudGrid>
 
                     </MudStep>
-                    <MudStep Title="Subir Anexo">
+                    <MudStep Title="Anexos">
                         <MudGrid>
                             <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
-                                <DocumentAnnex Annexes="annexes"></DocumentAnnex>
+                                <DocumentAnnex Annexes="annexes" AnnexesHeight="280px"></DocumentAnnex>
                             </MudItem>
                         </MudGrid>
                     </MudStep>

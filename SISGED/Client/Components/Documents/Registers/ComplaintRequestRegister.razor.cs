@@ -126,7 +126,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
             var documentContent = JsonSerializer.Deserialize<InitialRequestContentDTO>(JsonSerializer.Serialize(dossierTray!.Document!.Content));
 
-            complaintRequest.Solicitor = await GetSolicitorAsync(documentContent!.SolicitorId);
+            complaintRequest.Solicitor = string.IsNullOrEmpty(documentContent!.SolicitorId) ? new() : await GetSolicitorAsync(documentContent!.SolicitorId);
             complaintRequest.ComplaintType = GetComplaintType(complaintRequest.Client);
             dossierId = dossierTray.DossierId;
         }
@@ -146,7 +146,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
                 if (solicitorResponse.Error)
                 {
-                    await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los tipos de solicitudes del sistema");
+                    await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener al notario registrado en la solicitud");
                 }
 
                 return solicitorResponse.Response!;
@@ -154,7 +154,7 @@ namespace SISGED.Client.Components.Documents.Registers
             catch (Exception)
             {
 
-                await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los tipos de solicitudes del sistema");
+                await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener al notario registrado en la solicitud");
                 return new();
             }
         }

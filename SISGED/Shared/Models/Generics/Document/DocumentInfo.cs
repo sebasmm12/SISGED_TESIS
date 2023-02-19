@@ -19,8 +19,8 @@ namespace SISGED.Shared.Models.Generics.Document
         public object Content { get; set; } = default!;
         [BsonElement("estado")]
         public string State { get; set; } = default!;
-        [BsonElement("evaluacion")]
-        public object? Evaluation { get; set; }
+        [BsonElement("evaluaciones")]
+        public List<DocumentEvaluation> Evaluations { get; set; } = default!;
         [BsonElement("fechacreacion")]
         public DateTime CreationDate { get; set; }
         [BsonElement("urlanexo")]

@@ -3,6 +3,8 @@ using Microsoft.JSInterop;
 using SISGED.Client.Helpers;
 using SISGED.Client.Services.Contracts;
 using SISGED.Client.Services.Repositories;
+using SISGED.Shared.Entities;
+using SISGED.Shared.Models.Responses.Account;
 
 namespace SISGED.Client.Components.Documents
 {
@@ -15,6 +17,8 @@ namespace SISGED.Client.Components.Documents
         private DocumentStrategy DocumentStrategy { get; set; } = default!;
 
         // Parameters
+        [CascadingParameter(Name = "SessionAccount")]
+        public SessionAccountResponse SessionAccount { get; set; } = default!;
 
         // Fields
         private Roles userRole;
@@ -23,8 +27,7 @@ namespace SISGED.Client.Components.Documents
 
         protected override void OnInitialized()
         {
-            // TODO: Implement logic to get the userRoles based on the authenticated user
-            userRole = Roles.TramiteDocumentario;
+            userRole = Enum.Parse<Roles>(SessionAccount.Role);
 
             documentOptions = DocumentRepository.GetDocumentTypesWithDossier().Where(document => document.Rol == userRole);
         }

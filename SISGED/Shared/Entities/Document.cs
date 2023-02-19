@@ -298,18 +298,14 @@ namespace SISGED.Shared.Entities
         public string Code { get; set; } = default!;
         [BsonElement("idnotario")]
         public string SolicitorId { get; set; } = default!;
-        [BsonElement("idfiscal")]
-        public string ProsecutorId { get; set; } = default!;
-        [BsonElement("nombredenunciante")] 
-        public string ComplainantName { get; set; } = default!;
         [BsonElement("titulo")]
         public string Title { get; set; } = default!;
         [BsonElement("descripcion")]
         public string Description { get; set; } = default!;
         [BsonElement("fechainicioaudiencia")]
-        public DateTime AudienceStartDate { get; set; } = DateTime.UtcNow.AddHours(-5);
+        public DateTime AudienceStartDate { get; set; } = default!;
         [BsonElement("fechafinaudiencia")]
-        public DateTime AudienceEndDate { get; set; } = DateTime.UtcNow.AddDays(-5);
+        public DateTime AudienceEndDate { get; set; } = default!;
         [BsonElement("participantes")]
         public List<string> Participants { get; set; } = new();
         [BsonElement("lugaraudiencia")]
@@ -459,8 +455,6 @@ namespace SISGED.Shared.Entities
     [BsonDiscriminator("Resolucion")]
     public class Resolution : Document
     {
-        [BsonElement("evaluacion")]
-        public Evaluation Evaluation { get; set; } = default!;
         [BsonElement("contenido")]
         public ResolutionContent Content { get; set; } = default!;
 

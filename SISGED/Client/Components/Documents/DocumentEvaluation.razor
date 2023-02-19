@@ -21,34 +21,34 @@ else
                                 <MudText Typo="Typo.body1">@documentContent.Title</MudText>
                             </div>
                         </MudItem>
-                        <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                        <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
                             <div class="text-start text-sm-center mb-2">
                                 <MudText Typo="Typo.h6">Código del Documento</MudText>
                                 <MudText Typo="Typo.body1">@documentContent.Code</MudText>
                             </div>
                         </MudItem>
-                        <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                        <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
                             <div class="text-start text-sm-center mb-2">
                                 <MudText Typo="Typo.h6">Tipo de Documento</MudText>
                                 <MudText Typo="Typo.body1">@dossierTray.Document!.Type</MudText>
                             </div>
                         </MudItem>
-                        <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                        <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
                             <div class="text-start text-sm-center mb-2">
                                 <MudText Typo="Typo.h6">Usuario creador</MudText>
                                 <MudText Typo="Typo.body1">@user!.Data.Name @user!.Data.LastName</MudText>
                             </div>
                         </MudItem>
-                        <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                        <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
                             <div class="text-start text-sm-center mb-2">
                                 <MudText Typo="Typo.h6">Rol</MudText>
                                 <MudText Typo="Typo.body1">@userRole!.Label</MudText>
                             </div>
                         </MudItem>
-                        <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                        <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
                             <MudButton Color="Color.Primary" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AprroveDocumentAsync())">Aprobar</MudButton>
                         </MudItem>
-                        <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                        <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
                             <MudButton Color="Color.Error" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => RejectDocumentAsync())">Rechazar</MudButton>
                         </MudItem>
                         @if (!isApproved)

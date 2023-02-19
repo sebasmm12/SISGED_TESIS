@@ -2,12 +2,10 @@
     @if (canShow)
     {
         <table id="converted-pdf">
-            <thead>
-                <tr>
-                    <th colspan="2" data-type="title">@solicitorDossierShipmentContent.Title</th>
-                </tr>
-            </thead>
             <tbody>
+                <tr>
+                    <td colspan="2" data-type="title">@solicitorDossierShipmentContent.Title</td>
+                </tr>
                 <tr><td colspan="2" data-type="section">I. Datos Generales</td></tr>
                 <tr>
                     <td colspan="2" data-type="subtitle">Código</td>
@@ -63,7 +61,7 @@
 
                         <tr>
                             <td>
-                                <a target="_blank" data-text="@($"Ver Anexo { i }")" href="@annex"></a>
+                                <a target="_blank" data-text="@($"Ver Anexo { i + 1 }")" href="@annex"></a>
                             </td>
                         </tr>
                     }

@@ -54,7 +54,7 @@ namespace SISGED.Client.Helpers
                 .ForMember(dictumContent => dictumContent.SolicitorId, options => options.MapFrom(dictumRegister => dictumRegister.Solicitor.Id))
                 .ForMember(dictumContent => dictumContent.ComplaintId, options => options.MapFrom(dictumRegister => dictumRegister.Client.ClientId))
                 .ForMember(dictumContent => dictumContent.Observations, options => options.MapFrom(dictumRegister => dictumRegister.Observations.Select(observation => observation.Description).ToList()))
-                .ForMember(dictumContent => dictumContent.Recomendations, options => options.MapFrom(dictumRegister => dictumRegister.Recommendations.Select(recommendation => recommendation.Description).ToList()));
+                .ForMember(dictumContent => dictumContent.Recommendations, options => options.MapFrom(dictumRegister => dictumRegister.Recommendations.Select(recommendation => recommendation.Description).ToList()));
 
             // Resolution Request Mapper
             CreateMap<ResolutionRegisterDTO, ResolutionResponseContent>()

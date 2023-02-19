@@ -1,37 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
-using System.Net.Http;
-using System.Net.Http.Json;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.Web.Virtualization;
-using Microsoft.AspNetCore.Components.WebAssembly.Http;
-using Microsoft.JSInterop;
-using SISGED.Client;
-using SISGED.Client.Generics;
-using SISGED.Client.Shared;
 using SISGED.Client.Helpers;
-using SISGED.Client.Components.WorkEnvironments;
-using SISGED.Client.Components.SolicitorDossier;
-using SISGED.Shared.Models.Responses.Tray;
-using SISGED.Shared.Models.Responses.DossierTray;
-using SISGED.Shared.Models.Responses.PublicDeed;
-using SISGED.Shared.Models.Responses.User;
-using SISGED.Shared.Models.Responses.Document.UserRequest;
-using SISGED.Shared.Models.Responses.Solicitor;
-using SISGED.Shared.Models.Responses.DocumentType;
-using SISGED.Shared.DTOs;
-using MudBlazor;
-using MudExtensions;
-using MudExtensions.Enums;
 using SISGED.Client.Services.Contracts;
+using SISGED.Shared.DTOs;
+using SISGED.Shared.Models.Responses.Solicitor;
 using System.Text.Json;
-using SISGED.Client.Services.Repositories;
-using SISGED.Shared.Entities;
 
 namespace SISGED.Client.Components.Documents.Generators
 {
@@ -60,15 +32,9 @@ namespace SISGED.Client.Components.Documents.Generators
 
         private async Task GetDisciplinaryOpennessInfoAsync()
         {
-            var solicitorTask = GetSolicitorAsync(disciplinaryOpennessContent.SolicitorId);
-            var prosecutorTask = GetProsecutorInformationAsync(disciplinaryOpennessContent.ProsecutorId);
+            var solicitor = await GetSolicitorAsync(disciplinaryOpennessContent.SolicitorId);
 
-            await Task.WhenAll(solicitorTask, prosecutorTask);
-
-            var solicitor = await solicitorTask;
-            var prosecutor = await prosecutorTask;
-
-            disciplinaryOpenness = new(DocumentGenerator.Dossier.Client!, solicitor, prosecutor);
+            disciplinaryOpenness = new(DocumentGenerator.Dossier.Client!, solicitor);
         }
 
         private async Task<AutocompletedSolicitorResponse> GetSolicitorAsync(string solicitorId)
@@ -88,27 +54,6 @@ namespace SISGED.Client.Components.Documents.Generators
             {
 
                 await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener la información del notario");
-                return new();
-            }
-        }
-
-        private async Task<ProsecutorUserInfoResponse> GetProsecutorInformationAsync(string prosecutorId)
-        {
-            try
-            {
-                var prosecutorResponse = await HttpRepository.GetAsync<List<ProsecutorUserInfoResponse>>($"api/users/prosecutors");
-
-                if (prosecutorResponse.Error)
-                {
-                    await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los fiscales del sistema");
-                }
-
-                return prosecutorResponse.Response!.FirstOrDefault(l => l.Id == prosecutorId)!;
-            }
-            catch (Exception)
-            {
-
-                await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los fiscales del sistema");
                 return new();
             }
         }

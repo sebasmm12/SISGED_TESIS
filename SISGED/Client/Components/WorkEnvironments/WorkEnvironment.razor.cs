@@ -109,14 +109,10 @@ namespace SISGED.Client.Components.WorkEnvironments
 
         public void EvaluateDocument(Item item, bool isApproved)
         {
-            if (isApproved) {
-                ChangeToolPlace(new("inputs", "inputs", item));
-                return;
-            }
+            if (isApproved) ChangeToolPlace(new("inputs", "inputs", item));
+            else Items.Remove(item);
 
             // TODO: Implement the logic the send the document into the receiver user tray by the signalR Hub
-            Items.Remove(item);
-
             UpdateUsedTool();
         }
 

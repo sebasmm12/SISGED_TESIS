@@ -23,7 +23,7 @@ namespace SISGED.Shared.Validators
             RuleFor(x => x.AudienceStartDate)
                 .NotEmpty()
                 .WithMessage("Debe ingresar la fecha de inicio de audiencia");
-
+                
             RuleFor(x => x.AudienceEndDate)
                 .NotEmpty()
                 .WithMessage("Debe ingresar la fecha de fin de audiencia");
@@ -32,11 +32,6 @@ namespace SISGED.Shared.Validators
                 .NotNull()
                 .NotEmpty()
                 .WithMessage("Debe ingresar el nombre del notario");
-
-            RuleFor(x => x.Prosecutor)
-                .NotNull()
-                .NotEmpty()
-                .WithMessage("Debe ingresar el nombre del fiscal");
         }
 
         public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>

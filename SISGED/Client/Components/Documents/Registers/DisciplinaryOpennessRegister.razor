@@ -13,76 +13,63 @@ else
                     <MudStep Title="Datos Generales">
                         <MudGrid>
 
-                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
                                 <MudTextField @bind-Value="@disciplinaryOpennessRegister.Title" Class="text-field-style"
                                           Label="Titulo del Oficio" For="@(()=>disciplinaryOpennessRegister.Title)" Variant="Variant.Outlined"
                                           Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"></MudTextField>
                             </MudItem>
 
-                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
                                 <MudTextField Value="disciplinaryOpennessRegister.Client.GetShortName()" Label="Nombre del Cliente" Variant="Variant.Outlined"
                                           Adornment="Adornment.End" AdornmentIcon="fas fa-user" AdornmentColor="Color.Primary" ReadOnly="true"></MudTextField>
                             </MudItem>
 
-                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
-                                <MudTextField @bind-Value="@disciplinaryOpennessRegister.Description" Class="text-field-style"
-                                          Label="Descripción del aperturamiento" For="@(()=>disciplinaryOpennessRegister.Description)" Variant="Variant.Outlined"
-                                          Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"></MudTextField>
-                            </MudItem>
-
-                            <MudItem xs="12" sm="12" md="4" lg="4" xl="12">
-                                <MudTextField @bind-Value="@disciplinaryOpennessRegister.AudienceLocation" Class="text-field-style"
-                                          Label="Lugar de la audiencia" For="@(()=>disciplinaryOpennessRegister.AudienceLocation)" Lines="5" Immediate="true" Variant="Variant.Outlined"
-                                          Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"></MudTextField>
-                            </MudItem>
-
-                            <MudItem xs="12" sm="12" md="4" lg="4" xl="12">
-                                <MudDatePicker Label="Fecha de Inicio" AllowInput="false" @bind-Date="@disciplinaryOpennessRegister.AudienceStartDate" For="@(()=>disciplinaryOpennessRegister.AudienceStartDate)" Variant="Variant.Outlined"
-                                           Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"></MudDatePicker>
-                            </MudItem>
-
-                            <MudItem xs="12" sm="12" md="4" lg="4" xl="12">
-                                <MudDatePicker Label="Fecha de Finalizacion" AllowInput="false" @bind-Date="@disciplinaryOpennessRegister.AudienceEndDate" For="@(()=>disciplinaryOpennessRegister.AudienceEndDate)" Variant="Variant.Outlined"
-                                           Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"></MudDatePicker>
-                            </MudItem>
-
-                            <MudItem xs="12" sm="12" md="5" lg="5" xl="12">
+                            <MudItem xs="12" sm="12" md="5" lg="5" xl="5">
                                 <GenericSolicitorAutocomplete Solicitor="disciplinaryOpennessRegister.Solicitor" SolicitorResponse="GetSolicitorResponse"></GenericSolicitorAutocomplete>
                             </MudItem>
-
-                            <MudItem xs="12" sm="12" md="7" lg="7" xl="12">
+                            <MudItem xs="12" sm="12" md="7" lg="7" xl="7">
                                 <MudTextField Value="disciplinaryOpennessRegister.Solicitor.Address" Label="Dirección" Variant="Variant.Outlined"
                                           Adornment="Adornment.End" AdornmentColor="Color.Primary" AdornmentIcon="fas fa-location-dot" ReadOnly="true"></MudTextField>
                             </MudItem>
 
-                            <MudItem xs="12" sm="12" md="7" lg="7" xl="12">
-                                <MudSelect @bind-Value="@disciplinaryOpennessRegister.Prosecutor" Class="text-field-style" Label="Seleccione un Fiscal" For="@(()=>disciplinaryOpennessRegister.Prosecutor)" Clearable="true"
-                                       Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary" Variant="Variant.Outlined">
-                                    @foreach (ProsecutorUserInfoResponse prosecutor in prosecutors)
-                                    {
-                                        <MudSelectItem Value="@prosecutor">@prosecutor.Name @prosecutor.LastName</MudSelectItem>
-                                    }
-                                </MudSelect>
+                            <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
+                                <MudTextField @bind-Value="@disciplinaryOpennessRegister.AudienceLocation" Class="text-field-style"
+                                          Label="Lugar de la audiencia" For="@(()=>disciplinaryOpennessRegister.AudienceLocation)" Variant="Variant.Outlined"
+                                          Adornment="Adornment.End" AdornmentIcon="fas fa-location-dot" AdornmentColor="Color.Primary"></MudTextField>
+                            </MudItem>
+
+                            <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
+                                <MudDatePicker Label="Fecha de Inicio" AllowInput="false" @bind-Date="@disciplinaryOpennessRegister.AudienceStartDate" For="@(()=>disciplinaryOpennessRegister.AudienceStartDate)" Variant="Variant.Outlined"
+                                           Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"></MudDatePicker>
+                            </MudItem>
+
+                            <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
+                                <MudDatePicker Label="Fecha de Finalizacion" AllowInput="false" @bind-Date="@disciplinaryOpennessRegister.AudienceEndDate" For="@(()=>disciplinaryOpennessRegister.AudienceEndDate)" Variant="Variant.Outlined"
+                                           Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"></MudDatePicker>
+                            </MudItem>
+
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <MudTextField @bind-Value="@disciplinaryOpennessRegister.Description" Class="text-field-style"
+                                          Label="Descripción del aperturamiento" For="@(()=>disciplinaryOpennessRegister.Description)" Lines="5" Immediate="true" Variant="Variant.Outlined"
+                                          ></MudTextField>
                             </MudItem>
                         </MudGrid>
                     </MudStep>
 
-                    <MudStep Title="Participantes y Conclusiones">
+                    <MudStep Title="Participantes y Cargos">
                         <MudGrid>
-                            <!--**************************************************************************************-->
                             <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
                                 <GenericMultipleTexts TextFields="disciplinaryOpennessRegister.Participants" TextFieldIcon="fa-eye" TextLabel="Participantes"></GenericMultipleTexts>
                             </MudItem>
-                            <!--**************************************************************************************-->
                             <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
                                 <GenericMultipleTexts TextFields="disciplinaryOpennessRegister.ChargedDeeds" TextFieldIcon="fa-eye" TextLabel="Cargos"></GenericMultipleTexts>
                             </MudItem>
                         </MudGrid>
                     </MudStep>
-                    <MudStep Title="Subir Anexo">
+                    <MudStep Title="Anexos">
                         <MudGrid>
                             <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
-                                <DocumentAnnex Annexes="annexes"></DocumentAnnex>
+                                <DocumentAnnex Annexes="annexes" AnnexesHeight="280px"></DocumentAnnex>
                             </MudItem>
                         </MudGrid>
                     </MudStep>

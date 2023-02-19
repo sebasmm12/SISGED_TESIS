@@ -23,6 +23,6 @@ namespace SISGED.Shared.Models.Responses.Document
         public string Title { get; set; } = default!;
         public List<string> Observations { get; set; } = new();
         public string Conclusion { get; set; } = default!;
-        public List<string> Recomendations { get; set; } = new();
+        public List<string> Recommendations { get; set; } = new();
     }
 }

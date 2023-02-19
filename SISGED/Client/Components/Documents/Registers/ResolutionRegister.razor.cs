@@ -1,41 +1,20 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components;
-using System.Net.Http;
-using System.Net.Http.Json;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.Web.Virtualization;
-using Microsoft.AspNetCore.Components.WebAssembly.Http;
-using Microsoft.JSInterop;
-using SISGED.Client;
-using SISGED.Client.Generics;
-using SISGED.Client.Shared;
-using SISGED.Client.Helpers;
-using SISGED.Client.Components.WorkEnvironments;
-using SISGED.Shared.Models.Responses.Tray;
-using SISGED.Shared.Models.Responses.DossierTray;
-using SISGED.Shared.Models.Responses.PublicDeed;
-using SISGED.Shared.Models.Responses.User;
-using SISGED.Shared.Models.Responses.Document.UserRequest;
-using MudBlazor;
-using SISGED.Client.Services.Contracts;
-using SISGED.Shared.Entities;
-using SISGED.Shared.Models.Responses.Document;
-using SISGED.Shared.Models.Responses.Account;
-using SISGED.Shared.Models.Requests.Documents;
-using SISGED.Shared.Validators;
-using SISGED.Shared.DTOs;
 using AutoMapper;
+using Microsoft.AspNetCore.Components;
+using MudBlazor;
 using MudExtensions;
 using MudExtensions.Utilities;
-using SISGED.Shared.Models.Responses.Dossier;
-using SISGED.Shared.Models.Responses.Solicitor;
+using SISGED.Client.Components.WorkEnvironments;
+using SISGED.Client.Helpers;
+using SISGED.Client.Services.Contracts;
+using SISGED.Shared.DTOs;
+using SISGED.Shared.Entities;
+using SISGED.Shared.Models.Requests.Documents;
+using SISGED.Shared.Models.Responses.Account;
+using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.DocumentType;
-using SISGED.Client.Services.Repositories;
+using SISGED.Shared.Models.Responses.DossierTray;
+using SISGED.Shared.Models.Responses.Solicitor;
+using SISGED.Shared.Validators;
 using System.Text.Json;
 
 namespace SISGED.Client.Components.Documents.Registers
@@ -59,17 +38,15 @@ namespace SISGED.Client.Components.Documents.Registers
         //Variables de sesion
         [CascadingParameter(Name = "WorkEnvironment")]
         public WorkEnvironment WorkEnvironment { get; set; } = default!;
-        [CascadingParameter(Name = "SessionAccount")] protected SessionAccountResponse SessionAccount { get; set; }
 
         //Datos del formulario
-        private ResolutionRegisterDTO resolutionRegister = new ResolutionRegisterDTO();
+        private ResolutionRegisterDTO resolutionRegister = new();
         private IEnumerable<DocumentTypeInfoResponse> documentTypes = default!;
 
         private List<MediaRegisterDTO> annexes = new();
         private bool pageLoading = true;
         private string dossierId = default!;
-
-        String typeDocument = "Resolucion";
+        private readonly string typeDocument = "Denuncia";
 
         protected override async Task OnInitializedAsync()
         {
@@ -185,7 +162,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
             var dossierTray = userTray.Value as DossierTrayResponse;
 
-            var documentContent = JsonSerializer.Deserialize<InitialRequestContentDTO>(JsonSerializer.Serialize(dossierTray!.Document!.Content));
+            var documentContent = JsonSerializer.Deserialize<DictumContentDTO>(JsonSerializer.Serialize(dossierTray!.Document!.Content));
 
             resolutionRegister.Solicitor = await GetSolicitorAsync(documentContent!.SolicitorId);
             dossierId = dossierTray!.DossierId;

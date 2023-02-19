@@ -137,7 +137,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
             var complaintRequest = dossierTray!.DocumentObjects!.First(document => document.Type == "SolicitudDenuncia");
 
-            var complaintContent = JsonSerializer.Deserialize<ComplaintRequestContentDTO>(JsonSerializer.Serialize(complaintRequest.Content));
+            var complaintContent = JsonSerializer.Deserialize<SolicitorDossierRequestContentDTO>(JsonSerializer.Serialize(complaintRequest.Content));
 
             solicitorDossierShipment.Solicitor = await GetSolicitorAsync(complaintContent!.SolicitorId);
             dossierId = dossierTray.DossierId;

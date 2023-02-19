@@ -49,5 +49,10 @@ namespace SISGED.Shared.Entities
         {
             Documents.Add(dossierDocument);
         }
+
+        public void AddDocumentHistory(DossierDocument dossierDocument)
+        {
+            DocumentsHistory.Add(dossierDocument);
+        }
     }
 }

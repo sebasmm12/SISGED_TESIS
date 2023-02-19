@@ -12,13 +12,13 @@ else
                         PreventStepChange="@(() => CheckRegisterAsync())">
                     <MudStep Title="General">
                         <MudGrid>
-                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
                                 <MudTextField @bind-Value="@resolutionRegister.Title" Class="text-field-style" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"
                                           Label="Titulo de la resolución" For="@(()=>resolutionRegister.Title)"></MudTextField>
                             </MudItem>
 
 
-                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
                                 <MudSelect T="DocumentTypeInfoResponse" AdornmentIcon="fas fa-file-lines" AdornmentColor="Color.Primary"
                                        Label="Tipo de Solicitud" Dense="true" Variant="Variant.Outlined" Clearable="true" @bind-Value="resolutionRegister.Penalty"
                                        For="@(() => resolutionRegister.Penalty)">
@@ -28,33 +28,19 @@ else
                                     }
                                 </MudSelect>
                             </MudItem>
-
-                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
-                                <MudTextField Value="resolutionRegister.Client.GetShortName()" Label="Nombre del Denunciante" Variant="Variant.Outlined"
-                                          Adornment="Adornment.End" AdornmentIcon="fas fa-user" AdornmentColor="Color.Primary" ReadOnly="true"></MudTextField>
-                            </MudItem>
-
-                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
-                                <GenericSolicitorAutocomplete Solicitor="resolutionRegister.Solicitor" SolicitorResponse="GetSolicitorResponse"></GenericSolicitorAutocomplete>
-                            </MudItem>
-
-                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
-                                <MudTextField Value="resolutionRegister.Solicitor.Address" Label="Dirección" Variant="Variant.Outlined"
-                                          Adornment="Adornment.End" AdornmentColor="Color.Primary" AdornmentIcon="fas fa-location-dot" ReadOnly="true"></MudTextField>
-                            </MudItem>
-
-                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
-                                <MudTextField @bind-Value="@resolutionRegister.Description" Class="text-field-style" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"
-                                          Label="Descripcion" For="@(()=>resolutionRegister.Description)"></MudTextField>
-                            </MudItem>
-
-                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                            
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
                                 <MudDatePicker Label="Fecha de Inicio" @bind-Date="@resolutionRegister.AudienceStartDate" For="@(()=>resolutionRegister.AudienceStartDate)" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"></MudDatePicker>
                             </MudItem>
 
-                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
                                 <MudDatePicker AllowInput=" false" Label="Fecha de Fin" @bind-Date="@resolutionRegister.AudienceEndDate" For="@(()=>resolutionRegister.AudienceEndDate)" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary">
                                 </MudDatePicker>
+                            </MudItem>
+
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <MudTextField @bind-Value="@resolutionRegister.Description" Class="text-field-style" Variant="Variant.Outlined"
+                                          Lines="3" Immediate="true" Label="Descripcion" For="@(()=>resolutionRegister.Description)"></MudTextField>
                             </MudItem>
 
                         </MudGrid>
@@ -62,15 +48,28 @@ else
 
                     <MudStep Title="Participantes">
                         <MudGrid>
+                            <MudItem xs="12" sm="12" md="6" lg="12" xl="12">
+                                <MudTextField Value="resolutionRegister.Client.GetShortName()" Label="Nombre del Denunciante" Variant="Variant.Outlined"
+                                          Adornment="Adornment.End" AdornmentIcon="fas fa-user" AdornmentColor="Color.Primary" ReadOnly="true"></MudTextField>
+                            </MudItem>
+
+                            <MudItem xs="12" sm="12" md="5" lg="5" xl="5">
+                                <GenericSolicitorAutocomplete Solicitor="resolutionRegister.Solicitor" SolicitorResponse="GetSolicitorResponse"></GenericSolicitorAutocomplete>
+                            </MudItem>
+
+                            <MudItem xs="12" sm="12" md="7" lg="7" xl="7">
+                                <MudTextField Value="resolutionRegister.Solicitor.Address" Label="Dirección" Variant="Variant.Outlined"
+                                          Adornment="Adornment.End" AdornmentColor="Color.Primary" AdornmentIcon="fas fa-location-dot" ReadOnly="true"></MudTextField>
+                            </MudItem>
                             <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
                                 <GenericMultipleTexts TextFields="resolutionRegister.Participants" TextFieldIcon="fa-eye" TextLabel="Participantes"></GenericMultipleTexts>
                             </MudItem>
                         </MudGrid>
                     </MudStep>
-                    <MudStep Title="Subir Anexo">
+                    <MudStep Title="Anexos">
                         <MudGrid>
                             <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
-                                <DocumentAnnex Annexes="annexes"></DocumentAnnex>
+                                <DocumentAnnex Annexes="annexes" AnnexesHeight="280px"></DocumentAnnex>
                             </MudItem>
                         </MudGrid>
                     </MudStep>

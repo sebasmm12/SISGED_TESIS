@@ -2,12 +2,10 @@
     @if (canShow)
     {
         <table id="converted-pdf">
-            <thead>
-                <tr>
-                    <th colspan="2" data-type="title">@disciplinaryOpennessContent.Title</th>
-                </tr>
-            </thead>
             <tbody>
+                <tr>
+                    <td colspan="2" data-type="title">@disciplinaryOpennessContent.Title</td>
+                </tr>
                 <tr><td colspan="2" data-type="section">I. Datos Generales</td></tr>
                 <tr>
                     <td colspan="2" data-type="subtitle">Código</td>
@@ -70,12 +68,6 @@
                 <tr>
                     <td colspan="2" data-type="text">@disciplinaryOpenness.Solicitor.Address</td>
                 </tr>
-                <tr>
-                    <td colspan="2" data-type="subtitle">Fiscal</td>
-                </tr>
-                <tr>
-                    <td colspan="2" data-type="text">@disciplinaryOpenness.Prosecutor.Name @disciplinaryOpenness.Prosecutor.LastName</td>
-                </tr>
                 <tr><td colspan="2" data-type="section">III. Cargos</td></tr>
                 <tr>
                     <td colspan="2" data-type="subtitle">Participantes</td>
@@ -83,19 +75,18 @@
                 @foreach (string item in disciplinaryOpennessContent.Participants)
                 {
                     <tr>
-                        <td colspan="2" data-type="text">@item</td>
+                        <td colspan="2" data-type="text">- @item</td>
                     </tr>
                 }
                 <tr>
-                    <td colspan="2" data-type="subtitle">Conclusiones</td>
+                    <td colspan="2" data-type="subtitle">Cargos</td>
                 </tr>
                 @foreach (string item in disciplinaryOpennessContent.ImputedFacts)
                 {
                     <tr>
-                        <td colspan="2" data-type="text">@item</td>
+                        <td colspan="2" data-type="text">- @item</td>
                     </tr>
                 }
-
                 @if (DocumentGenerator.Document.UrlAnnex.Any())
                 {
                     <tr>
@@ -107,7 +98,7 @@
 
                         <tr>
                             <td>
-                                <a target="_blank" data-text="@($"Ver Anexo { i }")" href="@annex"></a>
+                                <a target="_blank" data-text="@($"Ver Anexo { i + 1 }")" href="@annex"></a>
                             </td>
                         </tr>
                     }

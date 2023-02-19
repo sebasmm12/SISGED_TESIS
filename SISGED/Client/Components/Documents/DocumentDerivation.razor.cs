@@ -39,7 +39,7 @@ namespace SISGED.Client.Components.Documents
         private Role? userRole = default!;
         private readonly string currentDate = DateTime.UtcNow.AddHours(-5).ToString("dd/MM/yyyy");
         // TODO: Get the roleId based on the derivation step from the helper
-        private string roleId = "5eeaf8d58ca4ff53a0b791ea";
+        private string roleId = "5eeaf91a8ca4ff53a0b791eb";
         private DocumentDerivationDTO documentDerivation = new();
         private MudForm? documentDerivationForm = default!;
 
@@ -174,7 +174,7 @@ namespace SISGED.Client.Components.Documents
             catch (Exception)
             {
 
-                await SwalFireRepository.ShowErrorSwalFireAsync($"No se realizar la derivación del documento");
+                await SwalFireRepository.ShowErrorSwalFireAsync($"No se pudo derivar el documento");
                 return null;
             }
         }

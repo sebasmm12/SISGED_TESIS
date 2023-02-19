@@ -13,7 +13,7 @@ namespace SISGED.Server.Controllers
     {
         private readonly ITrayService _trayService;
 
-        public TrayController(ITrayService trayService, IMapper mapper)
+        public TrayController(ITrayService trayService)
         {
             _trayService = trayService;
         }

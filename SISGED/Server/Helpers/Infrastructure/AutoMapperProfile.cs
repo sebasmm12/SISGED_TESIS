@@ -96,7 +96,6 @@ namespace SISGED.Server.Helpers.Infrastructure
             // Disciplinary Openness Type Mapper
             CreateMap<DisciplinaryOpennessResponse, DisciplinaryOpenness>();
             CreateMap<DisciplinaryOpennessResponseContent, DisciplinaryOpennessContent>()
-                .ForMember(disciplinaryContent => disciplinaryContent.ComplainantName, options => options.MapFrom(disciplinaryResponse => disciplinaryResponse.Complainant))
                 .ForMember(disciplinaryContent => disciplinaryContent.AudiencePlace, options => options.MapFrom(disciplinaryResponse => disciplinaryResponse.AudienceLocation))
                 .ForMember(disciplinaryContent => disciplinaryContent.ImputedFacts, options => options.MapFrom(disciplinaryResponse => disciplinaryResponse.ChargedDeeds))
                 .ForMember(disciplinaryContent => disciplinaryContent.Url, options => options.MapFrom(disciplinaryResponse => disciplinaryResponse.URL));

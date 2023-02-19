@@ -12,12 +12,12 @@ else
                         PreventStepChange="@(() => CheckComplaintRegisterAsync())">
                     <MudStep Title="Datos Generales">
                         <MudGrid>
-                           <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                           <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
                             <MudTextField @bind-Value="complaintRequest.Title" Label="Título" Variant="Variant.Outlined"
                                           Adornment="Adornment.End" AdornmentIcon="fas fa-pencil" AdornmentColor="Color.Primary" Immediate="true"
                                       For="@(() => complaintRequest.Title)"></MudTextField>
                            </MudItem>
-                           <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                           <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
                                 <MudSelect T="DocumentTypeInfoResponse" AdornmentIcon="fas fa-file-lines" AdornmentColor="Color.Primary"
                                        Label="Tipo de Solicitud" Dense="true" Variant="Variant.Outlined" Clearable="true" @bind-Value="complaintRequest.ComplaintType"
                                        For="@(() => complaintRequest.ComplaintType)">
@@ -35,22 +35,22 @@ else
                     </MudStep>
                     <MudStep Title="Participantes">
                         <MudGrid>
-                            <MudItem xs="12" sm="12" md="4" lg="4" xl="12">
+                            <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
                                 <MudTextField Value="complaintRequest.Client.GetShortName()" Label="Nombre del Cliente" Variant="Variant.Outlined"
                                           Adornment="Adornment.End" AdornmentIcon="fas fa-user" AdornmentColor="Color.Primary" ReadOnly="true"></MudTextField>
                             </MudItem>
-                            <MudItem xs="12" sm="12" md="4" lg="4" xl="12">
+                            <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
                                 <MudTextField Value="complaintRequest.Client.DocumentType" Label="Tipo de Documento" Variant="Variant.Outlined"
                                           Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary" ReadOnly="true"></MudTextField>
                             </MudItem>
-                            <MudItem xs="12" sm="12" md="4" lg="4" xl="12">
+                            <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
                                 <MudTextField Value="complaintRequest.Client.DocumentNumber" Label="Número de Documento" Variant="Variant.Outlined"
                                           Adornment="Adornment.End" AdornmentIcon="fas fa-id-badge" AdornmentColor="Color.Primary" ReadOnly="true"></MudTextField>
                             </MudItem>
-                            <MudItem xs="12" sm="12" md="5" lg="5" xl="12">
+                            <MudItem xs="12" sm="12" md="5" lg="5" xl="5">
                                 <GenericSolicitorAutocomplete Solicitor="complaintRequest.Solicitor" SolicitorResponse="GetSolicitorResponse"></GenericSolicitorAutocomplete>
                             </MudItem>
-                            <MudItem xs="12" sm="12" md="7" lg="7" xl="12">
+                            <MudItem xs="12" sm="12" md="7" lg="7" xl="7">
                                 <MudTextField Value="complaintRequest.Solicitor.Address" Label="Dirección de notario" Variant="Variant.Outlined"
                                           Adornment="Adornment.End" AdornmentColor="Color.Primary" AdornmentIcon="fas fa-location-dot" ReadOnly="true"></MudTextField>
                             </MudItem>

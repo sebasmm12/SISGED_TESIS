@@ -248,7 +248,6 @@ namespace SISGED.Server.Controllers
                 var document = DeserializeDocument<InitialRequestResponse>(dossierWrapper.Document);
 
                 var user = await GetUserAsync("userId");
-                //var user = await _userService.GetUserByIdAsync("5ef9f9c1afdbc540d868b3ce");
 
                 var initialRequest = await RegisterInitialRequestAsync(document, user);
 
@@ -487,11 +486,11 @@ namespace SISGED.Server.Controllers
             try
             {
                 var user = await GetUserAsync("userId");
-                var state = await _documentService.EvaluateDocumentAsync(documentEvaluationRequest, user);
+                var document = await _documentService.EvaluateDocumentAsync(documentEvaluationRequest, user);
 
-                await RegisterOutputTrayWithDocumentTrayAsync(state, user);
+               // await RegisterOutputTrayWithDocumentTrayAsync(document, user);
 
-                return Ok(state);
+                return Ok(document);
             }
             catch (Exception ex)
             {
@@ -1202,6 +1201,7 @@ namespace SISGED.Server.Controllers
             var dossier = new Dossier(client, "Solicitud", "registrado"); // In the past, the state was "solicitado"
 
             dossier.AddDocument(new DossierDocument(1, initialRequest.Id, "SolicitudInicial", DateTime.UtcNow.AddHours(-5).AddDays(10)));
+            dossier.AddDocumentHistory(new DossierDocument(1, initialRequest.Id, "SolicitudInicial", DateTime.UtcNow.AddHours(-5).AddDays(10)));
 
             await _dossierService.CreateDossierAsync(dossier);
 
@@ -1213,6 +1213,7 @@ namespace SISGED.Server.Controllers
             var dossier = new Dossier(dossierUpdateDTO.DossierWrapper.Id!, dossierUpdateDTO.DossierType, dossierUpdateDTO.DossierState);
 
             dossier.AddDocument(dossierUpdateDTO.DossierDocument);
+            dossier.AddDocumentHistory(dossierUpdateDTO.DossierDocument);
 
             return await _dossierService.UpdateDossierForInitialRequestAsync(dossier);
         }

@@ -1,6 +1,5 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using MudBlazor;
 using MudExtensions;
 using MudExtensions.Utilities;
@@ -75,7 +74,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
             dossierTray.DocumentObjects!.Add(documentResponse);
             dossierTray.Document = documentResponse;
-            dossierTray.Type = "Dictamen";
+            dossierTray.Type = "Denuncia";
 
             Mapper.Map(dossierTray, item);
         }
@@ -86,7 +85,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
             dictumForm!.Validate().GetAwaiter().GetResult();
 
-            if(!dictumForm.IsValid)
+            if (!dictumForm.IsValid)
             {
                 SwalFireRepository.ShowErrorSwalFireAsync("No se puede registrar el dictamen, por favor verifique los datos ingresados").GetAwaiter();
 
@@ -132,10 +131,10 @@ namespace SISGED.Client.Components.Documents.Registers
             dictum.Client = userTray.Client;
 
             var dossierTray = userTray.Value as DossierTrayResponse;
-            
+
             var complaintRequest = dossierTray!.DocumentObjects!.First(document => document.Type == "SolicitudDenuncia");
 
-            var complaintContent = JsonSerializer.Deserialize<ComplaintRequestContentDTO>(JsonSerializer.Serialize(complaintRequest.Content));
+            var complaintContent = JsonSerializer.Deserialize<SolicitorDossierRequestContentDTO>(JsonSerializer.Serialize(complaintRequest.Content));
 
             dictum.Solicitor = await GetSolicitorAsync(complaintContent!.SolicitorId);
             dossierId = dossierTray.DossierId;
@@ -147,7 +146,7 @@ namespace SISGED.Client.Components.Documents.Registers
             {
                 var dictum = await HttpRepository.PostAsync<DossierWrapper, Dictum>("api/documents/dictums", dossierWrapper);
 
-                if(dictum.Error)
+                if (dictum.Error)
                 {
                     await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo registar el dictamen");
                 }

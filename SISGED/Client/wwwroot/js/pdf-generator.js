@@ -89,6 +89,7 @@ var cellTypes = [
         type: 'title',
         executeStyle: function (data) {
             data.cell.styles.fontSize = 18;
+            data.cell.styles.fontStyle = 'bold';
         }
     },
     {
@@ -114,6 +115,8 @@ var cellTypes = [
 ];
 
 function getCellFont(data, type) {
+
+    console.log(data);
 
     let cellType = cellTypes.find(cellType => cellType.type === type);
 

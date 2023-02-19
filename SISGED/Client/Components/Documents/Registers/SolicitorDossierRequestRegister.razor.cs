@@ -38,16 +38,12 @@ namespace SISGED.Client.Components.Documents.Registers
         //Variables de sesion
         [CascadingParameter(Name = "WorkEnvironment")]
         public WorkEnvironment WorkEnvironment { get; set; } = default!;
-        [CascadingParameter(Name = "SessionAccount")] protected SessionAccountResponse SessionAccount { get; set; }
-
-
         //Datos del formulario
         private SolicitorDossierRequestRegisterDTO solicitorDossierRequestRegister = new SolicitorDossierRequestRegisterDTO();
         private List<MediaRegisterDTO> annexes = new();
         private bool pageLoading = true;
         private string dossierId = default!;
-
-        String typeDocument = "SolicitudExpedienteNotario";
+        private readonly string typeDocument = "Denuncia";
 
         protected override async Task OnInitializedAsync()
         {
@@ -160,7 +156,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
             var dossierTray = userTray.Value as DossierTrayResponse;
 
-            var documentContent = JsonSerializer.Deserialize<InitialRequestContentDTO>(JsonSerializer.Serialize(dossierTray!.Document!.Content));//ComplaintRequestContentDTO
+            var documentContent = JsonSerializer.Deserialize<DisciplinaryOpennessContentDTO>(JsonSerializer.Serialize(dossierTray!.Document!.Content));
 
             solicitorDossierRequestRegister.Client = userTray.Client;
             solicitorDossierRequestRegister.Solicitor = await GetSolicitorAsync(documentContent!.SolicitorId);
