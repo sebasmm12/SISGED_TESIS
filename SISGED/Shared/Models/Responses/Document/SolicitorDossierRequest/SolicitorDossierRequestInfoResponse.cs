@@ -8,14 +8,14 @@ namespace SISGED.Shared.Models.Responses.Document.SolicitorDossierRequest
         public SolicitorDossierRequestContentInfo Content { get; set; } = default!;
     }
 
-    public class SolicitorDossierRequestContentInfo
+    public class SolicitorDossierRequestContentInfo : SolicitorDossierRequestInfo
     {
+        [BsonElement("code")]
+        public string Code { get; set; } = default!;
         [BsonElement("title")]
         public string Title { get; set; } = default!;
         [BsonElement("description")]
         public string Description { get; set; } = default!;
-        [BsonElement("solicitor")]
-        public Entities.Solicitor Solicitor { get; set; } = default!;
         [BsonElement("issueDate")]
         public DateTime IssueDate { get; set; }
     }

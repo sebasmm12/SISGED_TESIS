@@ -9,6 +9,7 @@ using SISGED.Shared.Models.Responses.Document.BPNDocument;
 using SISGED.Shared.Models.Responses.Document.BPNResult;
 using SISGED.Shared.Models.Responses.Document.ComplaintRequest;
 using SISGED.Shared.Models.Responses.Document.DisciplinaryOpenness;
+using SISGED.Shared.Models.Responses.Document.Resolution;
 using SISGED.Shared.Models.Responses.Document.SignConclusion;
 using SISGED.Shared.Models.Responses.Document.SolicitorDesignationDocument;
 using SISGED.Shared.Models.Responses.Document.SolicitorDossierRequest;
@@ -34,7 +35,7 @@ namespace SISGED.Server.Services.Contracts
         Task<IEnumerable<DocumentByStateResponse>> GetDocumentsByStateAsync(DocumentsByStateQuery documentsByStateQuery);
         Task<IEnumerable<ExpiredDocumentsResponse>> GetExpiredDocumentsByMonthAsync(DocumentsByMonthQuery documentsByMonthQuery);
         Task<InitialRequest> GetInitialRequestDocumentAsync(string documentId);
-        Task<Resolution> GetResolutionDocumentAsync(string documentId);
+        Task<ResolutionInfoResponse> GetResolutionDocumentAsync(string documentId);
         Task<SignConclusionInfoResponse> GetSignConclusionAsync(string documentId);
         Task<SolicitorDesignationInfoResponse> GetSolicitorDesignationAsync(string documentId);
         Task<SolicitorDossierRequestInfoResponse> GetSolicitorDossierRequestAsync(string documentId);

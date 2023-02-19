@@ -915,9 +915,7 @@ namespace SISGED.Server.Controllers
             {
                 var resolution = await _documentService.GetResolutionDocumentAsync(documentId);
 
-                var resolutionResponse = _mapper.Map<ResolutionInfoResponse>(resolution);
-
-                return Ok(resolutionResponse);
+                return Ok(resolution);
             }
             catch (Exception ex)
             {

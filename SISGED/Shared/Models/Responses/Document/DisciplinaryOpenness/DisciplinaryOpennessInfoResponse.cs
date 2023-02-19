@@ -8,14 +8,10 @@ namespace SISGED.Shared.Models.Responses.Document.DisciplinaryOpenness
         public DisciplinaryOpennessContentInfo Content { get; set; } = default!;
     }
 
-    public class DisciplinaryOpennessContentInfo
+    public class DisciplinaryOpennessContentInfo : DisciplinaryOpennessRequestInfo
     {
-        [BsonElement("solicitor")]
-        public Entities.Solicitor Solicitor { get; set; } = default!;
-        [BsonElement("fiscalId")]
-        public string FiscalId { get; set; } = default!;
-        [BsonElement("complainantName")]
-        public string ComplainantName { get; set; } = default!;
+        [BsonElement("code")]
+        public string Code { get; set; } = default!;
         [BsonElement("title")]
         public string Title { get; set; } = default!;
         [BsonElement("description")]
@@ -30,7 +26,5 @@ namespace SISGED.Shared.Models.Responses.Document.DisciplinaryOpenness
         public string AudiencePlace { get; set; } = default!;
         [BsonElement("imputedFacts")]
         public List<string> ImputedFacts { get; set; } = new();
-        [BsonElement("url")]
-        public string Url { get; set; } = default!;
     }
 }
