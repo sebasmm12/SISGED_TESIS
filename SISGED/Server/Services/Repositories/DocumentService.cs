@@ -1249,7 +1249,7 @@ namespace SISGED.Server.Services.Repositories
                                 .Add("client", "$dossiers.cliente")
                                 .Add("audienceStartDate", "$contenido.fechainicioaudiencia")
                                 .Add("audienceEndDate", "$contenido.fechafinaudiencia")
-                                .Add("sanction", "$contenido.sancion")
+                                .Add("sanction", "$sanctionType.nombre")
                                 .Add("participants", "$contenido.participantes")
                 },
             });
@@ -1451,6 +1451,22 @@ namespace SISGED.Server.Services.Repositories
             return MongoDBAggregationExtension.Lookup(new("expedientes", letPipeline, lookUpPipeline, "dossiers"));
         }
 
+        private static BsonDocument GetSanctionLookUpPipeline()
+        {
+            var letPipeline = new Dictionary<string, BsonValue>()
+            {
+                { "docTypeId", MongoDBAggregationExtension.ObjectId("$contenido.sancion") }
+            };
+
+            var lookUpPipeline = new BsonArray()
+            {
+                MongoDBAggregationExtension.Match(
+                    MongoDBAggregationExtension.Expr(MongoDBAggregationExtension.Eq(new() { "$$docTypeId", "$_id" })))
+            };
+
+            return MongoDBAggregationExtension.Lookup(new("tipoDocumentos", letPipeline, lookUpPipeline, "sanctionType"));
+        }
+
         private static BsonDocument[] GetClientSearcherPipeline(string clientName)
         {
 
@@ -1557,10 +1573,14 @@ namespace SISGED.Server.Services.Repositories
 
             var dossierUnwindAggregation = MongoDBAggregationExtension.UnWind(new("$dossiers"));
 
+            var sanctionLookUpPipelineAggregation = GetSanctionLookUpPipeline();
+
+            var sanctionUnwindAggregation = MongoDBAggregationExtension.UnWind(new("$sanctionType"));
+
             var projectAggregation = GetResolutionProjectPipeline();
 
             return new BsonDocument[] { matchAggregation, solicitorLookUpAggregation,
-               solicitorUnwindAggregation,  dossierLookUpPipelineAggregation, dossierUnwindAggregation, projectAggregation  };
+               solicitorUnwindAggregation,  dossierLookUpPipelineAggregation, dossierUnwindAggregation, sanctionLookUpPipelineAggregation, sanctionUnwindAggregation, projectAggregation  };
         }
 
         private static BsonDocument[] GetSignConclusionPipeline(string documentId)

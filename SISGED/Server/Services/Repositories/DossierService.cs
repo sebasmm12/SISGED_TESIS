@@ -732,7 +732,7 @@ namespace SISGED.Server.Services.Repositories
                 { "cliente", "$cliente" },
                 { "fechainicio", "$fechainicio" },
                 { "fechafin", "$fechafin" },
-                { "documentos", "$documentos" },
+                { "documentos", "$historialdocumentos" },
                 { "derivaciones.areaprocedencia", "$areaProcedencia.label"},
                 { "derivaciones.areadestino", "$areaDestino.label"},
                 { "derivaciones.usuarioemisor", "$usuarioEmisor.nombre"},
