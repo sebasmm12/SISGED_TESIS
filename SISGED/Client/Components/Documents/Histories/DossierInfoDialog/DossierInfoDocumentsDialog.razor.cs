@@ -31,6 +31,8 @@ using MudBlazor;
 using MudExtensions;
 using MudExtensions.Enums;
 using SISGED.Shared.Entities;
+using SISGED.Client.Services.Repositories;
+using SISGED.Client.Services.Contracts;
 
 namespace SISGED.Client.Components.Documents.Histories.DossierInfoDialog
 {
@@ -38,12 +40,39 @@ namespace SISGED.Client.Components.Documents.Histories.DossierInfoDialog
     {
         [CascadingParameter]
         MudDialogInstance MudDialog { get; set; }
-
         [Parameter]
         public List<UserDocumentDTO> Documents { get; set; } = new List<UserDocumentDTO>();
+        [Inject]
+        public IDialogContentRepository DialogContentRepository { get; set; } = default!;
+        [Inject]
+        public IDocumentRepository DocumentRepository { get; set; } = default!;
         private void Cancel()
         {
             MudDialog.Cancel();
+        }
+
+        private async Task ShowDocumentVersionHistoryAsync(UserDocumentDTO document)
+        {
+            var dialogParameters = new List<DialogParameter>() { new("DocumentId", document.Id), new("PageSize", 5) };
+
+            await DialogContentRepository.ShowDialogAsync<DocumentsVersion>(dialogParameters, "Historial de versiones");
+        }
+
+
+        private async Task ShowDocumentProcessHistoryAsync(UserDocumentDTO document)
+        {
+            var dialogParameters = new List<DialogParameter>() { new("DocumentId", document.Id), new("PageSize", 5) };
+
+            await DialogContentRepository.ShowDialogAsync<DocumentsProcess>(dialogParameters, "Historial de procesos");
+        }
+
+        private async Task ShowDocumentInfoAsync(UserDocumentDTO document)
+        {
+            var dialogParameters = new List<DialogParameter>() { new("DocumentId", document.Id) };
+
+            Type documentInfoType = DocumentRepository.GetDocumentInfoType(document.Type);
+
+            await DialogContentRepository.ShowDialogAsync(documentInfoType, dialogParameters, "Información del Documento");
         }
     }
 }
