@@ -1,6 +1,5 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
-using MudBlazor;
 using SISGED.Server.Helpers.Infrastructure;
 using SISGED.Server.Services.Contracts;
 using SISGED.Shared.DTOs;
@@ -8,12 +7,10 @@ using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Queries.Document;
 using SISGED.Shared.Models.Queries.Dossier;
 using SISGED.Shared.Models.Queries.Statistic;
-using SISGED.Shared.Models.Queries.UserDocument;
 using SISGED.Shared.Models.Requests.Dossier;
 using SISGED.Shared.Models.Responses.Document.UserRequest;
 using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.Statistic;
-using SISGED.Shared.Models.Responses.UserDocument;
 
 namespace SISGED.Server.Services.Repositories
 {
@@ -35,17 +32,22 @@ namespace SISGED.Server.Services.Repositories
 
         public string CollectionName => "expedientes";
 
-        public async Task DeleteDossierDocumentAsync(string documentId)
+        public async Task<Dossier> DeleteDossierDocumentAsync(string documentId)
         {
-            var dossier = await GetDossierByDocumentAsync(documentId);
+            var currentDossier = await GetDossierByDocumentAsync(documentId);
 
-            var dossierDocument = dossier.Documents.First(dossierDocument => dossierDocument.DocumentId == documentId);
+            var dossierDocument = currentDossier.Documents.First(dossierDocument => dossierDocument.DocumentId == documentId);
 
             var dossierUpdate = Builders<Dossier>.Update.Pull("documentos", dossierDocument);
 
-            var updatedDossier = await _dossiersCollection.UpdateOneAsync(dossier => dossier.Id == dossier.Id, dossierUpdate);
+            var updatedDossier = await _dossiersCollection.FindOneAndUpdateAsync(dossier => dossier.Id == currentDossier.Id, dossierUpdate, new()
+            {
+                ReturnDocument = ReturnDocument.After
+            });
 
-            if (updatedDossier is null) throw new Exception($"No se pudo eliminar el documento con identificador { documentId } del expediente con identificador {dossier.Id}");
+            if (updatedDossier is null) throw new Exception($"No se pudo eliminar el documento con identificador {documentId} del expediente con identificador {currentDossier.Id}");
+
+            return updatedDossier;
         }
 
         public async Task CreateDossierAsync(Dossier dossier)
@@ -209,7 +211,7 @@ namespace SISGED.Server.Services.Repositories
 
             var dossier = await _dossiersCollection.Find(dossierBuilder).FirstOrDefaultAsync();
 
-            if (dossier is null) throw new Exception($"No se pudo encontrar el expediente que tiene el document con identificador { documentId } relacionado");
+            if (dossier is null) throw new Exception($"No se pudo encontrar el expediente que tiene el document con identificador {documentId} relacionado");
 
             return dossier;
         }

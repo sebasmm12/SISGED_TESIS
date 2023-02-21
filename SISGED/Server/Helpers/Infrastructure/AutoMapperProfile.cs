@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using SISGED.Client.Helpers;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Requests.Documents;

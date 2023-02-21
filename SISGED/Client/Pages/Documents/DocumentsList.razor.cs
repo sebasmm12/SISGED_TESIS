@@ -7,7 +7,9 @@ using SISGED.Client.Helpers;
 using SISGED.Client.Services.Contracts;
 using SISGED.Client.Services.Repositories;
 using SISGED.Shared.DTOs;
+using SISGED.Shared.Models.Requests.Documents;
 using SISGED.Shared.Models.Responses.Account;
+using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.UserDocument;
 using SISGED.Shared.Validators;
 
@@ -62,7 +64,6 @@ namespace SISGED.Client.Pages.Documents
 
             documentsLoading = false;
         }
-
         private async Task ShowDocumentVersionHistoryAsync(UserDocumentDTO document)
         {
             var dialogParameters = new List<DialogParameter>() { new("DocumentId", document.Id), new("PageSize", 5) };
@@ -85,6 +86,68 @@ namespace SISGED.Client.Pages.Documents
             Type documentInfoType = DocumentRepository.GetDocumentInfoType(document.Type);
             
             await DialogContentRepository.ShowDialogAsync(documentInfoType, dialogParameters, "Información del Documento");
+        }
+
+        private async Task AnnulDocumentAsync(UserDocumentDTO document)
+        {
+            var swalFireInfo = GetSwalFireInfo();
+
+            bool updatedDocument = await SwalFireRepository.ShowLockSwalFireAsync(swalFireInfo);
+
+            if (!updatedDocument) return;
+
+            var annuledDocument = await ShowLoadingDialogAsync(document.Id);
+
+            if (!annuledDocument) return;
+
+            await SwalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo anular el documento de manera satisfactoria");
+
+            await ChangePage(1);
+        }
+
+        private static SwalFireInfo GetSwalFireInfo()
+        {
+            string action = "anular";
+            string actionTitle = "Anulación";
+
+            string title = $"{actionTitle} del documento";
+            string htmlContent = $"¿Está seguro que desea {action} el documento?";
+
+            return new SwalFireInfo(title, htmlContent, SwalFireIcons.Warning, action);
+        }
+
+        private async Task<bool> ShowLoadingDialogAsync(string documentId)
+        {
+            string dialogTitle = $"Anulando el documento, por favor espere...";
+
+            var functionToExecute = () => EvaluateDocumentAsync(documentId);
+
+            return await DialogContentRepository.ShowLoadingDialogAsync(functionToExecute, dialogTitle);
+        }
+
+        private async Task<bool> EvaluateDocumentAsync(string documentId)
+        {
+            try
+            {
+                var documentEvaluationResponse = await HttpRepository.DeleteAsync($"api/documents/{documentId}");
+
+                if (documentEvaluationResponse.Error)
+                {
+                    await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo anular el documento");
+
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception)
+            {
+
+                await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo anular el documento");
+
+                return false;
+            }
+           
         }
 
         private async Task ChangePage(int page)
@@ -127,8 +190,6 @@ namespace SISGED.Client.Pages.Documents
 
                 var response = solicitorDossiersResponse.Response!;
                 var documents = Mapper.Map<PaginatedUserDocumentDTO>(response);
-
-                await JSRuntime.InvokeVoidAsync("console.log", documents);
 
                 return documents;
             }

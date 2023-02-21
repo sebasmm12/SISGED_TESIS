@@ -76,6 +76,6 @@ namespace SISGED.Server.Services.Contracts
         Task<int> CountDocumentsByUserAsync(string userId, UserDocumentPaginationQuery userDocumentPaginationQuery);
         Task<ComplaintRequestInfoResponse> GetComplaintRequestDocumentAsync(string documentId);
         Task<bool> VerifyDocumentAnnulmentAsync(string documentId);
-        Task AnnulDocumentAsync(string documentId, User user);
+        Task<Document> AnnulDocumentAsync(string documentId, User user);
     }
 }

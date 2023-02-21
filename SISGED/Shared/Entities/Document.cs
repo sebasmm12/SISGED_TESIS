@@ -40,9 +40,22 @@ namespace SISGED.Shared.Entities
         [BsonElement("fechacreacion")]
         public DateTime CreationDate { get; set; } = DateTime.UtcNow.AddHours(-5);
 
+        [BsonIgnore]
+        private readonly IEnumerable<string> derivatedStates = new List<string>() { "derivado" };
+
         public void AddProcess(Process process)
         {
             ProcessesHistory.Add(process);
+        }
+
+        public bool IsDerivated()
+        {
+            return derivatedStates.Contains(State);
+        }
+
+        public Process GetLastProcess()
+        {
+            return ProcessesHistory.Last();
         }
     }
     public class Evaluation
@@ -100,7 +113,7 @@ namespace SISGED.Shared.Entities
 
         }
 
-        public ComplaintRequest() {  }
+        public ComplaintRequest() { }
 
         [BsonElement("contenido")]
         public ComplaintRequestContent Content { get; set; } = new();
@@ -261,7 +274,7 @@ namespace SISGED.Shared.Entities
         [BsonElement("contenido")]
         public SignConclusionContent Content { get; set; } = new();
     }
-    
+
     [BsonDiscriminator("OficioDesignacionNotario")]
     public class SolicitorDesignationDocument : Document
     {
@@ -387,7 +400,7 @@ namespace SISGED.Shared.Entities
         [BsonElement("codigo")]
         public string Code { get; set; } = default!;
         [BsonElement("iddenunciante")]
-        public string ComplaintId { get; set; }=  default!;
+        public string ComplaintId { get; set; } = default!;
         [BsonElement("idnotario")]
         public string SolicitorId { get; set; } = default!;
         [BsonElement("titulo")]
@@ -510,14 +523,14 @@ namespace SISGED.Shared.Entities
         [BsonElement("tienenotario")]
         public bool HasSolicitor { get; set; }
         [BsonElement("idnotario")]
-        public string SolicitorId { get; set; } = default!;
+        public string? SolicitorId { get; set; }
 
     }
 
     [BsonDiscriminator("SolicitudInicial")]
     public class InitialRequest : Document
     {
-        public InitialRequest() {  }
+        public InitialRequest() { }
 
         public InitialRequest(InitialRequestContent content, string state, List<string> urls)
         {
@@ -547,7 +560,7 @@ namespace SISGED.Shared.Entities
         public List<string>? SolicitorDossiers { get; set; }
         [BsonElement("firma")]
         public string Sign { get; set; } = default!;
-        [BsonElement("urlGenerado")]        
+        [BsonElement("urlGenerado")]
         public string GeneratedUrl { get; set; } = default!;
     }
 

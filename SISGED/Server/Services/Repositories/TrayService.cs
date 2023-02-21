@@ -21,6 +21,30 @@ namespace SISGED.Server.Services.Repositories
             _usersCollection = mongoDatabase.GetCollection<User>(SecondCollectionName);
         }
 
+        public async Task MoveUserOutPutToInputTrayAsync(UserTrayAnnulmentDTO userTrayAnnulmentDTO)
+        {
+            var currentDocumentTray = new DocumentTray(userTrayAnnulmentDTO.DossierId, userTrayAnnulmentDTO.CurrentDocumentId);
+            var newDocumentTray = new DocumentTray(userTrayAnnulmentDTO.DossierId, userTrayAnnulmentDTO.NewDocumentId);
+
+            var outputTrayUpdate = PullDocumentTrayAsync(new(currentDocumentTray, userTrayAnnulmentDTO.CurrentUserId, "bandejasalida"));
+            
+            var inputTrayUpdate = PushDocumentTrayAsync(new(newDocumentTray, userTrayAnnulmentDTO.CurrentUserId, "bandejaentrada"));
+
+            await Task.WhenAll(inputTrayUpdate, outputTrayUpdate);
+        }
+
+        public async Task MoveUserTrayAsync(UserTrayAnnulmentDTO userTrayAnnulmentDTO)
+        {
+            var currentDocumentTray = new DocumentTray(userTrayAnnulmentDTO.DossierId, userTrayAnnulmentDTO.CurrentDocumentId);
+            var newDocumentTray = new DocumentTray(userTrayAnnulmentDTO.DossierId, userTrayAnnulmentDTO.NewDocumentId);
+
+            var currentUserinputTrayUpdate = PullDocumentTrayAsync(new(currentDocumentTray, userTrayAnnulmentDTO.CurrentUserId, "bandejaentrada"));
+
+            var newUserinputTrayUpdate = PushDocumentTrayAsync(new(newDocumentTray, userTrayAnnulmentDTO.NewUserId, "bandejaentrada"));
+
+            await Task.WhenAll(currentUserinputTrayUpdate, newUserinputTrayUpdate);
+        }
+
         public async Task RegisterUserTrayAsync(string type, string userId)
         {
             Tray userTray = new(type, userId);

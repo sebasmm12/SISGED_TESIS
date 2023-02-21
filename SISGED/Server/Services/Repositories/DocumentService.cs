@@ -45,16 +45,21 @@ namespace SISGED.Server.Services.Repositories
             _dossierService = dossierService;
         }
 
-        public async Task AnnulDocumentAsync(string documentId, User user)
+        public async Task<Document> AnnulDocumentAsync(string documentId, User user)
         {
             var annulmentProcess = new Process(user.Id, user.Id, "anulado", user.Rol);
 
             var updateDocumentState = Builders<Document>.Update.Set("estado", "anulado")
                                                                .Push("historialproceso", annulmentProcess);
 
-            var updatedDocument = await _documentsCollection.UpdateOneAsync(document => document.Id == documentId, updateDocumentState);
+            var updatedDocument = await _documentsCollection.FindOneAndUpdateAsync(document => document.Id == documentId, updateDocumentState, new()
+            {
+                ReturnDocument = ReturnDocument.Before
+            });
 
             if (updatedDocument is null) throw new Exception($"No se pudo anular el documento con identificador { documentId }");
+
+            return updatedDocument;
 
         }
 
@@ -1440,7 +1445,7 @@ namespace SISGED.Server.Services.Repositories
             var lookUpPipeline = new BsonArray()
             {
                 MongoDBAggregationExtension.Match(
-                    MongoDBAggregationExtension.Expr(MongoDBAggregationExtension.Eq(new() { MongoDBAggregationExtension.In("$$documentId", "$documentos.iddocumento"), true })))
+                    MongoDBAggregationExtension.Expr(MongoDBAggregationExtension.Eq(new() { MongoDBAggregationExtension.In("$$documentId", "$historialdocumentos.iddocumento"), true })))
             };
 
             return MongoDBAggregationExtension.Lookup(new("expedientes", letPipeline, lookUpPipeline, "dossiers"));

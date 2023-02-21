@@ -28,6 +28,6 @@ namespace SISGED.Server.Services.Contracts
         Task<long> CountUserRequestsAsync(string documentNumber);
         Task<IEnumerable<DossierListResponse>> GetDossiersListAsync(UserDossierPaginationQuery paginationQuery);
         Task<int> CountDossiersListAsync(UserDossierPaginationQuery paginationQuery);
-        Task DeleteDossierDocumentAsync(string documentId);
+        Task<Dossier> DeleteDossierDocumentAsync(string documentId);
     }
 }

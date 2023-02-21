@@ -81,7 +81,8 @@ else
                 @foreach (var document in paginatedUserDocuments.UserDocuments)
                 {
                     <DocumentInfo Document="document" @key="document" DocumentVersionHistoryInfo="ShowDocumentVersionHistoryAsync"
-                          DocumentProcessHistoryInfo="ShowDocumentProcessHistoryAsync" DocumentVisualization="ShowDocumentInfoAsync"></DocumentInfo>
+                          DocumentProcessHistoryInfo="ShowDocumentProcessHistoryAsync" DocumentVisualization="ShowDocumentInfoAsync"
+                          DocumentAnnulment="AnnulDocumentAsync"></DocumentInfo>
                 }
             </MudGrid>
             <div class="text-end mt-6">

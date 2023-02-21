@@ -1,12 +1,10 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using MudBlazor;
 using SISGED.Client.Components.WorkEnvironments;
 using SISGED.Client.Services.Contracts;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
-using SISGED.Shared.Models.Requests.Documents;
 using SISGED.Shared.Models.Requests.Dossier;
 using SISGED.Shared.Models.Responses.Account;
 using SISGED.Shared.Models.Responses.Document;
@@ -58,8 +56,8 @@ namespace SISGED.Client.Components.Documents
 
         private async Task GetUserInformationAsync()
         {
-            var userRoleTask =  GetRoleAsync(SessionAccount.GetUser().Rol);
-            var receiverUserRoleTask =  GetRoleAsync(roleId);
+            var userRoleTask = GetRoleAsync(SessionAccount.GetUser().Rol);
+            var receiverUserRoleTask = GetRoleAsync(roleId);
 
             await Task.WhenAll(userRoleTask, receiverUserRoleTask);
 
@@ -74,7 +72,7 @@ namespace SISGED.Client.Components.Documents
             {
                 var roleResponse = await HttpRepository.GetAsync<Role>($"api/accounts/roles/{roleId}");
 
-                if(roleResponse.Error)
+                if (roleResponse.Error)
                 {
                     await SwalFireRepository.ShowErrorSwalFireAsync($"No se pudo obtener información sobre su rol");
                 }
@@ -132,7 +130,7 @@ namespace SISGED.Client.Components.Documents
         private DossierLastDocumentRequest GetDossierLasDocument()
         {
             var dossierTray = GetDossierTray();
-            
+
             var derivation = new Derivation(userRole!.Id, documentDerivation.ReceiverUserRole!.Id,
                                             SessionAccount.User.Id, "derivado", dossierTray.Document!.Type);
 

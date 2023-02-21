@@ -1108,6 +1108,7 @@ namespace SISGED.Server.Controllers
 
         #region DELETE Services
         [HttpDelete("{documentId}")]
+        [AllowAnonymous]
         public async Task<IActionResult> AnnulDocumentAsync([FromRoute] string documentId)
         {
             try
@@ -1118,9 +1119,11 @@ namespace SISGED.Server.Controllers
 
                 var user = await GetUserAsync("userId");
 
-                await _documentService.AnnulDocumentAsync(documentId, user);
+                var document = await _documentService.AnnulDocumentAsync(documentId, user);
 
-                await _dossierService.DeleteDossierDocumentAsync(documentId);
+                var dossier = await _dossierService.DeleteDossierDocumentAsync(documentId);
+
+                await MoveUserTrayDocumentAsync(document, user, dossier);
 
                 return Ok();
             }
@@ -1292,6 +1295,30 @@ namespace SISGED.Server.Controllers
             return documentGenerationDTO;
         }
 
+        #endregion
+
+        #region DELETE PRIVATE METHODS
+        private async Task MoveUserTrayDocumentAsync(Document document, User user, Dossier dossier)
+        {
+            UserTrayAnnulmentDTO userTrayAnnulmentDTO;
+            var newDocument = dossier.Documents.Last();
+
+            if (document.IsDerivated())
+            {
+               userTrayAnnulmentDTO = new UserTrayAnnulmentDTO(dossier.Id, document.Id, 
+                                                    newDocument.DocumentId, document.GetLastProcess().ReceiverId, user.Id);
+
+
+                await _trayService.MoveUserTrayAsync(userTrayAnnulmentDTO); 
+
+               return;
+            }
+
+            userTrayAnnulmentDTO = new UserTrayAnnulmentDTO(dossier.Id, document.Id, newDocument.DocumentId, user.Id);
+
+            await _trayService.MoveUserOutPutToInputTrayAsync(userTrayAnnulmentDTO);
+
+        }
         #endregion
 
     }
