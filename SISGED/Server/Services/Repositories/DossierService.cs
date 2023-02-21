@@ -79,6 +79,8 @@ namespace SISGED.Server.Services.Repositories
         {
             Derivation dossierDerivation = dossierLastDocumentRequest.Derivation;
 
+            dossierDerivation.DerivationDate = DateTime.Now;
+
             dossierDerivation.ReceiverUser = userId;
 
             await UpdateDossierDerivationsAsync(dossierDerivation, dossierLastDocumentRequest.Id);
