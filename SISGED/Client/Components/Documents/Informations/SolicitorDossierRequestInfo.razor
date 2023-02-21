@@ -111,11 +111,11 @@
                             @if (document!.AttachedUrls.Any())
                             {
                                         <MudGrid>
-                                    @for (int index = 0; index < document.AttachedUrls.Count; index++)
+                                    @foreach (var (item, index) in document.AttachedUrls.WithIndex())
                                     {
                                                     <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
                                                         <MudPaper Elevation="3">
-                                                            <MudLink Underline="Underline.None" Href="@document.AttachedUrls[index]" Target="_blank">
+                                                            <MudLink Underline="Underline.None" Href="@item" Target="_blank">
                                                                 <MudText Typo="Typo.body1">Anexo @index</MudText>
                                                             </MudLink>
                                                         </MudPaper>
