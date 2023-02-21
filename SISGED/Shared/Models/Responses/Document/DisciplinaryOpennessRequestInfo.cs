@@ -12,11 +12,11 @@ namespace SISGED.Shared.Models.Responses.Document
 {
     public class DisciplinaryOpennessRequestInfo
     {
-        public DisciplinaryOpennessRequestInfo(Client client, AutocompletedSolicitorResponse solicitor, ProsecutorUserInfoResponse prosecutor)
+        public DisciplinaryOpennessRequestInfo(Client client, AutocompletedSolicitorResponse solicitor/*, ProsecutorUserInfoResponse prosecutor*/)
         {
             Client = client;
             Solicitor = solicitor;
-            Prosecutor = prosecutor;
+            //Prosecutor = prosecutor;
         }
 
         public DisciplinaryOpennessRequestInfo() { }
@@ -25,7 +25,7 @@ namespace SISGED.Shared.Models.Responses.Document
         public Client Client { get; set; } = default!;
         [BsonElement("solicitor")]
         public AutocompletedSolicitorResponse Solicitor { get; set; } = default!;
-        [BsonElement("prosecutor")]
-        public ProsecutorUserInfoResponse Prosecutor { get; set; } = default!;
+        //[BsonElement("prosecutor")]
+        //public ProsecutorUserInfoResponse Prosecutor { get; set; } = default!;
     }
 }

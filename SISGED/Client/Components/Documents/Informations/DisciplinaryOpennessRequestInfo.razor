@@ -111,12 +111,12 @@
                                         <MudText Typo="Typo.body1">@document!.Content.Solicitor.SolicitorOfficeName</MudText>
                                     </div>
                                 </MudItem>
-                                <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
+                                @*<MudItem xs="12" sm="12" md="6" lg="6" xl="6">
                                     <div class="text-start text-sm-center mb-2">
                                         <MudText Typo="Typo.h6">Fiscal</MudText>
                                         <MudText Typo="Typo.body1">@document!.Content.Prosecutor.Name @document!.Content.Prosecutor.LastName</MudText>
                                     </div>
-                                </MudItem>
+                                </MudItem>*@
                             </MudGrid>
                         </MudExpansionPanel>
                         <MudExpansionPanel Text="Otros participantes">
@@ -169,11 +169,11 @@
                             @if (document!.AttachedUrls.Any())
                             {
                                 <MudGrid>
-                                    @for (int index = 0; index < document.AttachedUrls.Count; index++)
+                                    @foreach (var (item, index) in document.AttachedUrls.WithIndex())
                                     {
                                         <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
                                             <MudPaper Elevation="3">
-                                                <MudLink Underline="Underline.None" Href="@document.AttachedUrls[index]" Target="_blank">
+                                                <MudLink Underline="Underline.None" Href="@item" Target="_blank">
                                                     <MudText Typo="Typo.body1">Anexo @index</MudText>
                                                 </MudLink>
                                             </MudPaper>

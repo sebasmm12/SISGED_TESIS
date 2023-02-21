@@ -1211,10 +1211,10 @@ namespace SISGED.Server.Services.Repositories
                                                     .Add("solicitorOfficeName", "$solicitors.oficionotarial.nombre")
                                                     .Add("email", "$solicitors.email")
                                                     .Add("address", "$solicitors.direccion"))
-                                .Add("prosecutor", new BsonDocument()
-                                                    .Add("_id", "$prosecutors._id")
-                                                    .Add("name", "$prosecutors.datos.nombre")
-                                                    .Add("lastName", "$prosecutors.datos.apellido"))
+                                //.Add("prosecutor", new BsonDocument()
+                                //                    .Add("_id", "$prosecutors._id")
+                                //                    .Add("name", "$prosecutors.datos.nombre")
+                                //                    .Add("lastName", "$prosecutors.datos.apellido"))
                                 .Add("client", "$dossiers.cliente")
                                 .Add("audienceStartDate", "$contenido.fechainicioaudiencia")
                                 .Add("audienceEndDate", "$contenido.fechafinaudiencia")
@@ -1547,9 +1547,9 @@ namespace SISGED.Server.Services.Repositories
 
             var solicitorUnwindAggregation = MongoDBAggregationExtension.UnWind(new("$solicitors"));
 
-            var prosecutorLookUpAggregation = GetProsecutorsLookUpPipeline();
+            //var prosecutorLookUpAggregation = GetProsecutorsLookUpPipeline();
 
-            var prosecutorUnwindAggregation = MongoDBAggregationExtension.UnWind(new("$prosecutors"));
+            //var prosecutorUnwindAggregation = MongoDBAggregationExtension.UnWind(new("$prosecutors"));
 
             var dossierLookUpPipelineAggregation = GetDossierLookUpPipeline();
 
@@ -1558,7 +1558,7 @@ namespace SISGED.Server.Services.Repositories
             var projectAggregation = GetDisciplinaryOpennessProjectPipeline();
 
             return new BsonDocument[] { matchAggregation, solicitorLookUpAggregation,
-               solicitorUnwindAggregation, prosecutorLookUpAggregation, prosecutorUnwindAggregation,  dossierLookUpPipelineAggregation, dossierUnwindAggregation, projectAggregation  };
+               solicitorUnwindAggregation, /*prosecutorLookUpAggregation, prosecutorUnwindAggregation,*/  dossierLookUpPipelineAggregation, dossierUnwindAggregation, projectAggregation  };
         }
         
         private static BsonDocument[] GetResolutionPipeline(string documentId)
