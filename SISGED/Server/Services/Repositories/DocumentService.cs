@@ -726,7 +726,7 @@ namespace SISGED.Server.Services.Repositories
         public async Task<Document> EvaluateDocumentAsync(DocumentEvaluationRequest documentEvaluationRequest, User user)
         {
 
-            var currentDocument = await GetDocumentAsync(documentEvaluationRequest.DocumentId);
+            //var currentDocument = await GetDocumentAsync(documentEvaluationRequest.DocumentId);
             var eval = new DocumentEvaluation(user.Id, documentEvaluationRequest.IsApproved, documentEvaluationRequest.Comment, DateTime.UtcNow.AddHours(-5));
             var process = new Process(user.Id, user.Id, "evaluado", user.Rol, DateTime.UtcNow.AddHours(-5), DateTime.UtcNow.AddHours(-5));
 

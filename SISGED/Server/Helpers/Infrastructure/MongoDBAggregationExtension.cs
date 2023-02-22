@@ -266,5 +266,10 @@ namespace SISGED.Server.Helpers.Infrastructure
         {
             return new BsonDocument("$toString", value);
         }
+        
+        public static BsonDocument ReplaceRoot(BsonValue value)
+        {
+            return new BsonDocument("$replaceRoot", new BsonDocument().Add("newRoot", value));
+        }
     }
 }

@@ -145,7 +145,37 @@ namespace SISGED.Server.Services.Repositories
             return userTray.User;
         }
 
+        public async Task<Tray> DeleteInputTrayDocumentAsync(string documentId)
+        {
+            var currentTray = await GetTrayByDocumentAsync(documentId);
+
+            var trayDocument = currentTray.InputTray.First(trayDocument => trayDocument.DocumentId == documentId);
+
+            var trayUpdate = Builders<Tray>.Update.Pull("bandejaentrada", trayDocument);
+
+            var updatedTray = await _traysCollection.FindOneAndUpdateAsync(tray => tray.Id == currentTray.Id, trayUpdate, new()
+            {
+                ReturnDocument = ReturnDocument.After
+            });
+
+            if (updatedTray is null) throw new Exception($"No se pudo eliminar el documento con identificador {documentId} de la bandeja con identificador {currentTray.Id}");
+
+            return updatedTray;
+        }
+
         #region private methods
+        private async Task<Tray> GetTrayByDocumentAsync(string documentId)
+        {
+            var trayDocumentBuilder = Builders<DocumentTray>.Filter.Eq(dosssierDocument => dosssierDocument.DocumentId, documentId);
+
+            var trayBuilder = Builders<Tray>.Filter.ElemMatch(tray => tray.InputTray, trayDocumentBuilder);
+
+            var tray = await _traysCollection.Find(trayBuilder).FirstOrDefaultAsync();
+
+            if (tray is null) throw new Exception($"No se pudo encontrar el expediente que tiene el document con identificador {documentId} relacionado");
+
+            return tray;
+        }
         private async Task<Tray> GetUserTrayWithLessInputTrayAsync(string type)
         {
             var userTray = await _traysCollection.Aggregate<Tray>(GetUserTrayWithLessInputTrayPipeLine(type)).FirstOrDefaultAsync();

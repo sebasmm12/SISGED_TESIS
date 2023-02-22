@@ -17,5 +17,6 @@ namespace SISGED.Server.Services.Contracts
         Task<IEnumerable<UserTrayResponse>> GetWorkloadByRoleAsync(string role);
         Task MoveUserOutPutToInputTrayAsync(UserTrayAnnulmentDTO userTrayAnnulmentDTO);
         Task MoveUserTrayAsync(UserTrayAnnulmentDTO userTrayAnnulmentDTO);
+        Task<Tray> DeleteInputTrayDocumentAsync(string documentId);
     }
 }

@@ -204,6 +204,22 @@ namespace SISGED.Server.Services.Repositories
             return totalDossiers.Total;
         }
 
+        public async Task<Dossier> DenyDossierByDocumentAsync(string documentId)
+        {
+            var currentDossier = await GetDossierByDocumentAsync(documentId);
+
+            var dossierUpdate = Builders<Dossier>.Update.Set("estado", "rechazado");
+
+            var updatedDossier = await _dossiersCollection.FindOneAndUpdateAsync(dossier => dossier.Id == currentDossier.Id, dossierUpdate, new()
+            {
+                ReturnDocument = ReturnDocument.After
+            });
+
+            if (updatedDossier is null) throw new Exception($"No se pudo actualizar el estado del expediente con identificador {currentDossier.Id} en base al documento con identificador {documentId}");
+
+            return updatedDossier;
+        }
+
         #region private methods
         private async Task<Dossier> GetDossierByDocumentAsync(string documentId)
         {
@@ -909,6 +925,36 @@ namespace SISGED.Server.Services.Repositories
         };
 
             return MongoDBAggregationExtension.Lookup(new("roles", letPipeline, lookUpPipeline, "areaDestino"));
+        }
+
+        private BsonDocument[] GetDossierBydDocumentIdPipeline(string documentId)
+        {
+            var lookupAggregation = GetDocumentLastPublicDeedLookUpPipeline();
+            var unWindAggregation = MongoDBAggregationExtension.UnWind(new("$dossiers"));
+            var projectAggregation = MongoDBAggregationExtension.Project(new()
+                {
+                    { "_id", 0 },
+                    {"dossier", "$dossiers" }
+                });
+            var replaceRootAggregation = MongoDBAggregationExtension.ReplaceRoot("$dossier");
+
+            return new BsonDocument[] { lookupAggregation, unWindAggregation, projectAggregation, replaceRootAggregation };
+        }
+
+        private static BsonDocument GetDossierBydDocumentIdLookupPipeline()
+        {
+            var letPipeline = new Dictionary<string, BsonValue>()
+            {
+                { "userObjId", MongoDBAggregationExtension.ToString("$_id") }
+            };
+
+            var lookUpPipeline = new BsonArray()
+            {
+                MongoDBAggregationExtension.Match(
+                    MongoDBAggregationExtension.Expr(MongoDBAggregationExtension.Eq(new() { MongoDBAggregationExtension.In("$$userObjId", "$historialdocumentos.iddocumento"), true })))
+            };
+
+            return MongoDBAggregationExtension.Lookup(new("expedientes", letPipeline, lookUpPipeline, "dossiers"));
         }
         #endregion
     }
