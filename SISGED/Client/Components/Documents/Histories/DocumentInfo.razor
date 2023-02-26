@@ -35,6 +35,9 @@
             <MudTooltip Text="Ver Historial de Acciones">
                 <MudFab Color="Color.Secondary" StartIcon="fas fa-file-contract" OnClick="@(() => ShowDocumentProcessHistoryAsync())"></MudFab>
             </MudTooltip>
+            <MudTooltip Text="Ver Evaluaciones">
+                <MudFab Color="Color.Warning" StartIcon="fas fa-clipboard-check" OnClick="@(() => ShowDocumentEvaluationAsync())"></MudFab>
+            </MudTooltip>
             <MudTooltip Text="Ver Documento">
                 <MudFab Color="Color.Info" StartIcon="fas fa-eye" OnClick="@(() => ShowDocumentInfoAsync())"></MudFab>
             </MudTooltip>

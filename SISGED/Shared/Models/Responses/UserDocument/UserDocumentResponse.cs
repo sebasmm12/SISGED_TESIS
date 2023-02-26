@@ -21,7 +21,7 @@ namespace SISGED.Shared.Models.Responses.UserDocument
         [BsonElement("estado")]
         public string State { get; set; } = default!;
         [BsonElement("evaluaciones")]
-        public List<DocumentEvaluation> Evaluations { get; set; } = default!;
+        public List<Entities.DocumentEvaluation> Evaluations { get; set; } = default!;
         [BsonElement("fechacreacion")]
         public DateTime CreationDate { get; set; } = default!;
         [BsonElement("urlanexo")]

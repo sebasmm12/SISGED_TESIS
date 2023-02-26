@@ -1,0 +1,33 @@
+﻿<MudItem xs="12" sm="6" md="6" lg="4" xl="4">
+    <MudCard Elevation="3">
+        <MudCardContent Class="text-center pb-0">
+            <MudImage Src="../images/document-process.png" Alt="Evaluación del Documento"></MudImage>
+            <br />
+            <MudChip Color="evaluationState.Color" Class="text-capitalize">@evaluationState.ProcessName</MudChip>
+            <br />
+            <MudText Typo="Typo.caption" Class="gray-text">@Evaluation.EvaluationDate.ToString("dd/MM/yyyy HH:mm:ss")</MudText>
+            <MudGrid Justify="Justify.Center" Class="mt-1">
+                <MudItem xs="12" sm="12" md="12" lg="12" xl="12" Class="pb-0">
+                    <MudAvatar Image="@Evaluation.EvaluatorUser.Image" Alt="Evaluador"></MudAvatar>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mt-1">@Evaluation.EvaluatorUser.FirstName @Evaluation.EvaluatorUser.LastName</MudText>
+                </MudItem>
+                <MudItem xs="12" sm="12" md="12" lg="12" xl="12" Class="pt-0">
+                    <div class="vertical-speech">
+                        @if(string.IsNullOrEmpty(Evaluation.Comment))
+                        {
+                            <label>Se aprobó el documento.</label>
+                        }
+                        else
+                        {
+                           <label>Evaluation.Comment</label>
+                        }
+
+                    </div>
+                </MudItem>
+            </MudGrid>
+            
+        </MudCardContent>
+    </MudCard>
+</MudItem>
+
+

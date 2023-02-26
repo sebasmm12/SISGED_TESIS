@@ -35,6 +35,7 @@ static void ConfigureServices(IServiceCollection services)
     services.AddScoped<IDocumentRepository, DocumentRepository>();
     services.AddScoped<IDossierRepository, DossierRepository>();
     services.AddScoped<IDocumentStateRepository, DocumentStateRepository>();
+    services.AddScoped<IDocumentEvaluationStateRepository, DocumentEvaluationStateRepository>();
     services.AddScoped<IDossierStateRepository, DossierStateRepository>();
     services.AddScoped<IFilterRepository<SolicitorFilter>, SolicitorRepository>();
     services.AddScoped<IFilterRepository<UserDocumentFilterDTO>, UserDocumentRepository>();

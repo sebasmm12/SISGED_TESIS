@@ -10,7 +10,32 @@
     background-color: #F2F2F2;
 }
 
-.speech label {
+.vertical-speech {
+    color: var(--mud-palette-secondary);
+    position: relative;
+    border-radius: 10px;
+    width: 100%;
+    margin-top: 20px;
+    height: 100px;
+    padding: 10px;
+    text-align: start !important;
+    background-color: #F2F2F2;
+}
+
+    .vertical-speech::after {
+        position: absolute;
+        content: '';
+        border: 20px solid transparent;
+        border-right-color: #F2F2F2;
+        border-bottom: 0;
+        left: 50%;
+        margin-left: -40px;
+        top: -20px;
+    }
+
+    
+
+.speech label, .vertical-speech label {
     color: var(--mud-palette-secondary);
     font-size: 15px;
 }

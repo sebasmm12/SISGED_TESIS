@@ -79,6 +79,14 @@ namespace SISGED.Client.Pages.Documents
             await DialogContentRepository.ShowDialogAsync<DocumentsProcess>(dialogParameters, "Historial de procesos");
         }
 
+        private async Task ShowDocumentEvaluationAsync(UserDocumentDTO document)
+        {
+            var dialogParameters = new List<DialogParameter>() { new("DocumentId", document.Id), new("PageSize", 5) };
+
+            await DialogContentRepository.ShowDialogAsync<DocumentsEvaluation>(dialogParameters, "Evaluaciones");
+
+        }
+
         private async Task ShowDocumentInfoAsync(UserDocumentDTO document)
         {
             var dialogParameters = new List<DialogParameter>() { new("DocumentId", document.Id) };

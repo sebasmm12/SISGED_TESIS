@@ -21,6 +21,8 @@ namespace SISGED.Client.Components.Documents.Histories
         public EventCallback<UserDocumentDTO> DocumentProcessHistoryInfo { get; set; }
         [Parameter]
         public EventCallback<UserDocumentDTO> DocumentVisualization { get; set; }
+        [Parameter]
+        public EventCallback<UserDocumentDTO> DocumentEvaluation { get; set; }
 
         private IEnumerable<string> annulmentInValidStates = new List<string>() { "evaluado", "anulado" };
 
@@ -47,6 +49,11 @@ namespace SISGED.Client.Components.Documents.Histories
         private async Task ShowDocumentInfoAsync()
         {
             await DocumentVisualization.InvokeAsync(Document);
+        }
+
+        private async Task ShowDocumentEvaluationAsync()
+        {
+            await DocumentEvaluation.InvokeAsync(Document);
         }
 
     }

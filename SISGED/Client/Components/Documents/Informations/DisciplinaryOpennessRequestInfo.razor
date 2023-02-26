@@ -172,11 +172,7 @@
                                     @foreach (var (item, index) in document.AttachedUrls.WithIndex())
                                     {
                                         <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
-                                            <MudPaper Elevation="3">
-                                                <MudLink Underline="Underline.None" Href="@item" Target="_blank">
-                                                    <MudText Typo="Typo.body1">Anexo @index</MudText>
-                                                </MudLink>
-                                            </MudPaper>
+                                            <AttachedDocumentInfo Name="@($"Anexo { index + 1}")" Url="@item" @key="item" Icon="GetDocumentPreview(item)"></AttachedDocumentInfo>
                                         </MudItem>
                                     }
                                 </MudGrid>

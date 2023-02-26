@@ -242,3 +242,7 @@ a, .btn-link {
 .text-capitalize {
     text-transform: capitalize;
 }
+
+.text-icon {
+    font-size: 1rem;
+}

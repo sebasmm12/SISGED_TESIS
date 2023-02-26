@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using SISGED.Client.Helpers;
 using SISGED.Client.Services.Contracts;
+using SISGED.Client.Services.Repositories;
 using SISGED.Shared.Models.Responses.Document.ComplaintRequest;
 
 namespace SISGED.Client.Components.Documents.Informations
@@ -11,6 +13,8 @@ namespace SISGED.Client.Components.Documents.Informations
         public IHttpRepository HttpRepository { get; set; } = default!;
         [Inject]
         public ISwalFireRepository SwalFireRepository { get; set; } = default!;
+        [Inject]
+        private IAnnexFactory AnnexFactory { get; set; } = default!;
 
         [CascadingParameter]
         MudDialogInstance MudDialog { get; set; } = default!;
@@ -34,6 +38,14 @@ namespace SISGED.Client.Components.Documents.Informations
             MudDialog.Cancel();
         }
 
+        private AnnexPreview GetDocumentPreview(string documentUrl)
+        {
+            var extension = Path.GetExtension(documentUrl);
+
+            var documentPreview = AnnexFactory.GetAnnexPreview(extension);
+
+            return documentPreview;
+        }
 
         private async Task<ComplaintRequestInfoResponse?> GetDocumentAsync(string documentId)
         {

@@ -488,14 +488,12 @@ namespace SISGED.Server.Controllers
                 var user = await GetUserAsync("userId");
                 var document = await _documentService.EvaluateDocumentAsync(documentEvaluationRequest, user);
 
-                if(document.Type == "SolicitudInicial" && !documentEvaluationRequest.IsApproved)
-                {
-                    //1. Elimina de bandeja de entrada
-                    await _trayService.DeleteInputTrayDocumentAsync(documentId: document.Id);
-                    //2. Estado expediente rechazado
-                    await _dossierService.DenyDossierByDocumentAsync(documentId: document.Id);
-                }
+                if (documentEvaluationRequest.IsApproved) return Ok(document);
 
+                if(document.IsTypeOf("SolicitudInicial")) await _dossierService.DenyDossierByDocumentAsync(document.Id);
+
+                await _trayService.DeleteInputTrayDocumentAsync(document.Id);
+                
                // await RegisterOutputTrayWithDocumentTrayAsync(document, user);
 
                 return Ok(document);

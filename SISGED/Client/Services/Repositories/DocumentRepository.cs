@@ -11,7 +11,9 @@ namespace SISGED.Client.Services.Repositories
             { "SolicitudDenuncia", typeof(ComplaintRequestInfo) },
             { "AperturamientoDisciplinario", typeof(DisciplinaryOpennessRequestInfo) },
             { "SolicitudExpedienteNotario", typeof(SolicitorDossierRequestInfo) },
-            { "Resolucion", typeof(ResolutionInfo) }
+            { "Dictamen", typeof(DictumInfo) },
+            { "Resolucion", typeof(ResolutionInfo) },
+            { "EntregaExpedienteNotario", typeof(SolicitorDossierShipmentInfo) }
         };
 
         public IEnumerable<DocumentOption> GetDocumentTypesWithDossier()

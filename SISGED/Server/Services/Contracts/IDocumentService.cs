@@ -8,6 +8,7 @@ using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.Document.BPNDocument;
 using SISGED.Shared.Models.Responses.Document.BPNResult;
 using SISGED.Shared.Models.Responses.Document.ComplaintRequest;
+using SISGED.Shared.Models.Responses.Document.Dictum;
 using SISGED.Shared.Models.Responses.Document.DisciplinaryOpenness;
 using SISGED.Shared.Models.Responses.Document.Resolution;
 using SISGED.Shared.Models.Responses.Document.SignConclusion;
@@ -27,7 +28,7 @@ namespace SISGED.Server.Services.Contracts
         Task<BPNDocumentInfoResponse> GetBPNDocumentAsync(string documentId);
         Task<BPNRequest> GetBPNRequestDocumentAsync(string documentId);
         Task<BPNResultInfoResponse> GetBPNResultAsync(string documentId);
-        Task<Dictum> GetDictumDocumentAsync(string documentId);
+        Task<DictumInfoResponse> GetDictumDocumentAsync(string documentId);
         Task<DisciplinaryOpennessInfoResponse> GetDisciplinaryOpennessAsync(string documentId);
         Task<DocumentResponse> GetDocumentAsync(string documentId);
         Task<IEnumerable<DocumentsByMonthAndAreaResponse>> GetDocumentsByMonthAndAreaAsync(DocumentsByMonthAndAreaQuery documentsByMonthAndAreaQuery);

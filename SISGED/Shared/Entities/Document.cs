@@ -53,6 +53,11 @@ namespace SISGED.Shared.Entities
             return derivatedStates.Contains(State);
         }
 
+        public bool IsTypeOf(string documentType)
+        {
+            return Type == documentType;
+        }
+
         public Process GetLastProcess()
         {
             return ProcessesHistory.Last();

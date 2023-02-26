@@ -1,0 +1,41 @@
+﻿<MudDialog>
+    <DialogContent>
+        @if (pageLoading)
+        {
+            <GenericPageLoader Body="Obteniendo las evaluaciones del documento, por favor espere..."></GenericPageLoader>
+        }
+        else
+        {
+            <MudCard Elevation="0" class="w-100">
+                <MudCardHeader>
+                    <GenericFormHeader HeaderIcon="fas fa-clipboard-check" HeaderTitle="Evaluaciones" HeaderDescription="Visualice todas las evaluaciones del documento"></GenericFormHeader>
+                </MudCardHeader>
+                <MudCardContent>
+                    @if (evaluations.Any())
+                    {
+                        <MudGrid>
+                            @foreach (var evaluation in paginatedEvaluations)
+                            {
+                                <DocumentEvaluationInfo Evaluation="evaluation"></DocumentEvaluationInfo>
+                            }
+                        </MudGrid>
+                        <div class="text-end mt-6">
+                            <MudPagination Count="TotalDocumentEvaluations" MiddleCount="5" SelectedChanged="ChangePage" />
+                        </div>
+                    }
+                    else
+                    {
+                        <MudGrid Justify="Justify.Center">
+                            <MudItem>
+                                <MudAlert Severity="Severity.Info" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Center">No se ha realizado ninguna evaluación al documento</MudAlert>
+                            </MudItem>
+                        </MudGrid>
+                    }
+                </MudCardContent>
+                <MudCardActions Class="justify-end pa-6">
+                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="rounded-pill" OnClick="@(() => Cancel())">Regresar</MudButton>
+                </MudCardActions>
+            </MudCard>
+        }
+    </DialogContent>
+</MudDialog>

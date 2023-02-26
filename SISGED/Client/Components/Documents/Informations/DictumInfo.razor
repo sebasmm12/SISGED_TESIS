@@ -25,34 +25,16 @@
                                                 <MudText Typo="Typo.body1">@document!.Content.Code</MudText>
                                             </div>
                                         </MudItem>
-                                        <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
+                                        <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
                                             <div class="text-start text-sm-center mb-2">
                                                 <MudText Typo="Typo.h6">Título</MudText>
                                                 <MudText Typo="Typo.body1">@document!.Content.Title</MudText>
                                             </div>
                                         </MudItem>
-                                        <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
-                                            <div class="text-start text-sm-center mb-2">
-                                                <MudText Typo="Typo.h6">Sanción</MudText>
-                                                <MudText Typo="Typo.body1">@document!.Content.Sanction</MudText>
-                                            </div>
-                                        </MudItem>
-                                        <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
-                                            <div class="text-start text-sm-center mb-2">
-                                                <MudText Typo="Typo.h6">Fecha Inicio de Audiencia</MudText>
-                                                <MudText Typo="Typo.body1">@document!.Content.AudienceStartDate</MudText>
-                                            </div>
-                                        </MudItem>
-                                        <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
-                                            <div class="text-start text-sm-center mb-2">
-                                                <MudText Typo="Typo.h6">Fecha Fin de Audiencia</MudText>
-                                                <MudText Typo="Typo.body1">@document!.Content.AudienceEndDate</MudText>
-                                            </div>
-                                        </MudItem>
                                         <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
                                             <div class="text-start text-sm-center mb-2">
-                                                <MudText Typo="Typo.h6">Descripción</MudText>
-                                                <MudText Typo="Typo.body1">@document!.Content.Description</MudText>
+                                                <MudText Typo="Typo.h6">Conclusión</MudText>
+                                                <MudText Typo="Typo.body1">@document!.Content.Conclusion</MudText>
                                             </div>
                                         </MudItem>
                                     </MudGrid>
@@ -125,28 +107,29 @@
                                 </MudItem>
                             </MudGrid>
                         </MudExpansionPanel>
-                        <MudExpansionPanel Text="Otros participantes">
-                            @if (document!.Content.Participants.Any())
-                            {
-                                <MudGrid>
-                                    @foreach (string item in document.Content.Participants)
+                        <MudExpansionPanel Text="Observaciones y Recomendaciones">
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <div class="text-start text-sm-center mb-2">
+                                    <MudText Typo="Typo.h6">Observaciones</MudText>
+                                    @foreach (var observation in document!.Content.Observations)
                                     {
-                                        <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
-                                            <MudPaper Elevation="3">
-                                                <MudText Typo="Typo.body1">@item</MudText>
-                                            </MudPaper>
-                                        </MudItem>
+                                        <MudText Typo="Typo.body1" Class="mt-1">
+                                            <MudIcon Icon="fas fa-eye" Color="Color.Primary" Class="text-icon"></MudIcon> @observation
+                                        </MudText>
                                     }
-                                </MudGrid>
-                            }
-                            else
-                            {
-                                <MudGrid Justify="Justify.Center">
-                                    <MudItem>
-                                        <MudAlert Severity="Severity.Info" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Center">No se ha registrado mayores participantes.</MudAlert>
-                                    </MudItem>
-                                </MudGrid>
-                            }
+                                </div>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <div class="text-start text-sm-center mb-2">
+                                    <MudText Typo="Typo.h6">Recomendaciones</MudText>
+                                    @foreach (var recommendation in document!.Content.Recommendations)
+                                    {
+                                        <MudText Typo="Typo.body1" Class="mt-1">
+                                            <MudIcon Icon="fas fa-comment-medical" Color="Color.Primary" Class="text-icon"></MudIcon> @recommendation
+                                        </MudText>
+                                    }
+                                </div>
+                            </MudItem>
                         </MudExpansionPanel>
                         <MudExpansionPanel Text="Anexos">
                             @if (document!.AttachedUrls.Any())
@@ -178,4 +161,3 @@
         }
     </DialogContent>
 </MudDialog>
-

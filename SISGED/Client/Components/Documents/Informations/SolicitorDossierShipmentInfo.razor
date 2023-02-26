@@ -1,6 +1,6 @@
 ﻿<MudDialog>
     <DialogContent>
-        @if (pageLoading)
+        @if(pageLoading)
         {
             <GenericPageLoader Body="Obteniendo la información del documento, por favor espere..."></GenericPageLoader>
         }
@@ -25,7 +25,7 @@
                                                 <MudText Typo="Typo.body1">@document!.Content.Code</MudText>
                                             </div>
                                         </MudItem>
-                                        <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
+                                        <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
                                             <div class="text-start text-sm-center mb-2">
                                                 <MudText Typo="Typo.h6">Título</MudText>
                                                 <MudText Typo="Typo.body1">@document!.Content.Title</MudText>
@@ -33,20 +33,14 @@
                                         </MudItem>
                                         <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
                                             <div class="text-start text-sm-center mb-2">
-                                                <MudText Typo="Typo.h6">Sanción</MudText>
-                                                <MudText Typo="Typo.body1">@document!.Content.Sanction</MudText>
+                                                <MudText Typo="Typo.h6">Notario</MudText>
+                                                <MudText Typo="Typo.body1">@document!.Content.Solicitor.Name @document!.Content.Solicitor.LastName</MudText>
                                             </div>
                                         </MudItem>
                                         <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
                                             <div class="text-start text-sm-center mb-2">
-                                                <MudText Typo="Typo.h6">Fecha Inicio de Audiencia</MudText>
-                                                <MudText Typo="Typo.body1">@document!.Content.AudienceStartDate</MudText>
-                                            </div>
-                                        </MudItem>
-                                        <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
-                                            <div class="text-start text-sm-center mb-2">
-                                                <MudText Typo="Typo.h6">Fecha Fin de Audiencia</MudText>
-                                                <MudText Typo="Typo.body1">@document!.Content.AudienceEndDate</MudText>
+                                                <MudText Typo="Typo.h6">Notaría</MudText>
+                                                <MudText Typo="Typo.body1">@document!.Content.Solicitor.SolicitorOfficeName</MudText>
                                             </div>
                                         </MudItem>
                                         <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
@@ -91,62 +85,15 @@
                                 </MudItem>
                             </MudGrid>
                         </MudExpansionPanel>
-                        <MudExpansionPanel Text="Participantes">
+                        <MudExpansionPanel Text="Expedientes del notario">
                             <MudGrid>
-                                <MudItem xs="12" sm="12" md="6" lg="4" xl="4">
-                                    <div class="text-start text-sm-center mb-2">
-                                        <MudText Typo="Typo.h6">Cliente</MudText>
-                                        <MudText Typo="Typo.body1">@document!.Content.Client.Name @document!.Content.Client.LastName</MudText>
-                                    </div>
-                                </MudItem>
-                                <MudItem xs="12" sm="12" md="6" lg="4" xl="4">
-                                    <div class="text-start text-sm-center mb-2">
-                                        <MudText Typo="Typo.h6">Tipo de Documento</MudText>
-                                        <MudText Typo="Typo.body1">@document!.Content.Client.DocumentType</MudText>
-                                    </div>
-                                </MudItem>
-                                <MudItem xs="12" sm="12" md="6" lg="4" xl="4">
-                                    <div class="text-start text-sm-center mb-2">
-                                        <MudText Typo="Typo.h6">Número de Documento</MudText>
-                                        <MudText Typo="Typo.body1">@document!.Content.Client.DocumentNumber</MudText>
-                                    </div>
-                                </MudItem>
-                                <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
-                                    <div class="text-start text-sm-center mb-2">
-                                        <MudText Typo="Typo.h6">Notario</MudText>
-                                        <MudText Typo="Typo.body1">@document!.Content.Solicitor.Name @document!.Content.Solicitor.LastName</MudText>
-                                    </div>
-                                </MudItem>
-                                <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
-                                    <div class="text-start text-sm-center mb-2">
-                                        <MudText Typo="Typo.h6">Notaría</MudText>
-                                        <MudText Typo="Typo.body1">@document!.Content.Solicitor.SolicitorOfficeName</MudText>
-                                    </div>
-                                </MudItem>
-                            </MudGrid>
-                        </MudExpansionPanel>
-                        <MudExpansionPanel Text="Otros participantes">
-                            @if (document!.Content.Participants.Any())
-                            {
-                                <MudGrid>
-                                    @foreach (string item in document.Content.Participants)
-                                    {
-                                        <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
-                                            <MudPaper Elevation="3">
-                                                <MudText Typo="Typo.body1">@item</MudText>
-                                            </MudPaper>
-                                        </MudItem>
-                                    }
-                                </MudGrid>
-                            }
-                            else
-                            {
-                                <MudGrid Justify="Justify.Center">
-                                    <MudItem>
-                                        <MudAlert Severity="Severity.Info" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Center">No se ha registrado mayores participantes.</MudAlert>
+                                @foreach (var solicitorDossier in document!.Content.SolicitorDossiers)
+                                {
+                                    <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
+                                        <AttachedDocumentInfo Name="@solicitorDossier.DocumentName" Url="@solicitorDossier.Url" @key="solicitorDossier" Icon="GetDocumentPreview(solicitorDossier.Url)"></AttachedDocumentInfo>
                                     </MudItem>
-                                </MudGrid>
-                            }
+                                }
+                            </MudGrid>
                         </MudExpansionPanel>
                         <MudExpansionPanel Text="Anexos">
                             @if (document!.AttachedUrls.Any())
