@@ -19,7 +19,7 @@ namespace SISGED.Server.Services.Repositories
             _mapper = mapper;
         }
 
-        public async Task<Step> GetStepByDossierNameAsync(string dossierName)
+        public async Task<Step> GetStepByDossierTypeAsync(string dossierName)
         {
             var steps = await _stepsCollection.Find(step => step.DossierName == dossierName).FirstOrDefaultAsync();
 

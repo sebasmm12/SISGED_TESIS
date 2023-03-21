@@ -72,16 +72,16 @@ namespace SISGED.Client.Components.Documents.Registers
 
             await SwalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo registrar la denuncia de manera satisfactoria");
 
-            UpdateRegisteredDocument(registeredComplaint);
+            await UpdateRegisteredDocumentAsync(registeredComplaint);
         }
 
-        private void UpdateRegisteredDocument(ComplaintRequest complaintRequest)
+        private async Task UpdateRegisteredDocumentAsync(ComplaintRequest complaintRequest)
         {
             var inputItem = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace == "inputs");
 
             ProcessWorkItemInfo(inputItem!, complaintRequest);
 
-            WorkEnvironment.UpdateRegisteredDocument(inputItem!);
+            await WorkEnvironment.UpdateRegisteredDocumentAsync(inputItem!);
 
         }
 
@@ -122,7 +122,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
             complaintRequest.Client = userTray.Client;
 
-            var dossierTray = userTray.Value as DossierTrayResponse;
+            var dossierTray = (DossierTrayResponse)userTray.Value;
 
             var documentContent = JsonSerializer.Deserialize<InitialRequestContentDTO>(JsonSerializer.Serialize(dossierTray!.Document!.Content));
 

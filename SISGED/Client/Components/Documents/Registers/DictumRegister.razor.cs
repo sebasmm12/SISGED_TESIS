@@ -53,16 +53,16 @@ namespace SISGED.Client.Components.Documents.Registers
 
             await SwalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo registrar el dictamen de manera satisfactoria");
 
-            UpdateRegisteredDocument(registeredDictum);
+            await UpdateRegisteredDocumentAsync(registeredDictum);
         }
 
-        private void UpdateRegisteredDocument(Dictum dictum)
+        private async Task UpdateRegisteredDocumentAsync(Dictum dictum)
         {
             var inputItem = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace == "inputs");
 
             ProcessWorkItemInfo(inputItem!, dictum);
 
-            WorkEnvironment.UpdateRegisteredDocument(inputItem!);
+            await WorkEnvironment.UpdateRegisteredDocumentAsync(inputItem!);
 
         }
 

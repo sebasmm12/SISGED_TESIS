@@ -7,11 +7,11 @@
     </MudPaper>
 }
 else {
-    <div class="flex-basis mt-5 h-100">
+    <div class="flex-basis mt-5 h-100 relative">
         <div class="work-box-title-style">
             <span>Área de Trabajo Especializada - Usuario: @SessionAccount.User.Data.Name @SessionAccount.User.Data.LastName</span>
         </div>
-        <MudDropContainer T="Item" Items="Items" ItemsSelector="VerifySelector" Class="h-100" ItemDropped="UpdateItem" CanDropClass="mud-border-success"
+        <MudDropContainer T="Item" Items="Items" ItemsSelector="VerifySelector" Class="h-100" ItemDropped="UpdateItemAsync" CanDropClass="mud-border-success"
         NoDropClass="mud-border-error">
                 <ChildContent>
                     <div class="wfe-container">
@@ -66,7 +66,8 @@ else {
                 <ItemRenderer Context="item">
                     <WorkItem Item="item" ></WorkItem>
                 </ItemRenderer>
-            </MudDropContainer>
+        </MudDropContainer>
+        <VirtualHelper Message="@assistantMessage" @ref="virtualHelper"></VirtualHelper>
     </div>
 }
 

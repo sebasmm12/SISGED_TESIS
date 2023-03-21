@@ -5,24 +5,118 @@ namespace SISGED.Shared.Entities
 {
     public class Assistant
     {
+        public Assistant()
+        {
+
+        }
+
+        public Assistant(string dossierId, string dossierType, List<AssistantStep> steps)
+        {
+            DossierId = dossierId;
+            DossierType = dossierType;
+            Steps = steps;
+        }
+
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public String Id { get; set; }
+        public string Id { get; set; } = default!;
         [BsonElement("idexpediente")]
-        public String DossierId { get; set; } = default!;
+        public string DossierId { get; set; } = default!;
         [BsonElement("pasos")]
-        public AssistantStep Steps { get; set; } = default!;
+        public List<AssistantStep> Steps { get; set; } = default!;
         [BsonElement("paso")]
-        public Int32 Step { get; set; }
+        public int Step { get; set; } = 0;
         [BsonElement("subpaso")]
-        public Int32 Substep { get; set; }
+        public int Substep { get; set; } = 0;
         [BsonElement("tipodocumento")]
-        public String DocumentType { get; set; } = default!;
+        public string DocumentType { get; set; } = default!;
+        [BsonElement("tipoexpediente")]
+        public string DossierType { get; set; } = default!;
+
+        public string GetFirstDocument() => Steps.First().Documents.First().Type;
+
+        public string GetCurrentMessage()
+        {
+            string currentMessage = GetCurrentDocumentStep()
+                                            .Substeps.ElementAt(Substep)
+                                            .Description;
+
+            return currentMessage;
+        }
+
+        public DocumentStep GetCurrentDocumentStep()
+        {
+            var currentDocumentStep = GetCurrentStep()!
+                                            .Steps
+                                            .ElementAt(Step);
+
+
+            return currentDocumentStep;
+        }
+
+        public StepDocument GetCurrentStep()
+        {
+            var currentStep = GetCurrentAssistantStep()
+                                   .Documents
+                                   .Find(document => document.Type == DocumentType)!;
+
+            return currentStep;
+        }
+
+        public AssistantStep GetCurrentAssistantStep()
+        {
+            var currentAssistantStep = Steps.Find(step => step.DossierName == DossierType)!;
+
+            return currentAssistantStep;
+        }
+
+        public int FindDocumentIndex()
+        {
+            int documentIndex = GetCurrentAssistantStep()
+                                     .Documents
+                                     .FindIndex(document => document.Type == DocumentType);
+
+            return documentIndex;
+        }
+
+        public void UpdateNextStep()
+        {
+            int newStepIndex = GetCurrentStep().GetNextStepIndex(Step);
+
+            Step = newStepIndex;
+        }
+
+        public void UpdateNextDocument(string documentType)
+        {
+            DocumentType = documentType;
+            Step = 0;
+        }
+
+        public bool IsLastSubStep() => Substep == GetCurrentDocumentStep().Substeps.Count - 1;
+        public bool IsLastStep() => Step == GetCurrentStep().Steps.Count - 1;
+        public bool IsLastDocument() => FindDocumentIndex() == GetCurrentAssistantStep().Documents.Count - 1;
     }
 
     public class AssistantStep
     {
-        public String DossierName { get; set; } = default!;
+        [BsonElement("nombreexpediente")]
+        public string DossierName { get; set; } = default!;
+        [BsonElement("documentos")]
         public List<StepDocument> Documents { get; set; } = default!;
+
+        public AssistantStep()
+        {
+
+        }
+
+        public AssistantStep(string dossierName)
+        {
+            DossierName = dossierName;
+        }
+
+        public AssistantStep(string dossierName, List<StepDocument> documents) : this(dossierName)
+        {
+            Documents = documents;
+        }
     }
 }

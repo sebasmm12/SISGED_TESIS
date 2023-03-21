@@ -1,7 +1,10 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
+using SISGED.Server.Helpers.Infrastructure;
 using SISGED.Server.Services.Contracts;
+using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
+using SISGED.Shared.Models.Requests.Assistants;
 using SISGED.Shared.Models.Requests.Step;
 
 namespace SISGED.Server.Services.Repositories
@@ -9,30 +12,156 @@ namespace SISGED.Server.Services.Repositories
     public class AssistantService : IAssistantService
     {
         private readonly IMongoCollection<Assistant> _assistantCollection;
+
         private readonly IStepService _stepService;
+
         public string CollectionName => "asistente";
-        public AssistantService(IMongoDatabase mongoDatabase)
+
+        public AssistantService(IMongoDatabase mongoDatabase, IStepService stepService)
         {
             _assistantCollection = mongoDatabase.GetCollection<Assistant>(CollectionName);
+            _stepService = stepService;
         }
-        public async Task<Assistant> CreateAsync(Assistant assistant)
+
+
+        public async Task<Assistant> GetAssistantAsync(string assistantId)
         {
-            Step steps = await _stepService.GetStepByDossierNameAsync(assistant.Steps.DossierName);
+            var assistant = await _assistantCollection.Find(assistant => assistant.Id == assistantId).FirstOrDefaultAsync();
 
-            assistant.Steps = new AssistantStep { Documents = steps.Documents, DossierName = steps.DossierName };
-            assistant.Step = 0;
-            assistant.Substep = 0;
-            assistant.DocumentType = "SolicitudInicial";
-
-            await _assistantCollection.InsertOneAsync(assistant);
+            if (assistant is null) throw new Exception($"No se pudo encontrar el asistante con identificador {assistantId}");
 
             return assistant;
         }
 
-        public async Task<Assistant> GetAssistantAsync(string dossierId)
+        public async Task<Assistant> CreateAsync(Assistant assistant)
+        {
+            await _assistantCollection.InsertOneAsync(assistant);
+
+            if (assistant.Id is null) throw new Exception($"No se pudo registrar el asistente para el expediente con identificador {assistant.DossierType}");
+
+            return assistant;
+        }
+
+        public async Task<Assistant> GetAssistantByDossierAsync(string dossierId)
         {
             Assistant assistant = await _assistantCollection.Find(x => x.DossierId == dossierId).FirstAsync();
             return assistant;
+        }
+
+        public async Task<Assistant> UpdateAssistantStepStartDateAsync(AssistantStepStartDateUpdateDTO stepStartDateUpdateRequest)
+        {
+            var assistantQuery = Builders<Assistant>.Filter.Eq(assistant => assistant.Id, stepStartDateUpdateRequest.Assistant.Id);
+
+            var assistantUpdate = Builders<Assistant>.Update
+                                                        .Set("pasos.$[dossier].documentos.$[document].pasos.$[step].fechainicio", stepStartDateUpdateRequest.StartDate)
+                                                        .Set("pasos.$[dossier].documentos.$[document].pasos.$[step].fechalimite", stepStartDateUpdateRequest.LimitDate);
+
+            var assistantArrayFilters = new List<ArrayFilterDefinition>()
+            {
+                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("dossier.nombreexpediente", stepStartDateUpdateRequest.Assistant.DossierType),
+                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("document.tipo", stepStartDateUpdateRequest.Assistant.DocumentType),
+                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("step.indice", stepStartDateUpdateRequest.Assistant.Step)
+            };
+
+            var updatedAssistant = await _assistantCollection.FindOneAndUpdateAsync(assistantQuery, assistantUpdate,
+                                                                                    new FindOneAndUpdateOptions<Assistant>
+                                                                                    {
+                                                                                        ReturnDocument = ReturnDocument.After,
+                                                                                        ArrayFilters = assistantArrayFilters
+                                                                                    });
+
+            if (updatedAssistant is null) throw new Exception($"No se pudo actualizar las fechas inicio y límite del paso actual del asistente con identificador {stepStartDateUpdateRequest.Assistant.Id}");
+
+            return updatedAssistant;
+        }
+
+
+        public async Task<Assistant> UpdateAssistantStepAsync(AssistantStepUpdateDTO assistantStepUpdate)
+        {
+            var assistantQuery = Builders<Assistant>.Filter.Eq(assistant => assistant.Id, assistantStepUpdate.Id);
+
+
+            var assistantUpdate = Builders<Assistant>.Update
+                                                        .Set("pasos.$[dossier].documentos.$[document].pasos.$[step].fechafin", assistantStepUpdate.EndDate)
+                                                        .Set("paso", assistantStepUpdate.NewAssistantStep.Step)
+                                                        .Set("tipodocumento", assistantStepUpdate.NewAssistantStep.DocumentType);
+
+            var assistantArrayFilters = new List<ArrayFilterDefinition>()
+            {
+                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("dossier.nombreexpediente", assistantStepUpdate.DossierType),
+                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("document.tipo", assistantStepUpdate.LastAssistantStep.DocumentType),
+                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("step.indice", assistantStepUpdate.LastAssistantStep.Step)
+            };
+
+            var updatedAssistant = await _assistantCollection.FindOneAndUpdateAsync(assistantQuery, assistantUpdate,
+                                                                                   new FindOneAndUpdateOptions<Assistant>
+                                                                                   {
+                                                                                       ReturnDocument = ReturnDocument.After,
+                                                                                       ArrayFilters = assistantArrayFilters
+                                                                                   });
+
+            if (updatedAssistant is null) throw new Exception($"No se pudo actualizar el paso del asistente con identificador {assistantStepUpdate.Id}");
+
+            return updatedAssistant;
+
+        }
+
+        public async Task<Assistant> UpdateAssistantDossierAsync(Assistant assistant, AssistantDossierUpdateDTO assistantDossierUpdate)
+        {
+            var assistantQuery = Builders<Assistant>.Filter.Eq(assistant => assistant.Id, assistantDossierUpdate.Id);
+
+            var assistantUpdate = GetAssistantDossierUpdateBuilder<Assistant>(assistantDossierUpdate);
+
+            var updatedAssistant = await _assistantCollection.FindOneAndUpdateAsync(assistantQuery, assistantUpdate,
+                                                                                  new FindOneAndUpdateOptions<Assistant>
+                                                                                  {
+                                                                                      ReturnDocument = ReturnDocument.After,
+                                                                                  });
+
+            if (updatedAssistant is null) throw new Exception($"No se pudo añadir el expediente de tipo { assistantDossierUpdate.DossierType } al asistente con identificador {assistant.Id}");
+
+            return updatedAssistant;
+        }
+
+        public async Task<Assistant> UpdateAssistantLastDossierStepAsync(Assistant assistant)
+        {
+            var assistantQuery = Builders<Assistant>.Filter.Eq(assistant => assistant.Id, assistant.Id);
+
+            var assistantUpdateBuilder = Builders<Assistant>.Update
+                                                        .Set("pasos.$[dossier].documentos.$[document].pasos.$[step].fechainicio", BsonNull.Value)
+                                                        .Set("pasos.$[dossier].documentos.$[document].pasos.$[step].fechalimite", BsonNull.Value);
+
+            var assistantArrayFilters = new List<ArrayFilterDefinition>()
+            {
+                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("dossier.nombreexpediente", assistant.DossierType),
+                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("document.tipo", assistant.DocumentType),
+                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("step.indice", assistant.Step)
+            };
+
+
+            var updatedAssistant = await _assistantCollection.FindOneAndUpdateAsync(assistantQuery, assistantUpdateBuilder,
+                                                                                  new FindOneAndUpdateOptions<Assistant>
+                                                                                  {
+                                                                                      ReturnDocument = ReturnDocument.After,
+                                                                                      ArrayFilters = assistantArrayFilters
+                                                                                  });
+
+            if (updatedAssistant is null) throw new Exception($"No se pudo actualizar la información del paso del asistente con identificador {assistant.Id}");
+
+            return updatedAssistant;
+
+        }
+
+        private static UpdateDefinition<T> GetAssistantDossierUpdateBuilder<T>(AssistantDossierUpdateDTO assistantDossierUpdate) where T: Assistant
+        {
+
+            var assistantUpdateBuilder = Builders<T>.Update
+                                                        .Set("paso", assistantDossierUpdate.Step)
+                                                        .Set("tipodocumento", assistantDossierUpdate.DocumentType)
+                                                        .Set("tipoexpediente", assistantDossierUpdate.DossierType)
+                                                        .Push("pasos", assistantDossierUpdate.Steps);
+
+            return assistantUpdateBuilder;
         }
 
         public async Task<Assistant> UpdateAsync(StepsUpdateRequest stepUpdateRequest)
@@ -87,16 +216,16 @@ namespace SISGED.Server.Services.Repositories
 
         public async Task<Assistant> UpdateInitialRequestAsync(Assistant assistant, string dossierName)
         {
-            Step steps = await _stepService.GetStepByDossierNameAsync(dossierName);
+            Step steps = await _stepService.GetStepByDossierTypeAsync(dossierName);
 
             steps.Documents.Find(x => x.Type == assistant.DocumentType)!
-                .Steps.Find(x => x.Index == assistant.Step - 1)!.StartDate = assistant.Steps.Documents.ElementAt(0).Steps.ElementAt(0).StartDate;
+                .Steps.Find(x => x.Index == assistant.Step - 1)!.StartDate = assistant.Steps.First().Documents.ElementAt(0).Steps.ElementAt(0).StartDate;
 
             steps.Documents.Find(x => x.Type == assistant.DocumentType)!
-                .Steps.Find(x => x.Index == assistant.Step - 1)!.EndDate = assistant.Steps.Documents.ElementAt(0).Steps.ElementAt(0).EndDate;
+                .Steps.Find(x => x.Index == assistant.Step - 1)!.EndDate = assistant.Steps.First().Documents.ElementAt(0).Steps.ElementAt(0).EndDate;
 
             steps.Documents.Find(x => x.Type == assistant.DocumentType)!
-            .Steps.Find(x => x.Index == assistant.Step - 1)!.DueDate = assistant.Steps.Documents.ElementAt(0).Steps.ElementAt(0).DueDate;
+            .Steps.Find(x => x.Index == assistant.Step - 1)!.DueDate = assistant.Steps.First().Documents.ElementAt(0).Steps.ElementAt(0).DueDate;
 
             FilterDefinition<Assistant> queryUpdate = Builders<Assistant>.Filter.Eq("idexpediente", assistant.DossierId);
 

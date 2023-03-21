@@ -83,16 +83,16 @@ namespace SISGED.Client.Components.Documents.Registers
 
             await swalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo registrar la solicitud de expediente de notario de manera satisfactoria");
 
-            UpdateRegisteredDocument(registeredSolicitorDossier);
+            await UpdateRegisteredDocumentAsync(registeredSolicitorDossier);
         }
 
-        private void UpdateRegisteredDocument(SolicitorDossierRequest solicitorDossierRequest)
+        private async Task UpdateRegisteredDocumentAsync(SolicitorDossierRequest solicitorDossierRequest)
         {
             var inputItem = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace == "inputs");
 
             ProcessWorkItemInfo(inputItem!, solicitorDossierRequest);
 
-            WorkEnvironment.UpdateRegisteredDocument(inputItem!);
+            await WorkEnvironment.UpdateRegisteredDocumentAsync(inputItem!);
 
         }
 

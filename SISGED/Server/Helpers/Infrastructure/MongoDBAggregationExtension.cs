@@ -1,4 +1,5 @@
 ﻿using MongoDB.Bson;
+using MongoDB.Driver;
 using SISGED.Shared.DTOs;
 
 namespace SISGED.Server.Helpers.Infrastructure
@@ -270,6 +271,11 @@ namespace SISGED.Server.Helpers.Infrastructure
         public static BsonDocument ReplaceRoot(BsonValue value)
         {
             return new BsonDocument("$replaceRoot", new BsonDocument().Add("newRoot", value));
+        }
+
+        public static ArrayFilterDefinition GetArrayFilterDefinition<T>(string name, BsonValue value)
+        {
+            return new BsonDocumentArrayFilterDefinition<T>(new BsonDocument(name, value));
         }
     }
 }

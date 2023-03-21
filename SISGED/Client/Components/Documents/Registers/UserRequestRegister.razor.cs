@@ -6,6 +6,7 @@ using SISGED.Client.Generics;
 using SISGED.Client.Helpers;
 using SISGED.Client.Services.Contracts;
 using SISGED.Shared.DTOs;
+using SISGED.Shared.Models.Requests.Assistants;
 using SISGED.Shared.Models.Requests.Documents;
 using SISGED.Shared.Models.Responses.Account;
 using SISGED.Shared.Models.Responses.Document;
@@ -67,16 +68,18 @@ namespace SISGED.Client.Components.Documents.Registers
 
             var documentRegister = GetDocumentRegister();
 
-            bool registered = await ShowLoadingDialogAsync(documentRegister);
+            var registeredInitialRequest = await ShowLoadingDialogAsync(documentRegister);
 
-            if (!registered) return;
+            if (registeredInitialRequest is null) return;
+
+            await RegisterAssistantAsync(new(registeredInitialRequest.Dossier.Id, registeredInitialRequest.Dossier.Type));
 
             await SwalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo registrar su solicitud de manera satisfactoria");
 
             MudDialog.Close(DialogResult.Ok(true));
         }
 
-        private async Task<bool> ShowLoadingDialogAsync(DossierWrapper documentRegister)
+        private async Task<DossierDocumentInitialRequestResponse?> ShowLoadingDialogAsync(DossierWrapper documentRegister)
         {
             string dialogTitle = $"Realizando el registro de su solicitud, por favor espere...";
 
@@ -97,24 +100,42 @@ namespace SISGED.Client.Components.Documents.Registers
             return documentRegister;
         }
 
-        private async Task<bool> RegisterUserRequestDocumentAsync(DossierWrapper documentRegister)
+        private async Task<DossierDocumentInitialRequestResponse?> RegisterUserRequestDocumentAsync(DossierWrapper documentRegister)
         {
             try
             {
-                var userRequestResponse = await HttpRepository.PostAsync("api/documents/user-requests", documentRegister);
+                var userRequestResponse = await HttpRepository.PostAsync<DossierWrapper, DossierDocumentInitialRequestResponse >("api/documents/user-requests", documentRegister);
 
                 if (userRequestResponse.Error)
                 {
                     await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo registar su solicitud");
                 }
 
-                return true;
+                return userRequestResponse.Response!;
             }
             catch (Exception)
             {
 
                 await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo registar su solicitud");
-                return false;
+                return null;
+            }
+        }
+
+        private async Task RegisterAssistantAsync(AssistantCreateRequest assistantRequest)
+        {
+            try
+            {
+                var assistantResponse = await HttpRepository.PostAsync("api/assistants", assistantRequest);
+
+                if(assistantResponse.Error)
+                {
+                    await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo completar con el registro de su solicitud");
+                }
+            }
+            catch (Exception)
+            {
+
+                await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo completar con el registro de su solicitud");
             }
         }
 

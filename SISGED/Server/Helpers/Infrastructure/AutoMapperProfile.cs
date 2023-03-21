@@ -128,6 +128,12 @@ namespace SISGED.Server.Helpers.Infrastructure
 
             // Document Version Mapper
             CreateMap<ContentVersion, DocumentVersionInfo>();
+
+            // Assistant Mapper
+            CreateMap<Assistant, AssistantStepUpdateDTO>()
+                .ForMember(assistant => assistant.EndDate, options => options.Ignore())
+                .ForMember(assistant => assistant.LastAssistantStep, options => options.Ignore())
+                .ForMember(assistant => assistant.NewAssistantStep, options => options.MapFrom(newAssistant => new AssistantStepDTO(newAssistant.Step, newAssistant.DocumentType)));
         }
 
         private string MapStepDocumentRequestUID(StepDocument stepDocument, StepGenericModel.StepDocument stepDocumentRequest)

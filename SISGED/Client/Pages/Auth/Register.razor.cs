@@ -65,7 +65,7 @@ namespace SISGED.Client.Pages.Auth
         {
             documentTypes = await GetDocumentTypesAsync();
 
-            userSelfRegister.DocumentType = documentTypes.FirstOrDefault();
+            userSelfRegister.DocumentType = documentTypes.FirstOrDefault()!;
 
             pageLoading = false;
         }

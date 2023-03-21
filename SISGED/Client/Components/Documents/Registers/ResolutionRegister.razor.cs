@@ -87,16 +87,16 @@ namespace SISGED.Client.Components.Documents.Registers
 
             await swalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo registrar la resolución de manera satisfactoria");
 
-            UpdateRegisteredDocument(registeredResolution);
+            await UpdateRegisteredDocumentAsync(registeredResolution);
         }
 
-        private void UpdateRegisteredDocument(Resolution resolution)
+        private async Task UpdateRegisteredDocumentAsync(Resolution resolution)
         {
             var inputItem = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace == "inputs");
 
             ProcessWorkItemInfo(inputItem!, resolution);
 
-            WorkEnvironment.UpdateRegisteredDocument(inputItem!);
+            await WorkEnvironment.UpdateRegisteredDocumentAsync(inputItem!);
 
         }
 

@@ -39,7 +39,7 @@ namespace SISGED.Client.Components.Documents.Histories.DossierInfoDialog
     public partial class DossierInfoDocumentsDialog
     {
         [CascadingParameter]
-        MudDialogInstance MudDialog { get; set; }
+        MudDialogInstance MudDialog { get; set; } = default!;
         [Parameter]
         public List<UserDocumentDTO> Documents { get; set; } = new List<UserDocumentDTO>();
         [Inject]

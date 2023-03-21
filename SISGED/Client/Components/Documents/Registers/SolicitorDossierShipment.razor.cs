@@ -65,16 +65,16 @@ namespace SISGED.Client.Components.Documents.Registers
 
             await SwalFireRepository.ShowSuccessfulSwalFireAsync("Se pudo registrar el envío de expediente de manera exitosa");
 
-            UpdateRegisteredDocument(registeredSolicitorDossierShipment);
+            await UpdateRegisteredDocumentAsync(registeredSolicitorDossierShipment);
         }
 
-        private void UpdateRegisteredDocument(Entities.SolicitorDossierShipment solicitorDossierShipment)
+        private async Task UpdateRegisteredDocumentAsync(Entities.SolicitorDossierShipment solicitorDossierShipment)
         {
             var inputItem = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace == "inputs");
 
             ProcessWorkItemInfo(inputItem!, solicitorDossierShipment);
 
-            WorkEnvironment.UpdateRegisteredDocument(inputItem!);
+            await WorkEnvironment.UpdateRegisteredDocumentAsync(inputItem!);
 
         }
 

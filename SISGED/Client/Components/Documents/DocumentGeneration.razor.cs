@@ -47,6 +47,7 @@ namespace SISGED.Client.Components.Documents
         private RenderFragment ChildContent = default!;
         private DocumentGenerator documentGenerator = default!;
         private IJSObjectReference pdfGeneratorModule = default!;
+        private DossierTrayResponse dossierTray = default!;
 
         private static string GenerateCode(DossierTrayResponse dossierTray, DocumentResponse document)
         {
@@ -63,7 +64,7 @@ namespace SISGED.Client.Components.Documents
 
         private void GetDocumentInformation()
         {
-            var dossierTray = GetDossierTray();
+            dossierTray = GetDossierTray();
             var lastDocument = dossierTray.DocumentObjects!.Last();
 
             generateDocumentRequest = new(lastDocument.Id, dossierTray.DossierId, GenerateCode(dossierTray, lastDocument));
@@ -72,17 +73,20 @@ namespace SISGED.Client.Components.Documents
             documentType = lastDocument.Type;
         }
 
-        private void GetSignature(MediaRegisterDTO sign)
+        private async Task GetSignatureAsync(MediaRegisterDTO sign)
         {
             generateDocumentRequest.Sign = sign;
             canGenerate = true;
-                
+
+            await WorkEnvironment.UpdateAssistantMessageAsync(new(dossierTray.Type!, dossierTray.Document!.Type, 1));
         }
 
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
             GetDocumentInformation();
             GetDocumentGenerator();
+
+            await WorkEnvironment.UpdateAssistantMessageAsync(new(dossierTray.Type!, dossierTray.Document!.Type, 0));
 
             pageLoading = false;
         }
@@ -144,7 +148,7 @@ namespace SISGED.Client.Components.Documents
 
             await SwalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo generar la denuncia de manera satisfactoria");
 
-            UpdateGeneratedDocument(document!);
+            await UpdateGeneratedDocumentAsync(document!);
         }
         
         private async Task<DialogResult> ShowPdfPrevisualization(string generatedUrl)
@@ -213,13 +217,13 @@ namespace SISGED.Client.Components.Documents
             return new(content, extension, fileName);
         }
 
-        private void UpdateGeneratedDocument(Document generatedDocument)
+        private async Task UpdateGeneratedDocumentAsync(Document generatedDocument)
         {
             var item = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace != "tools");
 
             ProcessWorkItemInfo(item!, generatedDocument);
             
-            WorkEnvironment.UpdateGeneratedDocument(item!);
+            await WorkEnvironment.UpdateGeneratedDocumentAsync(item!);
         }
 
         private void ProcessWorkItemInfo(Helpers.Item item, Document generatedDocument)

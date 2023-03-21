@@ -5,7 +5,7 @@ namespace SISGED.Shared.Models.Responses.DossierDocument
     public class DossierDocumentInitialRequestResponse
     {
         public Entities.Dossier Dossier { get; set; } = default!;
-        public Entities.InitialRequest InitialRequest { get; set; } = default!;
+        public InitialRequest InitialRequest { get; set; } = default!;
 
         public DossierDocumentInitialRequestResponse() { }
 

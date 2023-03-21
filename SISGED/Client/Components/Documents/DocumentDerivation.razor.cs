@@ -101,16 +101,16 @@ namespace SISGED.Client.Components.Documents
 
             await SwalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo derivar el documento de manera satisfactoria");
 
-            UpdateSentDocument(dossierDocument);
+            await UpdateSentDocumentAsync(dossierDocument);
         }
 
-        private void UpdateSentDocument(DossierLastDocumentResponse dossierDocument)
+        private async Task UpdateSentDocumentAsync(DossierLastDocumentResponse dossierDocument)
         {
             var item = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace != "tools");
 
             ProcessWorkItemInfo(item!, dossierDocument);
 
-            WorkEnvironment.SendDocument(item!);
+            await WorkEnvironment.SendDocumentAsync(item!);
         }
 
         private void ProcessWorkItemInfo(Helpers.Item item, DossierLastDocumentResponse dossierDocument)

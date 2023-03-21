@@ -36,7 +36,7 @@ namespace SISGED.Client.Services.Repositories
                 new("Solicitud de Denuncia", "ComplaintRequest", Roles.MesaPartes),
                 new("Aperturamiento Disciplinario", "DisciplinaryOpennessRequest", Roles.TribunalHonor),
                 new("Solicitud de Expediente de Notario", "SolicitorDossierRequest", Roles.Fiscal),
-                new("Entrega de Expediente de Notario", "SolicitorDossierShipment", Roles.TramiteDocumentario), // To be implemented by Sebastian
+                new("Entrega de Expediente de Notario", "SolicitorDossierShipment", Roles.TramiteDocumentario),
                 new("Dictamen", "Dictum", Roles.Fiscal),
                 new("Resolución", "Resolution", Roles.TribunalHonor),
             };

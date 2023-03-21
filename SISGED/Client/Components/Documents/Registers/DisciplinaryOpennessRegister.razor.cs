@@ -82,16 +82,17 @@ namespace SISGED.Client.Components.Documents.Registers
             if (registeredDisciplinary is null) return;
 
             await swalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo registrar el aperturamiento disciplinario de manera satisfactoria");
-            UpdateRegisteredDocument(registeredDisciplinary);
+
+            await UpdateRegisteredDocumentAsync(registeredDisciplinary);
         }
 
-        private void UpdateRegisteredDocument(DisciplinaryOpenness disciplinaryOpenness)
+        private async Task UpdateRegisteredDocumentAsync(DisciplinaryOpenness disciplinaryOpenness)
         {
             var inputItem = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace == "inputs");
 
             ProcessWorkItemInfo(inputItem!, disciplinaryOpenness);
 
-            WorkEnvironment.UpdateRegisteredDocument(inputItem!);
+            await WorkEnvironment.UpdateRegisteredDocumentAsync(inputItem!);
 
         }
 

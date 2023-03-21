@@ -53,6 +53,8 @@ namespace SISGED.Client.Components.Documents
         {
             await GetDocumentEvaluationInfoAsync();
 
+            await WorkEnvironment.UpdateAssistantMessageAsync(new(dossierTray.Type!, dossierTray.Document!.Type, 0));
+
             pageLoading = false;
         }
 
@@ -91,16 +93,16 @@ namespace SISGED.Client.Components.Documents
 
             await SwalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo evaluar el documento de manera satisfactoria");
 
-            UpdateEvaluatedDocument(evaluatedDocument);
+            await UpdateEvaluatedDocumentAsync(evaluatedDocument);
         }
 
-        private void UpdateEvaluatedDocument(DocumentResponse documentResponse)
+        private async Task UpdateEvaluatedDocumentAsync(DocumentResponse documentResponse)
         {
             var item = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace != "tools");
 
             ProcessWorkItemInfo(item!, documentResponse);
 
-            WorkEnvironment.EvaluateDocument(item!, isApproved);
+            await WorkEnvironment.EvaluateDocumentAsync(item!, isApproved);
         }
 
         private void ProcessWorkItemInfo(Item item, DocumentResponse documentResponse)

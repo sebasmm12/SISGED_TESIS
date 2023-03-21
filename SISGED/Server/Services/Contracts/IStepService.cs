@@ -7,7 +7,7 @@ namespace SISGED.Server.Services.Contracts
     public interface IStepService
     {
         Task<List<Step>> GetStepsAsync();
-        Task<Step> GetStepByDossierNameAsync(string dossierName);
+        Task<Step> GetStepByDossierTypeAsync(string dossierName);
         Task<Step> GetStepByIdAsync(string stepId);
         Task<IEnumerable<DossierStepsResponse>> GetStepRequestAsync();
         Task RegisterStepAsync(StepRegisterRequest stepsRequest);

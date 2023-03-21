@@ -1,8 +1,12 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using MudBlazor;
+using SISGED.Client.Components.VirtualHelpers;
 using SISGED.Client.Helpers;
 using SISGED.Client.Services.Contracts;
+using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
+using SISGED.Shared.Models.Requests.Assistants;
 using SISGED.Shared.Models.Responses.Account;
 using SISGED.Shared.Models.Responses.DossierTray;
 using SISGED.Shared.Models.Responses.Tray;
@@ -13,6 +17,10 @@ namespace SISGED.Client.Components.WorkEnvironments
     {
         [Inject]
         private IHttpRepository HttpRepository { get; set; } = default!;
+        [Inject]
+        private ISwalFireRepository SwalFireRepository { get; set; } = default!;
+        [Inject]
+        private IJSRuntime JSRuntime { get; set; } = default!;
 
         [CascadingParameter(Name = "SessionAccount")]
         public SessionAccountResponse SessionAccount { get; set; } = default!;
@@ -24,6 +32,9 @@ namespace SISGED.Client.Components.WorkEnvironments
         public readonly List<Item> workPlaceItems = new();
 
         private bool CanReorder => workPlaceItems.Count > 0;
+        private string assistantMessage = "Seleccione un expediente de las bandejas al área de trabajo para procesarlo";
+        private Assistant assistant = default!;
+        private VirtualHelper? virtualHelper;
 
         protected override async Task OnInitializedAsync()
         {
@@ -45,7 +56,7 @@ namespace SISGED.Client.Components.WorkEnvironments
             return permissions.Select(permission => new Item()
             {
                 Name = permission.Label,
-                Value = permission.Name,
+                Value = permission.Id,
                 Icon = permission.Icon,
                 Description = string.Empty,
                 CurrentPlace = "tools",
@@ -68,55 +79,192 @@ namespace SISGED.Client.Components.WorkEnvironments
             }).ToList();
         }
 
-        private void UpdateItem(MudItemDropInfo<Item> item)
+        private async Task UpdateItemAsync(MudItemDropInfo<Item> item)
         {
             if (item.Item.CurrentPlace == "workplace" && item.DropzoneIdentifier != "workplace") workPlaceItems.Remove(item.Item);
 
             item.Item.CurrentPlace = item.DropzoneIdentifier;
 
-            if (item.DropzoneIdentifier == "workplace") workPlaceItems.Add(item.Item);
+            if (item.DropzoneIdentifier != "workplace") return;
+
+            workPlaceItems.Add(item.Item);
+
+            if (item.Item.OriginPlace != "tools")
+            {
+                await GetDossierAssistantAsync(item.Item);
+
+                return;
+            }
+
+            await UpdateAssistantStepAsync();
         }
 
-        public void UpdateRegisteredDocument(Item item)
+        private async Task UpdateAssistantStepAsync()
         {
-            ChangeToolPlace(new("inputs", "outputs", item));
-            UpdateUsedTool();
+            if (assistant is null) return;
+
+            var currentDocumentStep = assistant.GetCurrentDocumentStep();
+
+            if (currentDocumentStep.StartDate.HasValue) return;
+
+            var updatedAssistantRequest = new AssistantStepStartDateUpdateRequest(assistant.Id);
+
+            assistant = await UpdateAssistantStepStartDateAsync(updatedAssistantRequest);
         }
 
-        public void UpdateGeneratedDocument(Item item)
+        public DocumentStep GetCurrentStep()
         {
-            ChangeToolPlace(new("outputs", "outputs", item));
-
-            UpdateUsedTool();
+            return assistant.GetCurrentDocumentStep();
         }
 
-        private void UpdateUsedTool()
+        private async Task GetDossierAssistantAsync(Item item)
         {
-            ChangeToolPlace(new("tools", "tools"));
+            if (item.Value is not DossierTrayResponse dossierTray) return;
+
+            assistant = await GetAsistantByDossierAsync(dossierTray.DossierId);
+
+            string assistantMessage = assistant.GetCurrentMessage();
+
+            ChangeAssistantMessage(assistantMessage);
+        }
+
+        private void ChangeAssistantMessage(string message)
+        {
+            virtualHelper!.ChangeMessage(message);
+        }
+
+        public async Task UpdateAssistantMessageAsync(AsistantMessageUpdate asistantMessageUpdate)
+        {
+            string assistantMessage;
+
+            if (assistant.Substep == asistantMessageUpdate.SubStep) return;
+
+            assistant.Substep = asistantMessageUpdate.SubStep;
+
+            if (!assistant.IsLastSubStep()) assistantMessage = assistant.GetCurrentMessage();
+            else
+            {
+                assistant = await UpdateAssistantStepAsync(new(assistant.Id, asistantMessageUpdate.DossierType, asistantMessageUpdate.DocumentType));
+
+                assistantMessage = this.assistantMessage;
+            }
+            
+            ChangeAssistantMessage(assistantMessage);
+        }
+
+        private async Task<Assistant> UpdateAssistantStepAsync(AssistantUpdateRequest assistantUpdateRequest)
+        {
+            try
+            {
+                var updatedAssistantResponse = await HttpRepository.PutAsync<AssistantUpdateRequest, Assistant>("api/assistants", assistantUpdateRequest);
+
+                if (updatedAssistantResponse.Error)
+                {
+                    await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo actualizar el flujo del expediente para el asistente");
+                }
+
+                return updatedAssistantResponse.Response!;
+            }
+            catch (Exception)
+            {
+
+                await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo actualizar el flujo del expediente para el asistente");
+                return new();
+            }
+        }
+
+        private async Task<Assistant> UpdateAssistantStepStartDateAsync(AssistantStepStartDateUpdateRequest updatedAssistantRequest)
+        {
+            try
+            {
+                var updatedAssistantResponse = await HttpRepository.PutAsync<AssistantStepStartDateUpdateRequest, Assistant>("api/assistants/steps/start-date", updatedAssistantRequest);
+
+                if (updatedAssistantResponse.Error)
+                {
+                    await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo actualizar la información de la herramienta seleccionada para el asistente");
+                }
+
+                return updatedAssistantResponse.Response!;
+            }
+            catch (Exception)
+            {
+
+                await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo actualizar la información de la herramienta seleccionada para el asistente");
+                return new();
+            }
+        }
+
+        private async Task<Assistant> GetAsistantByDossierAsync(string dossierId)
+        {
+            try
+            {
+                var assitantResponse = await HttpRepository.GetAsync<Assistant>($"api/assistants/{dossierId}");
+
+                if (assitantResponse.Error)
+                {
+                    await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener la información del expediente para el asistente");
+                }
+
+                return assitantResponse.Response!;
+            }
+            catch (Exception)
+            {
+
+                await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener la información del expediente para el asistente");
+                return new();
+            }
+        }
+
+
+        public async Task UpdateRegisteredDocumentAsync(Item item)
+        {
+            await ChangeToolPlaceAsync(new("inputs", "outputs", item));
+
+            await Task.WhenAny(UpdateUsedToolAsync(), UpdateAssistantMessageFromItemAsync(item, 1));
+        }
+
+        public async Task UpdateGeneratedDocumentAsync(Item item)
+        {
+            await ChangeToolPlaceAsync(new("outputs", "outputs", item));
+
+            await Task.WhenAny(UpdateUsedToolAsync(), UpdateAssistantMessageFromItemAsync(item, 2));
+        }
+
+        private async Task UpdateUsedToolAsync()
+        {
+            await ChangeToolPlaceAsync(new("tools", "tools"));
 
             workPlaceItems.Clear();
 
             StateHasChanged();
         }
 
-        public void SendDocument(Item item)
+        public async Task SendDocumentAsync(Item item)
         {
             // TODO: Implement the logic the send the document into the receiver user tray by the signalR Hub
             Items.Remove(item);
 
-            UpdateUsedTool();
+            await Task.WhenAny(UpdateUsedToolAsync(), UpdateAssistantMessageFromItemAsync(item, 2));
         }
 
-        public void EvaluateDocument(Item item, bool isApproved)
+        public async Task EvaluateDocumentAsync(Item item, bool isApproved)
         {
-            if (isApproved) ChangeToolPlace(new("inputs", "inputs", item));
+            if (isApproved) await ChangeToolPlaceAsync(new("inputs", "inputs", item));
             else Items.Remove(item);
 
             // TODO: Implement the logic the send the document into the receiver user tray by the signalR Hub
-            UpdateUsedTool();
+            await Task.WhenAny(UpdateUsedToolAsync(), UpdateAssistantMessageFromItemAsync(item, 1));
         }
 
-        private void ChangeToolPlace(WorkToolPlace workToolPlace)
+        private async Task UpdateAssistantMessageFromItemAsync(Item item, int assistantSubStep)
+        {
+            if (item.Value is not DossierTrayResponse dossierTray) return;
+
+            await UpdateAssistantMessageAsync(new(dossierTray.Type!, dossierTray.Document!.Type, assistantSubStep));
+        }
+
+
+        private async Task ChangeToolPlaceAsync(WorkToolPlace workToolPlace)
         {
             var item = workToolPlace.Item;
 
@@ -124,7 +272,7 @@ namespace SISGED.Client.Components.WorkEnvironments
 
             var itemDropInfo = new MudItemDropInfo<Item>(item!, workToolPlace.NewPlace, 0);
 
-            UpdateItem(itemDropInfo);
+            await UpdateItemAsync(itemDropInfo);
         }
 
         private async Task<InputOutputTrayResponse> GetUserTrayAsync(string userId)
