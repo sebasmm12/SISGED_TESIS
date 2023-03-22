@@ -92,7 +92,7 @@ namespace SISGED.Shared.Entities
             Step = 0;
         }
 
-        public bool IsLastSubStep() => Substep == GetCurrentDocumentStep().Substeps.Count - 1;
+        public bool IsLastSubStep() => Substep == GetCurrentDocumentStep().Substeps.Count;
         public bool IsLastStep() => Step == GetCurrentStep().Steps.Count - 1;
         public bool IsLastDocument() => FindDocumentIndex() == GetCurrentAssistantStep().Documents.Count - 1;
     }

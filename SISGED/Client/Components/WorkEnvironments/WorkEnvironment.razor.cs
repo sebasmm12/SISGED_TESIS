@@ -220,14 +220,14 @@ namespace SISGED.Client.Components.WorkEnvironments
         {
             await ChangeToolPlaceAsync(new("inputs", "outputs", item));
 
-            await Task.WhenAny(UpdateUsedToolAsync(), UpdateAssistantMessageFromItemAsync(item, 1));
+            await Task.WhenAny(UpdateUsedToolAsync(), UpdateAssistantMessageFromItemAsync(item, 2));
         }
 
         public async Task UpdateGeneratedDocumentAsync(Item item)
         {
             await ChangeToolPlaceAsync(new("outputs", "outputs", item));
 
-            await Task.WhenAny(UpdateUsedToolAsync(), UpdateAssistantMessageFromItemAsync(item, 2));
+            await Task.WhenAny(UpdateUsedToolAsync(), UpdateAssistantMessageFromItemAsync(item, 3));
         }
 
         private async Task UpdateUsedToolAsync()
@@ -244,7 +244,7 @@ namespace SISGED.Client.Components.WorkEnvironments
             // TODO: Implement the logic the send the document into the receiver user tray by the signalR Hub
             Items.Remove(item);
 
-            await Task.WhenAny(UpdateUsedToolAsync(), UpdateAssistantMessageFromItemAsync(item, 2));
+            await Task.WhenAny(UpdateUsedToolAsync(), UpdateAssistantMessageFromItemAsync(item, 3));
         }
 
         public async Task EvaluateDocumentAsync(Item item, bool isApproved)
@@ -253,7 +253,7 @@ namespace SISGED.Client.Components.WorkEnvironments
             else Items.Remove(item);
 
             // TODO: Implement the logic the send the document into the receiver user tray by the signalR Hub
-            await Task.WhenAny(UpdateUsedToolAsync(), UpdateAssistantMessageFromItemAsync(item, 1));
+            await Task.WhenAny(UpdateUsedToolAsync(), UpdateAssistantMessageFromItemAsync(item, 2));
         }
 
         private async Task UpdateAssistantMessageFromItemAsync(Item item, int assistantSubStep)

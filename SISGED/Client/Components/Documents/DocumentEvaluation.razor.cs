@@ -53,7 +53,7 @@ namespace SISGED.Client.Components.Documents
         {
             await GetDocumentEvaluationInfoAsync();
 
-            await WorkEnvironment.UpdateAssistantMessageAsync(new(dossierTray.Type!, dossierTray.Document!.Type, 0));
+            await WorkEnvironment.UpdateAssistantMessageAsync(new(dossierTray.Type!, dossierTray.Document!.Type, 1));
 
             pageLoading = false;
         }

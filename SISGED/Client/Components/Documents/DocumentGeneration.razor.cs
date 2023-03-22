@@ -78,7 +78,7 @@ namespace SISGED.Client.Components.Documents
             generateDocumentRequest.Sign = sign;
             canGenerate = true;
 
-            await WorkEnvironment.UpdateAssistantMessageAsync(new(dossierTray.Type!, dossierTray.Document!.Type, 1));
+            await WorkEnvironment.UpdateAssistantMessageAsync(new(dossierTray.Type!, dossierTray.Document!.Type, 2));
         }
 
         protected override async Task OnInitializedAsync()
@@ -86,7 +86,7 @@ namespace SISGED.Client.Components.Documents
             GetDocumentInformation();
             GetDocumentGenerator();
 
-            await WorkEnvironment.UpdateAssistantMessageAsync(new(dossierTray.Type!, dossierTray.Document!.Type, 0));
+            await WorkEnvironment.UpdateAssistantMessageAsync(new(dossierTray.Type!, dossierTray.Document!.Type, 1));
 
             pageLoading = false;
         }

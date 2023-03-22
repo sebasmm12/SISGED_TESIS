@@ -41,7 +41,7 @@ namespace SISGED.Client.Components.Documents
             documentOptions = DocumentRepository.GetDocumentTypesWithDossier().Where(document => document.Rol == userRole 
                                                                                     && registeredDocuments.Contains(document.Value));
 
-            await WorkEnvironment.UpdateAssistantMessageAsync(new(dossierTray.Type!, dossierTray.Document!.Type, 0));
+            await WorkEnvironment.UpdateAssistantMessageAsync(new(dossierTray.Type!, dossierTray.Document!.Type, 1));
         }
 
         private IEnumerable<string> GetDocumentsFromAssistant()
