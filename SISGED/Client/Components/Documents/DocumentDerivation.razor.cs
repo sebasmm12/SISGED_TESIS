@@ -40,24 +40,26 @@ namespace SISGED.Client.Components.Documents
         private string roleId = "5eeaf91a8ca4ff53a0b791eb";
         private DocumentDerivationDTO documentDerivation = new();
         private MudForm? documentDerivationForm = default!;
-
+        private DossierTrayResponse dossierTray = default!;
 
         protected override async Task OnInitializedAsync()
         {
+            dossierTray = GetDossierTray();
             await GetUserInformationAsync();
-
+            await WorkEnvironment.UpdateAssistantMessageAsync(new(dossierTray.Type!, dossierTray.Document!.Type, 1));
             pageLoading = false;
         }
 
-        private void UpdateUserTray(UserTrayResponse userTrayResponse)
+        private async Task UpdateUserTray(UserTrayResponse userTrayResponse)
         {
             documentDerivation.UserTray = userTrayResponse;
+            await WorkEnvironment.UpdateAssistantMessageAsync(new(dossierTray.Type!, dossierTray.Document!.Type, 2));
         }
 
         private async Task GetUserInformationAsync()
         {
             var userRoleTask = GetRoleAsync(SessionAccount.GetUser().Rol);
-            var receiverUserRoleTask = GetRoleAsync(roleId);
+            var receiverUserRoleTask = GetRoleAsync(GetReceiverRoleFromAssistant());
 
             await Task.WhenAll(userRoleTask, receiverUserRoleTask);
 
@@ -65,6 +67,14 @@ namespace SISGED.Client.Components.Documents
             documentDerivation.ReceiverUserRole = await receiverUserRoleTask;
         }
 
+        private string GetReceiverRoleFromAssistant()
+        {
+            var role = WorkEnvironment.GetCurrentStep().ReceiverRole;
+
+            if (role is null) return default!;
+
+            return role;
+        }
 
         private async Task<Role?> GetRoleAsync(string roleId)
         {
