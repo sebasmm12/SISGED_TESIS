@@ -21,7 +21,13 @@
                 <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="(() =>ToogleDrawer())"></MudIconButton>
                 <MudHidden Breakpoint="Breakpoint.MdAndDown"><MudText Typo="Typo.body2">SISGED - Sistema de Gestión Documentario del <MudLink Target="_blank" Href="@organizationMainPageUrl" Color="Color.Secondary" Typo="Typo.body2"> Colegio de Notarios de Lima</MudLink></MudText></MudHidden>
                 <MudSpacer />
-                <MudMenu Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" MaxHeight="500">
+                <MudMenu Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit"
+                         MaxHeight="500" AnchorOrigin="@Origin.BottomLeft" TransformOrigin="@Origin.TopRight">
+                    <ChildContent>
+                        <CascadingValue Value="@SessionAccount" Name="SessionAccount">
+                           <NotificationsList></NotificationsList>
+                       </CascadingValue>
+                    </ChildContent>
                 </MudMenu>
                 <MudMenu AnchorOrigin="@Origin.BottomCenter" TransformOrigin="@Origin.TopLeft" PopoverClass="standard-color">
                     <ActivatorContent>

@@ -14,6 +14,7 @@ using SISGED.Shared.Models.Responses.Document.Resolution;
 using SISGED.Shared.Models.Responses.DocumentType;
 using SISGED.Shared.Models.Responses.DocumentVersion;
 using SISGED.Shared.Models.Responses.Dossier;
+using SISGED.Shared.Models.Responses.Notification;
 using SISGED.Shared.Models.Responses.Role;
 using SISGED.Shared.Models.Responses.Solicitor;
 using SISGED.Shared.Models.Responses.SolicitorDossier;

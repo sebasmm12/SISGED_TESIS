@@ -28,6 +28,7 @@ namespace SISGED.Server.Helpers.Infrastructure
             services.AddScoped<IDocumentVersionService, DocumentVersionService>();
             services.AddScoped<IDocumentProcessService, DocumentProcessService>();
             services.AddScoped<IDocumentEvaluationService, DocumentEvaluationService>();
+            services.AddScoped<INotificationService, NotificationService>();
 
             return services;
         }

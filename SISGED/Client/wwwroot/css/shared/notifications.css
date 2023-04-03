@@ -1,0 +1,12 @@
+﻿.notifications-card {
+    width: 400px;
+}
+
+
+.notification:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.notification:has(.notification-state:hover) {
+    background-color: white;
+}

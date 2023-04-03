@@ -31,6 +31,7 @@ static void ConfigureServices(IServiceCollection services)
     services.AddAuthorizationCore();
 
     services.AddScoped<ISwalFireRepository, SwalFireRepository>();
+    services.AddScoped<IMomentRepository, MomentRepository>();
     services.AddScoped<IHttpRepository, HttpRepository>();
     services.AddScoped<IDocumentRepository, DocumentRepository>();
     services.AddScoped<IDossierRepository, DossierRepository>();
@@ -54,6 +55,7 @@ static void ConfigureServices(IServiceCollection services)
     services.AddTransient<ToolWindowStrategy>();
     services.AddTransient<DocumentStrategy>();
     services.AddTransient<DocumentGeneratorStrategy>();
+    services.AddTransient<NotificationStrategy>();
 
     services.AddTransient<UserRequestRegisterValidator>();
     services.AddTransient<ComplaintRequestValidator>();

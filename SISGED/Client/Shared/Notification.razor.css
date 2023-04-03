@@ -1,0 +1,20 @@
+﻿.notification-time {
+    font-size: 13px;
+    color: #636871;
+    margin-top: 2px;
+}
+
+.notification-state {
+    width: 10px;
+    height: 10px;
+    border-radius: 10px;
+    cursor : pointer;
+    background-color: gray;
+}
+
+.seen {
+    background-color: #25A871;
+}
+.no-seen {
+    background-color: #0F70EF;
+}

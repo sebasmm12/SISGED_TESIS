@@ -2,10 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using SISGED.Client.Services.Contracts;
-using SISGED.Client.Services.Repositories;
 using SISGED.Shared.Models.Responses.Account;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace SISGED.Client.Shared
 {
@@ -42,7 +39,7 @@ namespace SISGED.Client.Shared
             mainLayoutModule = await IJSRuntime.InvokeAsync<IJSObjectReference>("import", "../js/main-layout.js");
 
             var authState = await AuthenticationState;
-            
+
             var user = authState.User;
 
             if (user.Identity!.IsAuthenticated)
