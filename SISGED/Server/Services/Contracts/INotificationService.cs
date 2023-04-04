@@ -7,6 +7,7 @@ namespace SISGED.Server.Services.Contracts
     {
         Task<Notification> GetNotificationAsync(string notificationId);
         Task<IEnumerable<NotificationInfoResponse>> GetNotificationsByUserIdAsync(string userId);
+        Task<Notification> RegisterNotificationAsync(Notification notification);
         Task<Notification> UpdateNotificationAsync(Notification notification);
     }
 }

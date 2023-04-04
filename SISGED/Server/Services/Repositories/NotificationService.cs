@@ -50,6 +50,15 @@ namespace SISGED.Server.Services.Repositories
             return updatedNotification;
         }
 
+        public async Task<Notification> RegisterNotificationAsync(Notification notification)
+        {
+            await _notificationsCollection.InsertOneAsync(notification);
+
+            if (notification.Id is null) throw new Exception($"No se pudo crear la notificación de tipo { notification.Title }");
+
+            return notification;
+        }
+
         #region private methods
         private BsonDocument[] GetNotificationByUserIdPipeline(string userId)
         {

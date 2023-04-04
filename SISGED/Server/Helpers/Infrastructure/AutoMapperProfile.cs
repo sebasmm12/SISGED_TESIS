@@ -3,6 +3,7 @@ using SISGED.Client.Helpers;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Requests.Documents;
+using SISGED.Shared.Models.Requests.Notifications;
 using SISGED.Shared.Models.Requests.Step;
 using SISGED.Shared.Models.Requests.User;
 using SISGED.Shared.Models.Responses.Document;
@@ -135,6 +136,16 @@ namespace SISGED.Server.Helpers.Infrastructure
                 .ForMember(assistant => assistant.EndDate, options => options.Ignore())
                 .ForMember(assistant => assistant.LastAssistantStep, options => options.Ignore())
                 .ForMember(assistant => assistant.NewAssistantStep, options => options.MapFrom(newAssistant => new AssistantStepDTO(newAssistant.Step, newAssistant.DocumentType)));
+
+            // Notification Mapper
+            CreateMap<NotificationRegisterRequest, Notification>()
+                .ForMember(notification => notification.SenderId, options => options.MapFrom(notificationRegisterRequest => notificationRegisterRequest.SenderUserId))
+                .ForMember(notification => notification.ReceiverId, options => options.MapFrom(notificationRegisterRequest => notificationRegisterRequest.ReceiverUserId))
+                .ForMember(notification => notification.DocumentId, options => options.MapFrom(notificationRegisterRequest => notificationRegisterRequest.Document.DocumentId));
+
+
+            CreateMap<Template, Notification>()
+                .ForMember(notification => notification.Id, options => options.Ignore());
         }
 
         private string MapStepDocumentRequestUID(StepDocument stepDocument, StepGenericModel.StepDocument stepDocumentRequest)
