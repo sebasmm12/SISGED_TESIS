@@ -7,6 +7,7 @@ using MongoDB.Driver;
 using Serilog;
 using SISGED.Server.Helpers.Infrastructure;
 using SISGED.Server.Helpers.Middlewares;
+using SISGED.Server.Hubs;
 using SISGED.Server.Services.Contracts;
 using SISGED.Server.Services.Repositories;
 using System.Text;
@@ -25,6 +26,7 @@ try
 
     builder.Services.AddControllersWithViews();
     builder.Services.AddRazorPages();
+    builder.Services.AddSignalR();
 
     // Authentication Dependency Injection
     builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -135,6 +137,8 @@ try
 
     app.UseBlazorFrameworkFiles();
     app.UseStaticFiles();
+
+    app.MapHub<NotificationHub>("/notificationHub");
 
     app.UseRouting();
     app.UseAuthentication();

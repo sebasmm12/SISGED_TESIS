@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using SISGED.Server.Hubs;
 using SISGED.Server.Services.Contracts;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
@@ -18,16 +20,17 @@ namespace SISGED.Server.Controllers
         private readonly ITemplateService _templateService;
         private readonly IRoleService _roleService;
         private readonly IMapper _mapper;
-
+        private readonly IHubContext<NotificationHub> _notificationHub;
 
         public NotificationsController(IMapper mapper, INotificationService notificationService, 
-                IUserService userService, ITemplateService templateService, IRoleService roleService)
+                IUserService userService, ITemplateService templateService, IRoleService roleService, IHubContext<NotificationHub> notificationHub)
         {
             _mapper = mapper;
             _notificationService = notificationService;
             _userService = userService;
             _templateService = templateService;
             _roleService = roleService;
+            _notificationHub = notificationHub;
         }
 
 
@@ -82,7 +85,9 @@ namespace SISGED.Server.Controllers
                                                  notificationRegisterRequest.ActionId, notificationRegisterRequest.Type);
 
 
-                await RegisterNotificationAsync(userNotification, templateFilterDto, notification);
+                var inserted = await RegisterNotificationAsync(userNotification, templateFilterDto, notification);
+
+                await _notificationHub.Clients.All.SendAsync("RecieveNotification", inserted);
 
                 return Ok();
             }

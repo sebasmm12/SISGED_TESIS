@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.SignalR.Client;
 using SISGED.Client.Services.Contracts;
 using SISGED.Client.Services.Repositories;
+using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Responses.Account;
 using SISGED.Shared.Models.Responses.Notification;
 
@@ -14,16 +16,23 @@ namespace SISGED.Client.Shared
         private ISwalFireRepository SwalFireRepository { get; set; } = default!;
         [Inject]
         private NotificationStrategy NotificationStrategy { get; set; } = default!;
-
+        [Inject]
+        private ILocalStorageRepository LocalStorageRepository { get; set; } = default!;
 
         [CascadingParameter(Name = "SessionAccount")]
         public SessionAccountResponse SessionAccount { get; set; } = default!;
 
         private List<NotificationInfoResponse>? notifications;
 
+        private HubConnection? _notificationHubConnection = default!;
+
+        private readonly string tokenKey = "TOKENKEY";
+
         protected override async Task OnInitializedAsync()
         {
             notifications = await GetNotificationByUserIdAsync(SessionAccount.User.Id);
+            await StartHubConnection();
+            SetRefreshNotificationListener();
         }
 
         private string GetNotificationState(bool state)
@@ -65,6 +74,37 @@ namespace SISGED.Client.Shared
 
                 return new List<NotificationInfoResponse>();
             }
+        }
+
+        private async Task StartHubConnection()
+        {
+            var apiAddress = "https://localhost:7007";
+
+            //var tokenString = await LocalStorageRepository.GetFromLocalStorage(tokenKey);
+            var sensorDataUrl = ($"{apiAddress}/notificationHub");
+            _notificationHubConnection = new HubConnectionBuilder()
+                            .WithUrl(sensorDataUrl)
+                            //.WithUrl(sensorDataUrl, options =>
+                            //{
+                            //    options.AccessTokenProvider = () => Task.FromResult(tokenString!);
+                            //})
+                            //.WithAutomaticReconnect()
+                            .Build();
+
+
+            await _notificationHubConnection.StartAsync();
+        }
+
+        private void SetRefreshNotificationListener()
+        {
+            var methodName = "RecieveNotification";
+
+
+            _notificationHubConnection!.On<NotificationInfoResponse>(methodName, async (data) =>
+            {
+                notifications = await GetNotificationByUserIdAsync(SessionAccount.User.Id);
+                StateHasChanged();
+            });
         }
     }
 }
