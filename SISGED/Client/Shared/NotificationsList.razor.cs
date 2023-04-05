@@ -82,7 +82,7 @@ namespace SISGED.Client.Shared
             var apiAddress = "https://localhost:7007";
 
             //var tokenString = await LocalStorageRepository.GetFromLocalStorage(tokenKey);
-            var sensorDataUrl = ($"{apiAddress}/notificationHub");
+            var sensorDataUrl = ($"{apiAddress}/notificationHub?username={SessionAccount.User.Id}");
             _notificationHubConnection = new HubConnectionBuilder()
                             .WithUrl(sensorDataUrl)
                             //.WithUrl(sensorDataUrl, options =>
@@ -98,16 +98,13 @@ namespace SISGED.Client.Shared
 
         private void SetRefreshNotificationListener()
         {
-            var methodName = "RecieveNotification";
+            var methodName = "RecieveNotificationAsync";
 
 
             _notificationHubConnection!.On<string>(methodName, async (userId) =>
             {
-                if (userId.Equals(SessionAccount.User.Id))
-                {
                     notifications = await GetNotificationByUserIdAsync(SessionAccount.User.Id);
                     StateHasChanged();
-                }
             });
         }
     }

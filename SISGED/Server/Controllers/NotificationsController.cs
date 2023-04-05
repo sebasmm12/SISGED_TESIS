@@ -20,10 +20,10 @@ namespace SISGED.Server.Controllers
         private readonly ITemplateService _templateService;
         private readonly IRoleService _roleService;
         private readonly IMapper _mapper;
-        private readonly IHubContext<NotificationHub> _notificationHub;
+        private readonly IHubContext<NotificationHub, INotificationHub> _notificationHub;
 
         public NotificationsController(IMapper mapper, INotificationService notificationService, 
-                IUserService userService, ITemplateService templateService, IRoleService roleService, IHubContext<NotificationHub> notificationHub)
+                IUserService userService, ITemplateService templateService, IRoleService roleService, IHubContext<NotificationHub, INotificationHub> notificationHub)
         {
             _mapper = mapper;
             _notificationService = notificationService;
@@ -87,7 +87,7 @@ namespace SISGED.Server.Controllers
 
                 var inserted = await RegisterNotificationAsync(userNotification, templateFilterDto, notification);
 
-                await _notificationHub.Clients.All.SendAsync("RecieveNotification", inserted.ReceiverId);
+                await _notificationHub.Clients.All.RecieveNotificationAsync(inserted.ReceiverId);
 
                 return Ok();
             }
