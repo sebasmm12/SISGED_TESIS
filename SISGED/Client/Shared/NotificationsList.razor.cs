@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using SISGED.Client.Services.Contracts;
 using SISGED.Client.Services.Repositories;
+using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Responses.Account;
 using SISGED.Shared.Models.Responses.Notification;
@@ -100,10 +101,13 @@ namespace SISGED.Client.Shared
             var methodName = "RecieveNotification";
 
 
-            _notificationHubConnection!.On<NotificationInfoResponse>(methodName, async (data) =>
+            _notificationHubConnection!.On<string>(methodName, async (userId) =>
             {
-                notifications = await GetNotificationByUserIdAsync(SessionAccount.User.Id);
-                StateHasChanged();
+                if (userId.Equals(SessionAccount.User.Id))
+                {
+                    notifications = await GetNotificationByUserIdAsync(SessionAccount.User.Id);
+                    StateHasChanged();
+                }
             });
         }
     }

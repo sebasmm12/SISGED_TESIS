@@ -87,7 +87,7 @@ namespace SISGED.Server.Controllers
 
                 var inserted = await RegisterNotificationAsync(userNotification, templateFilterDto, notification);
 
-                await _notificationHub.Clients.All.SendAsync("RecieveNotification", inserted);
+                await _notificationHub.Clients.All.SendAsync("RecieveNotification", inserted.ReceiverId);
 
                 return Ok();
             }
