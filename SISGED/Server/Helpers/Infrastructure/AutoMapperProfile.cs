@@ -146,6 +146,9 @@ namespace SISGED.Server.Helpers.Infrastructure
 
             CreateMap<Template, Notification>()
                 .ForMember(notification => notification.Id, options => options.Ignore());
+
+            CreateMap<Notification, NotificationInfoResponse>()
+                .ForMember(notificationInfo => notificationInfo.SenderUserImage, options => options.Ignore());
         }
 
         private string MapStepDocumentRequestUID(StepDocument stepDocument, StepGenericModel.StepDocument stepDocumentRequest)

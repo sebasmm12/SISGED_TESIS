@@ -2,16 +2,19 @@ using AutoMapper;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using SISGED.Client.Components.WorkEnvironments;
+using SISGED.Client.Helpers;
 using SISGED.Client.Services.Contracts;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Requests.Dossier;
+using SISGED.Shared.Models.Requests.Notifications;
 using SISGED.Shared.Models.Responses.Account;
 using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.DossierTray;
 using SISGED.Shared.Models.Responses.Tray;
 using SISGED.Shared.Validators;
+using System.Text.Json;
 
 namespace SISGED.Client.Components.Documents
 {
@@ -111,6 +114,8 @@ namespace SISGED.Client.Components.Documents
 
             await SwalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo derivar el documento de manera satisfactoria");
 
+            await SendNotificationAsync();
+
             await UpdateSentDocumentAsync(dossierDocument);
         }
 
@@ -121,6 +126,20 @@ namespace SISGED.Client.Components.Documents
             ProcessWorkItemInfo(item!, dossierDocument);
 
             await WorkEnvironment.SendDocumentAsync(item!);
+        }
+
+        private async Task SendNotificationAsync()
+        {
+            var currentTool = GetCurrentTool();
+            string? toolId = currentTool.Value as string;
+
+            var documentContent = JsonSerializer.Deserialize<DocumentContentDTO>(JsonSerializer.Serialize(dossierTray.Document!.Content));
+            var notificationDocument = new NotificationDocument(dossierTray.Document!.Id, documentContent!.Title);
+
+            var notificationRegisterRequest = new NotificationRegisterRequest(SessionAccount.User.Id, documentDerivation.UserTray.UserId,
+                notificationDocument, toolId!, "notificacion"); 
+
+            await RegisterNotificationAsync(notificationRegisterRequest);
         }
 
         private void ProcessWorkItemInfo(Helpers.Item item, DossierLastDocumentResponse dossierDocument)
@@ -156,6 +175,13 @@ namespace SISGED.Client.Components.Documents
             return dossierTray!;
         }
 
+        private Item GetCurrentTool()
+        {
+            var currentTool = WorkEnvironment.workPlaceItems.First(workItem => workItem.OriginPlace == "tools");
+
+            return currentTool;
+        } 
+
         private async Task<DossierLastDocumentResponse?> ShowLoadingDialogAsync(DossierLastDocumentRequest dossierLastDocumentRequest, string userId)
         {
             string dialogTitle = $"Realizando la derivación del documento, por favor espere...";
@@ -164,6 +190,24 @@ namespace SISGED.Client.Components.Documents
 
             return await DialogContentRepository.ShowLoadingDialogAsync(complaintToRegister, dialogTitle);
 
+        }
+
+        private async Task RegisterNotificationAsync(NotificationRegisterRequest notificationRegisterRequest)
+        {
+            try
+            {
+                var notificationRegisterResponse = await HttpRepository.PostAsync<NotificationRegisterRequest>($"api/notifications/users", notificationRegisterRequest);
+
+                if(notificationRegisterResponse.Error)
+                {
+                    await SwalFireRepository.ShowErrorSwalFireAsync($"No se pudo enviar la notificación de la derivación del documento");
+                }
+            }
+            catch (Exception)
+            {
+
+                await SwalFireRepository.ShowErrorSwalFireAsync($"No se pudo enviar la notificación de la derivación del documento");
+            }
         }
 
         private async Task<DossierLastDocumentResponse?> RegisterDerivationAsync(DossierLastDocumentRequest dossierLastDocumentRequest, string userId)

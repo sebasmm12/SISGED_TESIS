@@ -4,13 +4,13 @@
         <MudText Typo="Typo.h6">Notificaciones</MudText>
     </MudCardHeader>
     <MudCardContent>
-        @if(notifications is null)
+        @if (Notifications is null)
         {
             <GenericToolLoader Body="Cargando las notificaciones"></GenericToolLoader>
         }
         else
         {
-            @foreach (var notification in notifications)
+            @foreach (var notification in Notifications)
             {
                 <Notification NotificationInfo="notification" NotificationState="@GetNotificationState(notification.Seen)" NotificationUpdate="UpdateNotification"
                       @key="notification"></Notification>

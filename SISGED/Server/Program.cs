@@ -138,14 +138,16 @@ try
     app.UseBlazorFrameworkFiles();
     app.UseStaticFiles();
 
-    app.MapHub<NotificationHub>("/notificationHub");
-
     app.UseRouting();
     app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapRazorPages();
+    
     app.MapControllers();
+
+    app.MapHub<NotificationHub>("/notifications");
+
     app.MapFallbackToFile("index.html");
 
     app.Run();

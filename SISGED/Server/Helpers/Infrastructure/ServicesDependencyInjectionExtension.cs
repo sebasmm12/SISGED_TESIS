@@ -10,6 +10,7 @@ namespace SISGED.Server.Helpers.Infrastructure
             services.AddSingleton<IFileStorageService, AzureFileStorageService>();
             services.AddSingleton<IFileService, FileService>();
             services.AddSingleton<IMediaService, MediaService>();
+            services.AddSingleton<IUserConnectionManagerService, UserConnectionManagerService>();
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITrayService, TrayService>();

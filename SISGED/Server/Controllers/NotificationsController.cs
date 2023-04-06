@@ -20,10 +20,12 @@ namespace SISGED.Server.Controllers
         private readonly ITemplateService _templateService;
         private readonly IRoleService _roleService;
         private readonly IMapper _mapper;
+        private readonly IUserConnectionManagerService _userConnectionManagerService;
         private readonly IHubContext<NotificationHub, INotificationHub> _notificationHub;
 
         public NotificationsController(IMapper mapper, INotificationService notificationService, 
-                IUserService userService, ITemplateService templateService, IRoleService roleService, IHubContext<NotificationHub, INotificationHub> notificationHub)
+                IUserService userService, ITemplateService templateService, IRoleService roleService, IHubContext<NotificationHub, INotificationHub> notificationHub,
+                IUserConnectionManagerService userConnectionManagerService)
         {
             _mapper = mapper;
             _notificationService = notificationService;
@@ -31,6 +33,7 @@ namespace SISGED.Server.Controllers
             _templateService = templateService;
             _roleService = roleService;
             _notificationHub = notificationHub;
+            _userConnectionManagerService = userConnectionManagerService;
         }
 
 
@@ -85,9 +88,12 @@ namespace SISGED.Server.Controllers
                                                  notificationRegisterRequest.ActionId, notificationRegisterRequest.Type);
 
 
-                var inserted = await RegisterNotificationAsync(userNotification, templateFilterDto, notification);
+                var insertedNotification = await RegisterNotificationAsync(userNotification, templateFilterDto, notification);
 
-                await _notificationHub.Clients.All.RecieveNotificationAsync(inserted.ReceiverId);
+
+                var notificationInfoResponse = CreateNotificationInfo(notificationUsers.SenderUser.GetProfile()!, notification);
+
+                await SendNotificationToUserAsync(notificationUsers.ReceiverUser.Id, notificationInfoResponse);
 
                 return Ok();
             }
@@ -98,6 +104,30 @@ namespace SISGED.Server.Controllers
         }
 
         #region private methods
+        private NotificationInfoResponse CreateNotificationInfo(string senderUserImage, Notification notification)
+        {
+            var notificationInfo = _mapper.Map<NotificationInfoResponse>(notification);
+
+            notificationInfo.SenderUserImage = senderUserImage;
+
+            return notificationInfo;
+        }
+
+        private async Task SendNotificationToUserAsync(string recieverUserId, NotificationInfoResponse notificationInfoResponse)
+        {
+            var userConnections = _userConnectionManagerService.GetUserConnections(recieverUserId) ?? new List<string>();
+
+            if (!userConnections.Any()) return;
+
+            var connections = userConnections.Select(async userConnection => 
+                                        await _notificationHub
+                                                        .Clients
+                                                        .Client(userConnection)
+                                                        .RecieveNotificationAsync(notificationInfoResponse));
+
+            await Task.WhenAll(connections);
+        }
+
         private async Task<Notification> RegisterNotificationAsync<T>(T notificationModel, TemplateFilterDTO templateFilterDTO, Notification notification)
         {
             var notificationTemplate = await _templateService.GetTemplateAsync(templateFilterDTO);
@@ -125,14 +155,6 @@ namespace SISGED.Server.Controllers
                                                                             (string)property.GetValue(notificationModel, null)!);
             }    
             
-        }
-
-        private async Task<Template> GetTemplateAsync(TemplateFilterDTO templateFilterDTO)
-        {
-            //var templateFilterDTO = new TemplateFilterDTO(notificationUserDTO.SenderUser.Type, notificationUserDTO.ReceiverUser.Type, 
-            //                                    notificationRegisterRequest.ActionId, notificationRegisterRequest.Type);
-
-            return await _templateService.GetTemplateAsync(templateFilterDTO);
         }
 
         private async Task<NotificationUsersDTO> GetNotificationUsersAsync(string senderUserId, string receiverUserId)

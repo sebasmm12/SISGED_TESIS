@@ -1,7 +1,9 @@
-﻿namespace SISGED.Server.Hubs
+﻿using SISGED.Shared.Models.Responses.Notification;
+
+namespace SISGED.Server.Hubs
 {
     public interface INotificationHub
     {
-        Task RecieveNotificationAsync(string userId);
+        Task RecieveNotificationAsync(NotificationInfoResponse notification);
     }
 }

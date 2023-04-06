@@ -1,16 +1,33 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using SISGED.Shared.Models.Responses.Notification;
+using SISGED.Server.Services.Contracts;
 
 namespace SISGED.Server.Hubs
 {
-    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class NotificationHub : Hub<INotificationHub>
     {
-        public override Task OnConnectedAsync()
+        private readonly IUserConnectionManagerService _userConnectionManagerService;
+
+        public NotificationHub(IUserConnectionManagerService userConnectionManagerService)
         {
-            var username = Context.GetHttpContext()!.Request.Query["username"];
-            // username = xxxx
-            return base.OnConnectedAsync();
+            _userConnectionManagerService = userConnectionManagerService;
+        }
+
+        public async override Task OnConnectedAsync()
+        {
+            var userId = Context.GetHttpContext()!.Request.Query["userId"];
+
+            _userConnectionManagerService.AddUserConnection(userId!, Context.ConnectionId);
+
+            await base.OnConnectedAsync();
+        }
+
+        public override async Task OnDisconnectedAsync(Exception? exception)
+        {
+            string connectionId = Context.ConnectionId;
+
+            _userConnectionManagerService.RemoveUserConnection(connectionId);
+
+            await base.OnDisconnectedAsync(exception);
         }
     }
 }

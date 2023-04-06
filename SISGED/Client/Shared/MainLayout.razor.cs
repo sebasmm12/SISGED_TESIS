@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 using SISGED.Client.Services.Contracts;
 using SISGED.Shared.Models.Responses.Account;
+using SISGED.Shared.Models.Responses.Notification;
 
 namespace SISGED.Client.Shared
 {
@@ -16,8 +19,12 @@ namespace SISGED.Client.Shared
         private ISwalFireRepository SwalFireRepository { get; set; } = default!;
         [Inject]
         private ITokenRenewer TokenRenewer { get; set; } = default!;
+        [Inject]
+        private IWebAssemblyHostEnvironment WebAssemblyHostEnvironment { get; set; } = default!;
 
         public SessionAccountResponse SessionAccount { get; set; } = default!;
+        public List<NotificationInfoResponse>? Notifications { get; set; }
+
         [CascadingParameter]
         public Task<AuthenticationState> AuthenticationState { get; set; } = default!;
 
@@ -26,6 +33,8 @@ namespace SISGED.Client.Shared
         private IJSObjectReference mainLayoutModule = default!;
         private string userName = "";
         private bool _render;
+        private HubConnection? _notificationHubConnection = default!;
+        private readonly string notificationMethodName = "RecieveNotificationAsync";
 
         private void ToogleDrawer()
         {
@@ -47,10 +56,21 @@ namespace SISGED.Client.Shared
                 userName = user.Identity!.Name!;
                 SessionAccount = await GetSessionAccountAsync();
 
+                await GetNotificationsByUserAsync();
             }
 
             await mainLayoutModule.InvokeVoidAsync("hideCircularProgress");
+
             _render = true;
+        }
+
+        private async Task GetNotificationsByUserAsync()
+        {
+            Notifications = await GetNotificationByUserIdAsync(SessionAccount.User.Id);
+
+            await StartHubConnectionAsync();
+
+            SetRefreshNotificationListener();
         }
 
         private async Task<SessionAccountResponse> GetSessionAccountAsync()
@@ -71,6 +91,53 @@ namespace SISGED.Client.Shared
                 await SwalFireRepository.ShowErrorSwalFireAsync("Hubo un error con la sesión de usuario.");
                 return new();
             }
+        }
+
+        private async Task<List<NotificationInfoResponse>> GetNotificationByUserIdAsync(string userId)
+        {
+            try
+            {
+                var notificationResponse = await HttpRepository.GetAsync<List<NotificationInfoResponse>>($"api/notifications/{userId}");
+
+                if (notificationResponse.Error)
+                {
+                    await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener sus última notificaciones");
+                }
+
+                return notificationResponse.Response!;
+            }
+            catch (Exception)
+            {
+
+                await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener sus última notificaciones");
+
+                return new List<NotificationInfoResponse>();
+            }
+        }
+
+        private async Task StartHubConnectionAsync()
+        {
+            var apiAddress = WebAssemblyHostEnvironment.BaseAddress;
+
+            var sensorDataUrl = ($"{apiAddress}notifications?userId={SessionAccount.User.Id}");
+            _notificationHubConnection = new HubConnectionBuilder()
+                            .WithUrl(sensorDataUrl)
+                            .Build();
+
+
+            await _notificationHubConnection.StartAsync();
+        }
+
+        private void SetRefreshNotificationListener()
+        {
+            _notificationHubConnection!.On<NotificationInfoResponse>(notificationMethodName, notificationInfoResponse =>
+            {
+                if (Notifications is null) return;
+
+                if (Notifications.Count > 10) Notifications.RemoveAt(Notifications.Count - 1);
+
+                Notifications.Insert(0, notificationInfoResponse);
+            });
         }
     }
 }

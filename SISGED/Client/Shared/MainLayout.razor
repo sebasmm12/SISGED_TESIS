@@ -25,7 +25,9 @@
                          MaxHeight="500" AnchorOrigin="@Origin.BottomLeft" TransformOrigin="@Origin.TopRight">
                     <ChildContent>
                         <CascadingValue Value="@SessionAccount" Name="SessionAccount">
-                           <NotificationsList></NotificationsList>
+                            <CascadingValue Value="@Notifications" Name="Notifications">
+                                <NotificationsList></NotificationsList>
+                            </CascadingValue>
                        </CascadingValue>
                     </ChildContent>
                 </MudMenu>

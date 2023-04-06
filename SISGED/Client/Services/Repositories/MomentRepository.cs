@@ -14,7 +14,7 @@ namespace SISGED.Client.Services.Repositories
 
         public async Task<string> GetTimeFromNowAsync(DateTime date)
         {
-            string timeFromNow = await _jsRuntime.InvokeAsync<string>("getTimeFromNow", date.ToString("dd/MM/yyyy hh:mm:ss"));
+            string timeFromNow = await _jsRuntime.InvokeAsync<string>("getTimeFromNow", date.ToString());
 
             return timeFromNow;
         }
