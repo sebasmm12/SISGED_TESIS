@@ -21,7 +21,12 @@ namespace SISGED.Server.Services.Repositories
         {
             var userConnection = new List<string>();
 
-            lock (userConnectionMapLocker) userConnection = userConnections[userId];
+            lock (userConnectionMapLocker)
+            {
+                if (!userConnections.ContainsKey(userId)) return userConnection;
+
+                userConnection = userConnections[userId];
+            }
 
             return userConnection;
         }

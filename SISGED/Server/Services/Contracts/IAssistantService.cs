@@ -17,6 +17,6 @@ namespace SISGED.Server.Services.Contracts
         Task<Assistant> UpdateAssistantStepStartDateAsync(AssistantStepStartDateUpdateDTO stepStartDateUpdateRequest);
         Task<Assistant> UpdateAssistantStepAsync(AssistantStepUpdateDTO assistantStepUpdate);
         Task<Assistant> UpdateAssistantDossierAsync(Assistant assistant, AssistantDossierUpdateDTO assistantDossierUpdate);
-        Task<Assistant> UpdateAssistantLastDossierStepAsync(Assistant assistant);
+        Task<Assistant> UpdateAssistantDocumentLastStepAsync(string assistantId, AssistantStepDTO assistantStepDTO);
     }
 }

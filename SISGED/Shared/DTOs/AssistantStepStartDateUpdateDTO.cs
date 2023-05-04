@@ -4,14 +4,16 @@ namespace SISGED.Shared.DTOs
 {
     public class AssistantStepStartDateUpdateDTO
     {
-        public AssistantStepStartDateUpdateDTO(Assistant assistant, DateTime startDate, DateTime limitDate)
+        public AssistantStepStartDateUpdateDTO(string id, AssistantStepDTO assistant, DateTime startDate, DateTime limitDate)
         {
+            Id = id;
             Assistant = assistant;
             StartDate = startDate;
             LimitDate = limitDate;
         }
 
-        public Assistant Assistant { get; set; } = default!;
+        public string Id { get; set; } = default!;
+        public AssistantStepDTO Assistant { get; set; } = default!;
         public DateTime StartDate { get; set; }
         public DateTime LimitDate { get; set; }
     }

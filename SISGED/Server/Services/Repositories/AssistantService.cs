@@ -4,7 +4,6 @@ using SISGED.Server.Helpers.Infrastructure;
 using SISGED.Server.Services.Contracts;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
-using SISGED.Shared.Models.Requests.Assistants;
 using SISGED.Shared.Models.Requests.Step;
 
 namespace SISGED.Server.Services.Repositories
@@ -50,18 +49,13 @@ namespace SISGED.Server.Services.Repositories
 
         public async Task<Assistant> UpdateAssistantStepStartDateAsync(AssistantStepStartDateUpdateDTO stepStartDateUpdateRequest)
         {
-            var assistantQuery = Builders<Assistant>.Filter.Eq(assistant => assistant.Id, stepStartDateUpdateRequest.Assistant.Id);
+            var assistantQuery = Builders<Assistant>.Filter.Eq(assistant => assistant.Id, stepStartDateUpdateRequest.Id);
 
             var assistantUpdate = Builders<Assistant>.Update
                                                         .Set("pasos.$[dossier].documentos.$[document].pasos.$[step].fechainicio", stepStartDateUpdateRequest.StartDate)
                                                         .Set("pasos.$[dossier].documentos.$[document].pasos.$[step].fechalimite", stepStartDateUpdateRequest.LimitDate);
 
-            var assistantArrayFilters = new List<ArrayFilterDefinition>()
-            {
-                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("dossier.nombreexpediente", stepStartDateUpdateRequest.Assistant.DossierType),
-                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("document.tipo", stepStartDateUpdateRequest.Assistant.DocumentType),
-                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("step.indice", stepStartDateUpdateRequest.Assistant.Step)
-            };
+            var assistantArrayFilters = GetAssistantStepUpdateFilters(stepStartDateUpdateRequest.Assistant);
 
             var updatedAssistant = await _assistantCollection.FindOneAndUpdateAsync(assistantQuery, assistantUpdate,
                                                                                     new FindOneAndUpdateOptions<Assistant>
@@ -70,7 +64,7 @@ namespace SISGED.Server.Services.Repositories
                                                                                         ArrayFilters = assistantArrayFilters
                                                                                     });
 
-            if (updatedAssistant is null) throw new Exception($"No se pudo actualizar las fechas inicio y límite del paso actual del asistente con identificador {stepStartDateUpdateRequest.Assistant.Id}");
+            if (updatedAssistant is null) throw new Exception($"No se pudo actualizar las fechas inicio y límite del paso actual del asistente con identificador {stepStartDateUpdateRequest.Id}");
 
             return updatedAssistant;
         }
@@ -86,12 +80,7 @@ namespace SISGED.Server.Services.Repositories
                                                         .Set("paso", assistantStepUpdate.NewAssistantStep.Step)
                                                         .Set("tipodocumento", assistantStepUpdate.NewAssistantStep.DocumentType);
 
-            var assistantArrayFilters = new List<ArrayFilterDefinition>()
-            {
-                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("dossier.nombreexpediente", assistantStepUpdate.DossierType),
-                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("document.tipo", assistantStepUpdate.LastAssistantStep.DocumentType),
-                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("step.indice", assistantStepUpdate.LastAssistantStep.Step)
-            };
+            var assistantArrayFilters = GetAssistantStepUpdateFilters(assistantStepUpdate.LastAssistantStep);
 
             var updatedAssistant = await _assistantCollection.FindOneAndUpdateAsync(assistantQuery, assistantUpdate,
                                                                                    new FindOneAndUpdateOptions<Assistant>
@@ -118,26 +107,20 @@ namespace SISGED.Server.Services.Repositories
                                                                                       ReturnDocument = ReturnDocument.After,
                                                                                   });
 
-            if (updatedAssistant is null) throw new Exception($"No se pudo añadir el expediente de tipo { assistantDossierUpdate.DossierType } al asistente con identificador {assistant.Id}");
+            if (updatedAssistant is null) throw new Exception($"No se pudo añadir el expediente de tipo {assistantDossierUpdate.DossierType} al asistente con identificador {assistant.Id}");
 
             return updatedAssistant;
         }
 
-        public async Task<Assistant> UpdateAssistantLastDossierStepAsync(Assistant assistant)
+        public async Task<Assistant> UpdateAssistantDocumentLastStepAsync(string assistantId, AssistantStepDTO assistantStepDTO)
         {
-            var assistantQuery = Builders<Assistant>.Filter.Eq(assistant => assistant.Id, assistant.Id);
+            var assistantQuery = Builders<Assistant>.Filter.Eq(assistant => assistant.Id, assistantId);
 
             var assistantUpdateBuilder = Builders<Assistant>.Update
                                                         .Set("pasos.$[dossier].documentos.$[document].pasos.$[step].fechainicio", BsonNull.Value)
                                                         .Set("pasos.$[dossier].documentos.$[document].pasos.$[step].fechalimite", BsonNull.Value);
 
-            var assistantArrayFilters = new List<ArrayFilterDefinition>()
-            {
-                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("dossier.nombreexpediente", assistant.DossierType),
-                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("document.tipo", assistant.DocumentType),
-                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("step.indice", assistant.Step)
-            };
-
+            var assistantArrayFilters = GetAssistantStepUpdateFilters(assistantStepDTO);
 
             var updatedAssistant = await _assistantCollection.FindOneAndUpdateAsync(assistantQuery, assistantUpdateBuilder,
                                                                                   new FindOneAndUpdateOptions<Assistant>
@@ -146,22 +129,10 @@ namespace SISGED.Server.Services.Repositories
                                                                                       ArrayFilters = assistantArrayFilters
                                                                                   });
 
-            if (updatedAssistant is null) throw new Exception($"No se pudo actualizar la información del paso del asistente con identificador {assistant.Id}");
+            if (updatedAssistant is null) throw new Exception($"No se pudo actualizar la información del paso del asistente con identificador { assistantId }");
 
             return updatedAssistant;
 
-        }
-
-        private static UpdateDefinition<T> GetAssistantDossierUpdateBuilder<T>(AssistantDossierUpdateDTO assistantDossierUpdate) where T: Assistant
-        {
-
-            var assistantUpdateBuilder = Builders<T>.Update
-                                                        .Set("paso", assistantDossierUpdate.Step)
-                                                        .Set("tipodocumento", assistantDossierUpdate.DocumentType)
-                                                        .Set("tipoexpediente", assistantDossierUpdate.DossierType)
-                                                        .Push("pasos", assistantDossierUpdate.Steps);
-
-            return assistantUpdateBuilder;
         }
 
         public async Task<Assistant> UpdateAsync(StepsUpdateRequest stepUpdateRequest)
@@ -260,5 +231,31 @@ namespace SISGED.Server.Services.Repositories
 
             return updatedAssistant;
         }
+
+        #region private methods
+        private static UpdateDefinition<T> GetAssistantDossierUpdateBuilder<T>(AssistantDossierUpdateDTO assistantDossierUpdate) where T : Assistant
+        {
+
+            var assistantUpdateBuilder = Builders<T>.Update
+                                                        .Set("paso", assistantDossierUpdate.Step)
+                                                        .Set("tipodocumento", assistantDossierUpdate.DocumentType)
+                                                        .Set("tipoexpediente", assistantDossierUpdate.DossierType)
+                                                        .Push("pasos", assistantDossierUpdate.Steps);
+
+            return assistantUpdateBuilder;
+        }
+
+        private List<ArrayFilterDefinition> GetAssistantStepUpdateFilters(AssistantStepDTO assistantStepDTO)
+        {
+            var assistantArrayFilters = new List<ArrayFilterDefinition>()
+            {
+                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("dossier.nombreexpediente", assistantStepDTO.DossierType),
+                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("document.tipo", assistantStepDTO.DocumentType),
+                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("step.indice", assistantStepDTO.Step)
+            };
+
+            return assistantArrayFilters;
+        }
+        #endregion
     }
 }

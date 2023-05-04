@@ -1,9 +1,9 @@
 ﻿<div class="d-flex fixed virtual-message">
     <div class="align-self-center">
-        <MudAvatar Color="Color.Info" Image="../images/virtual-helper-user.jpg" Alt="Consultor virtual" />
+        <MudAvatar Color="Color.Info" Image="../images/virtual-helper-user.jpg" Alt="Consultor virtual" @onclick="HideHelperMessage" />
     </div>
     <div>
-        <div class="speech virtual-speech">
+        <div class="speech virtual-speech @showMessageClass">
             <label>Bienvenido Josue Stefano,</label>
             <br />
             <label class="message">@letters</label>

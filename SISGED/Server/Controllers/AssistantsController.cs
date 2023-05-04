@@ -52,7 +52,9 @@ namespace SISGED.Server.Controllers
                 var stepStartDate = DateTime.UtcNow.AddHours(-5);
                 var stepLimitDate = stepStartDate.AddDays(assistant.GetCurrentDocumentStep().Days);
 
-                var assistantResponse = await _assistantService.UpdateAssistantStepStartDateAsync(new(assistant, stepStartDate, stepLimitDate));
+                var assitantStepDto = new AssistantStepDTO(assistant.Step, assistant.DocumentType, assistant.DossierType);
+
+                var assistantResponse = await _assistantService.UpdateAssistantStepStartDateAsync(new(assistant.Id, assitantStepDto, stepStartDate, stepLimitDate));
 
                 return Ok(assistantResponse);
 
@@ -154,18 +156,18 @@ namespace SISGED.Server.Controllers
 
         private async Task<Assistant> UpdateAssistantStepAsync(Assistant assistant, AssistantUpdateRequest assistantUpdateRequest)
         {
-            var assistantStepUpdateDTO = new AssistantStepUpdateDTO(DateTime.UtcNow.AddHours(-5), new(assistant.Step, assistant.DocumentType));
+            var assistantStepUpdateDTO = new AssistantStepUpdateDTO(DateTime.UtcNow.AddHours(-5), new(assistant.Step, assistant.DocumentType, assistant.DossierType));
 
             if (assistant.DossierType != assistantUpdateRequest.DossierType) return await UpdateAssistantDossierAsync(new(assistant, assistantUpdateRequest.DossierType,
                                                                                                                            assistantUpdateRequest.DocumentType, assistantStepUpdateDTO.EndDate));
-            VerifyAssistantsStepsAndDocuments(assistant, assistantUpdateRequest);
+            await VerifyAssistantsStepsAndDocuments(assistant, assistantUpdateRequest, assistantStepUpdateDTO);
 
             _mapper.Map(assistant, assistantStepUpdateDTO);
 
             return await _assistantService.UpdateAssistantStepAsync(assistantStepUpdateDTO);
         }
 
-        private static void VerifyAssistantsStepsAndDocuments(Assistant assistant, AssistantUpdateRequest assistantUpdateRequest)
+        private async Task VerifyAssistantsStepsAndDocuments(Assistant assistant, AssistantUpdateRequest assistantUpdateRequest, AssistantStepUpdateDTO assistantStepUpdateDTO)
         {
             if (!assistant.IsLastStep())
             {
@@ -174,8 +176,24 @@ namespace SISGED.Server.Controllers
                 return;
             }
 
-            if(!assistant.IsLastDocument()) assistant.UpdateNextDocument(assistantUpdateRequest.DocumentType);
+            if (!assistant.IsLastDocument())
+            {
+                await _assistantService.UpdateAssistantDocumentLastStepAsync(assistant.Id, assistantStepUpdateDTO.LastAssistantStep);
 
+                assistant.UpdateNextDocument(assistantUpdateRequest.DocumentType);
+
+                await MoveAssistantStepStartDatesAsync(assistant, assistantStepUpdateDTO.LastAssistantStep);
+
+                assistantStepUpdateDTO.LastAssistantStep = new AssistantStepDTO(assistant.Step, assistant.DocumentType, assistant.DossierType);
+            }
+        }
+
+        private async Task MoveAssistantStepStartDatesAsync(Assistant assistant, AssistantStepDTO currentAssistantStep)
+        {
+            var assistantStep = new AssistantStepDTO(assistant.Step, assistant.DocumentType, assistant.DossierType);
+            var assistantLastStep = assistant.GetDocument(currentAssistantStep.DocumentType);
+
+            await _assistantService.UpdateAssistantStepStartDateAsync(new(assistant.Id, assistantStep, assistantLastStep.StartDate!.Value, assistantLastStep.DueDate!.Value));
         }
 
         private async Task<Assistant> UpdateAssistantDossierAsync(AssistantDossierStepUpdateDTO assistantDossierStepUpdate)
@@ -184,7 +202,10 @@ namespace SISGED.Server.Controllers
 
             await _assistantService.UpdateAssistantDossierAsync(assistantDossierStepUpdate.Assistant, assistantDossierUpdateDTO);
 
-            return await _assistantService.UpdateAssistantLastDossierStepAsync(assistantDossierStepUpdate.Assistant);
+            var assitantStepDto = new AssistantStepDTO(assistantDossierStepUpdate.Assistant.Step, 
+                                            assistantDossierStepUpdate.Assistant.DocumentType, assistantDossierStepUpdate.Assistant.DossierType);
+
+            return await _assistantService.UpdateAssistantDocumentLastStepAsync(assistantDossierStepUpdate.Assistant.Id, assitantStepDto);
         }
 
         private async Task<AssistantDossierUpdateDTO> FillAssistantDossierUpdateAsync(AssistantDossierStepUpdateDTO assistantDossierStepUpdate)

@@ -115,7 +115,7 @@ namespace SISGED.Server.Controllers
 
         private async Task SendNotificationToUserAsync(string recieverUserId, NotificationInfoResponse notificationInfoResponse)
         {
-            var userConnections = _userConnectionManagerService.GetUserConnections(recieverUserId) ?? new List<string>();
+            var userConnections = _userConnectionManagerService.GetUserConnections(recieverUserId);
 
             if (!userConnections.Any()) return;
 

@@ -19,16 +19,4 @@
             LastAssistantStep = lastAssistantStep;
         }
     }
-
-    public class AssistantStepDTO
-    {
-        public AssistantStepDTO(int step, string documentType)
-        {
-            Step = step;
-            DocumentType = documentType;
-        }
-
-        public int Step { get; set; }
-        public string DocumentType { get; set; } = default!;
-    }
 }

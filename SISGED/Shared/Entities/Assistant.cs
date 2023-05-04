@@ -95,6 +95,10 @@ namespace SISGED.Shared.Entities
         public bool IsLastSubStep() => Substep == GetCurrentDocumentStep().Substeps.Count;
         public bool IsLastStep() => Step == GetCurrentStep().Steps.Count - 1;
         public bool IsLastDocument() => FindDocumentIndex() == GetCurrentAssistantStep().Documents.Count - 1;
+        public DocumentStep GetDocument(string documentType) => GetCurrentAssistantStep()
+                                                                        .GetDocument(documentType)
+                                                                        .Steps
+                                                                        .Last();
     }
 
     public class AssistantStep
@@ -118,5 +122,7 @@ namespace SISGED.Shared.Entities
         {
             Documents = documents;
         }
+
+        public StepDocument GetDocument(string documentType) => Documents.FirstOrDefault(document => document.Type == documentType)!;
     }
 }

@@ -13,6 +13,8 @@ namespace SISGED.Client.Components.VirtualHelpers
         private Timer.Timer timer = default!;
         private int messageIndex = 0;
         private string letters = string.Empty;
+        private string showMessageClass = "d-block";
+        private bool showMessage = true;
 
         public void Dispose() => timer?.Dispose();
 
@@ -48,6 +50,13 @@ namespace SISGED.Client.Components.VirtualHelpers
             else messageIndex++;
 
             StateHasChanged();
+        }
+
+        private void HideHelperMessage()
+        {
+            showMessage = !showMessage;
+
+            showMessageClass = showMessage ? "d-block" : "d-none";
         }
     }
 }
