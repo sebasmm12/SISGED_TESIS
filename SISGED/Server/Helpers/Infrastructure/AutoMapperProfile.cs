@@ -135,7 +135,7 @@ namespace SISGED.Server.Helpers.Infrastructure
             CreateMap<Assistant, AssistantStepUpdateDTO>()
                 .ForMember(assistant => assistant.EndDate, options => options.Ignore())
                 .ForMember(assistant => assistant.LastAssistantStep, options => options.Ignore())
-                .ForMember(assistant => assistant.NewAssistantStep, options => options.MapFrom(newAssistant => new AssistantStepDTO(newAssistant.Step, newAssistant.DocumentType)));
+                .ForMember(assistant => assistant.NewAssistantStep, options => options.MapFrom(newAssistant => new AssistantStepDTO(newAssistant.Step, newAssistant.DocumentType, newAssistant.DossierType)));
 
             // Notification Mapper
             CreateMap<NotificationRegisterRequest, Notification>()
