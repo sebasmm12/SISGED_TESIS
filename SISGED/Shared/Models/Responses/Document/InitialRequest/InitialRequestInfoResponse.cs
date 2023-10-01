@@ -1,6 +1,4 @@
-﻿
-
-namespace SISGED.Shared.Models.Responses.Document.InitialRequest
+﻿namespace SISGED.Shared.Models.Responses.Document.InitialRequest
 {
     public class InitialRequestInfoResponse: DocumentInfoResponse
     {

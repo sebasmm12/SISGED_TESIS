@@ -27,21 +27,21 @@ namespace SISGED.Shared.Entities
         [BsonRepresentation(BsonType.ObjectId)]
         [BsonElement("id")]
         public string Id { get; set; } = default!;
-        [BsonElement("tipo")]
+        [BsonElement("type")]
         public string Type { get; set; } = default!;
-        [BsonElement("cliente")]
+        [BsonElement("client")]
         public Client Client { get; set; } = default!;
-        [BsonElement("fechainicio")]
+        [BsonElement("startDate")]
         public DateTime StartDate { get; set; } = DateTime.UtcNow.AddHours(-5);
-        [BsonElement("fechafin")]
+        [BsonElement("endDate")]
         public DateTime? EndDate { get; set; }
-        [BsonElement("documentos")]
+        [BsonElement("documents")]
         public List<DossierDocument> Documents { get; set; } = new();
-        [BsonElement("historialdocumentos")]
+        [BsonElement("documentsHistory")]
         public List<DossierDocument> DocumentsHistory { get; set; } = new();
-        [BsonElement("derivaciones")]
+        [BsonElement("derivations")]
         public List<Derivation> Derivations { get; set; } = new();
-        [BsonElement("estado")]
+        [BsonElement("state")]
         public string State { get; set; } = default!;
 
 

@@ -1,11 +1,6 @@
 ﻿using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Responses.DocumentType;
 using SISGED.Shared.Models.Responses.Solicitor;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SISGED.Shared.DTOs
 {

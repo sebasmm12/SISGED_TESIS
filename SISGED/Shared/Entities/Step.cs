@@ -8,9 +8,9 @@ namespace SISGED.Shared.Entities
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; } = default!;
-        [BsonElement("nombreexpediente")]
+        [BsonElement("dossierName")]
         public string DossierName { get; set; } = default!;
-        [BsonElement("documentos")]
+        [BsonElement("documents")]
         public List<StepDocument> Documents { get; set; } = default!;
 
         public StepDocument GetFirstDocument()
@@ -21,9 +21,9 @@ namespace SISGED.Shared.Entities
 
     public class StepDocument
     {
-        [BsonElement("tipo")]
+        [BsonElement("type")]
         public string Type { get; set; } = default!;
-        [BsonElement("pasos")]
+        [BsonElement("steps")]
         public List<DocumentStep> Steps { get; set; } = default!;
 
         public int GetNextStepIndex(int currentStep)
@@ -41,38 +41,38 @@ namespace SISGED.Shared.Entities
     }
     public class DocumentStep
     {
-        [BsonElement("indice")]
+        [BsonElement("index")]
         public int Index { get; set; }
-        [BsonElement("idaccion")]
+        [BsonElement("actionId")]
         public string ActionId { get; set; } = default!;
-        [BsonElement("nombre")]
+        [BsonElement("name")]
         public string Name { get; set; } = default!;
-        [BsonElement("descripcion")]
+        [BsonElement("description")]
         public string Description { get; set; } = default!;
-        [BsonElement("fechainicio")]
+        [BsonElement("startDate")]
         public DateTime? StartDate { get; set; }
-        [BsonElement("fechafin")]
+        [BsonElement("endDate")]
         public DateTime? EndDate { get; set; }
-        [BsonElement("fechalimite")]
+        [BsonElement("dueDate")]
         public DateTime? DueDate { get; set; }
-        [BsonElement("dias")]
+        [BsonElement("days")]
         public int Days { get; set; }
-        [BsonElement("documentosregistrados")]
+        [BsonElement("registeredDocuments")]
         public List<string> RegisteredDocuments { get; set; } = new();
-        [BsonElement("rolreceptor")]
+        [BsonElement("receiverRole")]
         public string? ReceiverRole { get; set; }
-        [BsonElement("esopcional")]
+        [BsonElement("isOptional")]
         public bool IsOptional { get; set; }
-        [BsonElement("subpasos")]
+        [BsonElement("substeps")]
         public List<Substep> Substeps { get; set; } = default!;
 
     }
 
     public class Substep
     {
-        [BsonElement("indice")]
+        [BsonElement("index")]
         public int Index { get; set; }
-        [BsonElement("descripcion")]
+        [BsonElement("description")]
         public string Description { get; set; } = default!;
     }
 }

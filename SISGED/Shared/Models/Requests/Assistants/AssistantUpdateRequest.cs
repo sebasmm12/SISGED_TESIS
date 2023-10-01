@@ -9,9 +9,9 @@
             DocumentType = documentType;
         }
 
-        public string Id { get; set; } = default!;
-        public string DossierType { get; set; } = default!;
-        public string DocumentType { get; set; } = default!;
+        public string Id { get; set; }
+        public string DossierType { get; set; }
+        public string DocumentType { get; set; }
 
     }
 }

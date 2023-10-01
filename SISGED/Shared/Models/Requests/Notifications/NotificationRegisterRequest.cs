@@ -1,6 +1,4 @@
-﻿using SISGED.Shared.DTOs;
-
-namespace SISGED.Shared.Models.Requests.Notifications
+﻿namespace SISGED.Shared.Models.Requests.Notifications
 {
     public class NotificationRegisterRequest
     {
@@ -13,10 +11,10 @@ namespace SISGED.Shared.Models.Requests.Notifications
             Type = type;
         }
 
-        public string SenderUserId { get; set; } = default!;
-        public string ReceiverUserId { get; set; } = default!;
-        public NotificationDocument Document { get; set; } = default!;
-        public string ActionId { get; set; } = default!;
+        public string SenderUserId { get; set; }
+        public string ReceiverUserId { get; set; }
+        public NotificationDocument Document { get; set; }
+        public string ActionId { get; set; }
         public string Type { get; set; } = "notificacion";
     }
 }

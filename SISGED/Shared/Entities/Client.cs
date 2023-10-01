@@ -1,5 +1,4 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson.Serialization.Attributes;
 
 namespace SISGED.Shared.Entities
 {
@@ -15,15 +14,15 @@ namespace SISGED.Shared.Entities
             DocumentNumber = documentNumber;
             DocumentType = documentType;
         }
-        [BsonElement("nombre")]
+        [BsonElement("name")]
         public string Name { get; set; } = default!;
-        [BsonElement("apellido")]
+        [BsonElement("lastName")]
         public string LastName { get; set; } = default!;
-        [BsonElement("numerodocumento")]
+        [BsonElement("documentNumber")]
         public string DocumentNumber { get; set; } = default!;
-        [BsonElement("tipodocumento")]
+        [BsonElement("documentType")]
         public string DocumentType { get; set; } = default!;
-        [BsonElement("idcliente")]
+        [BsonElement("clientId")]
         public string ClientId { get; set; } = default!;
 
         public string GetShortName()

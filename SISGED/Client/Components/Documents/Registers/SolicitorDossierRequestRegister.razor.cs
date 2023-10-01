@@ -138,14 +138,14 @@ namespace SISGED.Client.Components.Documents.Registers
 
                 if (solicitorResponse.Error)
                 {
-                    await swalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los tipos de solicitudes del sistema");
+                    await swalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener la información del notario asociado al registro");
                 }
 
                 return solicitorResponse.Response!;
             }
             catch (Exception)
             {
-                await swalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los tipos de solicitudes del sistema");
+                await swalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener la información del notario asociado al registro");
                 return new();
             }
         }

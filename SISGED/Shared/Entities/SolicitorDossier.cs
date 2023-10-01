@@ -8,11 +8,11 @@ namespace SISGED.Shared.Entities
         [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
         [BsonElement("id")]
         public string Id { get; set; } = default!;
-        [BsonElement("idnotario")]
+        [BsonElement("solicitorId")]
         public string SolicitorId { get; set; } = default!;
-        [BsonElement("nombredocumento")]
+        [BsonElement("documentName")]
         public string DocumentName { get; set; } = default!;
-        [BsonElement("fechaexpedicion")]
+        [BsonElement("issueDate")]
         public DateTime IssueDate { get; set; }
         [BsonElement("url")]
         public string Url { get; set; } = default!;

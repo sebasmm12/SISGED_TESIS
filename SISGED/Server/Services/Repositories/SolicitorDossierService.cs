@@ -4,9 +4,7 @@ using SISGED.Server.Helpers.Infrastructure;
 using SISGED.Server.Services.Contracts;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
-using SISGED.Shared.Models.Queries.Document;
 using SISGED.Shared.Models.Queries.SolicitorDossier;
-using SISGED.Shared.Models.Responses.SolicitorDossier;
 
 namespace SISGED.Server.Services.Repositories
 {
@@ -64,16 +62,16 @@ namespace SISGED.Server.Services.Repositories
 
         private static BsonDocument[] GetSolicitorDossierYearsPipeline(string solicitorId)
         {
-            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("idnotario", solicitorId));
+            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("solicitorId", solicitorId));
 
             var addFieldAggregation = MongoDBAggregationExtension.AddFields(new()
             {
-                { "issueYear", MongoDBAggregationExtension.Year("$fechaexpedicion") }
+                { "issueYear", MongoDBAggregationExtension.Year("$issueDate") }
             });
 
             var groupAggregation = MongoDBAggregationExtension.Group(new()
             {
-                { "_id", "$idnotario" },
+                { "_id", "$solicitorIdo" },
                 { "years", MongoDBAggregationExtension.AddToSet("$issueYear") }
             });
 
@@ -87,7 +85,7 @@ namespace SISGED.Server.Services.Repositories
         {
             var addFieldAggregation = MongoDBAggregationExtension.AddFields(new()
             {
-                { "issueYear", MongoDBAggregationExtension.Year("$fechaexpedicion")  }
+                { "issueYear", MongoDBAggregationExtension.Year("$issueDate")  }
             });
 
             var matchAggregation = GetSolicitorDossierQueryMatch(solicitorDossierPaginationQuery);
@@ -120,9 +118,9 @@ namespace SISGED.Server.Services.Repositories
 
         private static BsonDocument GetSolicitorDossierQueryMatch(SolicitorDossierPaginationQuery solicitorDossierPaginationQuery)
         {
-            var matchedElements = new Dictionary<string, BsonValue>()
+            var matchedElements = new Dictionary<string, BsonValue>
             {
-                { "idnotario", solicitorDossierPaginationQuery.SolicitorId }
+                { "solicitorId", solicitorDossierPaginationQuery.SolicitorId }
             };
 
             if (solicitorDossierPaginationQuery.Years.Any()) matchedElements.Add("issueYear", MongoDBAggregationExtension.In(solicitorDossierPaginationQuery.Years));

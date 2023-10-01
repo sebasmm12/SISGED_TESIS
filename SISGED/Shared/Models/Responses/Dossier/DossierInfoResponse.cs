@@ -1,6 +1,4 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-using SISGED.Shared.Entities;
+﻿using SISGED.Shared.Entities;
 
 namespace SISGED.Shared.Models.Responses.Dossier
 {

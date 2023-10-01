@@ -24,7 +24,6 @@ using SISGED.Shared.Models.Responses.Document.UserRequest;
 using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.Statistic;
 using SISGED.Shared.Models.Responses.UserDocument;
-using System.Linq;
 
 namespace SISGED.Server.Services.Repositories
 {
@@ -50,8 +49,8 @@ namespace SISGED.Server.Services.Repositories
         {
             var annulmentProcess = new Process(user.Id, user.Id, "anulado", user.Rol);
 
-            var updateDocumentState = Builders<Document>.Update.Set("estado", "anulado")
-                                                               .Push("historialproceso", annulmentProcess);
+            var updateDocumentState = Builders<Document>.Update.Set("state", "anulado")
+                                                               .Push("processesHistory", annulmentProcess);
 
             var updatedDocument = await _documentsCollection.FindOneAndUpdateAsync(document => document.Id == documentId, updateDocumentState, new()
             {
@@ -273,7 +272,7 @@ namespace SISGED.Server.Services.Repositories
         public async Task UpdateDocumentProcessAsync(Process proccess, string documentId)
         {
             var updateDocumentProccess = Builders<Document>.Update.Push(document => document.ProcessesHistory, proccess)
-                                                                  .Set("estado", proccess.State);
+                                                                  .Set("state", proccess.State);
 
             var updatedDocument = await _documentsCollection.UpdateOneAsync(document => document.Id == documentId, updateDocumentProccess);
 
@@ -411,7 +410,7 @@ namespace SISGED.Server.Services.Repositories
             //Actulizar el documento anterior a revisado
             var filter = Builders<Document>.Filter.Eq("id", dossierWrapper.InputDocument);
             var update = Builders<Document>.Update
-                .Set("estado", "revisado");
+                .Set("state", "revisado");
             await _documentsCollection.UpdateOneAsync(filter, update);
             return documentoBPN;
         }
@@ -424,7 +423,7 @@ namespace SISGED.Server.Services.Repositories
             var json = JsonConvert.SerializeObject(dossierWrapper.Document);
             document = JsonConvert.DeserializeObject<BPNRequestResponse>(json)!;
 
-            //Solo para registrar nombre de otorgantes
+            //Solo para registrar nombre de grantors
             List<String> grantorslist = new List<string>();
             foreach (GrantorList obs in document.Content.GrantorLists)
             {
@@ -478,7 +477,7 @@ namespace SISGED.Server.Services.Repositories
 
             var filter = Builders<Document>.Filter.Eq("id", dossierWrapper.InputDocument);
             var update = Builders<Document>.Update
-                .Set("estado", "revisado");
+                .Set("state", "revisado");
             await _documentsCollection.UpdateOneAsync(filter, update);
 
             return solicitudBPN;
@@ -546,7 +545,7 @@ namespace SISGED.Server.Services.Repositories
 
             var filter = Builders<Document>.Filter.Eq("id", dossierWrapepr.InputDocument);
             var update = Builders<Document>.Update
-                .Set("estado", "revisado");
+                .Set("state", "revisado");
             await _documentsCollection.UpdateOneAsync(filter, update);
 
             return documentSEF;
@@ -604,7 +603,7 @@ namespace SISGED.Server.Services.Repositories
             //Actulizar el documento anterior a revisado
             var filter = Builders<Document>.Filter.Eq("id", dossierWrapper.InputDocument);
             var update = Builders<Document>.Update
-                .Set("estado", "revisado");
+                .Set("state", "revisado");
             await _documentsCollection.UpdateOneAsync(filter, update);
 
             //Actualizar el documento de solicitud a emitido, obtener el id de la solicitudBPN
@@ -612,7 +611,7 @@ namespace SISGED.Server.Services.Repositories
             {
                 var filterS = Builders<Document>.Filter.Eq("id", documentId);
                 var updateS = Builders<Document>.Update
-                    .Set("estado", "emitido");
+                    .Set("state", "emitido");
                 await _documentsCollection.UpdateOneAsync(filterS, updateS);
             }
             return documentoDF;
@@ -700,7 +699,7 @@ namespace SISGED.Server.Services.Repositories
             //Actulizar el documento anterior a revisado
             var filter = Builders<Document>.Filter.Eq("id", inputDocId);
             var update = Builders<Document>.Update
-                .Set("estado", "revisado");
+                .Set("state", "revisado");
             await _documentsCollection.UpdateOneAsync(filter, update);
 
             //Actualizar el documento de solicitud a emitido, obtener el id de la solicitudBPN
@@ -708,7 +707,7 @@ namespace SISGED.Server.Services.Repositories
             {
                 var filterS = Builders<Document>.Filter.Eq("id", documentRequestId);
                 var updateS = Builders<Document>.Update
-                    .Set("estado", "emitido");
+                    .Set("state", "emitido");
                 await _documentsCollection.UpdateOneAsync(filterS, updateS);
             }
 
@@ -732,9 +731,9 @@ namespace SISGED.Server.Services.Repositories
             var process = new Process(user.Id, user.Id, "evaluado", user.Rol, DateTime.UtcNow.AddHours(-5), DateTime.UtcNow.AddHours(-5));
 
             var updateFilter = Builders<Document>.Update
-                                                       .Set("estado", "evaluado")
-                                                       .Push("historialproceso", process)
-                                                       .Push("evaluaciones", eval);
+                                                       .Set("state", "evaluado")
+                                                       .Push("processesHistory", process)
+                                                       .Push("evaluations", eval);
 
 
             var updateQuery = Builders<Document>.Filter.Eq(document => document.Id, documentEvaluationRequest.DocumentId);
@@ -755,12 +754,12 @@ namespace SISGED.Server.Services.Repositories
             var process = new Process(documentGenerationDTO.UserId, documentGenerationDTO.UserId, "generado", documentGenerationDTO.RoleId);
 
             var updateFilter = Builders<Document>.Update
-                                                       .Set("contenido.codigo", documentGenerationDTO.Code)
-                                                       .Set("contenido.firma", documentGenerationDTO.Sign)
-                                                       .Set("contenido.urlGenerado", documentGenerationDTO.GeneratedURL)
-                                                       .Set("estado", "generado")
-                                                       .Push("historialcontenido", contentVersion)
-                                                       .Push("historialproceso", process);
+                                                       .Set("content.code", documentGenerationDTO.Code)
+                                                       .Set("content.sign", documentGenerationDTO.Sign)
+                                                       .Set("content.urlGenerado", documentGenerationDTO.GeneratedURL)
+                                                       .Set("state", "generado")
+                                                       .Push("contentsHistory", contentVersion)
+                                                       .Push("processesHistory", process);
 
 
             var updateQuery = Builders<Document>.Filter.Eq(document => document.Id, documentGenerationDTO.DocumentId);
@@ -801,12 +800,12 @@ namespace SISGED.Server.Services.Repositories
             SolicitorDesignationDocument oficioDesignacionNotario = new SolicitorDesignationDocument();
             var filter = Builders<Document>.Filter.Eq("id", DTO.Id);
             var update = Builders<Document>.Update
-                .Set("contenido.titulo", content.Title)
-                .Set("contenido.descripcion", content.Description)
-                .Set("contenido.lugaroficionotarial", content.SolicitorAddress)
-                .Set("contenido.idusuario", content.UserId)
-                .Set("contenido.idnotario", content.SolicitorId)
-                .Set("urlanexo", url2);
+                .Set("content.title", content.Title)
+                .Set("content.description", content.Description)
+                .Set("content.solicitorAddress", content.SolicitorAddress)
+                .Set("content.userId", content.UserId)
+                .Set("content.solicitorId", content.SolicitorId)
+                .Set("attachedUrls", url2);
             await _documentsCollection.UpdateOneAsync(filter, update);
             return oficioDesignacionNotario;
         }
@@ -829,10 +828,10 @@ namespace SISGED.Server.Services.Repositories
 
             var filter = Builders<Document>.Filter.Eq("id", DTO.Id);
             var update = Builders<Document>.Update
-                .Set("contenido.titulo", content.Title)
-                .Set("contenido.descripcion", content.Description)
-                .Set("contenido.url", content.Url)
-                .Set("urlanexo", url2);
+                .Set("content.title", content.Title)
+                .Set("content.description", content.Description)
+                .Set("content.url", content.Url)
+                .Set("attachedUrls", url2);
 
             await _documentsCollection.UpdateOneAsync(filter, update);
             return appeal;
@@ -845,7 +844,7 @@ namespace SISGED.Server.Services.Repositories
             var json = JsonConvert.SerializeObject(dossierWrapper.Document);
             DTO = JsonConvert.DeserializeObject<DisciplinaryOpennessResponse>(json)!;
 
-            //Listas de participantes a string
+            //Listas de participants a string
             List<String> participantsList = DTO.Content.Participants;
 
 
@@ -867,15 +866,15 @@ namespace SISGED.Server.Services.Repositories
             DisciplinaryOpenness disciplinaryOpenness = new DisciplinaryOpenness();
             var filter = Builders<Document>.Filter.Eq("id", DTO.Id);
             var update = Builders<Document>.Update
-                .Set("contenido.titulo", content.Title)
-                .Set("contenido.descripcion", content.Description)
-                .Set("contenido.lugaraudiencia", content.AudiencePlace)
-                .Set("contenido.idnotario", content.SolicitorId)
-                .Set("contenido.participantes", content.Participants)
-                .Set("contenido.hechosimputados", content.ImputedFacts)
-                .Set("contenido.fechainicioaudiencia", content.AudienceStartDate)
-                .Set("contenido.fechafinaudiencia", content.AudienceEndDate)
-                .Set("urlanexo", url2);
+                .Set("content.title", content.Title)
+                .Set("content.description", content.Description)
+                .Set("content.audiencePlace", content.AudiencePlace)
+                .Set("content.solicitorId", content.SolicitorId)
+                .Set("content.participants", content.Participants)
+                .Set("content.imputedFacts", content.ImputedFacts)
+                .Set("content.audienceStartDate", content.AudienceStartDate)
+                .Set("content.audienceEndDate", content.AudienceEndDate)
+                .Set("attachedUrls", url2);
             await _documentsCollection.UpdateOneAsync(filter, update);
             return disciplinaryOpenness;
         }
@@ -900,12 +899,12 @@ namespace SISGED.Server.Services.Repositories
             SignConclusion signConclusion = new SignConclusion();
             var filter = Builders<Document>.Filter.Eq("id", DTO.Id);
             var update = Builders<Document>.Update
-                .Set("contenido.idescriturapublica", content.PublicDeedId)
-                .Set("contenido.idnotario", content.PublicDeedId)
-                .Set("contenido.idcliente", content.ClientId)
-                .Set("contenido.cantidadfoja", content.TotalSheets)
-                .Set("contenido.precio", content.Price)
-                .Set("urlanexo", url2);
+                .Set("content.publicDeedId", content.PublicDeedId)
+                .Set("content.solicitorId", content.PublicDeedId)
+                .Set("content.clientId", content.ClientId)
+                .Set("content.totalSheets", content.TotalSheets)
+                .Set("content.price", content.Price)
+                .Set("attachedUrls", url2);
             await _documentsCollection.UpdateOneAsync(filter, update);
             return signConclusion;
         }
@@ -917,7 +916,7 @@ namespace SISGED.Server.Services.Repositories
             var json = JsonConvert.SerializeObject(dossierWrapper.Document);
             DTO = JsonConvert.DeserializeObject<DictumResponse>(json)!;
 
-            //Listas de participantes a string
+            //Listas de participants a string
             List<String> observationsList = new List<string>();
             //foreach (Observations obs in DTO.Content.Observations)
             //{
@@ -945,13 +944,13 @@ namespace SISGED.Server.Services.Repositories
 
             var filter = Builders<Document>.Filter.Eq("id", DTO.Id);
             var update = Builders<Document>.Update
-                .Set("contenido.titulo", contentD.Title)
-                //.Set("contenido.descripcion", contentD.Description)
-                //.Set("contenido.nombredenunciante", contentD.ComplainantName)
-                .Set("contenido.conclusion", contentD.Conclusion)
-                .Set("contenido.observaciones", contentD.Observations)
-                .Set("contenido.recomendaciones", contentD.Recommendations)
-                .Set("urlanexo", url2);
+                .Set("content.title", contentD.Title)
+                //.Set("content.description", contentD.Description)
+                //.Set("content.nombredenunciante", contentD.ComplainantName)
+                .Set("content.conclusion", contentD.Conclusion)
+                .Set("content.observations", contentD.Observations)
+                .Set("content.recommendations", contentD.Recommendations)
+                .Set("attachedUrls", url2);
             await _documentsCollection.UpdateOneAsync(filter, update);
             return dictum;
 
@@ -985,15 +984,15 @@ namespace SISGED.Server.Services.Repositories
             BPNDocument oficioBPN = new BPNDocument();
             var filter = Builders<Document>.Filter.Eq("id", DTO.Id);
             var update = Builders<Document>.Update
-                .Set("contenido.titulo", content.Title)
-                .Set("contenido.descripcion", content.Description)
-                .Set("contenido.idcliente", content.ClientId)
-                .Set("contenido.direccionoficio", content.DocumentAddress)
-                .Set("contenido.idnotario", content.SolicitorId)
-                .Set("contenido.actojuridico", content.JuridicalAct)
-                .Set("contenido.tipoprotocolo", content.ProtocolType)
-                .Set("contenido.otorgantes", content.Grantors)
-                .Set("urlanexo", url2);
+                .Set("content.title", content.Title)
+                .Set("content.description", content.Description)
+                .Set("content.clientId", content.ClientId)
+                .Set("content.documentAddress", content.DocumentAddress)
+                .Set("content.solicitorId", content.SolicitorId)
+                .Set("content.juridicalAct", content.JuridicalAct)
+                .Set("content.protocolType", content.ProtocolType)
+                .Set("content.grantors", content.Grantors)
+                .Set("attachedUrls", url2);
             await _documentsCollection.UpdateOneAsync(filter, update);
             return oficioBPN;
         }
@@ -1005,7 +1004,7 @@ namespace SISGED.Server.Services.Repositories
             var json = JsonConvert.SerializeObject(dossierWrapper.Document);
             DTO = JsonConvert.DeserializeObject<ResolutionResponse>(json)!;
 
-            //Listas de participantes a string
+            //Listas de participants a string
             List<String> listaParticipantes = DTO.Content.Participants;
 
             //Creacion de Obj y registro en coleccion de documentos 
@@ -1023,14 +1022,14 @@ namespace SISGED.Server.Services.Repositories
             Resolution resolution = new Resolution();
             var filter = Builders<Document>.Filter.Eq("id", DTO.Id);
             var update = Builders<Document>.Update
-                .Set("contenido.titulo", content.Title)
-                .Set("contenido.descripcion", content.Description)
-                .Set("contenido.sancion", content.Sanction)
-                .Set("contenido.fechainicioaudiencia", content.AudienceStartDate)
-                .Set("contenido.fechafinaudiencia", content.AudienceEndDate)
-                .Set("contenido.url", content.Url)
-                .Set("contenido.participantes", content.Participants)
-                .Set("urlanexo", url2);
+                .Set("content.title", content.Title)
+                .Set("content.description", content.Description)
+                .Set("content.sanction", content.Sanction)
+                .Set("content.audienceStartDate", content.AudienceStartDate)
+                .Set("content.audienceEndDate", content.AudienceEndDate)
+                .Set("content.url", content.Url)
+                .Set("content.participants", content.Participants)
+                .Set("attachedUrls", url2);
             await _documentsCollection.UpdateOneAsync(filter, update);
             return resolution;
         }
@@ -1052,9 +1051,9 @@ namespace SISGED.Server.Services.Repositories
 
             var filter = Builders<Document>.Filter.Eq("id", DTO.Id);
             var update = Builders<Document>.Update
-                .Set("contenido.titulo", content.Title)
-                .Set("contenido.descripcion", content.Description)
-                .Set("contenido.idnotario", content.SolicitorId);
+                .Set("content.title", content.Title)
+                .Set("content.description", content.Description)
+                .Set("content.solicitorId", content.SolicitorId);
             await _documentsCollection.UpdateOneAsync(filter, update);
         }
 
@@ -1076,10 +1075,10 @@ namespace SISGED.Server.Services.Repositories
 
             var filter = Builders<Document>.Filter.Eq("id", DTO.Id);
             var update = Builders<Document>.Update
-                .Set("contenido.cantidadfoja", content.TotalSheets)
-                .Set("contenido.costo", content.Cost)
-                .Set("contenido.idescriturapublica", content.PublicDeedId)
-                .Set("urlanexo", url2);
+                .Set("content.totalSheets", content.TotalSheets)
+                .Set("content.cost", content.Cost)
+                .Set("content.publicDeedId", content.PublicDeedId)
+                .Set("attachedUrls", url2);
             await _documentsCollection.UpdateOneAsync(filter, update);
             return result;
         }
@@ -1100,9 +1099,9 @@ namespace SISGED.Server.Services.Repositories
 
             var filter = Builders<Document>.Filter.Eq("id", DTO.Id);
             var update = Builders<Document>.Update
-                .Set("estado", "modificado")
-                .Set("contenido.titulo", DTO.Content.Title)
-                .Set("contenido.descripcion", DTO.Content.Description);
+                .Set("state", "modificado")
+                .Set("content.title", DTO.Content.Title)
+                .Set("content.description", DTO.Content.Description);
             await _documentsCollection.UpdateOneAsync(filter, update);
         }
 
@@ -1115,10 +1114,10 @@ namespace SISGED.Server.Services.Repositories
 
             var filter = Builders<Document>.Filter.Eq("id", DTO.Id);
             var update = Builders<Document>.Update
-                .Set("estado", "modificado")
-                .Set("contenido.titulo", DTO.Content.Title)
-                .Set("contenido.descripcion", DTO.Content.Description)
-                .Set("contenido.idnotario", DTO.Content.SolicitorId);
+                .Set("state", "modificado")
+                .Set("content.title", DTO.Content.Title)
+                .Set("content.description", DTO.Content.Description)
+                .Set("content.solicitorId", DTO.Content.SolicitorId);
 
             await _documentsCollection.UpdateOneAsync(filter, update);
         }
@@ -1136,7 +1135,7 @@ namespace SISGED.Server.Services.Repositories
 
             var filter = Builders<Document>.Filter.Eq("id", DTO.Id);
             var update = Builders<Document>.Update
-                .Set("estado", DTO.State);
+                .Set("state", DTO.State);
             await _documentsCollection.UpdateOneAsync(filter, update);
         }
         #region private methods
@@ -1154,7 +1153,7 @@ namespace SISGED.Server.Services.Repositories
             
             var projectAggregation = GetDictumProjectPipeline();
 
-            return new BsonDocument[] { matchAggregation, solicitorLookUpAggregation, solicitorUnwindAggregation, dossierLookUpPipelineAggregation,
+            return new[] { matchAggregation, solicitorLookUpAggregation, solicitorUnwindAggregation, dossierLookUpPipelineAggregation,
                    dossierUnwindAggregation, projectAggregation };
         }
 
@@ -1176,7 +1175,7 @@ namespace SISGED.Server.Services.Repositories
 
             var projectAggregation = GetComplaintRequestProjectPipeline();
 
-            return new BsonDocument[] { matchAggregation, documentTypeLookUpAggregation, documentTypeUnwindAggregation, solicitorLookUpAggregation,
+            return new[] { matchAggregation, documentTypeLookUpAggregation, documentTypeUnwindAggregation, solicitorLookUpAggregation,
                solicitorUnwindAggregation, dossierLookUpPipelineAggregation, dossierUnwindAggregation, projectAggregation  };
         }
 
@@ -1192,7 +1191,7 @@ namespace SISGED.Server.Services.Repositories
 
             var projectAggregation = GetSolicitorDossierShipmentProjectPipeline();
 
-            return new BsonDocument[] { matchAggregation, solicitorLookUpAggregation, solicitorUnwindAggregation,
+            return new[] { matchAggregation, solicitorLookUpAggregation, solicitorUnwindAggregation,
                 solicitorDossiersLookUpPipelineAggregation, projectAggregation };
         }
 
@@ -1200,22 +1199,22 @@ namespace SISGED.Server.Services.Repositories
         {
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
-                { "type", "$tipo"  },
-                { "contentsHistory", "$historialcontenido" },
-                { "processesHistory", "$historialproceso"  },
-                { "attachedUrls", "$urlanexo"  },
-                { "state", "$estado" },
+                { "type", "$type"  },
+                { "contentsHistory", "$contentsHistory" },
+                { "processesHistory", "$processesHistory"  },
+                { "attachedUrls", "$attachedUrls"  },
+                { "state", "$state" },
                 { "content", new BsonDocument()
-                                .Add("code", "$contenido.codigo")
-                                .Add("title", "$contenido.titulo")
-                                .Add("description", "$contenido.descripcion")
+                                .Add("code", "$content.code")
+                                .Add("title", "$content.title")
+                                .Add("description", "$content.description")
                                 .Add("solicitor", new BsonDocument()
                                                     .Add("_id", "$solicitors._id")
-                                                    .Add("name", "$solicitors.nombre")
-                                                    .Add("lastName", "$solicitors.apellido")
-                                                    .Add("solicitorOfficeName", "$solicitors.oficionotarial.nombre")
+                                                    .Add("name", "$solicitors.name")
+                                                    .Add("lastName", "$solicitors.lastName")
+                                                    .Add("solicitorOfficeName", "$solicitors.solicitorOffice.name")
                                                     .Add("email", "$solicitors.email")
-                                                    .Add("address", "$solicitors.direccion"))
+                                                    .Add("address", "$solicitors.address"))
                                 .Add("solicitorDossiers", "$solicitorDossiers")
                 },
             });
@@ -1227,25 +1226,25 @@ namespace SISGED.Server.Services.Repositories
         {
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
-                { "type", "$tipo"  },
-                { "contentsHistory", "$historialcontenido" },
-                { "processesHistory", "$historialproceso"  },
-                { "attachedUrls", "$urlanexo"  },
-                { "state", "$estado" },
+                { "type", "$type"  },
+                { "contentsHistory", "$contentsHistory" },
+                { "processesHistory", "$processesHistory"  },
+                { "attachedUrls", "$attachedUrls"  },
+                { "state", "$state" },
                 { "content", new BsonDocument()
-                                .Add("code", "$contenido.codigo")
-                                .Add("title", "$contenido.titulo")
-                                .Add("conclusion", "$contenido.conclusion")
+                                .Add("code", "$content.code")
+                                .Add("title", "$content.title")
+                                .Add("conclusion", "$content.conclusion")
                                 .Add("solicitor", new BsonDocument()
                                                     .Add("_id", "$solicitors._id")
-                                                    .Add("name", "$solicitors.nombre")
-                                                    .Add("lastName", "$solicitors.apellido")
-                                                    .Add("solicitorOfficeName", "$solicitors.oficionotarial.nombre")
+                                                    .Add("name", "$solicitors.name")
+                                                    .Add("lastName", "$solicitors.lastName")
+                                                    .Add("solicitorOfficeName", "$solicitors.solicitorOffice.name")
                                                     .Add("email", "$solicitors.email")
-                                                    .Add("address", "$solicitors.direccion"))
-                                .Add("client", "$dossiers.cliente")
-                                .Add("observations", "$contenido.observaciones")
-                                .Add("recommendations", "$contenido.recomendaciones")
+                                                    .Add("address", "$solicitors.address"))
+                                .Add("client", "$dossiers.client")
+                                .Add("observations", "$content.observations")
+                                .Add("recommendations", "$content.recommendations")
                 },
             });
 
@@ -1256,25 +1255,25 @@ namespace SISGED.Server.Services.Repositories
         {
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
-                { "type", "$tipo"  },
-                { "contentsHistory", "$historialcontenido" },
-                { "processesHistory", "$historialproceso"  },
-                { "attachedUrls", "$urlanexo"  },
-                { "state", "$estado" },
+                { "type", "$type"  },
+                { "contentsHistory", "$contentsHistory" },
+                { "processesHistory", "$processesHistory"  },
+                { "attachedUrls", "$attachedUrls"  },
+                { "state", "$state" },
                 { "content", new BsonDocument()
-                                .Add("code", "$contenido.codigo")
-                                .Add("title", "$contenido.titulo")
-                                .Add("description", "$contenido.descripcion")
+                                .Add("code", "$content.code")
+                                .Add("title", "$content.title")
+                                .Add("description", "$content.description")
                                 .Add("solicitor", new BsonDocument()
                                                     .Add("_id", "$solicitors._id")
-                                                    .Add("name", "$solicitors.nombre")
-                                                    .Add("lastName", "$solicitors.apellido")
-                                                    .Add("solicitorOfficeName", "$solicitors.oficionotarial.nombre")
+                                                    .Add("name", "$solicitors.name")
+                                                    .Add("lastName", "$solicitors.lastName")
+                                                    .Add("solicitorOfficeName", "$solicitors.solicitorOffice.name")
                                                     .Add("email", "$solicitors.email")
-                                                    .Add("address", "$solicitors.direccion"))
-                                .Add("client", "$dossiers.cliente")
-                                .Add("complaintType", "$documentTypes.nombre")
-                                .Add("deliveryDate", "$contenido.fechaentrega")
+                                                    .Add("address", "$solicitors.address"))
+                                .Add("client", "$dossiers.client")
+                                .Add("complaintType", "$documentTypes.name")
+                                .Add("deliveryDate", "$content.deliveryDate")
                 },
             });
 
@@ -1285,32 +1284,28 @@ namespace SISGED.Server.Services.Repositories
         {
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
-                { "type", "$tipo"  },
-                { "contentsHistory", "$historialcontenido" },
-                { "processesHistory", "$historialproceso"  },
-                { "attachedUrls", "$urlanexo"  },
-                { "state", "$estado" },
+                { "type", "$type"  },
+                { "contentsHistory", "$contentsHistory" },
+                { "processesHistory", "$processesHistory"  },
+                { "attachedUrls", "$attachedUrls"  },
+                { "state", "$state" },
                 { "content", new BsonDocument()
-                                .Add("code", "$contenido.codigo")
-                                .Add("title", "$contenido.titulo")
-                                .Add("description", "$contenido.descripcion")
+                                .Add("code", "$content.code")
+                                .Add("title", "$content.title")
+                                .Add("description", "$content.description")
                                 .Add("solicitor", new BsonDocument()
                                                     .Add("_id", "$solicitors._id")
-                                                    .Add("name", "$solicitors.nombre")
-                                                    .Add("lastName", "$solicitors.apellido")
-                                                    .Add("solicitorOfficeName", "$solicitors.oficionotarial.nombre")
+                                                    .Add("name", "$solicitors.name")
+                                                    .Add("lastName", "$solicitors.lastName")
+                                                    .Add("solicitorOfficeName", "$solicitors.solicitorOffice.name")
                                                     .Add("email", "$solicitors.email")
-                                                    .Add("address", "$solicitors.direccion"))
-                                //.Add("prosecutor", new BsonDocument()
-                                //                    .Add("_id", "$prosecutors._id")
-                                //                    .Add("name", "$prosecutors.datos.nombre")
-                                //                    .Add("lastName", "$prosecutors.datos.apellido"))
-                                .Add("client", "$dossiers.cliente")
-                                .Add("audienceStartDate", "$contenido.fechainicioaudiencia")
-                                .Add("audienceEndDate", "$contenido.fechafinaudiencia")
-                                .Add("audiencePlace", "$contenido.lugaraudiencia")
-                                .Add("imputedFacts", "$contenido.cargosimputados")
-                                .Add("participants", "$contenido.participantes")
+                                                    .Add("address", "$solicitors.address"))
+                                .Add("client", "$dossiers.client")
+                                .Add("audienceStartDate", "$content.audienceStartDate")
+                                .Add("audienceEndDate", "$content.audienceEndDate")
+                                .Add("audiencePlace", "$content.audiencePlace")
+                                .Add("imputedFacts", "$content.imputedFacts")
+                                .Add("participants", "$content.participants")
                 },
             });
 
@@ -1320,27 +1315,27 @@ namespace SISGED.Server.Services.Repositories
         {
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
-                { "type", "$tipo"  },
-                { "contentsHistory", "$historialcontenido" },
-                { "processesHistory", "$historialproceso"  },
-                { "attachedUrls", "$urlanexo"  },
-                { "state", "$estado" },
+                { "type", "$type"  },
+                { "contentsHistory", "$contentsHistory" },
+                { "processesHistory", "$processesHistory"  },
+                { "attachedUrls", "$attachedUrls"  },
+                { "state", "$state" },
                 { "content", new BsonDocument()
-                                .Add("code", "$contenido.codigo")
-                                .Add("title", "$contenido.titulo")
-                                .Add("description", "$contenido.descripcion")
+                                .Add("code", "$content.code")
+                                .Add("title", "$content.title")
+                                .Add("description", "$content.description")
                                 .Add("solicitor", new BsonDocument()
                                                     .Add("_id", "$solicitors._id")
-                                                    .Add("name", "$solicitors.nombre")
-                                                    .Add("lastName", "$solicitors.apellido")
-                                                    .Add("solicitorOfficeName", "$solicitors.oficionotarial.nombre")
+                                                    .Add("name", "$solicitors.name")
+                                                    .Add("lastName", "$solicitors.lastName")
+                                                    .Add("solicitorOfficeName", "$solicitors.solicitorOffice.name")
                                                     .Add("email", "$solicitors.email")
-                                                    .Add("address", "$solicitors.direccion"))
-                                .Add("client", "$dossiers.cliente")
-                                .Add("audienceStartDate", "$contenido.fechainicioaudiencia")
-                                .Add("audienceEndDate", "$contenido.fechafinaudiencia")
-                                .Add("sanction", "$sanctionType.nombre")
-                                .Add("participants", "$contenido.participantes")
+                                                    .Add("address", "$solicitors.address"))
+                                .Add("client", "$dossiers.client")
+                                .Add("audienceStartDate", "$content.audienceStartDate")
+                                .Add("audienceEndDate", "$content.audienceEndDate")
+                                .Add("sanction", "$sanctionType.name")
+                                .Add("participants", "$content.participants")
                 },
             });
 
@@ -1351,24 +1346,24 @@ namespace SISGED.Server.Services.Repositories
         {
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
-                { "type", "$tipo"  },
-                { "contentsHistory", "$historialcontenido" },
-                { "processesHistory", "$historialproceso"  },
-                { "attachedUrls", "$urlanexo"  },
-                { "state", "$estado" },
+                { "type", "$type"  },
+                { "contentsHistory", "$contentsHistory" },
+                { "processesHistory", "$processesHistory"  },
+                { "attachedUrls", "$attachedUrls"  },
+                { "state", "$state" },
                 { "content", new BsonDocument()
-                                .Add("code", "$contenido.codigo")
-                                .Add("title", "$contenido.titulo")
-                                .Add("description", "$contenido.descripcion")
+                                .Add("code", "$content.code")
+                                .Add("title", "$content.title")
+                                .Add("description", "$content.description")
                                 .Add("solicitor", new BsonDocument()
                                                     .Add("_id", "$solicitors._id")
-                                                    .Add("name", "$solicitors.nombre")
-                                                    .Add("lastName", "$solicitors.apellido")
-                                                    .Add("solicitorOfficeName", "$solicitors.oficionotarial.nombre")
+                                                    .Add("name", "$solicitors.name")
+                                                    .Add("lastName", "$solicitors.lastName")
+                                                    .Add("solicitorOfficeName", "$solicitors.solicitorOffice.name")
                                                     .Add("email", "$solicitors.email")
-                                                    .Add("address", "$solicitors.direccion"))
-                                .Add("client", "$dossiers.cliente")
-                                .Add("issueDate", "$contenido.fechaemision")
+                                                    .Add("address", "$solicitors.address"))
+                                .Add("client", "$dossiers.client")
+                                .Add("issueDate", "$content.issueDate")
                 },
             });
 
@@ -1379,7 +1374,7 @@ namespace SISGED.Server.Services.Repositories
         {
             var letPipeline = new Dictionary<string, BsonValue>()
             {
-                { "documentTypeId", MongoDBAggregationExtension.ObjectId("$contenido.tipoDenuncia") }
+                { "documentTypeId", MongoDBAggregationExtension.ObjectId("$content.complaintType") }
             };
 
             var lookUpPipeline = new BsonArray()
@@ -1396,7 +1391,7 @@ namespace SISGED.Server.Services.Repositories
         {
             var aggregations = GetDocumentsByUserPipeline(userId, userDocumentPaginationQuery).ToList();
 
-            aggregations.Add(MongoDBAggregationExtension.Sort(new BsonDocument("fechacreacion", -1)));
+            aggregations.Add(MongoDBAggregationExtension.Sort(new BsonDocument("creationDate", -1)));
             aggregations.Add(MongoDBAggregationExtension.Skip(userDocumentPaginationQuery.Page * userDocumentPaginationQuery.PageSize));
             aggregations.Add(MongoDBAggregationExtension.Limit(userDocumentPaginationQuery.PageSize));
 
@@ -1409,7 +1404,7 @@ namespace SISGED.Server.Services.Repositories
 
             var countAggregation = MongoDBAggregationExtension.Count("total");
 
-            return aggregations.Concat(new BsonDocument[] { countAggregation }).ToArray();
+            return aggregations.Concat(new[] { countAggregation }).ToArray();
         }
 
         private static BsonDocument[] GetDocumentsByUserPipeline(string userId, UserDocumentPaginationQuery userDocumentPaginationQuery)
@@ -1433,15 +1428,15 @@ namespace SISGED.Server.Services.Repositories
         {
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
-                { "tipo", 1 },
-                { "historialcontenido", 1 },
-                { "historialproceso", 1 },
-                { "urlanexo", 1 },
-                { "estado", 1 },
-                { "fechacreacion", 1 },
-                { "contenido", 1 },
-                { "cliente", "$dossiers.cliente" },
-                { "tipoExpediente", "$dossiers.tipo" }
+                { "type", 1 },
+                { "contentsHistory", 1 },
+                { "processesHistory", 1 },
+                { "attachedUrls", 1 },
+                { "state", 1 },
+                { "creationDate", 1 },
+                { "content", 1 },
+                { "client", "$dossiers.client" },
+                { "dossierType", "$dossiers.type" }
             });
 
             return projectAggregation;
@@ -1451,10 +1446,10 @@ namespace SISGED.Server.Services.Repositories
         {
             var matchedElements = new Dictionary<string, BsonValue>()
             {
-                { "historialproceso", MongoDBAggregationExtension.ElementMatch(new()
+                { "processesHistory", MongoDBAggregationExtension.ElementMatch(new()
                 {
-                    { "estado", "registrado" },
-                    { "idemisor", userId }
+                    { "state", "registrado" },
+                    { "senderId", userId }
                 })}
             };
 
@@ -1522,14 +1517,14 @@ namespace SISGED.Server.Services.Repositories
         {
             var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("dossiers.tipo", dossierType));
 
-            return new BsonDocument[] { matchAggregation };
+            return new[] { matchAggregation };
         }
 
         private static BsonDocument GetSolicitorDossiersLookUpPipeline()
         {
             var letPipeline = new Dictionary<string, BsonValue>()
             {
-                { "solicitorDossierIds", "$contenido.expedientes" }
+                { "solicitorDossierIds", "$content.solicitorDossiers" }
             };
 
             var lookUpPipeline = new BsonArray()
@@ -1540,8 +1535,8 @@ namespace SISGED.Server.Services.Repositories
                
                MongoDBAggregationExtension.Project(new()
                {
-                   { "fechaexpedicion", 0 },
-                   { "idnotario", 0 }
+                   { "issueDate", 0 },
+                   { "solicitorId", 0 }
                })
             };
 
@@ -1568,7 +1563,7 @@ namespace SISGED.Server.Services.Repositories
         {
             var letPipeline = new Dictionary<string, BsonValue>()
             {
-                { "docTypeId", MongoDBAggregationExtension.ObjectId("$contenido.sancion") }
+                { "docTypeId", MongoDBAggregationExtension.ObjectId("$content.sanction") }
             };
 
             var lookUpPipeline = new BsonArray()
@@ -1585,7 +1580,7 @@ namespace SISGED.Server.Services.Repositories
 
             var addFieldsAggregation = MongoDBAggregationExtension.AddFields(new()
             {
-                { "fullName", MongoDBAggregationExtension.Concat(new List<BsonValue>() { "$dossiers.cliente.nombre", " ", "$dossiers.cliente.apellido" }) }
+                { "fullName", MongoDBAggregationExtension.Concat(new List<BsonValue> { "$dossiers.client.name", " ", "$dossiers.client.lastName" }) }
             });
 
             var matchDictionary = new Dictionary<string, BsonValue>()
@@ -1595,7 +1590,7 @@ namespace SISGED.Server.Services.Repositories
 
             var matchAggregation = MongoDBAggregationExtension.Match(matchDictionary);
 
-            var unsetAggregation = MongoDBAggregationExtension.UnSet(new List<BsonValue>() { "fullName" });
+            var unsetAggregation = MongoDBAggregationExtension.UnSet(new List<BsonValue> { "fullName" });
 
 
             return new BsonDocument[] { addFieldsAggregation, matchAggregation, unsetAggregation };
@@ -1612,7 +1607,7 @@ namespace SISGED.Server.Services.Repositories
 
                         string code = userDocumentPaginationQuery.Code!.Trim();
                         
-                        matchedElements.Add("contenido.codigo", code);
+                        matchedElements.Add("content.code", code);
 
                         return matchedElements;
                     } 
@@ -1622,7 +1617,7 @@ namespace SISGED.Server.Services.Repositories
                     Condition = (userDocumentPaginationQuery) => !string.IsNullOrEmpty(userDocumentPaginationQuery.State),
                     Result = (matchedElements, userDocumentPaginationQuery) => {
 
-                        matchedElements.Add("estado", userDocumentPaginationQuery.State);
+                        matchedElements.Add("state", userDocumentPaginationQuery.State);
 
                         return matchedElements;
                     }                 
@@ -1632,7 +1627,7 @@ namespace SISGED.Server.Services.Repositories
                     Condition = (userDocumentPaginationQuery) => userDocumentPaginationQuery.StartDate.HasValue,
                     Result = (matchedElements, userDocumentPaginationQuery) => {
 
-                        matchedElements.Add("fechacreacion", MongoDBAggregationExtension.GreaterThanEquals(new BsonDateTime(userDocumentPaginationQuery.StartDate!.Value)));
+                        matchedElements.Add("creationDate", MongoDBAggregationExtension.GreaterThanEquals(new BsonDateTime(userDocumentPaginationQuery.StartDate!.Value)));
 
                         return matchedElements;
                     }                               
@@ -1642,7 +1637,7 @@ namespace SISGED.Server.Services.Repositories
                     Condition = (userDocumentPaginationQuery) => userDocumentPaginationQuery.EndDate.HasValue,
                     Result = (matchedElements, userDocumentPaginationQuery) => {
 
-                        matchedElements.Add("fechacreacion", MongoDBAggregationExtension.LessThanEquals(new BsonDateTime(userDocumentPaginationQuery.EndDate!.Value)));
+                        matchedElements.Add("creationDate", MongoDBAggregationExtension.LessThanEquals(new BsonDateTime(userDocumentPaginationQuery.EndDate!.Value)));
 
                         return matchedElements;
                     }                                             
@@ -1660,18 +1655,14 @@ namespace SISGED.Server.Services.Repositories
 
             var solicitorUnwindAggregation = MongoDBAggregationExtension.UnWind(new("$solicitors"));
 
-            //var prosecutorLookUpAggregation = GetProsecutorsLookUpPipeline();
-
-            //var prosecutorUnwindAggregation = MongoDBAggregationExtension.UnWind(new("$prosecutors"));
-
             var dossierLookUpPipelineAggregation = GetDossierLookUpPipeline();
 
             var dossierUnwindAggregation = MongoDBAggregationExtension.UnWind(new("$dossiers"));
 
             var projectAggregation = GetDisciplinaryOpennessProjectPipeline();
 
-            return new BsonDocument[] { matchAggregation, solicitorLookUpAggregation,
-               solicitorUnwindAggregation, /*prosecutorLookUpAggregation, prosecutorUnwindAggregation,*/  dossierLookUpPipelineAggregation, dossierUnwindAggregation, projectAggregation  };
+            return new[] { matchAggregation, solicitorLookUpAggregation,
+               solicitorUnwindAggregation, dossierLookUpPipelineAggregation, dossierUnwindAggregation, projectAggregation  };
         }
         
         private static BsonDocument[] GetResolutionPipeline(string documentId)
@@ -1692,7 +1683,7 @@ namespace SISGED.Server.Services.Repositories
 
             var projectAggregation = GetResolutionProjectPipeline();
 
-            return new BsonDocument[] { matchAggregation, solicitorLookUpAggregation,
+            return new[] { matchAggregation, solicitorLookUpAggregation,
                solicitorUnwindAggregation,  dossierLookUpPipelineAggregation, dossierUnwindAggregation, sanctionLookUpPipelineAggregation, sanctionUnwindAggregation, projectAggregation  };
         }
 
@@ -1714,22 +1705,22 @@ namespace SISGED.Server.Services.Repositories
 
             var projectPipeline = MongoDBAggregationExtension.Project(new()
             {
-                { "type", "$tipo" },
-                { "state", "$estado" },
-                { "contentsHistory", "$historialcontenido" },
-                { "processesHistory", "$historialproceso" },
-                { "attachedUrls", "$urlanexo" },
+                { "type", "$type" },
+                { "state", "$state" },
+                { "contentsHistory", "$contentsHistory" },
+                { "processesHistory", "$processesHistory" },
+                { "attachedUrls", "$attachedUrls" },
                 { "content", new BsonDocument()
                 {
                     { "client", "$clients" },
                     { "solicitor", "$solicitors" },
                     { "publicDeed", "$publicDeeds" },
-                    { "price", "$contenido.precio" },
-                    { "totalSheets", "$contenido.cantidadfoja" }
+                    { "price", "$content.price" },
+                    { "totalSheets", "$content.totalSheets" }
                 } }
             });
 
-            return new BsonDocument[] { matchAggregation, publicDeedLookUpPipeline, publicDeedUnwindPipeline,
+            return new[] { matchAggregation, publicDeedLookUpPipeline, publicDeedUnwindPipeline,
                 solicitorLookUpPipeline, solicitorUnwindPipeline, clientLookUpPipeline, clientUnwindPipeline, projectPipeline };
         }
 
@@ -1747,7 +1738,7 @@ namespace SISGED.Server.Services.Repositories
 
             var projectAggregation = GetSolicitorDossierRequestProjectPipeline();
 
-            return new BsonDocument[] { matchAggregation, solicitorLookUpAggregation,
+            return new[] { matchAggregation, solicitorLookUpAggregation,
                solicitorUnwindAggregation,  dossierLookUpPipelineAggregation, dossierUnwindAggregation, projectAggregation  };
         }
 
@@ -1761,28 +1752,28 @@ namespace SISGED.Server.Services.Repositories
 
             var projectPipeline = MongoDBAggregationExtension.Project(new Dictionary<string, BsonValue>()
             {
-                { "type", "$tipo" },
-                { "state", "$estado" },
-                { "contentsHistory", "$historialcontenido" },
-                { "processesHistory", "$historialproceso" },
-                { "attachedUrls", "$urlanexo" },
+                { "type", "$type" },
+                { "state", "$state" },
+                { "contentsHistory", "$contentsHistory" },
+                { "processesHistory", "$processesHistory" },
+                { "attachedUrls", "$attachedUrls" },
                 { "content", new BsonDocument()
                 {
                     { "publicDeed", "$publicDeeds" },
-                    { "totalSheets", "$contenido.cantidadfoja" },
-                    { "cost", "$contenido.costo" },
-                    { "status", "$contenido.estado" }
+                    { "totalSheets", "$content.totalSheets" },
+                    { "cost", "$content.cost" },
+                    { "status", "$content.status" }
                 } }
             });
 
-            return new BsonDocument[] { matchAggregation, lookUpPipeline, unwindPipeline, projectPipeline };
+            return new[] { matchAggregation, lookUpPipeline, unwindPipeline, projectPipeline };
         }
 
         private static BsonDocument GetPublicDeedLookUpPipeline()
         {
             var letPipeline = new Dictionary<string, BsonValue>()
             {
-                { "publicDeedId", MongoDBAggregationExtension.ObjectId("$contenido.idescriturapublica") }
+                { "publicDeedId", MongoDBAggregationExtension.ObjectId("$content.publicDeedId") }
             };
 
             var lookUpPipeline = new BsonArray()
@@ -1804,23 +1795,23 @@ namespace SISGED.Server.Services.Repositories
 
             var projectPipeline = MongoDBAggregationExtension.Project(new()
             {
-                { "type", "$tipo" },
-                { "state", "$estado" },
-                { "contentsHistory", "$historialcontenido" },
-                { "processesHistory", "$historialproceso" },
-                { "attachedUrls", "$urlanexo" },
+                { "type", "$type" },
+                { "state", "$state" },
+                { "contentsHistory", "$contentsHistory" },
+                { "processesHistory", "$processesHistory" },
+                { "attachedUrls", "$attachedUrls" },
                 { "content", new BsonDocument()
                 {
-                    { "title", "$contenido.titulo" },
-                    { "description", "$contenido.descripcion" },
+                    { "title", "$content.title" },
+                    { "description", "$content.description" },
                     { "solicitor", "$solicitors" },
-                    { "userId", "$contenido.idusuario" },
-                    { "solicitorAddress", "$contenido.lugaroficionotarial" },
-                    { "realizationDate", "$contenido.fecharealizacion" }
+                    { "userId", "$content.userId" },
+                    { "solicitorAddress", "$content.solicitorAddress" },
+                    { "realizationDate", "$content.realizationDate" }
                 } }
             });
 
-            return new BsonDocument[] { matchAggregation, solicitorLookUpPipeline, solicitorUnWindPipeline, projectPipeline };
+            return new[] { matchAggregation, solicitorLookUpPipeline, solicitorUnWindPipeline, projectPipeline };
         }
 
         private static BsonDocument[] GetBPNDocumentPipeline(string documentId)
@@ -1838,26 +1829,26 @@ namespace SISGED.Server.Services.Repositories
 
             var projectPipeline = MongoDBAggregationExtension.Project(new()
             {
-                { "type", "$tipo" },
-                { "state", "$estado" },
-                { "contentsHistory", "$historialcontenido" },
-                { "processesHistory", "$historialproceso" },
-                { "attachedUrls", "$urlanexo" },
+                { "type", "$type" },
+                { "state", "$state" },
+                { "contentsHistory", "$contentsHistory" },
+                { "processesHistory", "$processesHistory" },
+                { "attachedUrls", "$attachedUrls" },
                 { "content", new BsonDocument()
                 {
-                    { "title", "$contenido.titulo" },
-                    { "description", "$contenido.descripcion" },
+                    { "title", "$content.title" },
+                    { "description", "$content.description" },
                     { "client", "$clients" },
                     { "solicitor", "$solicitors" },
-                    { "juridicalAct", "$contentido.actojuridico" },
-                    { "protocolType", "$contenido.tipoprotocolo" },
-                    { "grantors", "$contenido.otorgantes" },
-                    { "realizationDate", "$contenido.fecharealizacion" }
+                    { "juridicalAct", "$content.juridicalAct" },
+                    { "protocolType", "$content.protocolType" },
+                    { "grantors", "$content.grantors" },
+                    { "realizationDate", "$content.realizationDate" }
                 } }
 
             });
 
-            return new BsonDocument[] { matchAggregation, solicitorLookUpPipeline, solicitorUnWindPipeline, clientLookUpPipeline, clientUnWindPipeline, projectPipeline };
+            return new[] { matchAggregation, solicitorLookUpPipeline, solicitorUnWindPipeline, clientLookUpPipeline, clientUnWindPipeline, projectPipeline };
         }
 
 
@@ -1865,7 +1856,7 @@ namespace SISGED.Server.Services.Repositories
         {
             var letPipeline = new Dictionary<string, BsonValue>()
             {
-                { "solicitorId", MongoDBAggregationExtension.ObjectId("$contenido.idnotario") }
+                { "solicitorId", MongoDBAggregationExtension.ObjectId("$content.solicitorId") }
             };
 
             var lookUpPipeline = new BsonArray()
@@ -1876,28 +1867,12 @@ namespace SISGED.Server.Services.Repositories
 
             return MongoDBAggregationExtension.Lookup(new("notarios", letPipeline, lookUpPipeline, "solicitors"));
         }
-        
-        private static BsonDocument GetProsecutorsLookUpPipeline()
-        {
-            var letPipeline = new Dictionary<string, BsonValue>()
-            {
-                { "prosecutorId", MongoDBAggregationExtension.ObjectId("$contenido.idfiscal") }
-            };
-
-            var lookUpPipeline = new BsonArray()
-            {
-                MongoDBAggregationExtension.Match(
-                    MongoDBAggregationExtension.Expr(MongoDBAggregationExtension.Eq(new() { "$_id", "$$prosecutorId" })))
-            };
-
-            return MongoDBAggregationExtension.Lookup(new("usuarios", letPipeline, lookUpPipeline, "prosecutors"));
-        }
 
         private static BsonDocument GetClientLookUpPipeline()
         {
             var letPipeline = new Dictionary<string, BsonValue>()
             {
-                { "clientId", MongoDBAggregationExtension.ObjectId("$contenido.idcliente") }
+                { "clientId", MongoDBAggregationExtension.ObjectId("$content.clientId") }
             };
 
             var lookUpPipeline = new BsonArray()
@@ -1919,12 +1894,12 @@ namespace SISGED.Server.Services.Repositories
 
         private static BsonDocument[] GetDocumentsByMonthAndAreaPipeline(DocumentsByMonthAndAreaQuery documentsByMonthAndAreaQuery)
         {
-            return GetDocumentsPipeline(MongoDBAggregationExtension.Match(new BsonDocument("historialproceso.area", documentsByMonthAndAreaQuery.Area)), GetDocumentsByMonthPipeline(documentsByMonthAndAreaQuery));
+            return GetDocumentsPipeline(MongoDBAggregationExtension.Match(new BsonDocument("processesHistory.area", documentsByMonthAndAreaQuery.Area)), GetDocumentsByMonthPipeline(documentsByMonthAndAreaQuery));
         }
 
         private static BsonDocument[] GetExpiredDocumentsByMonthPipeline(DocumentsByMonthQuery documentsByMonthQuery)
         {
-            return GetDocumentsPipeline(MongoDBAggregationExtension.Match(new BsonDocument("estado", "caducado")), GetDocumentsByMonthPipeline(documentsByMonthQuery));
+            return GetDocumentsPipeline(MongoDBAggregationExtension.Match(new BsonDocument("state", "caducado")), GetDocumentsByMonthPipeline(documentsByMonthQuery));
         }
 
         private static BsonDocument[] GetDocumentsByStatePipeline(DocumentsByStateQuery documentsByStateQuery)
@@ -1934,9 +1909,9 @@ namespace SISGED.Server.Services.Repositories
 
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
-                { "state", "$estado" },
-                { "month", MongoDBAggregationExtension.Month("$fechacreacion") },
-                { "type", "$tipo" }
+                { "state", "$state" },
+                { "month", MongoDBAggregationExtension.Month("$creationDate") },
+                { "type", "$type" }
             });
 
             var monthMatchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("month", documentsByStateQuery.Month));
@@ -1958,18 +1933,18 @@ namespace SISGED.Server.Services.Repositories
                 { "pending", 1 }
             });
 
-            return new BsonDocument[] { matchAggregation, projectAggregation, monthMatchAggregation, groupAggregation, documentsByStateProject };
+            return new[] { matchAggregation, projectAggregation, monthMatchAggregation, groupAggregation, documentsByStateProject };
         }
 
         private static Dictionary<string, BsonValue> GetMatchAggregationPipeline(DocumentsByStateQuery documentsByStateQuery)
         {
             var matchAggregationValues = new Dictionary<string, BsonValue>()
             {
-                { "tipo",MongoDBAggregationExtension.NotIn(new List<BsonValue>() { "SolicitudInicial" }) }
+                { "type",MongoDBAggregationExtension.NotIn(new List<BsonValue>() { "SolicitudInicial" }) }
             };
 
-            if (!string.IsNullOrEmpty(documentsByStateQuery.Area)) matchAggregationValues.Add("historialproceso.area", documentsByStateQuery.Area);
-            if (!string.IsNullOrEmpty(documentsByStateQuery.UserId)) matchAggregationValues.Add("historialproceso.idemisor", documentsByStateQuery.UserId);
+            if (!string.IsNullOrEmpty(documentsByStateQuery.Area)) matchAggregationValues.Add("processesHistory.area", documentsByStateQuery.Area);
+            if (!string.IsNullOrEmpty(documentsByStateQuery.UserId)) matchAggregationValues.Add("processesHistory.senderId", documentsByStateQuery.UserId);
 
             return matchAggregationValues;
         }
@@ -1980,15 +1955,15 @@ namespace SISGED.Server.Services.Repositories
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
                 { "_id", 1 },
-                { "tipo", 1 },
-                { "month", MongoDBAggregationExtension.Month("$fechacreacion") }
+                { "type", 1 },
+                { "month", MongoDBAggregationExtension.Month("$creationDate") }
             });
 
             var monthMatchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("month", documentsByMonthQuery.Month));
 
             var groupAggregation = MongoDBAggregationExtension.Group(new()
             {
-                { "_id", "$tipo" },
+                { "_id", "$type" },
                 { "quantity", MongoDBAggregationExtension.Sum(1) }
             });
 

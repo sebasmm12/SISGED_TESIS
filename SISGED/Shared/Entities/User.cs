@@ -15,21 +15,21 @@ namespace SISGED.Shared.Entities
         [BsonElement("id")]
         public string Id { get; set; } = default!;
 
-        [BsonElement("tipo")]
+        [BsonElement("type")]
         public string Type { get; set; } = default!;
 
-        [BsonElement("usuario")]
+        [BsonElement("userName")]
         public string UserName { get; set; } = default!;
 
-        [BsonElement("clave")]
+        [BsonElement("password")]
         public string Password { get; set; } = default!;
         [BsonElement("salt")]
         public string Salt { get; set; } = default!;
 
-        [BsonElement("datos")]
+        [BsonElement("data")]
         public UserData Data { get; set; } = new UserData();
 
-        [BsonElement("estado")]
+        [BsonElement("state")]
         public string State { get; set; } = default!;
 
         [BsonElement("rol")]

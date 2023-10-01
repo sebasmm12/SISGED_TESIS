@@ -1,21 +1,16 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SISGED.Shared.Entities
 {
     public class DocumentEvaluation
     {
-        [BsonElement("usuarioevaluador")]
+        [BsonElement("userEvaluator")]
         public string UserEvaluator { get; set; } = default!;
-        [BsonElement("estaaprobado")]
+        [BsonElement("isApproved")]
         public bool IsApproved { get; set; }
-        [BsonElement("observacion")]
+        [BsonElement("comment")]
         public string? Comment { get; set; } = default!;
-        [BsonElement("fechaevaluacion")]
+        [BsonElement("evaluationDate")]
         public DateTime EvaluationDate { get; set; } = default!;
 
         public DocumentEvaluation()

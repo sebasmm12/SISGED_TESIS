@@ -1,19 +1,18 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace SISGED.Shared.DTOs
 {
     public class SolicitorDossierRequestContentDTO
     {
-        [JsonPropertyName("titulo")]
+        [JsonPropertyName("title")]
         public string Title { get; set; } = default!;
-        [JsonPropertyName("descripcion")]
+        [JsonPropertyName("description")]
         public string Description { get; set; } = default!;
-        [JsonPropertyName("idnotario")]
+        [JsonPropertyName("solicitorId")]
         public string SolicitorId { get; set; } = default!;
-        [JsonPropertyName("fechaemision")]
+        [JsonPropertyName("issueDate")]
         public DateTime IssueDate { get; set; }
-        [JsonPropertyName("iddenunciante")]
+        [JsonPropertyName("clientId")]
         public string ClientId { get; set; } = default!;
     }
 }

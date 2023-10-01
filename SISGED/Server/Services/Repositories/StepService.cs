@@ -95,16 +95,11 @@ namespace SISGED.Server.Services.Repositories
             if (step.Id is null) throw new Exception($"No se pudo registrar la hoja de ruta del expediente {stepRegisterRequest.DossierName}");
         }
 
-        public string GenerateUID()
-        {
-            return Guid.NewGuid().ToString("N");
-        }
-
         private static UpdateDefinition<Step> SetStepInformation(Step step)
         {
             return Builders<Step>.Update
-                .Set("nombreexpediente", step.DossierName)
-                .Set("documentos", step.Documents);
+                .Set("dossierName", step.DossierName)
+                .Set("documents", step.Documents);
         }
     }
 }

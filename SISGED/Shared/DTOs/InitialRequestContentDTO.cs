@@ -4,15 +4,15 @@ namespace SISGED.Shared.DTOs
 {
     public class InitialRequestContentDTO
     {
-        [JsonPropertyName("descripcion")]
+        [JsonPropertyName("description")]
         public string Description { get; set; } = default!;
-        [JsonPropertyName("titulo")]
+        [JsonPropertyName("title")]
         public string Title { get; set; } = default!;
-        [JsonPropertyName("idtiposolicitud")]
+        [JsonPropertyName("requestTypeId")]
         public string RequestTypeId { get; set; } = default!;
-        [JsonPropertyName("tienenotario")]
+        [JsonPropertyName("hasSolicitor")]
         public bool HasSolicitor { get; set; }
-        [JsonPropertyName("idnotario")]
+        [JsonPropertyName("solicitorId")]
         public string SolicitorId { get; set; } = default!;
     }
 }

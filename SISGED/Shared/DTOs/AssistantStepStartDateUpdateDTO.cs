@@ -12,8 +12,8 @@ namespace SISGED.Shared.DTOs
             LimitDate = limitDate;
         }
 
-        public string Id { get; set; } = default!;
-        public AssistantStepDTO Assistant { get; set; } = default!;
+        public string Id { get; set; }
+        public AssistantStepDTO Assistant { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime LimitDate { get; set; }
     }

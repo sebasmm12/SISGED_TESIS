@@ -1,25 +1,24 @@
 ﻿using System.Text.Json.Serialization;
 
-
 namespace SISGED.Shared.DTOs
 {
     public class ResolutionContentDTO
     {
-        [JsonPropertyName("titulo")]
+        [JsonPropertyName("title")]
         public string Title { get; set; } = default!;
-        [JsonPropertyName("descripcion")]
+        [JsonPropertyName("description")]
         public string Description { get; set; } = default!;
-        [JsonPropertyName("fechainicioaudiencia")]
+        [JsonPropertyName("audienceStartDate")]
         public DateTime AudienceStartDate { get; set; }
-        [JsonPropertyName("fechafinaudiencia")]
+        [JsonPropertyName("audienceEndDate")]
         public DateTime AudienceEndDate { get; set; }
-        [JsonPropertyName("participantes")]
+        [JsonPropertyName("participants")]
         public List<string> Participants { get; set; } = new();
-        [JsonPropertyName("sancion")]
+        [JsonPropertyName("sanction")]
         public string Sanction { get; set; } = default!;
-        [JsonPropertyName("iddenunciante")]
+        [JsonPropertyName("clientId")]
         public string ClientId { get; set; } = default!;
-        [JsonPropertyName("idnotario")]
+        [JsonPropertyName("solicitorId")]
         public string SolicitorId { get; set; } = default!;
     }
 }

@@ -9,21 +9,21 @@ namespace SISGED.Shared.Entities
 {
     public class UserData
     {
-        [BsonElement("nombre")]
+        [BsonElement("name")]
         public string Name { get; set; } = default!;
-        [BsonElement("apellido")]
+        [BsonElement("lastName")]
         public string LastName { get; set; } = default!;
-        [BsonElement("fechanacimiento")]
+        [BsonElement("bornDate")]
         public DateTime BornDate { get; set; }
-        [BsonElement("tipodocumento")]
+        [BsonElement("documentType")]
         public string DocumentType { get; set; } = default!;
-        [BsonElement("numerodocumento")]
+        [BsonElement("documentNumber")]
         public string DocumentNumber { get; set; } = default!;
-        [BsonElement("direccion")]
+        [BsonElement("address")]
         public string Address { get; set; } = default!;
         [BsonElement("email")]
         public string Email { get; set; } = default!;
-        [BsonElement("imagen")]
+        [BsonElement("profile")]
         public string? Profile { get; set; }
     }
 }

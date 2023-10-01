@@ -4,13 +4,13 @@ namespace SISGED.Shared.Entities
 {
     public class LegalAct
     {
-        [BsonElement("titulo")]
+        [BsonElement("title")]
         public string Title { get; set; } = default!;
-        [BsonElement("descripcion")]
+        [BsonElement("description")]
         public string Description { get; set; } = default!;
-        [BsonElement("contratos")]
+        [BsonElement("contracts")]
         public List<Contract> Contracts { get; set; } = default!;
-        [BsonElement("otorgantes")]
+        [BsonElement("grantors")]
         public List<Grantor> Grantors { get; set; } = default!;
     }
 }

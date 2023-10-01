@@ -6,8 +6,10 @@ namespace SISGED.Shared.Entities
     {
         [BsonElement("version")]
         public int Version { get; set; } = default!;
-        [BsonElement("fechamodificacion")]
-        public DateTime ModificationDate { get; set; } = DateTime.Now;
+
+        [BsonElement("modificationDate")]
+        public DateTime ModificationDate { get; set; } = DateTime.UtcNow.AddHours(-5);
+
         [BsonElement("url")]
         public string Url { get; set; } = default!;
 

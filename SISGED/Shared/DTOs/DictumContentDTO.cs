@@ -1,21 +1,20 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace SISGED.Shared.DTOs
 {
     public class DictumContentDTO
     {
-        [JsonPropertyName("iddenunciante")]
+        [JsonPropertyName("complaintId")]
         public string ComplaintId { get; set; } = default!;
-        [JsonPropertyName("idnotario")]
+        [JsonPropertyName("solicitorId")]
         public string SolicitorId { get; set; } = default!;
-        [JsonPropertyName("titulo")]
+        [JsonPropertyName("title")]
         public string Title { get; set; } = default!;
-        [JsonPropertyName("observaciones")]
+        [JsonPropertyName("observations")]
         public List<string> Observations { get; set; } = new();
         [JsonPropertyName("conclusion")]
         public string Conclusion { get; set; } = default!;
-        [JsonPropertyName("recomendaciones")]
+        [JsonPropertyName("recommendations")]
         public List<string> Recommendations { get; set; } = new();
     }
 }

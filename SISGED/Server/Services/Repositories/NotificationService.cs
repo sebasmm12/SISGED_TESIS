@@ -40,7 +40,7 @@ namespace SISGED.Server.Services.Repositories
         {
             var notificationQuery = Builders<Notification>.Filter.Eq(notification => notification.Id, notification.Id);
 
-            var notificationUpdate = Builders<Notification>.Update.Set("visto", !notification.Seen);
+            var notificationUpdate = Builders<Notification>.Update.Set("seen", !notification.Seen);
 
             var updatedNotification = await _notificationsCollection.FindOneAndUpdateAsync(notificationQuery, notificationUpdate, new()
             {
@@ -62,13 +62,13 @@ namespace SISGED.Server.Services.Repositories
         #region private methods
         private BsonDocument[] GetNotificationByUserIdPipeline(string userId)
         {
-            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("idreceptor", userId));
+            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("receiverId", userId));
 
             var lookupAggregation = GetUsersLookUpPipeline();
 
             var unwindAggregation = MongoDBAggregationExtension.UnWind(new("$user"));
 
-            var sortAggregation = MongoDBAggregationExtension.Sort(new Dictionary<string, BsonValue>() { { "visto", 1 }, { "fechaemision", -1 } });
+            var sortAggregation = MongoDBAggregationExtension.Sort(new Dictionary<string, BsonValue>() { { "seen", 1 }, { "issueDate", -1 } });
 
             var limitAggregation = MongoDBAggregationExtension.Limit(10);
 
@@ -81,11 +81,11 @@ namespace SISGED.Server.Services.Repositories
         {
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
-                { "description", "$cuerpo" },
-                { "senderUserImage", "$user.datos.imagen" },
-                { "seen", "$visto" },
-                { "link", "$enlace" },
-                { "issueDate", "$fechaemision" }
+                { "description", "$description" },
+                { "senderUserImage", "$user.data.profile" },
+                { "seen", "$seen" },
+                { "link", "$link" },
+                { "issueDate", "$issueDate" }
             });
 
             return projectAggregation;
@@ -95,7 +95,7 @@ namespace SISGED.Server.Services.Repositories
         {
             var letPipeline = new Dictionary<string, BsonValue>()
             {
-                { "userId", MongoDBAggregationExtension.ObjectId("$idemisor")  }
+                { "userId", MongoDBAggregationExtension.ObjectId("$")  }
             }; 
 
             var lookUpPipeline = new BsonArray()

@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using MudBlazor;
 using SISGED.Client.Components.WorkEnvironments;
 using SISGED.Client.Helpers;
@@ -30,6 +31,8 @@ namespace SISGED.Client.Components.Documents
         public DocumentDerivationValidator DocumentDerivationValidator { get; set; } = default!;
         [Inject]
         public IMapper Mapper { get; set; } = default!;
+        [Inject]
+        public IJSRuntime JSRuntime { get; set; } = default!;
 
         [CascadingParameter(Name = "WorkEnvironment")]
         public WorkEnvironment WorkEnvironment { get; set; } = default!;
@@ -39,8 +42,6 @@ namespace SISGED.Client.Components.Documents
         private bool pageLoading = true;
         private Role? userRole = default!;
         private readonly string currentDate = DateTime.UtcNow.AddHours(-5).ToString("dd/MM/yyyy");
-        // TODO: Get the roleId based on the derivation step from the helper
-        private string roleId = "5eeaf91a8ca4ff53a0b791eb";
         private DocumentDerivationDTO documentDerivation = new();
         private MudForm? documentDerivationForm = default!;
         private DossierTrayResponse dossierTray = default!;
@@ -133,7 +134,13 @@ namespace SISGED.Client.Components.Documents
             var currentTool = GetCurrentTool();
             string? toolId = currentTool.Value as string;
 
+            await JSRuntime.InvokeVoidAsync("console.log", dossierTray.Document);
+            await JSRuntime.InvokeVoidAsync("console.log", dossierTray);
+
             var documentContent = JsonSerializer.Deserialize<DocumentContentDTO>(JsonSerializer.Serialize(dossierTray.Document!.Content));
+
+            await JSRuntime.InvokeVoidAsync("console.log", documentContent);
+
             var notificationDocument = new NotificationDocument(dossierTray.Document!.Id, documentContent!.Title);
 
             var notificationRegisterRequest = new NotificationRegisterRequest(SessionAccount.User.Id, documentDerivation.UserTray.UserId,
@@ -142,7 +149,7 @@ namespace SISGED.Client.Components.Documents
             await RegisterNotificationAsync(notificationRegisterRequest);
         }
 
-        private void ProcessWorkItemInfo(Helpers.Item item, DossierLastDocumentResponse dossierDocument)
+        private void ProcessWorkItemInfo(Item item, DossierLastDocumentResponse dossierDocument)
         {
             if (item.Value is not DossierTrayResponse dossierTray) return;
 

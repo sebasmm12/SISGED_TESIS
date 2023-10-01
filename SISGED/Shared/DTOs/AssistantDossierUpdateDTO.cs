@@ -13,10 +13,10 @@ namespace SISGED.Shared.DTOs
             Steps = steps;
         }
 
-        public string Id { get; set; } = default!;
+        public string Id { get; set; }
         public int Step { get; set; }
-        public string DossierType { get; set; } = default!;
-        public string DocumentType { get; set; } = default!;
-        public AssistantStep Steps { get; set; } = default!;
+        public string DossierType { get; set; }
+        public string DocumentType { get; set; }
+        public AssistantStep Steps { get; set; }
     }
 }

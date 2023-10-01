@@ -14,11 +14,11 @@ namespace SISGED.Shared.DTOs
             DossierDocument = dossierDocument;
         }
 
-        public DossierWrapper DossierWrapper { get; set; } = default!;
-        public string DossierType { get; set; } = default!;
+        public DossierWrapper DossierWrapper { get; set; }
+        public string DossierType { get; set; }
 
-        public string DossierState { get; set; } = default!;
-        public DossierDocument DossierDocument { get; set; } = default!;
+        public string DossierState { get; set; }
+        public DossierDocument DossierDocument { get; set; }
 
     }
    

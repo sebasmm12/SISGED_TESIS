@@ -8,7 +8,7 @@
             DossierName = dossierName;
         }
 
-        public string DossierId { get; set; } = default!;
-        public string DossierName { get; set; } = default!;
+        public string DossierId { get; set; }
+        public string DossierName { get; set; }
     }
 }

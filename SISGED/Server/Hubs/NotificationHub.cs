@@ -12,7 +12,7 @@ namespace SISGED.Server.Hubs
             _userConnectionManagerService = userConnectionManagerService;
         }
 
-        public async override Task OnConnectedAsync()
+        public override async Task OnConnectedAsync()
         {
             var userId = Context.GetHttpContext()!.Request.Query["userId"];
 

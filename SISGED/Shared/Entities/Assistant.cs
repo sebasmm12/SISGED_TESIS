@@ -20,17 +20,17 @@ namespace SISGED.Shared.Entities
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; } = default!;
-        [BsonElement("idexpediente")]
+        [BsonElement("dossierId")]
         public string DossierId { get; set; } = default!;
-        [BsonElement("pasos")]
+        [BsonElement("steps")]
         public List<AssistantStep> Steps { get; set; } = default!;
-        [BsonElement("paso")]
+        [BsonElement("step")]
         public int Step { get; set; } = 0;
-        [BsonElement("subpaso")]
+        [BsonElement("substep")]
         public int Substep { get; set; } = 0;
-        [BsonElement("tipodocumento")]
+        [BsonElement("documentType")]
         public string DocumentType { get; set; } = default!;
-        [BsonElement("tipoexpediente")]
+        [BsonElement("dossierType")]
         public string DossierType { get; set; } = default!;
 
         public string GetFirstDocument() => Steps.First().Documents.First().Type;
@@ -56,9 +56,7 @@ namespace SISGED.Shared.Entities
 
         public StepDocument GetCurrentStep()
         {
-            var currentStep = GetCurrentAssistantStep()
-                                   .Documents
-                                   .Find(document => document.Type == DocumentType)!;
+            var currentStep = GetCurrentAssistantStep().GetDocument(DocumentType);
 
             return currentStep;
         }
@@ -89,13 +87,23 @@ namespace SISGED.Shared.Entities
         public void UpdateNextDocument(string documentType)
         {
             DocumentType = documentType;
-            Step = 0;
+
+            var stepDocument = GetCurrentStep();
+
+            Step = stepDocument.Steps.First().Index;
+        }
+
+        public void UpdateNextDocumentStep()
+        {
+            var stepDocument = GetCurrentStep();
+
+            Step = stepDocument.GetNextStepIndex(Step);
         }
 
         public bool IsLastSubStep() => Substep == GetCurrentDocumentStep().Substeps.Count;
         public bool IsLastStep() => Step == GetCurrentStep().Steps.Count - 1;
         public bool IsLastDocument() => FindDocumentIndex() == GetCurrentAssistantStep().Documents.Count - 1;
-        public DocumentStep GetDocument(string documentType) => GetCurrentAssistantStep()
+        public DocumentStep GetDocumentStep(string documentType) => GetCurrentAssistantStep()
                                                                         .GetDocument(documentType)
                                                                         .Steps
                                                                         .Last();
@@ -103,9 +111,9 @@ namespace SISGED.Shared.Entities
 
     public class AssistantStep
     {
-        [BsonElement("nombreexpediente")]
+        [BsonElement("dossierName")]
         public string DossierName { get; set; } = default!;
-        [BsonElement("documentos")]
+        [BsonElement("documents")]
         public List<StepDocument> Documents { get; set; } = default!;
 
         public AssistantStep()

@@ -19,17 +19,17 @@ namespace SISGED.Shared.Entities
            DocumentId = documentId;
         }
 
-        [BsonElement("indice")]
+        [BsonElement("index")]
         public int Index { get; set; }
-        [BsonElement("iddocumento")]
+        [BsonElement("documentId")]
         public string DocumentId { get; set; } = default!;
-        [BsonElement("tipo")]
+        [BsonElement("type")]
         public string Type { get; set; } = default!;
-        [BsonElement("fechacreacion")]
+        [BsonElement("creationDate")]
         public DateTime CreationDate { get; set; } = DateTime.UtcNow.AddHours(-5);
-        [BsonElement("fechaexceso")]
+        [BsonElement("excessDate")]
         public DateTime ExcessDate { get; set; }
-        [BsonElement("fechademora")]
+        [BsonElement("delayDate")]
         public DateTime? DelayDate { get; set; }
     }
 }

@@ -5,7 +5,7 @@ namespace SISGED.Shared.Models.Responses.SolicitorDossier
 {
     public class SolicitorDossierResponse
     {
-        [BsonElement("nombredocumento")]
+        [BsonElement("documentName")]
         public string DocumentName { get; set; } = default!;
         [BsonElement("url")]
         public string Url { get; set; } = default!;

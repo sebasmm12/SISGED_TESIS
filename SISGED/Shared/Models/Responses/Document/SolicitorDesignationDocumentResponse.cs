@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MongoDB.Bson.Serialization.Attributes;
-using SISGED.Shared.Entities;
+﻿using SISGED.Shared.Entities;
 
 namespace SISGED.Shared.Models.Responses.Document
 {
@@ -21,6 +15,6 @@ namespace SISGED.Shared.Models.Responses.Document
         public string SolicitorOfficeLocation { get; set; }
         public string UserId { get; set; }
         public Entities.Solicitor SolicitorId { get; set; }
-        public List<string> URLannex { get; set; } = new List<string>();
+        public List<string> URLannex { get; set; } = new();
     }
 }

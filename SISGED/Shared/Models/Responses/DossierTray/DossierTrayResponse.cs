@@ -8,15 +8,15 @@ namespace SISGED.Shared.Models.Responses.DossierTray
     public class DossierTrayResponse
     {
         [BsonRepresentation(BsonType.ObjectId)]
-        [BsonElement("idexpediente")]
+        [BsonElement("dossierId")]
         public string DossierId { get; set; } = default!;
-        [BsonElement("cliente")]
+        [BsonElement("client")]
         public Client? Client { get; set; }
-        [BsonElement("documento")]
+        [BsonElement("document")]
         public DocumentResponse? Document { get; set; }
-        [BsonElement("documentosobj")]
+        [BsonElement("documentObjects")]
         public List<DocumentResponse>? DocumentObjects { get; set; }
-        [BsonElement("tipo")]
+        [BsonElement("type")]
         public string? Type { get; set; }
     }
 }

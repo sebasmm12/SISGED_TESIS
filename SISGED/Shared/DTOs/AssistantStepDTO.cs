@@ -10,7 +10,7 @@
         }
 
         public int Step { get; set; }
-        public string DocumentType { get; set; } = default!;
-        public string DossierType { get; set; } = default!;
+        public string DocumentType { get; set; }
+        public string DossierType { get; set; }
     }
 }

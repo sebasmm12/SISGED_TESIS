@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Serilog;
 using SISGED.Server.Helpers.Infrastructure;

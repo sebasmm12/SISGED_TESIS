@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SISGED.Shared.Models.Responses.Document
+﻿namespace SISGED.Shared.Models.Responses.Document
 {
     public class BPNResultResponse : Entities.Document
     {
@@ -17,6 +11,6 @@ namespace SISGED.Shared.Models.Responses.Document
         public Int32 PageQuantity { get; set; } = 2;
         public string State { get; set; }
         public Entities.PublicDeed PublicDeedId { get; set; }
-        public List<string> URLAnnex { get; set; } = new List<string>();
+        public List<string> URLAnnex { get; set; } = new();
     }
 }

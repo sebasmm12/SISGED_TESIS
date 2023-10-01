@@ -1,31 +1,26 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SISGED.Shared.Models.Responses.Derivation
 {
     public class DossierListDerivationResponse
     {
-        [BsonElement("areaprocedencia")]
+        [BsonElement("originArea")]
         public string OriginArea { get; set; } = default!;
-        [BsonElement("areadestino")]
+        [BsonElement("targetArea")]
         public string TargetArea { get; set; } = default!;
-        [BsonElement("usuarioemisor")]
+        [BsonElement("senderUser")]
         public string SenderUser { get; set; } = default!;
-        [BsonElement("imagenemisor")]
+        [BsonElement("senderImage")]
         public string SenderImage{ get; set; } = default!;
-        [BsonElement("usuarioreceptor")]
+        [BsonElement("receiverUser")]
         public string ReceiverUser { get; set; } = default!;
-        [BsonElement("imagenreceptor")]
+        [BsonElement("receiverImage")]
         public string ReceiverImage { get; set; } = default!;
-        [BsonElement("fechaderivacion")]
+        [BsonElement("derivationDate")]
         public DateTime DerivationDate { get; set; }
-        [BsonElement("estado")]
+        [BsonElement("state")]
         public string State { get; set; } = default!;
-        [BsonElement("tipo")]
+        [BsonElement("type")]
         public string Type { get; set; } = default!;
     }
 }

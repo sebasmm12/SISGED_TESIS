@@ -7,6 +7,6 @@
             AssistantId = assistantId;
         }
 
-        public string AssistantId { get; set; } = default!;
+        public string AssistantId { get; set; }
     }
 }

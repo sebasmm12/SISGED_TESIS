@@ -18,21 +18,21 @@ namespace SISGED.Shared.Entities
         [BsonRepresentation(BsonType.ObjectId)]
         [BsonElement("id")]
         public string Id { get; set; } = default!;
-        [BsonElement("titulo")]
+        [BsonElement("title")]
         public string Title { get; set; } = default!;
-        [BsonElement("cuerpo")]
+        [BsonElement("description")]
         public string Description { get; set; } = default!;
-        [BsonElement("idemisor")]
+        [BsonElement("senderId")]
         public string? SenderId { get; set; }
-        [BsonElement("idreceptor")]
+        [BsonElement("receiverId")]
         public string ReceiverId { get; set; } = default!;
-        [BsonElement("iddocumento")]
+        [BsonElement("documentId")]
         public string DocumentId { get; set; } = default!;
-        [BsonElement("fechaemision")]
+        [BsonElement("issueDate")]
         public DateTime IssueDate { get; set; } = DateTime.UtcNow.AddHours(-5);
-        [BsonElement("enlace")]
+        [BsonElement("link")]
         public string Link { get; set; } = default!;
-        [BsonElement("visto")]
+        [BsonElement("seen")]
         public bool Seen { get; set; } = false;
 
 

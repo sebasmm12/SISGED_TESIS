@@ -8,15 +8,15 @@ namespace SISGED.Shared.Entities
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; } = default!;
-        [BsonElement("nombre")]
+        [BsonElement("name")]
         public string Name { get; set; } = default!;
         [BsonElement("label")]
         public string Label { get; set; } = default!;
-        [BsonElement("listaherramientas")]
-        public List<string> Tools { get; set; } = new List<string>();
-        [BsonElement("listainterfaces")]
-        public List<string> Interfaces { get; set; } = new List<string>();
-        [BsonElement("descripcion")]
+        [BsonElement("tools")]
+        public List<string> Tools { get; set; } = new();
+        [BsonElement("interfaces")]
+        public List<string> Interfaces { get; set; } = new();
+        [BsonElement("description")]
         public string Description { get; set; } = default!;
     }
 }

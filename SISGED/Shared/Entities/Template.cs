@@ -9,19 +9,19 @@ namespace SISGED.Shared.Entities
         [BsonRepresentation(BsonType.ObjectId)]
         [BsonElement("id")]
         public string Id { get; set; } = default!;
-        [BsonElement("tipo")]
+        [BsonElement("type")]
         public string Type { get; set; } = default!;
-        [BsonElement("tipousuarioemisor")]
+        [BsonElement("senderUserType")]
         public string SenderUserType { get; set; } = default!;
-        [BsonElement("tipousuarioreceptor")]
+        [BsonElement("receiverUserType")]
         public string ReceiverUserType { get; set; } = default!;
-        [BsonElement("idaccion")]
+        [BsonElement("actionId")]
         public string ActionId { get; set; } = default!;
-        [BsonElement("titulo")]
+        [BsonElement("title")]
         public string Title { get; set; } = default!;
-        [BsonElement("descripcion")]
+        [BsonElement("description")]
         public string Description { get; set; } = default!;
-        [BsonElement("enlace")]
+        [BsonElement("link")]
         public string Link { get; set; } = default!;
     }
 }

@@ -1,10 +1,5 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SISGED.Shared.Entities
 {
@@ -13,19 +8,19 @@ namespace SISGED.Shared.Entities
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; } = default!;
-        [BsonElement("direccionoficio")]
+        [BsonElement("judicialOfficeDirection")]
         public string JudicialOfficeDirection { get; set; } = default!;
-        [BsonElement("titulo")]
+        [BsonElement("title")]
         public string Title { get; set; } = default!;
-        [BsonElement("idnotario")]
-        public string NotaryId { get; set; } = default!;
-        [BsonElement("actosjuridicos")]
+        [BsonElement("solicitorId")]
+        public string SolicitorId { get; set; } = default!;
+        [BsonElement("legalActs")]
         public List<LegalAct> LegalActs { get; set; } = default!;
-        [BsonElement("fechaescriturapublica")]
+        [BsonElement("publicDeedDate")]
         public DateTime PublicDeedDate { get; set; }
         [BsonElement("url")]
         public string Url { get; set; } = default!;
-        [BsonElement("estado")]
+        [BsonElement("state")]
         public string State { get; set; } = default!;
     }
 }

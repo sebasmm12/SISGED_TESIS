@@ -4,27 +4,27 @@ namespace SISGED.Shared.DTOs
 {
     public class DisciplinaryOpennessContentDTO
     {
-        [JsonPropertyName("idnotario")]
+        [JsonPropertyName("solicitorId")]
         public string SolicitorId { get; set; } = default!;
-        [JsonPropertyName("idfiscal")]
+        [JsonPropertyName("prosecutorId")]
         public string ProsecutorId { get; set; } = default!;
-        [JsonPropertyName("nombredenunciante")]
+        [JsonPropertyName("complainantName")]
         public string ComplainantName { get; set; } = default!;
-        [JsonPropertyName("titulo")]
+        [JsonPropertyName("title")]
         public string Title { get; set; } = default!;
-        [JsonPropertyName("descripcion")]
+        [JsonPropertyName("description")]
         public string Description { get; set; } = default!;
-        [JsonPropertyName("fechainicioaudiencia")]
+        [JsonPropertyName("audienceStartDate")]
         public DateTime AudienceStartDate { get; set; } = DateTime.UtcNow.AddHours(-5);
-        [JsonPropertyName("fechafinaudiencia")]
+        [JsonPropertyName("audienceEndDate")]
         public DateTime AudienceEndDate { get; set; } = DateTime.UtcNow.AddDays(-5);
-        [JsonPropertyName("participantes")]
+        [JsonPropertyName("participants")]
         public List<string> Participants { get; set; } = new();
-        [JsonPropertyName("lugaraudiencia")]
+        [JsonPropertyName("audiencePlace")]
         public string AudiencePlace { get; set; } = default!;
-        [JsonPropertyName("hechosimputados")]
+        [JsonPropertyName("imputedFacts")]
         public List<string> ImputedFacts { get; set; } = new();
-        [JsonPropertyName("iddenunciante")]
+        [JsonPropertyName("clientId")]
         public string ClientId { get; set; } = default!;
     }
 }

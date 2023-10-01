@@ -6,15 +6,15 @@ namespace SISGED.Shared.Entities
     {
         [BsonElement("area")]
         public string? Area { get; set; } = default!;
-        [BsonElement("fecharecepcion")]
+        [BsonElement("receiptDate")]
         public DateTime ReceiptDate { get; set; }
-        [BsonElement("fechaemision")]
+        [BsonElement("issuanceDate")]
         public DateTime IssuanceDate { get; set; }
-        [BsonElement("idemisor")]
+        [BsonElement("senderId")]
         public string SenderId { get; set; } = default!;
-        [BsonElement("idreceptor")]
+        [BsonElement("receiverId")]
         public string ReceiverId { get; set; } = default!;
-        [BsonElement("estado")]
+        [BsonElement("state")]
         public string State { get; set; } = default!;
 
         public Process()

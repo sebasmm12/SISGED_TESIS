@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SISGED.Shared.Models.Responses.Document
+﻿namespace SISGED.Shared.Models.Responses.Document
 {
     public class AppealResponse : Entities.Document
     {
@@ -19,6 +13,6 @@ namespace SISGED.Shared.Models.Responses.Document
         public string Description { get; set; } = default!;
         public DateTime AppealDate { get; set; } = default!;
         public string Data { get; set; } = default!;
-        public List<string> URLAnnex { get; set; } = new List<string>();
+        public List<string> URLAnnex { get; set; } = new();
     }
 }

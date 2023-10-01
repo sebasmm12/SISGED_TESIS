@@ -257,14 +257,6 @@ namespace SISGED.Server.Controllers
 
                 await _documentService.UpdateDocumentProcessAsync(new(user.Id, receiveUserId, "derivado", user.Rol), initialRequest.Id);
 
-                // TODO: Implement the assistant service when creating the initial request
-                //var assistant = new Assistant();
-                //assistant.DossierId = dossier.Id;
-                //assistant.Steps = new();
-                //assistant.Steps.DossierName = "Solicitud";
-
-                //await _assistantService.CreateAsync(assistant);
-
                 var dossierDocumentResponse = new DossierDocumentInitialRequestResponse(dossier, initialRequest);
 
                 return Ok(dossierDocumentResponse);

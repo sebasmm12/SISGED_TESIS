@@ -9,25 +9,25 @@ namespace SISGED.Shared.Entities
         [BsonRepresentation(BsonType.ObjectId)]
         [BsonElement("id")]
         public string Id { get; set; } = default!;
-        [BsonElement("nombre")]
+        [BsonElement("name")]
         public string Name { get; set; } = default!;
-        [BsonElement("apellido")]
+        [BsonElement("lastName")]
         public string LastName { get; set; } = default!;
-        [BsonElement("fechanacimiento")]
+        [BsonElement("bornDate")]
         public DateTime BornDate { get; set; }
         [BsonElement("dni")]
         public string DNI { get; set; } = default!;
-        [BsonElement("direccion")]
+        [BsonElement("address")]
         public string Address { get; set; } = default!;
         [BsonElement("email")]
         public string Email { get; set; } = default!;
-        [BsonElement("colegiatura")]
+        [BsonElement("tuition")]
         public string Tuition { get; set; } = default!;
-        [BsonElement("oficionotarial")]
+        [BsonElement("solicitorOffice")]
         public SolicitorOffice SolicitorOffice { get; set; } = new();
-        [BsonElement("imagen")]
+        [BsonElement("profile")]
         public string Profile { get; set; } = default!;
-        [BsonElement("exnotario")]
+        [BsonElement("exSolicitor")]
         public bool ExSolicitor { get; set; }
     }
 }

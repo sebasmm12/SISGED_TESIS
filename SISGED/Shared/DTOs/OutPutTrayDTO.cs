@@ -10,9 +10,9 @@
             UserId = userId;
         }
 
-        public string DossierId { get; set; } = default!;
-        public string CurrentDocumentId { get; set; } = default!;
-        public string NewDocumentId { get; set; } = default!;
-        public string UserId { get; set; } = default!;
+        public string DossierId { get; set; }
+        public string CurrentDocumentId { get; set; }
+        public string NewDocumentId { get; set; }
+        public string UserId { get; set; }
     }
 }

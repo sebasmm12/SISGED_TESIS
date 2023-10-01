@@ -3,7 +3,6 @@ using MongoDB.Driver;
 using SISGED.Server.Helpers.Infrastructure;
 using SISGED.Server.Services.Contracts;
 using SISGED.Shared.Entities;
-using System.Collections.Generic;
 
 namespace SISGED.Server.Services.Repositories
 {
@@ -39,7 +38,7 @@ namespace SISGED.Server.Services.Repositories
         {
             var addFieldAggregation = MongoDBAggregationExtension.AddFields(new()
             {
-                { "fullName", MongoDBAggregationExtension.Concat(new List<BsonValue>() { "$nombre", " ", "$apellido" }) }
+                { "fullName", MongoDBAggregationExtension.Concat(new List<BsonValue>() { "$name", " ", "$lastName" }) }
             });
 
             var matchAggregation = GetAutocompletedSolicitorMatch(solicitorName, exSolicitor);
@@ -56,7 +55,7 @@ namespace SISGED.Server.Services.Repositories
                 { "fullName", MongoDBAggregationExtension.Regex(solicitorName?.Trim().ToLower() + ".*", "i") } 
             };
 
-            if (exSolicitor is not null) solicitorMatchDictionary.Add("exnotario", exSolicitor.Value);
+            if (exSolicitor is not null) solicitorMatchDictionary.Add("exSolicitor", exSolicitor.Value);
 
             var matchAggregation = MongoDBAggregationExtension.Match(solicitorMatchDictionary);
 

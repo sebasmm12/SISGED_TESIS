@@ -10,8 +10,8 @@ namespace SISGED.Shared.Models.Responses.Tray
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; } = default!;
         public List<DossierTrayResponse> OutputDossier { get; set; }
-          = new List<DossierTrayResponse>();
+          = new();
         public List<DossierTrayResponse> InputDossier { get; set; }
-          = new List<DossierTrayResponse>();
+          = new();
     }
 }

@@ -4,17 +4,17 @@ namespace SISGED.Shared.DTOs
 {
     public class ComplaintRequestContentDTO
     {
-        [JsonPropertyName("descripcion")]
+        [JsonPropertyName("description")]
         public string Description { get; set; } = default!;
-        [JsonPropertyName("titulo")]
+        [JsonPropertyName("title")]
         public string Title { get; set; } = default!;
-        [JsonPropertyName("idnotario")]
+        [JsonPropertyName("solicitorId")]
         public string SolicitorId { get; set; } = default!;
-        [JsonPropertyName("idcliente")]
+        [JsonPropertyName("clientId")]
         public string ClientId { get; set; } = default!;
-        [JsonPropertyName("tipoDenuncia")]
+        [JsonPropertyName("complaintType")]
         public string ComplaintType { get; set; } = default!;
-        [JsonPropertyName("fechaentrega")]
+        [JsonPropertyName("deliveryDate")]
         public DateTime DeliveryDate { get; set; }
 
     }

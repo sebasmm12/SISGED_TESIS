@@ -21,10 +21,11 @@ namespace SISGED.Server.Services.Repositories
         public async Task<List<User>> GetUsersAsync(UserPaginationQuery userPaginationQuery)
         {
 
-            var users = await _usersCollection.Find(user => true)
-                .Skip(userPaginationQuery.Page * userPaginationQuery.PageSize)
-                .Limit(userPaginationQuery.PageSize)
-                .ToListAsync();
+            var users = await _usersCollection
+                                    .Find(user => true)
+                                    .Skip(userPaginationQuery.Page * userPaginationQuery.PageSize)
+                                    .Limit(userPaginationQuery.PageSize)
+                                    .ToListAsync();
 
             if (users is null) throw new Exception("No se ha podido encontrar los usuarios registrados");
 
@@ -88,7 +89,7 @@ namespace SISGED.Server.Services.Repositories
             var userState = state == "activo" ? "inactivo" : "activo";
 
             var filter = Builders<User>.Filter.Eq(user => user.Id, userId);
-            var update = Builders<User>.Update.Set("estado", userState);
+            var update = Builders<User>.Update.Set("state", userState);
 
             var updatedUser = await _usersCollection.FindOneAndUpdateAsync(filter, update);
 
@@ -98,7 +99,7 @@ namespace SISGED.Server.Services.Repositories
         public async Task UpdateUserPasswordAsync(string userId, string password)
         {
             var filter = Builders<User>.Filter.Eq(user => user.Id, userId);
-            var update = Builders<User>.Update.Set("clave", password);
+            var update = Builders<User>.Update.Set("password", password);
 
             var updatedUser = await _usersCollection.FindOneAndUpdateAsync(filter, update);
 
@@ -128,9 +129,9 @@ namespace SISGED.Server.Services.Repositories
         {
             string userNameRegex = @"\b" + userName + ".*";
 
-            var regexFilter = Builders<User>.Filter.Regex("datos.nombre", new BsonRegularExpression(userNameRegex, "i"));
+            var regexFilter = Builders<User>.Filter.Regex("data.name", new BsonRegularExpression(userNameRegex, "i"));
 
-            var userTypeFilter = Builders<User>.Filter.Eq("tipo", "cliente");
+            var userTypeFilter = Builders<User>.Filter.Eq("type", "cliente");
 
             var clientProjection = new FindExpressionProjectionDefinition<User, ClientUserInfoResponse>(user => new ClientUserInfoResponse
             {
@@ -149,7 +150,7 @@ namespace SISGED.Server.Services.Repositories
 
         public async Task<IEnumerable<AutocompletedUserResponse>> GetAutocompletedUsersAsync(string userName)
         {
-            var autocompletedUsers = await _usersCollection.Aggregate<AutocompletedUserResponse>(GetUsersPipepline(userName))
+            var autocompletedUsers = await _usersCollection.Aggregate<AutocompletedUserResponse>(GetUsersPipeline(userName))
                                                             .ToListAsync();
 
             if (autocompletedUsers is null) throw new Exception($"No se pudo encontrar los usuarios registrados con el nombre {userName}");
@@ -188,27 +189,27 @@ namespace SISGED.Server.Services.Repositories
 
         private static UpdateDefinition<User> SetUserInformation(User user)
         {
-            return Builders<User>.Update.Set("usuario", user.UserName)
-                                        .Set("clave", user.Password)
-                                        .Set("datos", user.Data)
+            return Builders<User>.Update.Set("userName", user.UserName)
+                                        .Set("password", user.Password)
+                                        .Set("data", user.Data)
                                         .Set("rol", user.Rol);
         }
-        private static BsonDocument[] GetUsersPipepline(string userName)
+        private static BsonDocument[] GetUsersPipeline(string userName)
         {
             string userNameRegex = @"\b" + userName;
 
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
                 { "_id", 1 },
-                { "tipo", 1 },
-                { "datos", 1 },
+                { "type", 1 },
+                { "data", 1 },
                 { "rol", 1 },
-                { "nombre", MongoDBAggregationExtension.Concat(new List<BsonValue>() { "$datos.nombre", " ", "$datos.apellido" })}
+                { "name", MongoDBAggregationExtension.Concat(new List<BsonValue> { "$data.name", " ", "$data.lastName" })}
             });
 
-            var matchAggregation = MongoDBAggregationExtension.Match(new Dictionary<string, BsonValue>() {
-            { "tipo", "administracion" },
-            { "nombre", new BsonDocument().Add("$regex", userNameRegex).Add("$options", "si") }
+            var matchAggregation = MongoDBAggregationExtension.Match(new Dictionary<string, BsonValue> {
+            { "type", "administracion" },
+            { "name", new BsonDocument().Add("$regex", userNameRegex).Add("$options", "si") }
             });
 
             var lookUpAggregation = GetRolesLookUpPipeline();
@@ -218,18 +219,18 @@ namespace SISGED.Server.Services.Repositories
             var autocompletedProjectAggregation = MongoDBAggregationExtension.Project(new()
             {
                 { "_id", 1 },
-                { "userName", "$nombre" },
+                { "userName", "$name" },
                 { "roleName", "$roles.label" },
-                { "document", "$datos.numerodocumento" }
+                { "document", "$data.documentNumber" }
             });
 
-            return new BsonDocument[] { projectAggregation, matchAggregation, lookUpAggregation, unWindAggregation, autocompletedProjectAggregation };
+            return new[] { projectAggregation, matchAggregation, lookUpAggregation, unWindAggregation, autocompletedProjectAggregation };
         }
 
         private static BsonDocument[] GetPersecutorsUserPipeline()
         {
             var matchAggregation = MongoDBAggregationExtension.Match(new Dictionary<string, BsonValue> {
-            {"tipo", "administracion"}
+            {"type", "administracion"}
             });
 
             var lookUpAggregation = GetRolesLookUpPipeline();
@@ -243,11 +244,11 @@ namespace SISGED.Server.Services.Repositories
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
                 { "_id", 1 },
-                { "name", "$datos.nombre" },
-                { "lastName", "$datos.apellido" }
+                { "name", "$data.name" },
+                { "lastName", "$data.lastName" }
             });
 
-            return new BsonDocument[] { matchAggregation, lookUpAggregation, unWindAggregation, roleMatchAggregation, projectAggregation };
+            return new[] { matchAggregation, lookUpAggregation, unWindAggregation, roleMatchAggregation, projectAggregation };
         }
 
         private static BsonDocument GetRolesLookUpPipeline()

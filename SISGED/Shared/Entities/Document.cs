@@ -25,23 +25,23 @@ namespace SISGED.Shared.Entities
         [BsonRepresentation(BsonType.ObjectId)]
         [BsonElement("id")]
         public string Id { get; set; } = default!;
-        [BsonElement("tipo")]
+        [BsonElement("type")]
         public string Type { get; set; } = default!;
-        [BsonElement("historialcontenido")]
+        [BsonElement("contentsHistory")]
         public List<ContentVersion> ContentsHistory { get; set; } = new();
-        [BsonElement("historialproceso")]
+        [BsonElement("processesHistory")]
         public List<Process> ProcessesHistory { get; set; } = new();
-        [BsonElement("evaluaciones")]
+        [BsonElement("evaluations")]
         public List<DocumentEvaluation> Evaluations { get; set; } = new();
-        [BsonElement("urlanexo")]
+        [BsonElement("attachedUrls")]
         public List<string> AttachedUrls { get; set; } = new();
-        [BsonElement("estado")]
+        [BsonElement("state")]
         public string State { get; set; } = default!;
-        [BsonElement("fechacreacion")]
+        [BsonElement("creationDate")]
         public DateTime CreationDate { get; set; } = DateTime.UtcNow.AddHours(-5);
 
         [BsonIgnore]
-        private readonly IEnumerable<string> derivatedStates = new List<string>() { "derivado" };
+        private readonly IEnumerable<string> derivatedStates = new List<string> { "derivado" };
 
         public void AddProcess(Process process)
         {
@@ -65,42 +65,42 @@ namespace SISGED.Shared.Entities
     }
     public class Evaluation
     {
-        [BsonElement("resultado")]
+        [BsonElement("result")]
         public string Result { get; set; } = default!;
-        [BsonElement("evaluaciones")]
+        [BsonElement("evaluations")]
         public List<IndividualEvaluation> Evaluations { get; set; } = new();
     }
 
     public class IndividualEvaluation
     {
-        [BsonElement("idparticipante")]
+        [BsonElement("participantId")]
         public string ParticipantId { get; set; } = default!;
         [BsonElement("status")]
         public string Status { get; set; } = default!;
-        [BsonElement("descripcion")]
+        [BsonElement("description")]
         public string Description { get; set; } = default!;
     }
 
 
     public class ComplaintRequestContent
     {
-        [BsonElement("codigo")]
+        [BsonElement("code")]
         public string Code { get; set; } = default!;
-        [BsonElement("titulo")]
+        [BsonElement("title")]
         public string Title { get; set; } = default!;
-        [BsonElement("descripcion")]
+        [BsonElement("description")]
         public string Description { get; set; } = default!;
-        [BsonElement("idnotario")]
+        [BsonElement("solicitorId")]
         public string SolicitorId { get; set; } = default!;
-        [BsonElement("idcliente")]
+        [BsonElement("clientId")]
         public string ClientId { get; set; } = default!;
-        [BsonElement("tipoDenuncia")]
+        [BsonElement("complaintType")]
         public string ComplaintType { get; set; } = default!;
-        [BsonElement("fechaentrega")]
+        [BsonElement("deliveryDate")]
         public DateTime DeliveryDate { get; set; }
-        [BsonElement("firma")]
+        [BsonElement("sign")]
         public string Sign { get; set; } = default!;
-        [BsonElement("urlGenerado")]
+        [BsonElement("generatedUrl")]
         public string GeneratedUrl { get; set; } = default!;
     }
 
@@ -120,37 +120,37 @@ namespace SISGED.Shared.Entities
 
         public ComplaintRequest() { }
 
-        [BsonElement("contenido")]
+        [BsonElement("content")]
         public ComplaintRequestContent Content { get; set; } = new();
     }
 
     public class BPNDocumentContent
     {
-        [BsonElement("codigo")]
+        [BsonElement("code")]
         public string Code { get; set; } = default!;
-        [BsonElement("titulo")]
+        [BsonElement("title")]
         public string Title { get; set; } = default!;
-        [BsonElement("descripcion")]
+        [BsonElement("description")]
         public string Description { get; set; } = default!;
-        [BsonElement("idcliente")]
+        [BsonElement("clientId")]
         public string ClientId { get; set; } = default!;
-        [BsonElement("direccionoficio")]
+        [BsonElement("documentAddress")]
         public string DocumentAddress { get; set; } = default!;
-        [BsonElement("idnotario")]
+        [BsonElement("solicitorId")]
         public string SolicitorId { get; set; } = default!;
-        [BsonElement("actojuridico")]
+        [BsonElement("juridicalAct")]
         public string JuridicalAct { get; set; } = default!;
-        [BsonElement("tipoprotocolo")]
+        [BsonElement("protocolType")]
         public string ProtocolType { get; set; } = default!;
-        [BsonElement("otorgantes")]
+        [BsonElement("grantors")]
         public List<string> Grantors { get; set; } = new();
-        [BsonElement("fecharealizacion")]
+        [BsonElement("realizationDate")]
         public DateTime RealizationDate { get; set; }
         [BsonElement("url")]
         public string Url { get; set; } = default!;
-        [BsonElement("firma")]
+        [BsonElement("sign")]
         public string Sign { get; set; } = default!;
-        [BsonElement("urlGenerado")]
+        [BsonElement("generatedUrl")]
         public string GeneratedUrl { get; set; } = default!;
 
     }
@@ -158,33 +158,33 @@ namespace SISGED.Shared.Entities
     [BsonDiscriminator("OficioBPN")]
     public class BPNDocument : Document
     {
-        [BsonElement("evaluacion")]
+        [BsonElement("evaluation")]
         public Evaluation Evaluation { get; set; } = default!;
-        [BsonElement("contenido")]
+        [BsonElement("content")]
         public BPNDocumentContent Content { get; set; } = new();
 
     }
     public class BPNRequestContent
     {
-        [BsonElement("codigo")]
+        [BsonElement("code")]
         public string Code { get; set; } = default!;
-        [BsonElement("idcliente")]
+        [BsonElement("clientId")]
         public string ClientId { get; set; } = default!;
-        [BsonElement("direccionoficio")]
+        [BsonElement("documentAddress")]
         public string DocumentAddress { get; set; } = default!;
-        [BsonElement("idnotario")]
+        [BsonElement("solicitorId")]
         public string SolicitorId { get; set; } = default!;
-        [BsonElement("actojuridico")]
+        [BsonElement("juridicalAct")]
         public string JuridicalAct { get; set; } = default!;
-        [BsonElement("tipoprotocolo")]
+        [BsonElement("protocolType")]
         public string ProtocolType { get; set; } = default!;
-        [BsonElement("otorgantes")]
+        [BsonElement("grantors")]
         public List<string> Grantors { get; set; } = new();
-        [BsonElement("fecharealizacion")]
+        [BsonElement("realizationDate")]
         public DateTime RealizationDate { get; set; }
-        [BsonElement("firma")]
+        [BsonElement("sign")]
         public string Sign { get; set; } = default!;
-        [BsonElement("urlGenerado")]
+        [BsonElement("generatedUrl")]
         public string GeneratedUrl { get; set; } = default!;
 
     }
@@ -192,25 +192,25 @@ namespace SISGED.Shared.Entities
     [BsonDiscriminator("SolicitudBPN")]
     public class BPNRequest : Document
     {
-        [BsonElement("contenido")]
+        [BsonElement("content")]
         public BPNRequestContent Content { get; set; } = new();
 
     }
     public class BPNResultContent
     {
-        [BsonElement("codigo")]
+        [BsonElement("code")]
         public string Code { get; set; } = default!;
-        [BsonElement("costo")]
+        [BsonElement("cost")]
         public int Cost { get; set; }
-        [BsonElement("cantidadfoja")]
+        [BsonElement("totalSheets")]
         public int TotalSheets { get; set; }
-        [BsonElement("estado")]
+        [BsonElement("status")]
         public string Status { get; set; } = default!;
-        [BsonElement("idescriturapublica")]
+        [BsonElement("publicDeedId")]
         public string PublicDeedId { get; set; } = default!;
-        [BsonElement("firma")]
+        [BsonElement("sign")]
         public string Sign { get; set; } = default!;
-        [BsonElement("urlGenerado")]
+        [BsonElement("generatedUrl")]
         public string GeneratedUrl { get; set; } = default!;
 
     }
@@ -219,131 +219,131 @@ namespace SISGED.Shared.Entities
 
     public class BPNResult : Document
     {
-        [BsonElement("contenido")]
+        [BsonElement("content")]
         public BPNResultContent Content { get; set; } = default!;
 
     }
 
     public class SignExpeditionRequestContent
     {
-        [BsonElement("codigo")]
+        [BsonElement("code")]
         public string Code { get; set; } = default!;
-        [BsonElement("titulo")]
+        [BsonElement("title")]
         public string Title { get; set; } = default!;
-        [BsonElement("descripcion")]
+        [BsonElement("description")]
         public string Description { get; set; } = default!;
-        [BsonElement("cliente")]
+        [BsonElement("client")]
         public string Client { get; set; } = default!;
-        [BsonElement("fecharealizacion")]
+        [BsonElement("realizationDate")]
         public DateTime RealizationDate { get; set; }
         [BsonElement("url")]
         public string Url { get; set; } = default!;
-        [BsonElement("firma")]
+        [BsonElement("sign")]
         public string Sign { get; set; } = default!;
-        [BsonElement("urlGenerado")]
+        [BsonElement("generatedUrl")]
         public string GeneratedUrl { get; set; } = default!;
 
     }
 
-    [BsonDiscriminator("SolicitudExpedicionFirma")]
+    [BsonDiscriminator("SolicitudExpedicionsign")]
     public class SignExpeditionRequest : Document
     {
-        [BsonElement("contenido")]
+        [BsonElement("content")]
         public SignExpeditionRequestContent Content { get; set; } = new();
 
     }
     public class SignConclusionContent
     {
-        [BsonElement("codigo")]
+        [BsonElement("code")]
         public string Code { get; set; } = default!;
-        [BsonElement("idescriturapublica")]
+        [BsonElement("publicDeedId")]
         public string PublicDeedId { get; set; } = default!;
-        [BsonElement("idnotario")]
+        [BsonElement("solicitorId")]
         public string SolicitorId { get; set; } = default!;
-        [BsonElement("idcliente")]
+        [BsonElement("clientId")]
         public string ClientId { get; set; } = default!;
-        [BsonElement("cantidadfoja")]
+        [BsonElement("totalSheets")]
         public int TotalSheets { get; set; }
-        [BsonElement("precio")]
+        [BsonElement("price")]
         public double Price { get; set; }
-        [BsonElement("firma")]
+        [BsonElement("sign")]
         public string Sign { get; set; } = default!;
-        [BsonElement("urlGenerado")]
+        [BsonElement("generatedUrl")]
         public string GeneratedUrl { get; set; } = default!;
 
     }
 
-    [BsonDiscriminator("ConclusionFirma")]
+    [BsonDiscriminator("Conclusionsign")]
     public class SignConclusion : Document
     {
-        [BsonElement("contenido")]
+        [BsonElement("content")]
         public SignConclusionContent Content { get; set; } = new();
     }
 
     [BsonDiscriminator("OficioDesignacionNotario")]
     public class SolicitorDesignationDocument : Document
     {
-        [BsonElement("evaluacion")]
+        [BsonElement("evaluation")]
         public Evaluation Evaluation { get; set; } = new();
-        [BsonElement("contenido")]
+        [BsonElement("content")]
         public SolicitorDesignationDocumentContent Content { get; set; } = new();
     }
     public class SolicitorDesignationDocumentContent
     {
-        [BsonElement("codigo")]
+        [BsonElement("code")]
         public string Code { get; set; } = default!;
-        [BsonElement("titulo")]
+        [BsonElement("title")]
         public string Title { get; set; } = default!;
-        [BsonElement("descripcion")]
+        [BsonElement("description")]
         public string Description { get; set; } = default!;
-        [BsonElement("fecharealizacion")]
+        [BsonElement("realizationDate")]
         public DateTime RealizationDate { get; set; } = default!;
-        [BsonElement("lugaroficionotarial")]
+        [BsonElement("solicitorAddress")]
         public string SolicitorAddress { get; set; } = default!;
-        [BsonElement("idusuario")]
+        [BsonElement("userId")]
         public string UserId { get; set; } = default!;
-        [BsonElement("idnotario")]
+        [BsonElement("solicitorId")]
         public string SolicitorId { get; set; } = default!;
-        [BsonElement("firma")]
+        [BsonElement("sign")]
         public string Sign { get; set; } = default!;
-        [BsonElement("urlGenerado")]
+        [BsonElement("generatedUrl")]
         public string GeneratedUrl { get; set; } = default!;
     }
 
     public class DisciplinaryOpennessContent
     {
-        [BsonElement("codigo")]
+        [BsonElement("code")]
         public string Code { get; set; } = default!;
-        [BsonElement("idnotario")]
+        [BsonElement("solicitorId")]
         public string SolicitorId { get; set; } = default!;
-        [BsonElement("titulo")]
+        [BsonElement("title")]
         public string Title { get; set; } = default!;
-        [BsonElement("descripcion")]
+        [BsonElement("description")]
         public string Description { get; set; } = default!;
-        [BsonElement("fechainicioaudiencia")]
+        [BsonElement("audienceStartDate")]
         public DateTime AudienceStartDate { get; set; } = default!;
-        [BsonElement("fechafinaudiencia")]
+        [BsonElement("audienceEndDate")]
         public DateTime AudienceEndDate { get; set; } = default!;
-        [BsonElement("participantes")]
+        [BsonElement("participants")]
         public List<string> Participants { get; set; } = new();
-        [BsonElement("lugaraudiencia")]
+        [BsonElement("audiencePlace")]
         public string AudiencePlace { get; set; } = default!;
-        [BsonElement("hechosimputados")]
+        [BsonElement("imputedFacts")]
         public List<string> ImputedFacts { get; set; } = new();
         [BsonElement("url")]
         public string Url { get; set; } = default!;
-        [BsonElement("firma")]
+        [BsonElement("sign")]
         public string Sign { get; set; } = default!;
-        [BsonElement("urlGenerado")]
+        [BsonElement("generatedUrl")]
         public string GeneratedUrl { get; set; } = default!;
-        [BsonElement("iddenunciante")]
+        [BsonElement("clientId")]
         public string ClientId { get; set; } = default!;
     }
 
     [BsonDiscriminator("AperturamientoDisciplinario")]
     public class DisciplinaryOpenness : Document
     {
-        [BsonElement("contenido")]
+        [BsonElement("content")]
         public DisciplinaryOpennessContent Content { get; set; } = default!;
 
         public DisciplinaryOpenness(DisciplinaryOpennessContent content, string state, List<string> urls)
@@ -362,28 +362,28 @@ namespace SISGED.Shared.Entities
 
     public class SolicitorDossierRequestContent
     {
-        [BsonElement("codigo")]
+        [BsonElement("code")]
         public string Code { get; set; } = default!;
-        [BsonElement("titulo")]
+        [BsonElement("title")]
         public string Title { get; set; } = default!;
-        [BsonElement("descripcion")]
+        [BsonElement("description")]
         public string Description { get; set; } = default!;
-        [BsonElement("idnotario")]
+        [BsonElement("solicitorId")]
         public string SolicitorId { get; set; } = default!;
-        [BsonElement("fechaemision")]
+        [BsonElement("issueDate")]
         public DateTime IssueDate { get; set; }
-        [BsonElement("firma")]
+        [BsonElement("sign")]
         public string Sign { get; set; } = default!;
-        [BsonElement("urlGenerado")]
+        [BsonElement("generatedUrl")]
         public string GeneratedUrl { get; set; } = default!;
-        [BsonElement("iddenunciante")]
+        [BsonElement("clientId")]
         public string ClientId { get; set; } = default!;
     }
 
     [BsonDiscriminator("SolicitudExpedienteNotario")]
     public class SolicitorDossierRequest : Document
     {
-        [BsonElement("contenido")]
+        [BsonElement("content")]
         public SolicitorDossierRequestContent Content { get; set; } = new();
 
         public SolicitorDossierRequest(SolicitorDossierRequestContent content, string state, List<string> urls)
@@ -402,23 +402,23 @@ namespace SISGED.Shared.Entities
 
     public class DictumContent
     {
-        [BsonElement("codigo")]
+        [BsonElement("code")]
         public string Code { get; set; } = default!;
-        [BsonElement("iddenunciante")]
+        [BsonElement("complaintId")]
         public string ComplaintId { get; set; } = default!;
-        [BsonElement("idnotario")]
+        [BsonElement("solicitorId")]
         public string SolicitorId { get; set; } = default!;
-        [BsonElement("titulo")]
+        [BsonElement("title")]
         public string Title { get; set; } = default!;
-        [BsonElement("observaciones")]
+        [BsonElement("observations")]
         public List<string> Observations { get; set; } = new();
         [BsonElement("conclusion")]
         public string Conclusion { get; set; } = default!;
-        [BsonElement("recomendaciones")]
+        [BsonElement("recommendations")]
         public List<string> Recommendations { get; set; } = new();
-        [BsonElement("firma")]
+        [BsonElement("sign")]
         public string Sign { get; set; } = default!;
-        [BsonElement("urlGenerado")]
+        [BsonElement("generatedUrl")]
         public string GeneratedUrl { get; set; } = default!;
     }
 
@@ -438,42 +438,42 @@ namespace SISGED.Shared.Entities
 
         public Dictum() { }
 
-        [BsonElement("contenido")]
+        [BsonElement("content")]
         public DictumContent Content { get; set; } = new();
     }
 
     public class ResolutionContent
     {
-        [BsonElement("codigo")]
+        [BsonElement("code")]
         public string Code { get; set; } = default!;
-        [BsonElement("titulo")]
+        [BsonElement("title")]
         public string Title { get; set; } = default!;
-        [BsonElement("descripcion")]
+        [BsonElement("description")]
         public string Description { get; set; } = default!;
-        [BsonElement("fechainicioaudiencia")]
+        [BsonElement("audienceStartDate")]
         public DateTime AudienceStartDate { get; set; }
-        [BsonElement("fechafinaudiencia")]
+        [BsonElement("audienceEndDate")]
         public DateTime AudienceEndDate { get; set; }
-        [BsonElement("participantes")]
+        [BsonElement("participants")]
         public List<string> Participants { get; set; } = new();
-        [BsonElement("sancion")]
+        [BsonElement("sanction")]
         public string Sanction { get; set; } = default!;
         [BsonElement("url")]
         public string Url { get; set; } = default!;
-        [BsonElement("firma")]
+        [BsonElement("sign")]
         public string Sign { get; set; } = default!;
-        [BsonElement("urlGenerado")]
+        [BsonElement("generatedUrl")]
         public string GeneratedUrl { get; set; } = default!;
-        [BsonElement("iddenunciante")]
+        [BsonElement("clientId")]
         public string ClientId { get; set; } = default!;
-        [BsonElement("idnotario")]
+        [BsonElement("solicitorId")]
         public string SolicitorId { get; set; } = default!;
     }
 
     [BsonDiscriminator("Resolucion")]
     public class Resolution : Document
     {
-        [BsonElement("contenido")]
+        [BsonElement("content")]
         public ResolutionContent Content { get; set; } = default!;
 
         public Resolution(ResolutionContent content, string state, List<string> urls)
@@ -491,19 +491,19 @@ namespace SISGED.Shared.Entities
     }
     public class AppealContent
     {
-        [BsonElement("codigo")]
+        [BsonElement("code")]
         public string Code { get; set; } = default!;
-        [BsonElement("titulo")]
+        [BsonElement("title")]
         public string Title { get; set; } = default!;
-        [BsonElement("descripcion")]
+        [BsonElement("description")]
         public string Description { get; set; } = default!;
-        [BsonElement("fechaapelacion")]
+        [BsonElement("appealDate")]
         public DateTime AppealDate { get; set; }
         [BsonElement("url")]
         public string Url { get; set; } = default!;
-        [BsonElement("firma")]
+        [BsonElement("sign")]
         public string Sign { get; set; } = default!;
-        [BsonElement("urlGenerado")]
+        [BsonElement("generatedUrl")]
         public string GeneratedUrl { get; set; } = default!;
 
     }
@@ -511,23 +511,23 @@ namespace SISGED.Shared.Entities
     [BsonDiscriminator("Apelacion")]
     public class Appeal : Document
     {
-        [BsonElement("evaluacion")]
+        [BsonElement("evaluation")]
         public Evaluation Evaluation { get; set; } = new();
-        [BsonElement("contenido")]
+        [BsonElement("content")]
         public AppealContent Content { get; set; } = new();
     }
 
     public class InitialRequestContent
     {
-        [BsonElement("descripcion")]
+        [BsonElement("description")]
         public string Description { get; set; } = default!;
-        [BsonElement("titulo")]
+        [BsonElement("title")]
         public string Title { get; set; } = default!;
-        [BsonElement("idtiposolicitud")]
+        [BsonElement("requestTypeId")]
         public string RequestTypeId { get; set; } = default!;
-        [BsonElement("tienenotario")]
+        [BsonElement("hasSolicitor")]
         public bool HasSolicitor { get; set; }
-        [BsonElement("idnotario")]
+        [BsonElement("solicitorId")]
         public string? SolicitorId { get; set; }
 
     }
@@ -547,25 +547,25 @@ namespace SISGED.Shared.Entities
             AttachedUrls = urls;
         }
 
-        [BsonElement("contenido")]
+        [BsonElement("content")]
         public InitialRequestContent Content { get; set; } = new();
     }
 
     public class SolicitorDossierShipmentContent
     {
-        [BsonElement("codigo")]
+        [BsonElement("code")]
         public string Code { get; set; } = default!;
-        [BsonElement("descripcion")]
+        [BsonElement("description")]
         public string Description { get; set; } = default!;
-        [BsonElement("titulo")]
+        [BsonElement("title")]
         public string Title { get; set; } = default!;
-        [BsonElement("idnotario")]
+        [BsonElement("solicitorId")]
         public string SolicitorId { get; set; } = default!;
-        [BsonElement("expedientes")]
+        [BsonElement("solicitorDossiers")]
         public List<string>? SolicitorDossiers { get; set; }
-        [BsonElement("firma")]
+        [BsonElement("sign")]
         public string Sign { get; set; } = default!;
-        [BsonElement("urlGenerado")]
+        [BsonElement("generatedUrl")]
         public string GeneratedUrl { get; set; } = default!;
     }
 
@@ -584,7 +584,7 @@ namespace SISGED.Shared.Entities
             AttachedUrls = urls;
         }
 
-        [BsonElement("contenido")]
+        [BsonElement("content")]
         public SolicitorDossierShipmentContent Content { get; set; } = new();
     }
 }

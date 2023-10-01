@@ -53,8 +53,9 @@ else
                                           Adornment="Adornment.End" AdornmentIcon="fas fa-user" AdornmentColor="Color.Primary" ReadOnly="true"></MudTextField>
                             </MudItem>
 
-                            <MudItem xs="12" sm="12" md="5" lg="5" xl="5">
-                                <GenericSolicitorAutocomplete Solicitor="resolutionRegister.Solicitor" SolicitorResponse="GetSolicitorResponse"></GenericSolicitorAutocomplete>
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
+                                <MudTextField Value="@($"{ resolutionRegister.Solicitor.Name } { resolutionRegister.Solicitor.LastName }")" Label="Notario asociado" Variant="Variant.Outlined"
+                                          Adornment="Adornment.End" AdornmentIcon="fas fa-user" AdornmentColor="Color.Primary" ReadOnly="true"></MudTextField>
                             </MudItem>
 
                             <MudItem xs="12" sm="12" md="7" lg="7" xl="7">

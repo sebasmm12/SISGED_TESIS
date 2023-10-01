@@ -8,14 +8,14 @@ namespace SISGED.Shared.Entities
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; } = default!;
-        [BsonElement("tipo")]
+        [BsonElement("type")]
         public string Type { get; set; } = default!;
-        [BsonElement("usuario")]
+        [BsonElement("user")]
         public string User { get; set; } = default!;
-        [BsonElement("bandejaentrada")]
-        public List<DocumentTray> InputTray { get; set; } = new List<DocumentTray>();
-        [BsonElement("bandejasalida")]
-        public List<DocumentTray> OutputTray { get; set; } = new List<DocumentTray>();
+        [BsonElement("inputTray")]
+        public List<DocumentTray> InputTray { get; set; } = new();
+        [BsonElement("outputTray")]
+        public List<DocumentTray> OutputTray { get; set; } = new();
         
         public Tray(string type, string userId)
         {

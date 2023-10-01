@@ -10,21 +10,21 @@ namespace SISGED.Shared.Models.Responses.Document
         [BsonRepresentation(BsonType.ObjectId)]
         [BsonElement("id")]
         public string Id { get; set; } = default!;
-        [BsonElement("tipo")]
+        [BsonElement("type")]
         public string Type { get; set; } = default!;
-        [BsonElement("historialcontenido")]
+        [BsonElement("contentsHistory")]
         public List<ContentVersion> ContentsHistory { get; set; } = default!;
-        [BsonElement("historialproceso")]
+        [BsonElement("processesHistory")]
         public List<Process> ProcessesHistory { get; set; } = default!;
-        [BsonElement("contenido")]
+        [BsonElement("content")]
         public object Content { get; set; } = default!;
-        [BsonElement("estado")]
+        [BsonElement("state")]
         public string State { get; set; } = default!;
-        [BsonElement("evaluaciones")]
+        [BsonElement("evaluations")]
         public List<Entities.DocumentEvaluation> Evaluations { get; set; } = default!;
-        [BsonElement("fechacreacion")]
+        [BsonElement("creationDate")]
         public DateTime CreationDate { get; set; } = default!;
-        [BsonElement("urlanexo")]
+        [BsonElement("urlAnnex")]
         public List<string> UrlAnnex { get; set; } = default!;
     }
 }

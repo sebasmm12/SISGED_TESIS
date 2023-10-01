@@ -4,9 +4,9 @@ namespace SISGED.Shared.Entities
 {
     public class Contract
     {
-        [BsonElement("titulo")]
+        [BsonElement("title")]
         public string Title { get; set; } = default!;
-        [BsonElement("descripcion")]
+        [BsonElement("description")]
         public string Description { get; set; } = default!;
         [BsonElement("url")]
         public string Url { get; set; } = default!;

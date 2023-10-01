@@ -1,5 +1,4 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
-using SISGED.Shared.DTOs;
+﻿using SISGED.Shared.DTOs;
 
 namespace SISGED.Shared.Models.Responses.Document
 {

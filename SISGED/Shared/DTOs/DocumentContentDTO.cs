@@ -4,9 +4,9 @@ namespace SISGED.Shared.DTOs
 {
     public class DocumentContentDTO
     {
-        [JsonPropertyName("titulo")]
+        [JsonPropertyName("title")]
         public string Title { get; set; } = default!;
-        [JsonPropertyName("codigo")]
+        [JsonPropertyName("code")]
         public string Code { get; set; } = default!;
     }
 }

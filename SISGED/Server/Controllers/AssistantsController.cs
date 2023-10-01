@@ -185,13 +185,15 @@ namespace SISGED.Server.Controllers
                 await MoveAssistantStepStartDatesAsync(assistant, assistantStepUpdateDTO.LastAssistantStep);
 
                 assistantStepUpdateDTO.LastAssistantStep = new AssistantStepDTO(assistant.Step, assistant.DocumentType, assistant.DossierType);
+
+                assistant.UpdateNextDocumentStep();
             }
         }
 
         private async Task MoveAssistantStepStartDatesAsync(Assistant assistant, AssistantStepDTO currentAssistantStep)
         {
             var assistantStep = new AssistantStepDTO(assistant.Step, assistant.DocumentType, assistant.DossierType);
-            var assistantLastStep = assistant.GetDocument(currentAssistantStep.DocumentType);
+            var assistantLastStep = assistant.GetDocumentStep(currentAssistantStep.DocumentType);
 
             await _assistantService.UpdateAssistantStepStartDateAsync(new(assistant.Id, assistantStep, assistantLastStep.StartDate!.Value, assistantLastStep.DueDate!.Value));
         }

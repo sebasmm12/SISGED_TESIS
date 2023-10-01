@@ -4,15 +4,15 @@ namespace SISGED.Shared.Entities
 {
     public class SolicitorOffice
     {
-        [BsonElement("nombre")]
+        [BsonElement("name")]
         public string Name { get; set; } = default!;
         [BsonElement("ruc")]
         public string RUC { get; set; } = default!;
-        [BsonElement("ubicacion")]
+        [BsonElement("address")]
         public string Address { get; set; } = default!;
-        [BsonElement("provincia")]
+        [BsonElement("province")]
         public string Province { get; set; } = default!;
-        [BsonElement("distrito")]
+        [BsonElement("district")]
         public string District { get; set; } = default!;
     }
 }
