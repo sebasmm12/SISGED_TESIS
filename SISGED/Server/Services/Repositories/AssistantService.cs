@@ -52,8 +52,8 @@ namespace SISGED.Server.Services.Repositories
             var assistantQuery = Builders<Assistant>.Filter.Eq(assistant => assistant.Id, stepStartDateUpdateRequest.Id);
 
             var assistantUpdate = Builders<Assistant>.Update
-                                                        .Set("pasos.$[dossier].documentos.$[document].pasos.$[step].fechainicio", stepStartDateUpdateRequest.StartDate)
-                                                        .Set("pasos.$[dossier].documentos.$[document].pasos.$[step].fechalimite", stepStartDateUpdateRequest.LimitDate);
+                                                        .Set("steps.$[dossier].documents.$[document].steps.$[step].startDate", stepStartDateUpdateRequest.StartDate)
+                                                        .Set("steps.$[dossier].documents.$[document].steps.$[step].dueDate", stepStartDateUpdateRequest.LimitDate);
 
             var assistantArrayFilters = GetAssistantStepUpdateFilters(stepStartDateUpdateRequest.Assistant);
 
@@ -64,7 +64,7 @@ namespace SISGED.Server.Services.Repositories
                                                                                         ArrayFilters = assistantArrayFilters
                                                                                     });
 
-            if (updatedAssistant is null) throw new Exception($"No se pudo actualizar las fechas inicio y límite del paso actual del asistente con identificador {stepStartDateUpdateRequest.Id}");
+            if (updatedAssistant is null) throw new Exception($"No se pudo actualizar las fechas inicio y límite del step actual del asistente con identificador {stepStartDateUpdateRequest.Id}");
 
             return updatedAssistant;
         }
@@ -76,9 +76,9 @@ namespace SISGED.Server.Services.Repositories
 
 
             var assistantUpdate = Builders<Assistant>.Update
-                                                        .Set("pasos.$[dossier].documentos.$[document].pasos.$[step].fechafin", assistantStepUpdate.EndDate)
-                                                        .Set("paso", assistantStepUpdate.NewAssistantStep.Step)
-                                                        .Set("tipodocumento", assistantStepUpdate.NewAssistantStep.DocumentType);
+                                                        .Set("steps.$[dossier].documents.$[document].steps.$[step].endDate", assistantStepUpdate.EndDate)
+                                                        .Set("step", assistantStepUpdate.NewAssistantStep.Step)
+                                                        .Set("documentType", assistantStepUpdate.NewAssistantStep.DocumentType);
 
             var assistantArrayFilters = GetAssistantStepUpdateFilters(assistantStepUpdate.LastAssistantStep);
 
@@ -89,7 +89,7 @@ namespace SISGED.Server.Services.Repositories
                                                                                        ArrayFilters = assistantArrayFilters
                                                                                    });
 
-            if (updatedAssistant is null) throw new Exception($"No se pudo actualizar el paso del asistente con identificador {assistantStepUpdate.Id}");
+            if (updatedAssistant is null) throw new Exception($"No se pudo actualizar el step del asistente con identificador {assistantStepUpdate.Id}");
 
             return updatedAssistant;
 
@@ -107,7 +107,7 @@ namespace SISGED.Server.Services.Repositories
                                                                                       ReturnDocument = ReturnDocument.After,
                                                                                   });
 
-            if (updatedAssistant is null) throw new Exception($"No se pudo añadir el expediente de tipo {assistantDossierUpdate.DossierType} al asistente con identificador {assistant.Id}");
+            if (updatedAssistant is null) throw new Exception($"No se pudo añadir el expediente de type {assistantDossierUpdate.DossierType} al asistente con identificador {assistant.Id}");
 
             return updatedAssistant;
         }
@@ -117,8 +117,8 @@ namespace SISGED.Server.Services.Repositories
             var assistantQuery = Builders<Assistant>.Filter.Eq(assistant => assistant.Id, assistantId);
 
             var assistantUpdateBuilder = Builders<Assistant>.Update
-                                                        .Set("pasos.$[dossier].documentos.$[document].pasos.$[step].fechainicio", BsonNull.Value)
-                                                        .Set("pasos.$[dossier].documentos.$[document].pasos.$[step].fechalimite", BsonNull.Value);
+                                                        .Set("steps.$[dossier].documents.$[document].steps.$[step].startDate", BsonNull.Value)
+                                                        .Set("steps.$[dossier].documents.$[document].steps.$[step].dueDate", BsonNull.Value);
 
             var assistantArrayFilters = GetAssistantStepUpdateFilters(assistantStepDTO);
 
@@ -129,7 +129,7 @@ namespace SISGED.Server.Services.Repositories
                                                                                       ArrayFilters = assistantArrayFilters
                                                                                   });
 
-            if (updatedAssistant is null) throw new Exception($"No se pudo actualizar la información del paso del asistente con identificador { assistantId }");
+            if (updatedAssistant is null) throw new Exception($"No se pudo actualizar la información del step del asistente con identificador { assistantId }");
 
             return updatedAssistant;
 
@@ -137,20 +137,20 @@ namespace SISGED.Server.Services.Repositories
 
         public async Task<Assistant> UpdateAsync(StepsUpdateRequest stepUpdateRequest)
         {
-            FilterDefinition<Assistant> queryUpdate = Builders<Assistant>.Filter.Eq("idexpediente", stepUpdateRequest.DossierId);
+            FilterDefinition<Assistant> queryUpdate = Builders<Assistant>.Filter.Eq("dossierId", stepUpdateRequest.DossierId);
 
             UpdateDefinition<Assistant> updateAsistente = Builders<Assistant>.Update
-                                                                                .Set("paso", stepUpdateRequest.Step)
-                                                                                .Set("subpaso", stepUpdateRequest.Substep)
-                                                                                .Set("tipodocumento", stepUpdateRequest.DocumentType)
-                                                                                .Set("pasos.documentos.$[doc].pasos.$[pas].fechainicio", stepUpdateRequest.StartDate)
-                                                                                .Set("pasos.documentos.$[doc].pasos.$[pas].fechalimite", stepUpdateRequest.EndDate);
+                                                                                .Set("step", stepUpdateRequest.Step)
+                                                                                .Set("subStep", stepUpdateRequest.Substep)
+                                                                                .Set("documentType", stepUpdateRequest.DocumentType)
+                                                                                .Set("steps.documents.$[doc].steps.$[pas].startDate", stepUpdateRequest.StartDate)
+                                                                                .Set("steps.documents.$[doc].steps.$[pas].dueDate", stepUpdateRequest.EndDate);
 
 
             var arrayFilter = new List<ArrayFilterDefinition>();
 
-            arrayFilter.Add(new BsonDocumentArrayFilterDefinition<Assistant>(new BsonDocument("doc.tipo", stepUpdateRequest.DocumentType)));
-            arrayFilter.Add(new BsonDocumentArrayFilterDefinition<Assistant>(new BsonDocument("pas.indice", stepUpdateRequest.Step)));
+            arrayFilter.Add(new BsonDocumentArrayFilterDefinition<Assistant>(new BsonDocument("doc.type", stepUpdateRequest.DocumentType)));
+            arrayFilter.Add(new BsonDocumentArrayFilterDefinition<Assistant>(new BsonDocument("pas.index", stepUpdateRequest.Step)));
 
             Assistant asistenteActualizado = await _assistantCollection.FindOneAndUpdateAsync(queryUpdate, updateAsistente, new FindOneAndUpdateOptions<Assistant>
             {
@@ -163,18 +163,18 @@ namespace SISGED.Server.Services.Repositories
 
         public async Task<Assistant> UpdateFinallyAsync(StepsUpdateRequest stepUpdateRequest)
         {
-            FilterDefinition<Assistant> queryUpdate = Builders<Assistant>.Filter.Eq("idexpediente", stepUpdateRequest.DossierId);
+            FilterDefinition<Assistant> queryUpdate = Builders<Assistant>.Filter.Eq("dossierId", stepUpdateRequest.DossierId);
 
             UpdateDefinition<Assistant> updateAsistente = Builders<Assistant>.Update
-                                                                                .Set("paso", stepUpdateRequest.Step)
-                                                                                .Set("subpaso", stepUpdateRequest.Substep)
-                                                                                .Set("tipodocumento", stepUpdateRequest.DocumentType)
-                                                                                .Set("pasos.documentos.$[doc].pasos.$[pas].fechafin", stepUpdateRequest.EndDate);
+                                                                                .Set("step", stepUpdateRequest.Step)
+                                                                                .Set("subStep", stepUpdateRequest.Substep)
+                                                                                .Set("documentType", stepUpdateRequest.DocumentType)
+                                                                                .Set("steps.documents.$[doc].steps.$[pas].endDate", stepUpdateRequest.EndDate);
 
             var arrayFilter = new List<ArrayFilterDefinition>();
 
-            arrayFilter.Add(new BsonDocumentArrayFilterDefinition<Assistant>(new BsonDocument("doc.tipo", stepUpdateRequest.OldDocumentType)));
-            arrayFilter.Add(new BsonDocumentArrayFilterDefinition<Assistant>(new BsonDocument("pas.indice", stepUpdateRequest.OldStep)));
+            arrayFilter.Add(new BsonDocumentArrayFilterDefinition<Assistant>(new BsonDocument("doc.type", stepUpdateRequest.OldDocumentType)));
+            arrayFilter.Add(new BsonDocumentArrayFilterDefinition<Assistant>(new BsonDocument("pas.index", stepUpdateRequest.OldStep)));
 
             Assistant asistenteActualizado = await _assistantCollection.FindOneAndUpdateAsync(queryUpdate, updateAsistente, new FindOneAndUpdateOptions<Assistant>
             {
@@ -198,13 +198,13 @@ namespace SISGED.Server.Services.Repositories
             steps.Documents.Find(x => x.Type == assistant.DocumentType)!
             .Steps.Find(x => x.Index == assistant.Step - 1)!.DueDate = assistant.Steps.First().Documents.ElementAt(0).Steps.ElementAt(0).DueDate;
 
-            FilterDefinition<Assistant> queryUpdate = Builders<Assistant>.Filter.Eq("idexpediente", assistant.DossierId);
+            FilterDefinition<Assistant> queryUpdate = Builders<Assistant>.Filter.Eq("dossierId", assistant.DossierId);
 
             UpdateDefinition<Assistant> updateAssistant = Builders<Assistant>.Update
-                                                                                .Set("paso", assistant.Step)
-                                                                                .Set("subpaso", assistant.Substep)
-                                                                                .Set("tipodocumento", assistant.DocumentType)
-                                                                                .Set("pasos", new AssistantStep { Documents = steps.Documents, DossierName = steps.DossierName });
+                                                                                .Set("step", assistant.Step)
+                                                                                .Set("subStep", assistant.Substep)
+                                                                                .Set("documentType", assistant.DocumentType)
+                                                                                .Set("steps", new AssistantStep { Documents = steps.Documents, DossierName = steps.DossierName });
 
 
             Assistant updatedAssistant = await _assistantCollection.FindOneAndUpdateAsync(queryUpdate, updateAssistant, new FindOneAndUpdateOptions<Assistant>
@@ -217,12 +217,12 @@ namespace SISGED.Server.Services.Repositories
 
         public async Task<Assistant> UpdateNormalAsync(StepsUpdateRequest stepUpdateRequest)
         {
-            FilterDefinition<Assistant> queryUpdate = Builders<Assistant>.Filter.Eq("idexpediente", stepUpdateRequest.DossierId);
+            FilterDefinition<Assistant> queryUpdate = Builders<Assistant>.Filter.Eq("dossierId", stepUpdateRequest.DossierId);
 
             UpdateDefinition<Assistant> updateAssistant = Builders<Assistant>.Update
-                                                                                .Set("paso", stepUpdateRequest.Step)
-                                                                                .Set("subpaso", stepUpdateRequest.Substep)
-                                                                                .Set("tipodocumento", stepUpdateRequest.DocumentType);
+                                                                                .Set("step", stepUpdateRequest.Step)
+                                                                                .Set("subStep", stepUpdateRequest.Substep)
+                                                                                .Set("documentType", stepUpdateRequest.DocumentType);
 
             Assistant updatedAssistant = await _assistantCollection.FindOneAndUpdateAsync(queryUpdate, updateAssistant, new FindOneAndUpdateOptions<Assistant>
             {
@@ -237,10 +237,10 @@ namespace SISGED.Server.Services.Repositories
         {
 
             var assistantUpdateBuilder = Builders<T>.Update
-                                                        .Set("paso", assistantDossierUpdate.Step)
-                                                        .Set("tipodocumento", assistantDossierUpdate.DocumentType)
-                                                        .Set("tipoexpediente", assistantDossierUpdate.DossierType)
-                                                        .Push("pasos", assistantDossierUpdate.Steps);
+                                                        .Set("step", assistantDossierUpdate.Step)
+                                                        .Set("documentType", assistantDossierUpdate.DocumentType)
+                                                        .Set("dossierType", assistantDossierUpdate.DossierType)
+                                                        .Push("steps", assistantDossierUpdate.Steps);
 
             return assistantUpdateBuilder;
         }
@@ -249,9 +249,9 @@ namespace SISGED.Server.Services.Repositories
         {
             var assistantArrayFilters = new List<ArrayFilterDefinition>()
             {
-                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("dossier.nombreexpediente", assistantStepDTO.DossierType),
-                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("document.tipo", assistantStepDTO.DocumentType),
-                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("step.indice", assistantStepDTO.Step)
+                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("dossier.dossierName", assistantStepDTO.DossierType),
+                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("document.type", assistantStepDTO.DocumentType),
+                MongoDBAggregationExtension.GetArrayFilterDefinition<Assistant>("step.index", assistantStepDTO.Step)
             };
 
             return assistantArrayFilters;

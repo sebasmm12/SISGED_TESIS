@@ -5,13 +5,13 @@ namespace SISGED.Shared.DTOs
     public class SolicitorDossierShipmentContentDTO
     {
 
-        [JsonPropertyName("description")]
+        //[JsonPropertyName("description")]
         public string Description { get; set; } = default!;
-        [JsonPropertyName("title")]
+        //[JsonPropertyName("title")]
         public string Title { get; set; } = default!;
-        [JsonPropertyName("solicitorId")]
+        //[JsonPropertyName("solicitorId")]
         public string SolicitorId { get; set; } = default!;
-        [JsonPropertyName("solicitorDossiers")]
+        //[JsonPropertyName("solicitorDossiers")]
         public List<string>? SolicitorDossiers { get; set; }
     }
 }

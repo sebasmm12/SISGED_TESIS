@@ -24,7 +24,7 @@ namespace SISGED.Shared.Models.Responses.Document
         public List<Entities.DocumentEvaluation> Evaluations { get; set; } = default!;
         [BsonElement("creationDate")]
         public DateTime CreationDate { get; set; } = default!;
-        [BsonElement("urlAnnex")]
-        public List<string> UrlAnnex { get; set; } = default!;
+        [BsonElement("attachedUrls")]
+        public List<string> AttachedUrls { get; set; } = default!;
     }
 }

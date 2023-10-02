@@ -27,7 +27,10 @@ namespace SISGED.Client.Components.Documents.Generators
 
         protected override async Task OnInitializedAsync()
         {
-            complaintRequestContent = JsonSerializer.Deserialize<ComplaintRequestContentDTO>(JsonSerializer.Serialize(DocumentGenerator.Document.Content))!;
+            complaintRequestContent = JsonSerializer.Deserialize<ComplaintRequestContentDTO>(JsonSerializer.Serialize(DocumentGenerator.Document.Content), new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            })!;
 
             await GetComplaintRequestInfoAsync();
 

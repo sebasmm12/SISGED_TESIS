@@ -23,7 +23,10 @@ namespace SISGED.Client.Components.Documents.Generators
 
         protected override async Task OnInitializedAsync()
         {
-            disciplinaryOpennessContent = JsonSerializer.Deserialize<DisciplinaryOpennessContentDTO>(JsonSerializer.Serialize(DocumentGenerator.Document.Content))!;
+            disciplinaryOpennessContent = JsonSerializer.Deserialize<DisciplinaryOpennessContentDTO>(JsonSerializer.Serialize(DocumentGenerator.Document.Content), new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            })!;
 
             await GetDisciplinaryOpennessInfoAsync();
 

@@ -49,7 +49,10 @@ namespace SISGED.Client.Components.Documents.Generators
 
         protected override async Task OnInitializedAsync()
         {
-            resolutionContent = JsonSerializer.Deserialize<ResolutionContentDTO>(JsonSerializer.Serialize(DocumentGenerator.Document.Content))!;
+            resolutionContent = JsonSerializer.Deserialize<ResolutionContentDTO>(JsonSerializer.Serialize(DocumentGenerator.Document.Content), new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            })!;
 
             await GetResolutionInfoAsync();
 

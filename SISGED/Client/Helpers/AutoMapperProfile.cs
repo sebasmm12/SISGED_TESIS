@@ -13,6 +13,7 @@ using SISGED.Shared.Models.Responses.Solicitor;
 using SISGED.Shared.Models.Responses.UserDocument;
 using SISGED.Shared.Models.Responses.UserDossier;
 using System.Text.Json;
+using Entities = SISGED.Shared.Entities;
 
 namespace SISGED.Client.Helpers
 {
@@ -23,6 +24,7 @@ namespace SISGED.Client.Helpers
             // Document Request Mapper
             CreateMap<ComplaintRequest, DocumentResponse>();
             CreateMap<Document, DocumentResponse>();
+            CreateMap<Entities.SolicitorDossierShipment, DocumentResponse>();
 
             // User Request Mapper
             CreateMap<UserRequestRegisterDTO, InitialRequestResponseContent>()
@@ -78,7 +80,7 @@ namespace SISGED.Client.Helpers
 
             // Document Derivation
             CreateMap<DocumentInfo, DocumentResponse>()
-                .ForMember(documentResponse => documentResponse.UrlAnnex, options => options.MapFrom(documentInfo => documentInfo.AttachedUrls));
+                .ForMember(documentResponse => documentResponse.AttachedUrls, options => options.MapFrom(documentInfo => documentInfo.AttachedUrls));
 
             // Login
             CreateMap<UserLoginDTO, AccountLoginRequest>();
@@ -114,7 +116,10 @@ namespace SISGED.Client.Helpers
 
         private DocumentContentDTO MapUserDocumentContent(UserDocumentResponse userDocumentResponse, UserDocumentDTO userDocumentDTO)
         {
-            return JsonSerializer.Deserialize<DocumentContentDTO>(JsonSerializer.Serialize(userDocumentResponse.Content))!;
+            return JsonSerializer.Deserialize<DocumentContentDTO>(JsonSerializer.Serialize(userDocumentResponse.Content), new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            })!;
         }
     }
 }

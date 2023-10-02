@@ -156,7 +156,10 @@ namespace SISGED.Client.Components.Documents.Registers
 
             var dossierTray = userTray.Value as DossierTrayResponse;
 
-            var documentContent = JsonSerializer.Deserialize<DisciplinaryOpennessContentDTO>(JsonSerializer.Serialize(dossierTray!.Document!.Content));
+            var documentContent = JsonSerializer.Deserialize<DisciplinaryOpennessContentDTO>(JsonSerializer.Serialize(dossierTray!.Document!.Content), new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
 
             solicitorDossierRequestRegister.Client = userTray.Client;
             solicitorDossierRequestRegister.Solicitor = await GetSolicitorAsync(documentContent!.SolicitorId);

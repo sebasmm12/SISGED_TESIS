@@ -140,7 +140,10 @@ namespace SISGED.Client.Components.Documents
         {
             dossierTray = GetDossierTray();
 
-            documentContent = JsonSerializer.Deserialize<DocumentContentDTO>(JsonSerializer.Serialize(dossierTray.Document!.Content))!;
+            documentContent = JsonSerializer.Deserialize<DocumentContentDTO>(JsonSerializer.Serialize(dossierTray.Document!.Content), new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            })!;
 
             var lastProcess = dossierTray.Document!.ProcessesHistory.Last();
 

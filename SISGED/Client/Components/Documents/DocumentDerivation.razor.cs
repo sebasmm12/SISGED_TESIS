@@ -31,8 +31,6 @@ namespace SISGED.Client.Components.Documents
         public DocumentDerivationValidator DocumentDerivationValidator { get; set; } = default!;
         [Inject]
         public IMapper Mapper { get; set; } = default!;
-        [Inject]
-        public IJSRuntime JSRuntime { get; set; } = default!;
 
         [CascadingParameter(Name = "WorkEnvironment")]
         public WorkEnvironment WorkEnvironment { get; set; } = default!;
@@ -134,12 +132,10 @@ namespace SISGED.Client.Components.Documents
             var currentTool = GetCurrentTool();
             string? toolId = currentTool.Value as string;
 
-            await JSRuntime.InvokeVoidAsync("console.log", dossierTray.Document);
-            await JSRuntime.InvokeVoidAsync("console.log", dossierTray);
-
-            var documentContent = JsonSerializer.Deserialize<DocumentContentDTO>(JsonSerializer.Serialize(dossierTray.Document!.Content));
-
-            await JSRuntime.InvokeVoidAsync("console.log", documentContent);
+            var documentContent = JsonSerializer.Deserialize<DocumentContentDTO>(JsonSerializer.Serialize(dossierTray.Document!.Content), new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
 
             var notificationDocument = new NotificationDocument(dossierTray.Document!.Id, documentContent!.Title);
 

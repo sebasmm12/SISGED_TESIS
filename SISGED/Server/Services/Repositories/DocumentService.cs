@@ -756,7 +756,7 @@ namespace SISGED.Server.Services.Repositories
             var updateFilter = Builders<Document>.Update
                                                        .Set("content.code", documentGenerationDTO.Code)
                                                        .Set("content.sign", documentGenerationDTO.Sign)
-                                                       .Set("content.urlGenerado", documentGenerationDTO.GeneratedURL)
+                                                       .Set("content.generatedUrl", documentGenerationDTO.GeneratedURL)
                                                        .Set("state", "generado")
                                                        .Push("contentsHistory", contentVersion)
                                                        .Push("processesHistory", process);

@@ -49,7 +49,11 @@ namespace SISGED.Client.Components.Documents.Generators
 
         protected override async Task OnInitializedAsync()
         {
-            solicitorDossierRequestContent = JsonSerializer.Deserialize<SolicitorDossierRequestContentDTO>(JsonSerializer.Serialize(DocumentGenerator.Document.Content))!;
+
+            solicitorDossierRequestContent = JsonSerializer.Deserialize<SolicitorDossierRequestContentDTO>(JsonSerializer.Serialize(DocumentGenerator.Document.Content), new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            })!;
 
             await GetSolicitorDossierRequestInfoAsync();
 

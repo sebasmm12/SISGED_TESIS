@@ -87,14 +87,14 @@
                         <td colspan="2" data-type="text">- @item</td>
                     </tr>
                 }
-                @if (DocumentGenerator.Document.UrlAnnex.Any())
+                @if (DocumentGenerator.Document.AttachedUrls.Any())
                 {
                     <tr>
                         <td colspan="2" data-type="section">IV. Anexos</td>
                     </tr>
-                    @for (int i = 0; i < DocumentGenerator.Document.UrlAnnex.Count; i++)
+                    @for (int i = 0; i < DocumentGenerator.Document.AttachedUrls.Count; i++)
                     {
-                        string annex = DocumentGenerator.Document.UrlAnnex[i];
+                        string annex = DocumentGenerator.Document.AttachedUrls[i];
 
                         <tr>
                             <td>

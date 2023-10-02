@@ -72,17 +72,21 @@ namespace SISGED.Client.Components.Documents.Registers
         {
             var inputItem = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace == "inputs");
 
-            ProcessWorkItemInfo(inputItem!, solicitorDossierShipment);
+            await JSRuntime.InvokeVoidAsync("console.log", solicitorDossierShipment);
+
+            await ProcessWorkItemInfo(inputItem!, solicitorDossierShipment);
 
             await WorkEnvironment.UpdateRegisteredDocumentAsync(inputItem!);
 
         }
 
-        private void ProcessWorkItemInfo(Item item, Entities.SolicitorDossierShipment solicitorDossierShipment)
+        private async Task ProcessWorkItemInfo(Item item, Entities.SolicitorDossierShipment solicitorDossierShipment)
         {
             if (item.Value is not DossierTrayResponse dossierTray) return;
 
             var documentResponse = Mapper.Map<DocumentResponse>(solicitorDossierShipment);
+
+            await JSRuntime.InvokeVoidAsync("console.log", documentResponse);
 
             dossierTray.DocumentObjects!.Add(documentResponse);
             dossierTray.Document = documentResponse;
@@ -137,7 +141,10 @@ namespace SISGED.Client.Components.Documents.Registers
 
             var complaintRequest = dossierTray!.DocumentObjects!.First(document => document.Type == "SolicitudDenuncia");
 
-            var complaintContent = JsonSerializer.Deserialize<SolicitorDossierRequestContentDTO>(JsonSerializer.Serialize(complaintRequest.Content));
+            var complaintContent = JsonSerializer.Deserialize<SolicitorDossierRequestContentDTO>(JsonSerializer.Serialize(complaintRequest.Content), new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
 
             solicitorDossierShipment.Solicitor = await GetSolicitorAsync(complaintContent!.SolicitorId);
             dossierId = dossierTray.DossierId;

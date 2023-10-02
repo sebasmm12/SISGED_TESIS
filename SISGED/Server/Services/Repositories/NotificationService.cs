@@ -93,9 +93,9 @@ namespace SISGED.Server.Services.Repositories
 
         private static BsonDocument GetUsersLookUpPipeline()
         {
-            var letPipeline = new Dictionary<string, BsonValue>()
+            var letPipeline = new Dictionary<string, BsonValue>
             {
-                { "userId", MongoDBAggregationExtension.ObjectId("$")  }
+                { "userId", MongoDBAggregationExtension.ObjectId("$senderId")  }
             }; 
 
             var lookUpPipeline = new BsonArray()

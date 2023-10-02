@@ -24,7 +24,7 @@ namespace SISGED.Client.Components.Documents.Generators
 
         protected override async Task OnInitializedAsync()
         {
-            dictumContent = JsonSerializer.Deserialize<DictumContentDTO>(JsonSerializer.Serialize(DocumentGenerator.Document.Content))!;
+            dictumContent = JsonSerializer.Deserialize<DictumContentDTO>(JsonSerializer.Serialize(DocumentGenerator.Document.Content), new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
 
             await GetDictumInfoAsync();
 

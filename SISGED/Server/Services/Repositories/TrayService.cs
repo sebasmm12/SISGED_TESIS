@@ -295,7 +295,7 @@ namespace SISGED.Server.Services.Repositories
                 { "_id", "$documentTray._id" },
                 { "client", MongoDBAggregationExtension.First("$documentTray.client") },
                 { "type", MongoDBAggregationExtension.First("$documentTray.type") },
-                { "documentsObj", MongoDBAggregationExtension.Push("$documentsObj") },
+                { "documentObjects", MongoDBAggregationExtension.Push("$documentObjects") },
                 { "outputTray", MongoDBAggregationExtension.First("$outputTray") },
                 { "inputTray", MongoDBAggregationExtension.First("$inputTray") },
                 { "trayId", MongoDBAggregationExtension.First("$_id") }
@@ -303,9 +303,9 @@ namespace SISGED.Server.Services.Repositories
 
             ///* Proyección para devolver los datos que se necesitan */
 
-            var conditionalFilter = MongoDBAggregationExtension.Eq(new BsonArray() { "$$item._id", MongoDBAggregationExtension.ObjectId("$outputTray.iddocumento") });
+            var conditionalFilter = MongoDBAggregationExtension.Eq(new BsonArray() { "$$item._id", MongoDBAggregationExtension.ObjectId("$outputTray.documentId") });
 
-            var filter = MongoDBAggregationExtension.Filter("$documentsObj", conditionalFilter, "item");
+            var filter = MongoDBAggregationExtension.Filter("$documentObjects", conditionalFilter, "item");
 
             var declaredVariable = MongoDBAggregationExtension.Let(new BsonDocument("document", filter),
                 new BsonDocument("$arrayElemAt", new BsonArray { "$$document", 0 }));
@@ -314,7 +314,7 @@ namespace SISGED.Server.Services.Repositories
             var documentProjectAggregation = MongoDBAggregationExtension.Project(new()
             {
                 { "document", declaredVariable },
-                { "documentsObj", "$documentsObj" },
+                { "documentObjects", "$documentObjects" },
                 { "type", "$type" },
                 { "_id", "$_id" },
                 { "client", "$client" },
@@ -327,7 +327,7 @@ namespace SISGED.Server.Services.Repositories
                 { "dossierId", "$_id" },
                 { "client", "$client" },
                 { "type", "$type" },
-                { "documentsObj", "$documentsObj" },
+                { "documentObjects", "$documentObjects" },
                 { "document", "$document" }
             };
             /* Proyección para crear el atributo de expediente salida*/
@@ -356,7 +356,7 @@ namespace SISGED.Server.Services.Repositories
                 { "_id", "$documentTray._id" },
                 { "client", MongoDBAggregationExtension.First("$documentTray.client") },
                 { "type", MongoDBAggregationExtension.First("$documentTray.type") },
-                { "documentsObj", MongoDBAggregationExtension.Push("$documentsObj") },
+                { "documentObjects", MongoDBAggregationExtension.Push("$documentObjects") },
                 { "outputDossier", MongoDBAggregationExtension.First("$outputDossier") },
                 { "inputTray", MongoDBAggregationExtension.First("$inputTray") },
                 { "trayId", MongoDBAggregationExtension.First("$_id") }
@@ -366,7 +366,7 @@ namespace SISGED.Server.Services.Repositories
 
             var conditionalInputFilter = MongoDBAggregationExtension.Eq(new BsonArray { "$$item._id", MongoDBAggregationExtension.ObjectId("$inputTray.documentId") });
 
-            var inputfilter = MongoDBAggregationExtension.Filter("$documentsObj", conditionalInputFilter, "item");
+            var inputfilter = MongoDBAggregationExtension.Filter("$documentObjects", conditionalInputFilter, "item");
 
             var inputVarDeclaration = MongoDBAggregationExtension.Let(new BsonDocument("document", inputfilter),
                 new BsonDocument("$arrayElemAt", new BsonArray { "$$document", 0 }));
@@ -374,7 +374,7 @@ namespace SISGED.Server.Services.Repositories
             var inputProjectAggregation = MongoDBAggregationExtension.Project(new()
             {
                 { "document", inputVarDeclaration },
-                { "documentsObj", "$documentsObj" },
+                { "documentObjects", "$documentObjects" },
                 { "type", "$type" },
                 { "_id", "$_id" },
                 { "client", "$client" },
@@ -388,7 +388,7 @@ namespace SISGED.Server.Services.Repositories
                 { "dossierId", "$_id" },
                 { "client", "$client" },
                 { "type", "$type" },
-                { "documentsObj", "$documentsObj" },
+                { "documentObjects", "$documentObjects" },
                 { "document", "$document" }
             };
 
@@ -415,7 +415,7 @@ namespace SISGED.Server.Services.Repositories
             var unWindAggregation0 = MongoDBAggregationExtension.UnWind(new("$outputTray", preserveNullAndEmptyArrays: true));
             var unWindAggregation1 = MongoDBAggregationExtension.UnWind(new("$documentTray", preserveNullAndEmptyArrays: true));
             var unWindAggregation2 = MongoDBAggregationExtension.UnWind(new("$documentTray.documents", preserveNullAndEmptyArrays: true));
-            var unWindAggregation3 = MongoDBAggregationExtension.UnWind(new("$documentsObj", preserveNullAndEmptyArrays: true));
+            var unWindAggregation3 = MongoDBAggregationExtension.UnWind(new("$documentObjects", preserveNullAndEmptyArrays: true));
             var unWindAggregation4 = MongoDBAggregationExtension.UnWind(new("$inputTray", preserveNullAndEmptyArrays: true));
 
             return new BsonDocument[] { userFilterMatchAggregation, unWindAggregation0, dossierLookupPipeline, unWindAggregation1,
@@ -470,7 +470,7 @@ namespace SISGED.Server.Services.Repositories
                                                        .Eq(new BsonArray { "$_id", MongoDBAggregationExtension.ObjectId("$$documentId") })))
             };
 
-            return MongoDBAggregationExtension.Lookup(new("documentos", letPipeline, lookUpPipeline, "documentsObj"));
+            return MongoDBAggregationExtension.Lookup(new("documentos", letPipeline, lookUpPipeline, "documentObjects"));
         }
         private static BsonDocument DossierInputLookUpPipeline()
         {

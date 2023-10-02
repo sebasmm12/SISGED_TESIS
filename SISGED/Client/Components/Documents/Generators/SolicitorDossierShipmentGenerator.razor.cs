@@ -5,6 +5,7 @@ using SISGED.Shared.DTOs;
 using SISGED.Shared.Models.Responses.Solicitor;
 using SISGED.Shared.Models.Responses.SolicitorDossier;
 using System.Text.Json;
+using Microsoft.JSInterop;
 
 namespace SISGED.Client.Components.Documents.Generators
 {
@@ -24,7 +25,10 @@ namespace SISGED.Client.Components.Documents.Generators
 
         protected override async Task OnInitializedAsync()
         {
-            solicitorDossierShipmentContent = JsonSerializer.Deserialize<SolicitorDossierShipmentContentDTO>(JsonSerializer.Serialize(DocumentGenerator.Document.Content))!;
+            solicitorDossierShipmentContent = JsonSerializer.Deserialize<SolicitorDossierShipmentContentDTO>(JsonSerializer.Serialize(DocumentGenerator.Document.Content), new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            })!;
 
             await GetSolicitorDossierShipmentInfoAsync();
 

@@ -241,7 +241,7 @@ namespace SISGED.Server.Services.Repositories
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
                 { "type", "$type" },
-                { "initDate", "$initDate" },
+                { "initDate", "$startDate" },
                 { "initialDocument", MongoDBAggregationExtension.ArrayElementAt(new List<BsonValue>() { "$documents", 0 }) },
                 { "lastDocument", MongoDBAggregationExtension.ArrayElementAt(new List<BsonValue>() { "$documents", -1 })  }
             });
