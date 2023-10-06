@@ -12,7 +12,6 @@ using SISGED.Shared.Models.Requests.Documents;
 using SISGED.Shared.Models.Responses.Account;
 using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.DossierTray;
-using static MudBlazor.CategoryTypes;
 
 namespace SISGED.Client.Components.Documents
 {

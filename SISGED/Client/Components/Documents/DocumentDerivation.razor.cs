@@ -1,6 +1,5 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using MudBlazor;
 using SISGED.Client.Components.WorkEnvironments;
 using SISGED.Client.Helpers;

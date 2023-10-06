@@ -63,6 +63,10 @@ namespace SISGED.Shared.Entities
         public string? ReceiverRole { get; set; }
         [BsonElement("isOptional")]
         public bool IsOptional { get; set; }
+        [BsonElement("isLastStep")]
+        public bool IsLastStep { get; set; }
+        [BsonElement("documentSendingTypes")]
+        public List<DocumentSendingType> DocumentSendingTypes { get; set; } = new();
         [BsonElement("substeps")]
         public List<Substep> Substeps { get; set; } = default!;
 
@@ -74,5 +78,14 @@ namespace SISGED.Shared.Entities
         public int Index { get; set; }
         [BsonElement("description")]
         public string Description { get; set; } = default!;
+    }
+
+    public class DocumentSendingType
+    {
+        [BsonElement("userType")] 
+        public string UserType { get; set; } = default!;
+
+        [BsonElement("sendingTypes")] 
+        public List<string> SendingTypes { get; set; } = default!;
     }
 }

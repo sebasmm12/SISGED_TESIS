@@ -1,6 +1,4 @@
-﻿using SISGED.Client.Components.Documents.Registers;
-using SISGED.Client.Services.Contracts;
-using SISGED.Shared.Entities;
+﻿using SISGED.Client.Services.Contracts;
 
 namespace SISGED.Client.Services.Repositories
 {
@@ -16,7 +14,8 @@ namespace SISGED.Client.Services.Repositories
             new DictumDocument(),
             new SolicitorDossierShipmentDocument(),
             new DictumDocument(),
-            new ResolutionDocument()
+            new ResolutionDocument(),
+            new SessionResolutionDocument()
         };
 
         public IDocumentRender GetDocument(string documentType)

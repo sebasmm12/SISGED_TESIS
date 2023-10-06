@@ -54,6 +54,7 @@ namespace SISGED.Server.Services.Contracts
         Task<SolicitorDossierRequest> SolicitorDossierRequestRegisterAsync(SolicitorDossierRequest solicitorDossierRequest);
         Task<Dictum> RegisterDictumAsync(Dictum dictum);
         Task<Resolution> ResolutionRegisterAsync(Resolution resolution);
+        Task<SessionResolution> RegisterSessionResolutionAsync(SessionResolution sessionResolution);
         Task<BPNResult> BPNResultRegisterAsync(BPNResultResponse DTO, List<string> url2, string UserId, string dossierId, string inputDocId, string documentRequestId);
         Task<SolicitorDossierShipment> RegisterSolicitorDossierShipmentAsync(SolicitorDossierShipment solicitorDossierShipment);
         Task<Document> EvaluateDocumentAsync(DocumentEvaluationRequest documentEvaluationRequest, User user);

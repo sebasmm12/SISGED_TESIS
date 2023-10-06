@@ -1,0 +1,65 @@
+﻿@if (pageLoading)
+{
+    <GenericToolLoader Body="Cargando los elementos para el registro de la resolución de la sesión, por favor espere..."></GenericToolLoader>
+}
+else
+{
+    <MudCard Elevation="0">
+        <MudForm>
+            <MudCardContent>
+                <MudStepper @ref="sessionResolutionStepper" LocalizedStrings="GetRegisterLocalizedStrings()"
+                            Color="Color.Secondary" Variant="Variant.Filled" HeaderTextView="HeaderTextView.NewLine"
+                            PreventStepChange="@(() => CheckSessionResolutionRegisterAsync())">
+                    <MudStep Title="Datos generales">
+                        <MudGrid>
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
+                                <MudTextField @bind-Value="sessionResolution.Title" Label="Título" Variant="Variant.Outlined"
+                                              Adornment="Adornment.End" AdornmentIcon="fas fa-pencil" AdornmentColor="Color.Primary" Immediate="true"
+                                              For="@(() => sessionResolution.Title)"></MudTextField>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
+                                <MudTextField Value="sessionResolution.DocumentContent.Title" Label="Resolución de Junta Directiva" Variant="Variant.Outlined"
+                                              Adornment="Adornment.End" AdornmentIcon="fas fa-file-lines" AdornmentColor="Color.Primary" ReadOnly="true"></MudTextField>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <MudTextField @bind-Value="sessionResolution.Description" Label="Descripción" Variant="Variant.Outlined"
+                                              Lines="5" Immediate="true" For="@(() => sessionResolution.Description)"></MudTextField>
+                            </MudItem>
+                        </MudGrid>
+                    </MudStep>
+                    <MudStep Title="Participantes">
+                        <MudGrid>
+                            <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
+                                <MudTextField Value="sessionResolution.Client.GetShortName()" Label="Nombre del Cliente" Variant="Variant.Outlined"
+                                              Adornment="Adornment.End" AdornmentIcon="fas fa-user" AdornmentColor="Color.Primary" ReadOnly="true"></MudTextField>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
+                                <MudTextField Value="sessionResolution.Client.DocumentType" Label="Tipo de Documento" Variant="Variant.Outlined"
+                                              Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary" ReadOnly="true"></MudTextField>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
+                                <MudTextField Value="sessionResolution.Client.DocumentNumber" Label="Número de Documento" Variant="Variant.Outlined"
+                                              Adornment="Adornment.End" AdornmentIcon="fas fa-id-badge" AdornmentColor="Color.Primary" ReadOnly="true"></MudTextField>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="5" lg="5" xl="5">
+                                <MudTextField Value="@($"{ sessionResolution.Solicitor.Name } { sessionResolution.Solicitor.LastName }")" Label="Notario denunciado" Variant="Variant.Outlined"
+                                              Adornment="Adornment.End" AdornmentIcon="fas fa-user" AdornmentColor="Color.Primary" ReadOnly="true"></MudTextField>
+                            </MudItem>
+                            <MudItem xs="12" sm="12" md="7" lg="7" xl="7">
+                                <MudTextField Value="sessionResolution.Solicitor.Address" Label="Dirección de notario" Variant="Variant.Outlined"
+                                              Adornment="Adornment.End" AdornmentColor="Color.Primary" AdornmentIcon="fas fa-location-dot" ReadOnly="true"></MudTextField>
+                            </MudItem>
+                        </MudGrid>
+                    </MudStep>
+                    <MudStep Title="Anexos">
+                        <MudGrid>
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <DocumentAnnex Annexes="annexes" AnnexesHeight="280px"></DocumentAnnex>
+                            </MudItem>
+                        </MudGrid>
+                    </MudStep>
+                </MudStepper>
+            </MudCardContent>
+        </MudForm>
+    </MudCard>
+}

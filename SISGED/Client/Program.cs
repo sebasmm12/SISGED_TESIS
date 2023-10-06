@@ -62,6 +62,7 @@ static void ConfigureServices(IServiceCollection services)
     services.AddTransient<DictumValidator>();
     services.AddTransient<SolicitorDossierShipmentValidator>();
     services.AddTransient<ResolutionRegisterValidator>();
+    services.AddTransient<SessionResolutionValidator>();
     services.AddTransient<DisciplinaryOpennessRegisterValidator>();
     services.AddTransient<SolicitorDossierRequestRegisterValidator>();
     services.AddTransient<UserLoginValidator>();

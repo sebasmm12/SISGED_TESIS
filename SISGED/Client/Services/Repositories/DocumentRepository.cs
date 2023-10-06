@@ -29,7 +29,6 @@ namespace SISGED.Client.Services.Repositories
                 new("Solicitud de Expedición de Firma", "SignExpeditionRequest", Roles.MesaPartes),
                 new("Oficio de Expedición de Firma", "OficioExpedicionFirma", Roles.OrientacionLegal),
                 new("Oficio de Designación de Notario", "OficioDesignacionNotario", Roles.ArchivosExnotarios),
-                new("Resolución de Sesión", "ResolucionSesion", Roles.SecretariaGeneral),
                 new("Conclusión de Firma - Rechazo Notarial", "RechazoConclusionFirma", Roles.ArchivosExnotarios),
                 new("Pago de Entrega de Testimonio", "PagoTestimonio", Roles.ArchivosExnotarios),
                 new("Conclusión de Firma - Aprobación Notarial", "AprobacionConclusionFirma", Roles.ArchivosExnotarios),
@@ -39,10 +38,11 @@ namespace SISGED.Client.Services.Repositories
                 new("Entrega de Expediente de Notario", "SolicitorDossierShipment", Roles.TramiteDocumentario),
                 new("Dictamen", "Dictum", Roles.Fiscal),
                 new("Resolución", "Resolution", Roles.TribunalHonor),
+                new("Resolución de la Sesión", "SessionResolution", Roles.SecretariaGeneral)
             };
         }
 
-        public Type  GetDocumentInfoType(string documentType)
+        public Type GetDocumentInfoType(string documentType)
         {
             return _documentInfoComponents.FirstOrDefault(documentInfoComponent => documentInfoComponent.Key == documentType).Value;
         }

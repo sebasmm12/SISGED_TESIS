@@ -393,7 +393,7 @@ namespace SISGED.Server.Controllers
 
                 var resolutionDocument = await RegisterResolutionDocumentAsync(document, user);
 
-                var updatedDossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia", "Finalizado",
+                var updatedDossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia", "En proceso",
                     new(7, resolutionDocument.Id, resolutionDocument.Type, DateTime.UtcNow.AddHours(-5).AddDays(5))));
 
                 await RegisterOutPutTrayAsync(resolutionDocument, user, updatedDossier);
@@ -403,6 +403,31 @@ namespace SISGED.Server.Controllers
             catch (Exception ex)
             {
 
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost("session-resolutions")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<SessionResolution>> RegisterSessionResolutionAsync([FromBody] DossierWrapper dossierWrapper)
+        {
+            try
+            {
+                var document = DeserializeDocument<SessionResolutionResponse>(dossierWrapper.Document);
+
+                var user = await GetUserAsync("userId");
+
+                var sessionResolution = await RegisterSessionResolutionAsync(document, user);
+
+                var dossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia", "En proceso",
+                    new(8, sessionResolution.Id, sessionResolution.Type, DateTime.UtcNow.AddHours(-5).AddDays(5))));
+
+                await RegisterOutPutTrayAsync(sessionResolution, user, dossier);
+
+                return Ok(sessionResolution);
+            }
+            catch (Exception ex)
+            {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
@@ -1192,6 +1217,17 @@ namespace SISGED.Server.Controllers
             solicitorDossierShipment.AddProcess(new Process(user.Id, user.Id, "registrado", user.Rol));
 
             return await _documentService.RegisterSolicitorDossierShipmentAsync(solicitorDossierShipment);
+        }
+
+        private async Task<SessionResolution> RegisterSessionResolutionAsync(SessionResolutionResponse document, User user)
+        {
+            var urls = await _mediaService.SaveFilesAsync(document.URLAnnex, _containerName);
+
+            var sessionResolutionContent = _mapper.Map<SessionResolutionContent>(document.Content);
+            var sessionResolution = new SessionResolution(sessionResolutionContent, "registrado", urls.ToList());
+            sessionResolution.AddProcess(new Process(user.Id, user.Id, "registrado", user.Rol));
+
+            return await _documentService.RegisterSessionResolutionAsync(sessionResolution);
         }
 
         private async Task<Dossier> RegisterInitialDossierAsync(InitialRequestResponse document, InitialRequest initialRequest)

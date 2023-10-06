@@ -22,8 +22,6 @@ namespace SISGED.Client.Components.Documents.Registers
     public partial class SolicitorDossierShipment
     {
         [Inject]
-        private IJSRuntime JSRuntime { get; set; } = default!;
-        [Inject]
         private IHttpRepository HttpRepository { get; set; } = default!;
         [Inject]
         public ISwalFireRepository SwalFireRepository { get; set; } = default!;
@@ -46,6 +44,7 @@ namespace SISGED.Client.Components.Documents.Registers
         private readonly List<MediaRegisterDTO> annexes = new();
         private IEnumerable<int> years = default!;
         private string dossierId = default!;
+        private readonly string typeDocument = "Denuncia";
 
         protected override async Task OnInitializedAsync()
         {
@@ -72,8 +71,6 @@ namespace SISGED.Client.Components.Documents.Registers
         {
             var inputItem = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace == "inputs");
 
-            await JSRuntime.InvokeVoidAsync("console.log", solicitorDossierShipment);
-
             await ProcessWorkItemInfo(inputItem!, solicitorDossierShipment);
 
             await WorkEnvironment.UpdateRegisteredDocumentAsync(inputItem!);
@@ -86,11 +83,9 @@ namespace SISGED.Client.Components.Documents.Registers
 
             var documentResponse = Mapper.Map<DocumentResponse>(solicitorDossierShipment);
 
-            await JSRuntime.InvokeVoidAsync("console.log", documentResponse);
-
             dossierTray.DocumentObjects!.Add(documentResponse);
             dossierTray.Document = documentResponse;
-            dossierTray.Type = "EntregaExpedienteNotario";
+            dossierTray.Type = typeDocument;
 
             Mapper.Map(dossierTray, item);
         }

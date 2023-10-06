@@ -638,8 +638,9 @@ namespace SISGED.Server.Services.Repositories
         public async Task<Dossier> UpdateDossierAsync(DossierDocument dossierDocument, string dossierId)
         {
             UpdateDefinition<Dossier> update = Builders<Dossier>.Update.Push("documentos", dossierDocument);
+
             Dossier dossier = await _dossierService.FindOneAndUpdateAsync(dossierId, update);
-            // TODO: IMPLEMENT A NEW SERVICE IN THE DOSSIER SERVICE
+
             return dossier;
         }
 
@@ -659,6 +660,15 @@ namespace SISGED.Server.Services.Repositories
             if (resolution.Id is null) throw new Exception($"No se pudo registrar la resolución {resolution.Content.Title}");
 
             return resolution;
+        }
+
+        public async Task<SessionResolution> RegisterSessionResolutionAsync(SessionResolution sessionResolution)
+        {
+            await _documentsCollection.InsertOneAsync(sessionResolution);
+
+            if (sessionResolution.Id is null) throw new Exception($"No se pudo registrar el dictamen {sessionResolution.Content.Title}");
+
+            return sessionResolution;
         }
 
         public async Task<BPNResult> BPNResultRegisterAsync(BPNResultResponse DTO, List<string> url2,

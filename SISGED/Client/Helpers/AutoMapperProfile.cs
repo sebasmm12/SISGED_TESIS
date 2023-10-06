@@ -9,7 +9,6 @@ using SISGED.Shared.Models.Responses.Derivation;
 using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.DossierTray;
-using SISGED.Shared.Models.Responses.Solicitor;
 using SISGED.Shared.Models.Responses.UserDocument;
 using SISGED.Shared.Models.Responses.UserDossier;
 using System.Text.Json;
@@ -22,9 +21,14 @@ namespace SISGED.Client.Helpers
         public AutoMapperProfile()
         {
             // Document Request Mapper
-            CreateMap<ComplaintRequest, DocumentResponse>();
             CreateMap<Document, DocumentResponse>();
+            CreateMap<ComplaintRequest, DocumentResponse>();
+            CreateMap<DisciplinaryOpenness, DocumentResponse>();
+            CreateMap<SolicitorDossierRequest, DocumentResponse>();
             CreateMap<Entities.SolicitorDossierShipment, DocumentResponse>();
+            CreateMap<Dictum, DocumentResponse>();
+            CreateMap<Resolution, DocumentResponse>();
+            CreateMap<SessionResolution, DocumentResponse>();
 
             // User Request Mapper
             CreateMap<UserRequestRegisterDTO, InitialRequestResponseContent>()
@@ -64,6 +68,13 @@ namespace SISGED.Client.Helpers
                 .ForMember(resolutionContent => resolutionContent.Penalty, options => options.MapFrom(resolutionRegister => resolutionRegister.Penalty.Id))
                 .ForMember(resolutionContent => resolutionContent.SolicitorId, options => options.MapFrom(resolutionRegister => resolutionRegister.Solicitor.Id))
                 .ForMember(resolutionContent => resolutionContent.ClientId, options => options.MapFrom(resolutionRegister => resolutionRegister.Client.ClientId));
+
+            // Session Resolution Request Mapper
+            CreateMap<SessionResolutionRegisterDTO, SessionResolutionResponseContent>()
+                .ForMember(sessionResolutionContent => sessionResolutionContent.ClientId,
+                    options => options.MapFrom(sessionResolutionRegister => sessionResolutionRegister.Client.ClientId))
+                .ForMember(sessionResolutionContent => sessionResolutionContent.SolicitorId,
+                    options => options.MapFrom(sessionResolutionRegister => sessionResolutionRegister.Solicitor.Id));
 
             // Solicitor Dossier Shipment
             CreateMap<SolicitorDossierShipmentRegisterDTO, SolicitorDossierShipmentResponseContent>()

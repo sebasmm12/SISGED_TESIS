@@ -18,7 +18,8 @@ namespace SISGED.Shared.Entities
         typeof(Dictum),
         typeof(Resolution),
         typeof(Appeal),
-        typeof(InitialRequest))]
+        typeof(InitialRequest),
+        typeof(SessionResolution))]
     public class Document
     {
         [BsonId]
@@ -586,5 +587,52 @@ namespace SISGED.Shared.Entities
 
         [BsonElement("content")]
         public SolicitorDossierShipmentContent Content { get; set; } = new();
+    }
+
+    public class SessionResolutionContent
+    {
+        [BsonElement("code")]
+        public string Code { get; set; } = default!;
+
+        [BsonElement("title")]
+        public string Title { get; set; } = default!;
+
+        [BsonElement("previousDocumentId")]
+        public string PreviousDocumentId { get; set; } = default!;
+
+        [BsonElement("description")]
+        public string Description { get; set; } = default!;
+
+        [BsonElement("clientId")]
+        public string ClientId { get; set; } = default!;
+
+        [BsonElement("solicitorId")]
+        public string SolicitorId { get; set; } = default!;
+
+        [BsonElement("sign")]
+        public string Sign { get; set; } = default!;
+
+        [BsonElement("generatedUrl")]
+        public string GeneratedUrl { get; set; } = default!;
+
+    }
+
+    [BsonDiscriminator("ResolucionSesion")]
+    public class SessionResolution : Document
+    {
+        public SessionResolution() { }
+
+        public SessionResolution(SessionResolutionContent content, string state, List<string> urls)
+        {
+            Content = content;
+            State = state;
+            Type = "ResolucionSesion";
+            ContentsHistory = new();
+            ProcessesHistory = new();
+            AttachedUrls = urls;
+        }
+
+        [BsonElement("content")]
+        public SessionResolutionContent Content { get; set; } = new();
     }
 }

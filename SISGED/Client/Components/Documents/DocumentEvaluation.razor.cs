@@ -23,8 +23,6 @@ namespace SISGED.Client.Components.Documents
         [Inject]
         public IHttpRepository HttpRepository { get; set; } = default!;
         [Inject]
-        public IJSRuntime JSRuntime { get; set; } = default!;
-        [Inject]
         public IDialogService DialogService { get; set; } = default!;
         [Inject]
         public ISwalFireRepository SwalFireRepository { get; set; } = default!;
