@@ -1,0 +1,82 @@
+﻿<div class="d-none">
+    @if (canShow)
+    {
+        <table id="converted-pdf">
+            <tbody>
+            <tr>
+                <td colspan="2" data-type="title">@sessionResolutionContent.Title</td>
+            </tr>
+            <tr><td colspan="2" data-type="section">I. Datos Generales</td></tr>
+            <tr>
+                <td colspan="2" data-type="subtitle">Código</td>
+            </tr>
+            <tr>
+                <td colspan="2" data-type="text">@DocumentGenerator.DocumentCode</td>
+            </tr>
+            <tr>
+                <td colspan="2" data-type="subtitle">Resolución de Junta Directiva</td>
+            </tr>
+            <tr>
+                <td colspan="2" data-type="text">@sessionResolution.PreviousDocumentContent.Title</td>
+            </tr>
+            <tr>
+                <td colspan="2" data-type="subtitle">Descripción</td>
+            </tr>
+            <tr>
+                <td colspan="2" data-type="text">@sessionResolutionContent.Description</td>
+            </tr>
+            <tr><td colspan="2" data-type="section">II. Involucrados</td></tr>
+            <tr>
+                <td colspan="2" data-type="subtitle">Denunciante</td>
+            </tr>
+            <tr>
+                <td colspan="2" data-type="text">@sessionResolution.Client.Name @sessionResolution.Client.LastName</td>
+            </tr>
+            <tr>
+                <td data-type="subtitle">Tipo de Documento</td>
+                <td data-type="subtitle">Número de Documento</td>
+            </tr>
+            <tr>
+                <td data-type="text">@sessionResolution.Client.DocumentType</td>
+                <td data-type="text">@sessionResolution.Client.DocumentNumber</td>
+            </tr>
+            <tr>
+                <td colspan="2" data-type="subtitle">Denunciado</td>
+            </tr>
+            <tr>
+                <td colspan="2" data-type="text">@sessionResolution.Solicitor.Name @sessionResolution.Solicitor.LastName</td>
+            </tr>
+            <tr>
+                <td data-type="subtitle">Correo electrónico</td>
+                <td data-type="subtitle">Notaría</td>
+            </tr>
+            <tr>
+                <td data-type="text">@sessionResolution.Solicitor.Email</td>
+                <td data-type="text">@sessionResolution.Solicitor.SolicitorOfficeName</td>
+            </tr>
+            <tr>
+                <td colspan="2" data-type="subtitle">Dirección de Notaría</td>
+            </tr>
+            <tr>
+                <td colspan="2" data-type="text">@sessionResolution.Solicitor.Address</td>
+            </tr>
+            @if (DocumentGenerator.Document.AttachedUrls.Any())
+            {
+                <tr>
+                    <td colspan="2" data-type="section">III. Anexos</td>
+                </tr>
+                @for (int i = 0; i < DocumentGenerator.Document.AttachedUrls.Count; i++)
+                {
+                    string annex = DocumentGenerator.Document.AttachedUrls[i];
+
+                    <tr>
+                        <td>
+                            <a target="_blank" data-text="@($"Ver Anexo {i + 1}")" href="@annex"></a>
+                        </td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    }
+</div>

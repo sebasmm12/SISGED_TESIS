@@ -18,5 +18,7 @@ namespace SISGED.Server.Services.Contracts
         Task MoveUserOutPutToInputTrayAsync(UserTrayAnnulmentDTO userTrayAnnulmentDTO);
         Task MoveUserTrayAsync(UserTrayAnnulmentDTO userTrayAnnulmentDTO);
         Task<Tray> DeleteInputTrayDocumentAsync(string documentId);
+        Task PushDocumentTrayAsync(UpdateDocumentTrayDTO updateDocumentTrayDTO);
+        Task PullDocumentTrayAsync(UpdateDocumentTrayDTO updateDocumentTrayDTO);
     }
 }

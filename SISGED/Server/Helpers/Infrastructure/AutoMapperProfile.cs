@@ -112,6 +112,9 @@ namespace SISGED.Server.Helpers.Infrastructure
             // Solicitor Dossier Shipment Mapper
             CreateMap<SolicitorDossierShipmentResponseContent, SolicitorDossierShipmentContent>();
 
+            // Session Resolution Mapper
+            CreateMap<SessionResolutionResponseContent, SessionResolutionContent>();
+
             // Resolution Type Mapper
             CreateMap<ResolutionResponse, Resolution>();
             CreateMap<ResolutionResponseContent, ResolutionContent>()

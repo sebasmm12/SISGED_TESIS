@@ -31,7 +31,7 @@ namespace SISGED.Client.Components.VirtualHelpers
 
         private void StartTimer()
         {
-            timer = new(70);
+            timer = new(50);
 
             timer.Elapsed += TimerOnElapsed!;
             timer.Start();

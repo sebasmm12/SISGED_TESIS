@@ -15,6 +15,7 @@ using SISGED.Shared.Models.Responses.DossierTray;
 using SISGED.Shared.Models.Responses.Tray;
 using SISGED.Shared.Validators;
 using System.Text.Json;
+using SISGED.Shared.Models.Responses.User;
 
 namespace SISGED.Client.Components.Documents
 {
@@ -60,12 +61,33 @@ namespace SISGED.Client.Components.Documents
         private async Task GetUserInformationAsync()
         {
             var userRoleTask = GetRoleAsync(SessionAccount.GetUser().Rol);
+
+            if (WorkEnvironment.IsAssistantLastStep())
+            {
+                userRole = await userRoleTask;
+
+                await SetClientInfoAsync();
+
+                return; 
+            }
+
             var receiverUserRoleTask = GetRoleAsync(GetReceiverRoleFromAssistant());
 
             await Task.WhenAll(userRoleTask, receiverUserRoleTask);
 
             userRole = await userRoleTask;
             documentDerivation.ReceiverUserRole = await receiverUserRoleTask;
+        }
+
+        private async Task SetClientInfoAsync()
+        {
+            var client = dossierTray.Client!;
+
+            documentDerivation.UserTray = new(client.ClientId, client.Name, client.LastName);
+
+            var clientRole = await GetUserByIdAsync(client.ClientId);
+
+            documentDerivation.ReceiverUserRole = new(clientRole.Rol);
         }
 
         private string GetReceiverRoleFromAssistant()
@@ -112,7 +134,12 @@ namespace SISGED.Client.Components.Documents
 
             await SwalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo derivar el documento de manera satisfactoria");
 
-            await SendNotificationAsync();
+            // TODO: Implement email notifications in the last derivation of the process
+            if (!WorkEnvironment.IsAssistantLastStep())
+            {
+                await SendNotificationAsync();
+            }
+
 
             await UpdateSentDocumentAsync(dossierDocument);
         }
@@ -220,7 +247,7 @@ namespace SISGED.Client.Components.Documents
 
                 if (documentDerivationResponse.Error)
                 {
-                    await SwalFireRepository.ShowErrorSwalFireAsync($"No se pudo derivar el documento");
+                    await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo derivar el documento");
                 }
 
                 return documentDerivationResponse.Response!;
@@ -228,7 +255,28 @@ namespace SISGED.Client.Components.Documents
             catch (Exception)
             {
 
-                await SwalFireRepository.ShowErrorSwalFireAsync($"No se pudo derivar el documento");
+                await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo derivar el documento");
+                return null;
+            }
+        }
+
+        private async Task<UserInfoResponse> GetUserByIdAsync(string userId)
+        {
+            try
+            {
+                var userInfoResponse = await HttpRepository.GetAsync<UserInfoResponse>($"api/users/{userId}");
+
+                if (userInfoResponse.Error)
+                {
+                    await SwalFireRepository.ShowErrorSwalFireAsync("No se obtener la información del usuario");
+                }
+
+                return userInfoResponse.Response!;
+            }
+            catch (Exception)
+            {
+
+                await SwalFireRepository.ShowErrorSwalFireAsync("No se obtener la información del usuario");
                 return null;
             }
         }

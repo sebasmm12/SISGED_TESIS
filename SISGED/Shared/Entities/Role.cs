@@ -18,5 +18,15 @@ namespace SISGED.Shared.Entities
         public List<string> Interfaces { get; set; } = new();
         [BsonElement("description")]
         public string Description { get; set; } = default!;
+
+        public Role()
+        {
+            
+        }
+
+        public Role(string id)
+        {
+            Id = id;
+        }
     }
 }

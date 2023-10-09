@@ -2,13 +2,13 @@
 {
     public class PaginatedUserRequest
     {
-        public PaginatedUserRequest(IEnumerable<UserRequestWithPublicDeedResponse> userRequests, long totalUserRequests)
+        public PaginatedUserRequest(IEnumerable<UserRequestResponse> userRequests, long totalUserRequests)
         {
             UserRequests = userRequests;
             TotalUserRequests = totalUserRequests;
         }
 
-        public IEnumerable<UserRequestWithPublicDeedResponse> UserRequests { get; set; } = default!;
+        public IEnumerable<UserRequestResponse> UserRequests { get; set; } = default!;
         public long TotalUserRequests { get; set; }
     }
 }

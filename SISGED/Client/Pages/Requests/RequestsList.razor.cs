@@ -25,7 +25,7 @@ namespace SISGED.Client.Pages.Requests
         public SessionAccountResponse SessionAccount { get; set; } = default!;
 
         private bool requestsLoading = true;
-        private MudTable<UserRequestWithPublicDeedResponse> requestsList = default!;
+        private MudTable<UserRequestResponse> requestsList = default!;
 
 
         private int TotalUserRequests => (requestsList.GetFilteredItemsCount() + requestsList.RowsPerPage - 1) / requestsList.RowsPerPage;
@@ -64,13 +64,13 @@ namespace SISGED.Client.Pages.Requests
             requestsList.NavigateTo(page - 1);
         }
 
-        private async Task<TableData<UserRequestWithPublicDeedResponse>> ReloadTableAsync(TableState tableState)
+        private async Task<TableData<UserRequestResponse>> ReloadTableAsync(TableState tableState)
         {
             var userRequests = await GetUserRequestsAsync(tableState);
 
             await Task.Delay(100);
 
-            return new TableData<UserRequestWithPublicDeedResponse>() { Items = userRequests.UserRequests, 
+            return new TableData<UserRequestResponse>() { Items = userRequests.UserRequests, 
                 TotalItems = (int)userRequests.TotalUserRequests };
         }
 
@@ -96,7 +96,7 @@ namespace SISGED.Client.Pages.Requests
             {
 
                 await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener sus solicitudes registradas en el sistema");
-                return new PaginatedUserRequest(new List<UserRequestWithPublicDeedResponse>(), 0);
+                return new PaginatedUserRequest(new List<UserRequestResponse>(), 0);
             }
         }
 
@@ -106,7 +106,7 @@ namespace SISGED.Client.Pages.Requests
 
             userRequestQueries += $"page={System.Web.HttpUtility.UrlEncode(tableState.Page.ToString())}";
             userRequestQueries += $"&pagesize={System.Web.HttpUtility.UrlEncode(tableState.PageSize.ToString())}";
-            userRequestQueries += $"&documentNumber={System.Web.HttpUtility.UrlEncode(SessionAccount.GetDocumentNumber())}";
+            userRequestQueries += $"&clientId={System.Web.HttpUtility.UrlEncode(SessionAccount.GetUser().Id)}";
 
             return userRequestQueries;
         }

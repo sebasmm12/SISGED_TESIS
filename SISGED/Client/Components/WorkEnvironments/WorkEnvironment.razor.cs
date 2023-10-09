@@ -133,6 +133,8 @@ namespace SISGED.Client.Components.WorkEnvironments
             virtualHelper!.ChangeMessage(message);
         }
 
+        public bool IsAssistantLastStep() => assistant.IsLastStep();
+
         public async Task UpdateAssistantMessageAsync(AsistantMessageUpdate asistantMessageUpdate)
         {
             string assistantMessage;

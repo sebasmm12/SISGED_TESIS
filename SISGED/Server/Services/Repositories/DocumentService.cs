@@ -93,14 +93,14 @@ namespace SISGED.Server.Services.Repositories
             return await _dossierService.GetUserRequestDocumentsAsync(documentNumber);
         }
 
-        public async Task<IEnumerable<UserRequestWithPublicDeedResponse>> GetUserRequestsWithPublicDeedAsync(UserRequestPaginationQuery userRequestPaginationQuery)
+        public async Task<IEnumerable<UserRequestResponse>> GetUserRequestsWithPublicDeedAsync(UserRequestPaginationQuery userRequestPaginationQuery)
         {
             return await _dossierService.GetUserRequestsWithPublicDeedAsync(userRequestPaginationQuery);
         }
 
-        public async Task<long> CountUserRequestAsync(string documentNumber)
+        public async Task<long> CountUserRequestAsync(string clientId)
         {
-            return await _dossierService.CountUserRequestsAsync(documentNumber);
+            return await _dossierService.CountUserRequestsAsync(clientId);
         }
 
         public async Task<BPNRequest> GetBPNRequestDocumentAsync(string documentId)

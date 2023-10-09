@@ -169,7 +169,7 @@ namespace SISGED.Server.Controllers
 
         private async Task VerifyAssistantsStepsAndDocuments(Assistant assistant, AssistantUpdateRequest assistantUpdateRequest, AssistantStepUpdateDTO assistantStepUpdateDTO)
         {
-            if (!assistant.IsLastStep())
+            if (!assistant.IsLastDocumentStep())
             {
                 assistant.UpdateNextStep();
 

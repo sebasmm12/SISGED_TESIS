@@ -101,8 +101,13 @@ namespace SISGED.Shared.Entities
         }
 
         public bool IsLastSubStep() => Substep == GetCurrentDocumentStep().Substeps.Count;
-        public bool IsLastStep() => Step == GetCurrentStep().Steps.Count - 1;
+        
+        public bool IsLastDocumentStep() => Step == GetCurrentStep().Steps.Count - 1;
+        
         public bool IsLastDocument() => FindDocumentIndex() == GetCurrentAssistantStep().Documents.Count - 1;
+
+        public bool IsLastStep() => IsLastDocumentStep() && IsLastDocument();
+
         public DocumentStep GetDocumentStep(string documentType) => GetCurrentAssistantStep()
                                                                         .GetDocument(documentType)
                                                                         .Steps

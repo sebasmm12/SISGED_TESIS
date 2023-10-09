@@ -5,7 +5,7 @@
 else
 {
     <MudCard Elevation="0">
-        <MudForm>
+        <MudForm @ref="sessionResolutionForm" ValidationDelay="0" Model="sessionResolution" Validation="@(SessionResolutionValidator.ValidateValue)">
             <MudCardContent>
                 <MudStepper @ref="sessionResolutionStepper" LocalizedStrings="GetRegisterLocalizedStrings()"
                             Color="Color.Secondary" Variant="Variant.Filled" HeaderTextView="HeaderTextView.NewLine"

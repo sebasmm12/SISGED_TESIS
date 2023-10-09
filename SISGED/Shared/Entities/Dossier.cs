@@ -43,6 +43,8 @@ namespace SISGED.Shared.Entities
         public List<Derivation> Derivations { get; set; } = new();
         [BsonElement("state")]
         public string State { get; set; } = default!;
+        [BsonElement("documentUrl")] 
+        public string? DocumentUrl { get; set; } = default!;
 
 
         public void AddDocument(DossierDocument dossierDocument)

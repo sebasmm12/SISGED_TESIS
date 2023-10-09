@@ -42,7 +42,7 @@ namespace SISGED.Server.Services.Contracts
         Task<SolicitorDossierRequestInfoResponse> GetSolicitorDossierRequestAsync(string documentId);
         Task<SolicitorDossierShipmentInfoResponse> GetSolicitorDossierShipmentAsync(string documentId);
         Task<IEnumerable<UserRequestDocumentResponse>> GetUserRequestDocumentsAsync(string documentNumber);
-        Task<IEnumerable<UserRequestWithPublicDeedResponse>> GetUserRequestsWithPublicDeedAsync(UserRequestPaginationQuery userRequestPaginationQuery);
+        Task<IEnumerable<UserRequestResponse>> GetUserRequestsWithPublicDeedAsync(UserRequestPaginationQuery userRequestPaginationQuery);
         Task UpdateDocumentProcessAsync(Process proccess, string documentId);
         Task<SolicitorDesignationDocument> SolicitorDesignationOfficeRegisterAsync(DossierWrapper dossier, List<string> url2);
         Task<BPNDocument> RegisterBPNOfficeAsync(DossierWrapper dossierWrapper, List<string> url2, string url);
@@ -72,7 +72,7 @@ namespace SISGED.Server.Services.Contracts
         Task UpdateInitialRequestDocumentAsync(DossierWrapper dossierWrapper);
         Task UpdateEENDocumentAsync(DossierWrapper dossierWrapper);
         Task UpdateInitialRequestStateAsync(DossierWrapper dossierWrapper);
-        Task<long> CountUserRequestAsync(string documentNumber);
+        Task<long> CountUserRequestAsync(string clientId);
         Task<ComplaintRequest> RegisterComplaintRequestAsync(ComplaintRequest complaintRequest);
         Task<IEnumerable<UserDocumentResponse>> GetDocumentsByUserAsync(string userId, UserDocumentPaginationQuery userDocumentPaginationQuery);
         Task<int> CountDocumentsByUserAsync(string userId, UserDocumentPaginationQuery userDocumentPaginationQuery);

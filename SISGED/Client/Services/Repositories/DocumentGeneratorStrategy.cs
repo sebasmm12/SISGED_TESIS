@@ -11,7 +11,8 @@ namespace SISGED.Client.Services.Repositories
             new SolicitorDossierShipmentGeneration(),
             new SolicitorDossierRequestGeneration(),
             new DisciplinaryOpennessGeneration(),
-            new ResolutionGeneration()
+            new ResolutionGeneration(),
+            new SessionResolutionGeneration()
         };
 
         public IDocumentRender GetDocument(string documentType)

@@ -23,9 +23,9 @@ namespace SISGED.Server.Services.Contracts
         Task<Dossier> UpdateDossierForInitialRequestAsync(Dossier dossier);
         Task<DossierResponse> GetDossierByIdAsync(string id);
         Task<IEnumerable<UserRequestDocumentResponse>> GetUserRequestDocumentsAsync(string documentNumber);
-        Task<IEnumerable<UserRequestWithPublicDeedResponse>> GetUserRequestsWithPublicDeedAsync(UserRequestPaginationQuery userRequestPaginationQuery);
+        Task<IEnumerable<UserRequestResponse>> GetUserRequestsWithPublicDeedAsync(UserRequestPaginationQuery userRequestPaginationQuery);
         Task<Dossier> FindOneAndUpdateAsync(string Id, UpdateDefinition<Dossier> update);
-        Task<long> CountUserRequestsAsync(string documentNumber);
+        Task<long> CountUserRequestsAsync(string clientId);
         Task<IEnumerable<DossierListResponse>> GetDossiersListAsync(UserDossierPaginationQuery paginationQuery);
         Task<int> CountDossiersListAsync(UserDossierPaginationQuery paginationQuery);
         Task<Dossier> DeleteDossierDocumentAsync(string documentId);

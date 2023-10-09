@@ -109,7 +109,6 @@ namespace SISGED.Server.Services.Repositories
             var senderInputTrayUpdate = PullDocumentTrayAsync(new(documentTray, updateTrayDTO.SenderUserId, "inputTray"));
 
             await Task.WhenAll(receiverInputTrayUpdate, senderOutputTrayUpdate, senderInputTrayUpdate);
-
         }
 
         public async Task RegisterOutputTrayAsync(OutPutTrayDTO outPutTrayDTO)
@@ -160,6 +159,24 @@ namespace SISGED.Server.Services.Repositories
             if (updatedTray is null) throw new Exception($"No se pudo eliminar el documento con identificador {documentId} de la bandeja con identificador {currentTray.Id}");
 
             return updatedTray;
+        }
+
+        public async Task PushDocumentTrayAsync(UpdateDocumentTrayDTO updateDocumentTrayDTO)
+        {
+            var updateDocumentTray = Builders<Tray>.Update.Push(updateDocumentTrayDTO.TrayType, updateDocumentTrayDTO.DocumentTray);
+
+            var updateTray = await _traysCollection.UpdateOneAsync(tray => tray.User == updateDocumentTrayDTO.UserId, updateDocumentTray);
+
+            if (updateTray is null) throw new Exception($"No se pudo actualizar la bandeja del usuario con identificador {updateDocumentTrayDTO.UserId}");
+        }
+
+        public async Task PullDocumentTrayAsync(UpdateDocumentTrayDTO updateDocumentTrayDTO)
+        {
+            var updateDocumentTray = Builders<Tray>.Update.Pull(updateDocumentTrayDTO.TrayType, updateDocumentTrayDTO.DocumentTray);
+
+            var updateTray = await _traysCollection.UpdateOneAsync(tray => tray.User == updateDocumentTrayDTO.UserId, updateDocumentTray);
+
+            if (updateTray is null) throw new Exception($"No se pudo actualizar la bandeja del usuario con identificador {updateDocumentTrayDTO.UserId}");
         }
 
         #region private methods
@@ -510,24 +527,6 @@ namespace SISGED.Server.Services.Repositories
 
             return MongoDBAggregationExtension.Lookup(new("usuarios", letPipeline, lookUpPipeline, "userInfo"));
 
-        }
-
-        private async Task PushDocumentTrayAsync(UpdateDocumentTrayDTO updateDocumentTrayDTO)
-        {
-            var updateDocumentTray = Builders<Tray>.Update.Push(updateDocumentTrayDTO.TrayType, updateDocumentTrayDTO.DocumentTray);
-
-            var updateTray = await _traysCollection.UpdateOneAsync(tray => tray.User == updateDocumentTrayDTO.UserId, updateDocumentTray);
-
-            if (updateTray is null) throw new Exception($"No se pudo actualizar la bandeja del usuario con identificador {updateDocumentTrayDTO.UserId}");
-        }
-
-        private async Task PullDocumentTrayAsync(UpdateDocumentTrayDTO updateDocumentTrayDTO)
-        {
-            var updateDocumentTray = Builders<Tray>.Update.Pull(updateDocumentTrayDTO.TrayType, updateDocumentTrayDTO.DocumentTray);
-
-            var updateTray = await _traysCollection.UpdateOneAsync(tray => tray.User == updateDocumentTrayDTO.UserId, updateDocumentTray);
-
-            if (updateTray is null) throw new Exception($"No se pudo actualizar la bandeja del usuario con identificador {updateDocumentTrayDTO.UserId}");
         }
         #endregion
     }

@@ -2,6 +2,6 @@
 {
     public class UserRequestPaginationQuery : PaginationQuery
     {
-        public string DocumentNumber { get; set; } = default!;
+        public string ClientId { get; set; } = default!;
     }
 }

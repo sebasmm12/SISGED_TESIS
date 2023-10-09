@@ -7,6 +7,18 @@
         public string UserLastName { get; set; } = default!;
         public int Quantity { get; set; }
 
+        public UserTrayResponse()
+        {
+            
+        }
+
+        public UserTrayResponse(string userId, string userName, string userLastName)
+        {
+            UserId = userId;
+            UserName = userName;
+            UserLastName = userLastName;
+        }
+
         public override bool Equals(object? obj)
         {
             var other = obj as UserTrayResponse;

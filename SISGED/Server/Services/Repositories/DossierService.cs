@@ -19,15 +19,20 @@ namespace SISGED.Server.Services.Repositories
         private readonly IMongoCollection<Dossier> _dossiersCollection;
         private readonly IMongoCollection<Document> _documentsCollection;
         private readonly ITrayService _trayService;
+        private readonly IAssistantService _assistantService;
 
         public string DocumentsCollectionName => "documentos";
 
-        public DossierService(IMongoDatabase mongoDatabase, ITrayService trayService)
+        public DossierService(
+            IMongoDatabase mongoDatabase, 
+            ITrayService trayService, 
+            IAssistantService assistantService)
         {
 
             _dossiersCollection = mongoDatabase.GetCollection<Dossier>(CollectionName);
             _documentsCollection = mongoDatabase.GetCollection<Document>(DocumentsCollectionName);
             _trayService = trayService;
+            _assistantService = assistantService;
         }
 
         public string CollectionName => "expedientes";
@@ -79,23 +84,23 @@ namespace SISGED.Server.Services.Repositories
         {
             Derivation dossierDerivation = dossierLastDocumentRequest.Derivation;
 
-            dossierDerivation.DerivationDate = DateTime.Now;
+            dossierDerivation.DerivationDate = DateTime.UtcNow.AddHours(-5);
 
             dossierDerivation.ReceiverUser = userId;
 
             await UpdateDossierDerivationsAsync(dossierDerivation, dossierLastDocumentRequest.Id);
 
-            var updateTrayDTO = new UpdateTrayDTO(dossierLastDocumentRequest.Id, userId,
-                                                  dossierDerivation.SenderUser,
-                                                  dossierLastDocumentRequest.DocumentId);
+            var assistant = await _assistantService.GetAssistantByDossierAsync(dossierLastDocumentRequest.Id);
 
-            var usersTraysupdate = _trayService.UpdateTrayForDerivationAsync(updateTrayDTO);
+            await UpdateDossierGeneratedDocumentAsync(dossierLastDocumentRequest, assistant);
 
             var process = new Process(dossierDerivation.SenderUser, dossierDerivation.ReceiverUser, "derivado", dossierLastDocumentRequest.Derivation.OriginArea);
 
-            var documentProcessupdate = UpdateDocumentProcessAsync(process, dossierLastDocumentRequest.DocumentId);
+            var documentProcessUpdate = UpdateDocumentProcessAsync(process, dossierLastDocumentRequest.DocumentId);
 
-            await Task.WhenAll(usersTraysupdate, documentProcessupdate);
+            var usersTraysUpdate = UpdateUsersTraysAsync(assistant, dossierLastDocumentRequest, userId);
+
+            await Task.WhenAll(usersTraysUpdate, documentProcessUpdate);
 
             return await GetDossiertLastDocument(dossierLastDocumentRequest.Id);
         }
@@ -166,11 +171,11 @@ namespace SISGED.Server.Services.Repositories
             return userRequestDocuments;
         }
 
-        public async Task<IEnumerable<UserRequestWithPublicDeedResponse>> GetUserRequestsWithPublicDeedAsync(UserRequestPaginationQuery userRequestPaginationQuery)
+        public async Task<IEnumerable<UserRequestResponse>> GetUserRequestsWithPublicDeedAsync(UserRequestPaginationQuery userRequestPaginationQuery)
         {
-            var userRequestDocuments = await _dossiersCollection.Aggregate<UserRequestWithPublicDeedResponse>(GetUserRequestsWithPublicDeedPipeline(userRequestPaginationQuery)).ToListAsync();
+            var userRequestDocuments = await _dossiersCollection.Aggregate<UserRequestResponse>(GetUserRequestsWithPublicDeedPipeline(userRequestPaginationQuery)).ToListAsync();
 
-            if (userRequestDocuments is null) throw new Exception($"No se pudo obtener las solicitudes iniciales del cliente con número de documento {userRequestPaginationQuery.DocumentNumber}");
+            if (userRequestDocuments is null) throw new Exception($"No se pudo obtener las solicitudes iniciales del cliente con identificador {userRequestPaginationQuery.ClientId}");
 
             return userRequestDocuments;
         }
@@ -180,9 +185,9 @@ namespace SISGED.Server.Services.Repositories
             return await _dossiersCollection.FindOneAndUpdateAsync(x => x.Id == Id, update);
         }
 
-        public async Task<long> CountUserRequestsAsync(string documentNumber)
+        public async Task<long> CountUserRequestsAsync(string clientId)
         {
-            long totalRequests = await _dossiersCollection.CountDocumentsAsync(dossier => dossier.Client.DocumentNumber == documentNumber);
+            long totalRequests = await _dossiersCollection.CountDocumentsAsync(dossier => dossier.Client.ClientId == clientId);
 
             return totalRequests;
         }
@@ -215,12 +220,67 @@ namespace SISGED.Server.Services.Repositories
                 ReturnDocument = ReturnDocument.After
             });
 
-            if (updatedDossier is null) throw new Exception($"No se pudo actualizar el state del expediente con identificador {currentDossier.Id} en base al documento con identificador {documentId}");
+            if (updatedDossier is null) throw new Exception($"No se pudo actualizar el estado del expediente con identificador {currentDossier.Id} en base al documento con identificador {documentId}");
 
             return updatedDossier;
         }
 
         #region private methods
+
+        private async Task UpdateDossierGeneratedDocumentAsync(DossierLastDocumentRequest dossierLastDocumentRequest, Assistant assistant)
+        {
+            if (!assistant.IsLastStep())
+                return;
+
+            var document = await GetDocumentAsync(dossierLastDocumentRequest.DocumentId);
+
+            var documentUrl = document
+                                .ContentsHistory
+                                .LastOrDefault()!
+                                .Url;
+
+            var dossierUpdate = Builders<Dossier>
+                                    .Update
+                                    .Set(dossier => dossier.DocumentUrl, documentUrl)
+                                    .Set(dossier => dossier.EndDate, DateTime.UtcNow.AddHours(-5))
+                                    .Set(dossier => dossier.State, "Finalizado");
+
+            var updatedDossier = await _dossiersCollection.FindOneAndUpdateAsync(dossier => dossier.Id == dossierLastDocumentRequest.Id, dossierUpdate, new()
+            {
+                ReturnDocument = ReturnDocument.After
+            });
+
+            if (updatedDossier is null) 
+                throw new Exception($"No se pudo registrar la url del documento con expediente {dossierLastDocumentRequest.Id}");
+        }
+
+        private async Task<Document> GetDocumentAsync(string documentId)
+        {
+            var document = await _documentsCollection
+                                    .Find(document => document.Id == documentId)
+                                    .FirstAsync();
+
+            return document;
+        }
+
+        private Task UpdateUsersTraysAsync(Assistant assistant, DossierLastDocumentRequest dossierLastDocumentRequest, string userId)
+        {
+            if (assistant.IsLastStep())
+            {
+                var updateDocumentTrayDTO = new UpdateDocumentTrayDTO(new(dossierLastDocumentRequest.Id, 
+                                                                          dossierLastDocumentRequest.DocumentId), 
+                                                                          dossierLastDocumentRequest.Derivation.SenderUser, "outputTray");
+
+                return _trayService.PullDocumentTrayAsync(updateDocumentTrayDTO);
+            }
+
+            var updateTrayDTO = new UpdateTrayDTO(dossierLastDocumentRequest.Id, userId,
+                dossierLastDocumentRequest.Derivation.SenderUser,
+                dossierLastDocumentRequest.DocumentId);
+
+            return _trayService.UpdateTrayForDerivationAsync(updateTrayDTO);
+        }
+
         private async Task<Dossier> GetDossierByDocumentAsync(string documentId)
         {
             var dossierDocumentBuilder = Builders<DossierDocument>.Filter.Eq(dosssierDocument => dosssierDocument.DocumentId, documentId);
@@ -236,32 +296,32 @@ namespace SISGED.Server.Services.Repositories
 
         private static BsonDocument[] GetUserRequestsWithPublicDeedPipeline(UserRequestPaginationQuery userRequestPaginationQuery)
         {
-            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("client.documentNumber", userRequestPaginationQuery.DocumentNumber));
+            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("client.clientId", userRequestPaginationQuery.ClientId));
 
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
                 { "type", "$type" },
                 { "initDate", "$startDate" },
                 { "initialDocument", MongoDBAggregationExtension.ArrayElementAt(new List<BsonValue>() { "$documents", 0 }) },
-                { "lastDocument", MongoDBAggregationExtension.ArrayElementAt(new List<BsonValue>() { "$documents", -1 })  }
+                { "state", "$state" },
+                { "endDate", "$endDate" },
+                { "documentUrl", "$documentUrl" }
             });
 
             var lookUpPipeline = GetUserRequestsWithPublicDeedLookUpPipeline();
 
+            var documentsUnWindAggregation = MongoDBAggregationExtension.UnWind(new("$documents"));
+            
             var documentsProjectAggregation = MongoDBAggregationExtension.Project(new()
             {
                 { "_id", 0 },
                 { "type", 1  },
                 { "initDate", 1 },
-                { "initialDocument", MongoDBAggregationExtension.First(MongoDBAggregationExtension.Filter("$documents",
-                    MongoDBAggregationExtension.Eq(new() { "$$documents._id", MongoDBAggregationExtension.ObjectId("$initialDocument.documentId") }), "documents"))},
-                { "lastDocument", MongoDBAggregationExtension.First(MongoDBAggregationExtension.Filter("$documents",
-                    MongoDBAggregationExtension.Eq(new() { "$$documents._id", MongoDBAggregationExtension.ObjectId("$lastDocument.documentId") }), "documents"))},
+                { "initialDocument", "$documents" },
+                { "state", 1},
+                { "endDate", 1 },
+                { "documentUrl", 1 }
             });
-
-            var publicDeedLookUpAggregation = GetDocumentLastPublicDeedLookUpPipeline();
-
-            var userRequestsWithPublicDeedProject = GetUserRequestWithPublicDeedProjectPipeline();
 
             var sortAggregation = MongoDBAggregationExtension.Sort(new BsonDocument("initDate", -1));
 
@@ -269,10 +329,9 @@ namespace SISGED.Server.Services.Repositories
 
             var limitAggregation = MongoDBAggregationExtension.Limit(userRequestPaginationQuery.PageSize);
 
-            return new BsonDocument[] { matchAggregation, projectAggregation, lookUpPipeline,
-                documentsProjectAggregation, publicDeedLookUpAggregation, userRequestsWithPublicDeedProject,
+            return new BsonDocument[] { matchAggregation, projectAggregation, lookUpPipeline, documentsUnWindAggregation,
+                documentsProjectAggregation,
                 sortAggregation, skipAggregation, limitAggregation };
-
         }
 
         private static BsonDocument GetUserRequestWithPublicDeedProjectPipeline()
@@ -316,18 +375,16 @@ namespace SISGED.Server.Services.Repositories
             var letPipeline = new Dictionary<string, BsonValue>()
             {
                 { "initialDocumentId", MongoDBAggregationExtension.ObjectId("$initialDocument.documentId") },
-                { "lastDocumentId", MongoDBAggregationExtension.ObjectId("$lastDocument.documentId") }
             };
 
             var lookUpPipeline = new BsonArray()
             {
                 MongoDBAggregationExtension.Match(MongoDBAggregationExtension.Expr(
-                    MongoDBAggregationExtension.In("$_id", new() { "$$initialDocumentId", "$$lastDocumentId" })))
+                    MongoDBAggregationExtension.In("$_id", new() { "$$initialDocumentId" })))
             };
 
 
             return MongoDBAggregationExtension.Lookup(new("documentos", letPipeline, lookUpPipeline, "documents"));
-
         }
 
         private static BsonDocument[] GetUserRequestDocumentsPipeline(string documentNumber)

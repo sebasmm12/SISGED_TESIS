@@ -7,17 +7,18 @@
                    OnCreationButton="CreateUserRequest"></GenericListHeader>
 
 <MudCard Elevation="5" Class="mt-2">
-    <MudTable ServerData="@(new Func<TableState, Task<TableData<UserRequestWithPublicDeedResponse>>>(ReloadTableAsync))" Hover="true" Loading="requestsLoading"
+    <MudTable ServerData="@(new Func<TableState, Task<TableData<UserRequestResponse>>>(ReloadTableAsync))" Hover="true" Loading="requestsLoading"
         Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Primary" @ref="requestsList" RowsPerPage="5">
         <HeaderContent>
             <MudTh class="header-table">Título</MudTh>
             <MudTh class="header-table">Tipo</MudTh>
             <MudTh class="header-table">Estado</MudTh>
             <MudTh class="header-table">Fecha de Registro</MudTh>
+            <MudTh class="header-table">Fecha Fin</MudTh>
             <MudTh class="header-table">Acciones</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Título">@context.Content.Title</MudTd>
+            <MudTd DataLabel="Título">@context.InitialDocument.Content.Title</MudTd>
             <MudTd DataLabel="Tipo">@context.Type</MudTd>
             <MudTd DataLabel="Estado">
                 <MudChip Variant="Variant.Text" Color="Color.Success">
@@ -27,7 +28,27 @@
             <MudTd DataLabel="Fecha de Registro">
                 @context.InitDate.ToString("dd/MM/yyyy")
             </MudTd>
-            <MudTd DataLabel="Acciones"></MudTd>
+            <MudTd DataLabel="Fecha Fin">
+                @if (context.EndDate is not null)
+                {
+                    @context.EndDate!.Value.ToString("dd/MM/yyyy")
+                }
+                else
+                {
+                    <text>-</text>
+                }
+            </MudTd>
+            <MudTd DataLabel="Acciones">
+                <MudPaper Elevation="0" Class="transparent-color">
+                    @if (!string.IsNullOrEmpty(context.DocumentUrl))
+                    {
+                        <MudTooltip Text="Ver Documento" Arrow="true" Placement="Placement.Top">
+                            <MudIconButton Icon="fas fa-file-pdf" Color="Color.Error" Href="@context.DocumentUrl"
+                                           Class="rounded-circle"></MudIconButton>
+                        </MudTooltip>
+                    }
+                </MudPaper>    
+            </MudTd>
         </RowTemplate>
         <NoRecordsContent>
             <MudPaper Elevation="0" Class="transparent-color">

@@ -19,5 +19,9 @@ namespace SISGED.Shared.Models.Generics.Document
         public List<string> AttachedUrls { get; set; } = new();
         [BsonElement("state")]
         public string State { get; set; } = default!;
+        [BsonElement("evaluations")]
+        public List<DocumentEvaluation> Evaluations { get; set; } = new();
+        [BsonElement("creationDate")]
+        public DateTime CreationDate { get; set; }
     }
 }

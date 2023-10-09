@@ -876,13 +876,13 @@ namespace SISGED.Server.Controllers
         }
 
         [HttpGet("user-requests-public-deeds")]
-        public async Task<ActionResult<IEnumerable<UserRequestWithPublicDeedResponse>>> GetUserRequestsWithPublicDeedAsync([FromQuery] UserRequestPaginationQuery userRequestPaginationQuery)
+        public async Task<ActionResult<IEnumerable<UserRequestResponse>>> GetUserRequestsWithPublicDeedAsync([FromQuery] UserRequestPaginationQuery userRequestPaginationQuery)
         {
             try
             {
                 var usersRequestWithPublicDeed = await _documentService.GetUserRequestsWithPublicDeedAsync(userRequestPaginationQuery);
 
-                long totalUserRequests = await _documentService.CountUserRequestAsync(userRequestPaginationQuery.DocumentNumber);
+                long totalUserRequests = await _documentService.CountUserRequestAsync(userRequestPaginationQuery.ClientId);
 
                 var paginatedUserRequests = new PaginatedUserRequest(usersRequestWithPublicDeed, totalUserRequests);
 

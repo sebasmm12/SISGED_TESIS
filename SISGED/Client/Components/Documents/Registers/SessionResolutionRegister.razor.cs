@@ -149,6 +149,8 @@ namespace SISGED.Client.Components.Documents.Registers
             {
                 PropertyNameCaseInsensitive = true
             })!;
+
+            sessionResolution.PreviousDocumentId = dossierTray.Document!.Id;
         }
 
         private async Task<SessionResolution?> RegisterSessionResolutionAsync(DossierWrapper dossierWrapper)
