@@ -829,7 +829,7 @@ namespace SISGED.Server.Services.Repositories
                 { "endDate", MongoDBAggregationExtension.First("$endDate") },
                 { "documents", MongoDBAggregationExtension.First("$documents") },
                 { "derivations", MongoDBAggregationExtension.Push("$derivations") },
-                { "state", MongoDBAggregationExtension.First("$estado") }
+                { "state", MongoDBAggregationExtension.First("$state") }
             });
 
             return new BsonDocument[] { unwindAggregation, lookupAggregation1, lookupAggregation2, lookupAggregation3, lookupAggregation4, unwindAggregation2, unwindAggregation3, unwindAggregation4, unwindAggregation5, projectAggregation, groupAggregation };

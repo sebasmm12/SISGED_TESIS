@@ -72,8 +72,7 @@ namespace SISGED.Server.Services.Repositories
 
         public async Task<IEnumerable<UserDocumentResponse>> GetDocumentsByUserAsync(string userId, UserDocumentPaginationQuery userDocumentPaginationQuery)
         {
-            var documents = await _documentsCollection.Aggregate<UserDocumentResponse>(GetPaginatedDocumentsByUserPipeline(userId, userDocumentPaginationQuery))
-                .ToListAsync();
+            var documents = await _documentsCollection.Aggregate<UserDocumentResponse>(GetPaginatedDocumentsByUserPipeline(userId, userDocumentPaginationQuery)).ToListAsync();
 
             if (documents is null) throw new Exception($"No se encontraron documentos del usuario con identificador {userId}");
 
@@ -1563,7 +1562,7 @@ namespace SISGED.Server.Services.Repositories
             var lookUpPipeline = new BsonArray()
             {
                 MongoDBAggregationExtension.Match(
-                    MongoDBAggregationExtension.Expr(MongoDBAggregationExtension.Eq(new() { MongoDBAggregationExtension.In("$$documentId", "$historialdocumentos.iddocumento"), true })))
+                    MongoDBAggregationExtension.Expr(MongoDBAggregationExtension.Eq(new() { MongoDBAggregationExtension.In("$$documentId", "$documentsHistory.documentId"), true })))
             };
 
             return MongoDBAggregationExtension.Lookup(new("expedientes", letPipeline, lookUpPipeline, "dossiers"));

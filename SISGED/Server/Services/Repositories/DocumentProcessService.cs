@@ -33,10 +33,10 @@ namespace SISGED.Server.Services.Repositories
 
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
-                { "historialproceso", 1  }
+                { "processesHistory", 1  }
             });
 
-            var unwindAggregation = MongoDBAggregationExtension.UnWind(new("$historialproceso"));
+            var unwindAggregation = MongoDBAggregationExtension.UnWind(new("$processesHistory"));
 
             var senderUserLookUpAggregation = GetSenderUserLookUpPipeline();
 
@@ -64,19 +64,19 @@ namespace SISGED.Server.Services.Repositories
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
                 { "area", "$role.label"  },
-                { "receiptDate", "$historialproceso.fechaemision" },
-                { "state", "$historialproceso.estado" },
+                { "receiptDate", "$processesHistory.receiptDate" },
+                { "state", "$processesHistory.state" },
                 { "senderUser",  new BsonDocument()
                                 .Add("userId", "$senderUser._id")
-                                .Add("firstName", "$senderUser.datos.nombre")
-                                .Add("lastName", "$senderUser.datos.apellido")
-                                .Add("image", "$senderUser.datos.imagen")
+                                .Add("firstName", "$senderUser.data.name")
+                                .Add("lastName", "$senderUser.data.lastName")
+                                .Add("image", "$senderUser.data.profile")
                 },
                 { "receiverUser", new BsonDocument()
                                 .Add("userId", "$receiverUser._id")
-                                .Add("firstName", "$receiverUser.datos.nombre")
-                                .Add("lastName", "$receiverUser.datos.apellido")
-                                .Add("image", "$receiverUser.datos.imagen")
+                                .Add("firstName", "$receiverUser.data.name")
+                                .Add("lastName", "$receiverUser.data.lastName")
+                                .Add("image", "$receiverUser.data.profile")
                 }
             });
 
@@ -87,7 +87,7 @@ namespace SISGED.Server.Services.Repositories
         {
             var letPipeline = new Dictionary<string, BsonValue>()
             {
-                { "roleId", MongoDBAggregationExtension.ObjectId("$historialproceso.area") }
+                { "roleId", MongoDBAggregationExtension.ObjectId("$processesHistory.area") }
             };
 
             var lookUpPipeline = new BsonArray()
@@ -103,7 +103,7 @@ namespace SISGED.Server.Services.Repositories
         {
             var letPipeline = new Dictionary<string, BsonValue>()
             {
-                { "userId", MongoDBAggregationExtension.ObjectId("$historialproceso.idemisor") }
+                { "userId", MongoDBAggregationExtension.ObjectId("$processesHistory.senderId") }
             };
 
             var lookUpPipeline = new BsonArray()
@@ -119,7 +119,7 @@ namespace SISGED.Server.Services.Repositories
         {
             var letPipeline = new Dictionary<string, BsonValue>()
             {
-                { "userId", MongoDBAggregationExtension.ObjectId("$historialproceso.idreceptor") }
+                { "userId", MongoDBAggregationExtension.ObjectId("$processesHistory.receiverId") }
             };
 
             var lookUpPipeline = new BsonArray()

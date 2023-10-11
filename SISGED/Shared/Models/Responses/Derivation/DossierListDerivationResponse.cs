@@ -10,12 +10,12 @@ namespace SISGED.Shared.Models.Responses.Derivation
         public string TargetArea { get; set; } = default!;
         [BsonElement("senderUser")]
         public string SenderUser { get; set; } = default!;
-        [BsonElement("senderImage")]
-        public string SenderImage{ get; set; } = default!;
+        [BsonElement("senderUserProfile")]
+        public string SenderUserProfile{ get; set; } = default!;
         [BsonElement("receiverUser")]
         public string ReceiverUser { get; set; } = default!;
-        [BsonElement("receiverImage")]
-        public string ReceiverImage { get; set; } = default!;
+        [BsonElement("receiverUserProfile")]
+        public string ReceiverUserProfile { get; set; } = default!;
         [BsonElement("derivationDate")]
         public DateTime DerivationDate { get; set; }
         [BsonElement("state")]

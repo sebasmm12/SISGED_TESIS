@@ -1,0 +1,4 @@
+﻿.document-history-container {
+    max-height: calc(100vh * 0.64);
+    overflow-y: auto;
+}

@@ -33,10 +33,10 @@ namespace SISGED.Server.Services.Repositories
 
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
-                { "evaluaciones", 1  }
+                { "evaluations", 1  }
             });
 
-            var unwindAggregation = MongoDBAggregationExtension.UnWind(new("$evaluaciones"));
+            var unwindAggregation = MongoDBAggregationExtension.UnWind(new("$evaluations"));
 
             var evaluatorUserLookUpAggregation = GetEvaluatorUserLookUpPipeline();
 
@@ -55,13 +55,13 @@ namespace SISGED.Server.Services.Repositories
         {
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
-                { "isApproved", "$evaluaciones.estaaprobado" },
-                { "comment", "$evaluaciones.observacion" },
-                { "evaluationDate", "$evaluaciones.fechaevaluacion"  },
+                { "isApproved", "$evaluations.isApproved" },
+                { "comment", "$evaluations.comment" },
+                { "evaluationDate", "$evaluations.evaluationDate"  },
                 { "evaluatorUser",  new BsonDocument()
-                                .Add("firstName", "$evaluatorUser.datos.nombre")
-                                .Add("lastName", "$evaluatorUser.datos.apellido")
-                                .Add("image", "$evaluatorUser.datos.imagen")
+                                .Add("firstName", "$evaluatorUser.data.name")
+                                .Add("lastName", "$evaluatorUser.data.lastName")
+                                .Add("image", "$evaluatorUser.data.profile")
                 },
             });
 
@@ -72,7 +72,7 @@ namespace SISGED.Server.Services.Repositories
         {
             var letPipeline = new Dictionary<string, BsonValue>()
             {
-                { "userId", MongoDBAggregationExtension.ObjectId("$evaluaciones.usuarioevaluador") }
+                { "userId", MongoDBAggregationExtension.ObjectId("$evaluations.userEvaluator") }
             };
 
             var lookUpPipeline = new BsonArray()

@@ -13,7 +13,7 @@
                 <MudCardContent>
                     @if (evaluations.Any())
                     {
-                        <MudGrid>
+                        <MudGrid Class="document-history-container">
                             @foreach (var evaluation in paginatedEvaluations)
                             {
                                 <DocumentEvaluationInfo Evaluation="evaluation"></DocumentEvaluationInfo>
