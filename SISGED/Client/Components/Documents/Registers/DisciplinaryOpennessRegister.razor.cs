@@ -88,7 +88,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
         private async Task UpdateRegisteredDocumentAsync(DisciplinaryOpenness disciplinaryOpenness)
         {
-            var inputItem = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace == "inputs");
+            var inputItem = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace != "tools");
 
             ProcessWorkItemInfo(inputItem!, disciplinaryOpenness);
 

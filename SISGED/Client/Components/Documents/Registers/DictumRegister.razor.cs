@@ -58,7 +58,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
         private async Task UpdateRegisteredDocumentAsync(Dictum dictum)
         {
-            var inputItem = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace == "inputs");
+            var inputItem = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace != "tools");
 
             ProcessWorkItemInfo(inputItem!, dictum);
 

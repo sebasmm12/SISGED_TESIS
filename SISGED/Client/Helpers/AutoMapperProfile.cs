@@ -22,6 +22,7 @@ namespace SISGED.Client.Helpers
         {
             // Document Request Mapper
             CreateMap<Document, DocumentResponse>();
+            CreateMap<InitialRequest, DocumentResponse>();
             CreateMap<ComplaintRequest, DocumentResponse>();
             CreateMap<DisciplinaryOpenness, DocumentResponse>();
             CreateMap<SolicitorDossierRequest, DocumentResponse>();

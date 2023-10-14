@@ -69,7 +69,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
         private async Task UpdateRegisteredDocumentAsync(Entities.SolicitorDossierShipment solicitorDossierShipment)
         {
-            var inputItem = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace == "inputs");
+            var inputItem = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace != "tools");
 
             await ProcessWorkItemInfo(inputItem!, solicitorDossierShipment);
 

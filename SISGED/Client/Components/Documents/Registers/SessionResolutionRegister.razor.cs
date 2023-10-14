@@ -87,7 +87,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
         private async Task UpdateRegisteredDocumentAsync(SessionResolution sessionResolution)
         {
-            var inputItem = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace == "inputs");
+            var inputItem = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace != "tools");
 
             ProcessWorkItemInfo(inputItem!, sessionResolution);
 

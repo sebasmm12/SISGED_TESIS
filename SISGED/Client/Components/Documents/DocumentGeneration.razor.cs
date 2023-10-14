@@ -173,11 +173,11 @@ namespace SISGED.Client.Components.Documents
             return dialogParameters;
         }
 
-        private async Task<Document?> GenerateDocumentAsync(GenerateDocumentRequest generateDocumentRequest)
+        private async Task<DocumentResponse?> GenerateDocumentAsync(GenerateDocumentRequest generateDocumentRequest)
         {
             try
             {
-                var complaintResponse = await HttpRepository.PutAsync<GenerateDocumentRequest, Document>("api/documents/generation", generateDocumentRequest);
+                var complaintResponse = await HttpRepository.PutAsync<GenerateDocumentRequest, DocumentResponse>("api/documents/generation", generateDocumentRequest);
 
                 if(complaintResponse.Error)
                 {
@@ -194,7 +194,7 @@ namespace SISGED.Client.Components.Documents
             }
         }
 
-        private async Task<Document?> ShowLoadingDialogAsync(GenerateDocumentRequest generateDocumentRequest)
+        private async Task<DocumentResponse?> ShowLoadingDialogAsync(GenerateDocumentRequest generateDocumentRequest)
         {
             string dialogTitle = $"Realizando la generación del documento, por favor espere...";
 
@@ -216,7 +216,7 @@ namespace SISGED.Client.Components.Documents
             return new(content, extension, fileName);
         }
 
-        private async Task UpdateGeneratedDocumentAsync(Document generatedDocument)
+        private async Task UpdateGeneratedDocumentAsync(DocumentResponse generatedDocument)
         {
             var item = WorkEnvironment.workPlaceItems.FirstOrDefault(workItem => workItem.OriginPlace != "tools");
 
@@ -225,7 +225,7 @@ namespace SISGED.Client.Components.Documents
             await WorkEnvironment.UpdateGeneratedDocumentAsync(item!);
         }
 
-        private void ProcessWorkItemInfo(Helpers.Item item, Document generatedDocument)
+        private void ProcessWorkItemInfo(Helpers.Item item, DocumentResponse generatedDocument)
         {
             if (item.Value is not DossierTrayResponse dossierTray) return;
 
