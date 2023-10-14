@@ -16,6 +16,7 @@ using SISGED.Shared.Models.Responses.Document.ComplaintRequest;
 using SISGED.Shared.Models.Responses.Document.Dictum;
 using SISGED.Shared.Models.Responses.Document.DisciplinaryOpenness;
 using SISGED.Shared.Models.Responses.Document.Resolution;
+using SISGED.Shared.Models.Responses.Document.SessionResolutions;
 using SISGED.Shared.Models.Responses.Document.SignConclusion;
 using SISGED.Shared.Models.Responses.Document.SolicitorDesignationDocument;
 using SISGED.Shared.Models.Responses.Document.SolicitorDossierRequest;
@@ -128,6 +129,15 @@ namespace SISGED.Server.Services.Repositories
             if (resolutionDocument is null) throw new Exception($"No se pudo obtener la resolución con el identificador {documentId}");
 
             return resolutionDocument;
+        }
+
+        public async Task<SessionResolutionInfoResponse> GetSessionResolutionDocumentAsync(string documentId)
+        {
+            var sessionResolution = await _documentsCollection.Aggregate<SessionResolutionInfoResponse>(GetSessionResolutionPipeline(documentId)).FirstOrDefaultAsync();
+
+            if(sessionResolution is null) throw new Exception($"No se pudo obtener la sesión de la resolución con el identificador {documentId}");
+
+            return sessionResolution;
         }
 
         public async Task<Appeal> GetAppealDocumentAsync(string documentId)
@@ -1211,6 +1221,7 @@ namespace SISGED.Server.Services.Repositories
                 { "type", "$type"  },
                 { "contentsHistory", "$contentsHistory" },
                 { "processesHistory", "$processesHistory"  },
+                { "evaluations", "$evaluations" },
                 { "attachedUrls", "$attachedUrls"  },
                 { "state", "$state" },
                 { "content", new BsonDocument()
@@ -1238,6 +1249,7 @@ namespace SISGED.Server.Services.Repositories
                 { "type", "$type"  },
                 { "contentsHistory", "$contentsHistory" },
                 { "processesHistory", "$processesHistory"  },
+                { "evaluations", "$evaluations" },
                 { "attachedUrls", "$attachedUrls"  },
                 { "state", "$state" },
                 { "content", new BsonDocument()
@@ -1267,6 +1279,7 @@ namespace SISGED.Server.Services.Repositories
                 { "type", "$type"  },
                 { "contentsHistory", "$contentsHistory" },
                 { "processesHistory", "$processesHistory"  },
+                { "evaluations", "$evaluations" },
                 { "attachedUrls", "$attachedUrls"  },
                 { "state", "$state" },
                 { "content", new BsonDocument()
@@ -1296,6 +1309,7 @@ namespace SISGED.Server.Services.Repositories
                 { "type", "$type"  },
                 { "contentsHistory", "$contentsHistory" },
                 { "processesHistory", "$processesHistory"  },
+                { "evaluations", "$evaluations" },
                 { "attachedUrls", "$attachedUrls"  },
                 { "state", "$state" },
                 { "content", new BsonDocument()
@@ -1327,6 +1341,7 @@ namespace SISGED.Server.Services.Repositories
                 { "type", "$type"  },
                 { "contentsHistory", "$contentsHistory" },
                 { "processesHistory", "$processesHistory"  },
+                { "evaluations", "$evaluations" },
                 { "attachedUrls", "$attachedUrls"  },
                 { "state", "$state" },
                 { "content", new BsonDocument()
@@ -1358,6 +1373,7 @@ namespace SISGED.Server.Services.Repositories
                 { "type", "$type"  },
                 { "contentsHistory", "$contentsHistory" },
                 { "processesHistory", "$processesHistory"  },
+                { "evaluations", "$evaluations" },
                 { "attachedUrls", "$attachedUrls"  },
                 { "state", "$state" },
                 { "content", new BsonDocument()
@@ -1694,6 +1710,21 @@ namespace SISGED.Server.Services.Repositories
 
             return new[] { matchAggregation, solicitorLookUpAggregation,
                solicitorUnwindAggregation,  dossierLookUpPipelineAggregation, dossierUnwindAggregation, sanctionLookUpPipelineAggregation, sanctionUnwindAggregation, projectAggregation  };
+        }
+
+        private static BsonDocument[] GetSessionResolutionPipeline(string documentId)
+        {
+            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("_id", new ObjectId(documentId)));
+
+            var solicitorLookUpAggregation = GetSolicitorsLookUpPipeline();
+
+            var solicitorUnwindAggregation = MongoDBAggregationExtension.UnWind(new("$solicitors"));
+
+            var dossierLookUpPipelineAggregation = GetDossierLookUpPipeline();
+
+            var dossierUnwindAggregation = MongoDBAggregationExtension.UnWind(new("$dossiers"));
+
+            return new[] { matchAggregation, solicitorLookUpAggregation, solicitorUnwindAggregation, dossierLookUpPipelineAggregation, dossierUnwindAggregation };
         }
 
         private static BsonDocument[] GetSignConclusionPipeline(string documentId)
