@@ -13,7 +13,8 @@ namespace SISGED.Client.Services.Repositories
             { "SolicitudExpedienteNotario", typeof(SolicitorDossierRequestInfo) },
             { "Dictamen", typeof(DictumInfo) },
             { "Resolucion", typeof(ResolutionInfo) },
-            { "EntregaExpedienteNotario", typeof(SolicitorDossierShipmentInfo) }
+            { "EntregaExpedienteNotario", typeof(SolicitorDossierShipmentInfo) },
+            { "ResolucionSesion", typeof(SessionResolutionInfo) }
         };
 
         public IEnumerable<DocumentOption> GetDocumentTypesWithDossier()

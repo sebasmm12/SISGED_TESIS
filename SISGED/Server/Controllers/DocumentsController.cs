@@ -17,6 +17,7 @@ using SISGED.Shared.Models.Responses.Document.Dictum;
 using SISGED.Shared.Models.Responses.Document.DisciplinaryOpenness;
 using SISGED.Shared.Models.Responses.Document.InitialRequest;
 using SISGED.Shared.Models.Responses.Document.Resolution;
+using SISGED.Shared.Models.Responses.Document.SessionResolutions;
 using SISGED.Shared.Models.Responses.Document.SignConclusion;
 using SISGED.Shared.Models.Responses.Document.SolicitorDesignationDocument;
 using SISGED.Shared.Models.Responses.Document.SolicitorDossierRequest;
@@ -946,6 +947,21 @@ namespace SISGED.Server.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+
+        [HttpGet("session-resolutions/{documentId}")]
+        public async Task<ActionResult<SessionResolutionInfoResponse>> GetSessionResolutionDocumentAsync([FromRoute] string documentId)
+        {
+            try
+            {
+                var sessionResolution = await _documentService.GetSessionResolutionDocumentAsync(documentId);
+
+                return Ok(sessionResolution);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }  
 
         [HttpGet("appeals/{documentId}")]
         public async Task<ActionResult<AppealInfoResponse>> GetAppealDocumentAsync([FromRoute] string documentId)

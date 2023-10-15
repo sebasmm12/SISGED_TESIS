@@ -22,6 +22,6 @@ namespace SISGED.Shared.Models.Responses.Document.SessionResolutions
         public AutocompletedSolicitorResponse Solicitor { get; set; } = default!;
 
         [BsonElement("previousDocument")]
-        public DocumentContentDTO previousDocument { get; set; } = default!;
+        public DocumentContentDTO PreviousDocument { get; set; } = default!;
     }
 }

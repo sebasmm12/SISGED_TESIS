@@ -19,6 +19,7 @@ using SISGED.Shared.Models.Responses.Document.UserRequest;
 using SISGED.Shared.Models.Responses.Statistic;
 using SISGED.Shared.Models.Responses.UserDocument;
 using System.Threading.Tasks;
+using SISGED.Shared.Models.Responses.Document.SessionResolutions;
 
 namespace SISGED.Server.Services.Contracts
 {
@@ -79,5 +80,6 @@ namespace SISGED.Server.Services.Contracts
         Task<ComplaintRequestInfoResponse> GetComplaintRequestDocumentAsync(string documentId);
         Task<bool> VerifyDocumentAnnulmentAsync(string documentId);
         Task<Document> AnnulDocumentAsync(string documentId, User user);
+        Task<SessionResolutionInfoResponse> GetSessionResolutionDocumentAsync(string documentId);
     }
 }

@@ -11,8 +11,8 @@
                     <GenericFormHeader HeaderIcon="fas fa-file-lines" HeaderTitle="Información del Documento" HeaderDescription="Visualice la información actual del documento"></GenericFormHeader>
                 </MudCardHeader>
                 <MudCardContent>
-                    <MudExpansionPanels MultiExpansion="true">
-                        <MudExpansionPanel Text="General" IsInitiallyExpanded="true" Class="document-history-container">
+                    <MudExpansionPanels MultiExpansion="true" Class="document-history-container">
+                        <MudExpansionPanel Text="General" IsInitiallyExpanded="true">
                             <MudGrid>
                                 <MudItem xs="12" sm="12" md="5" lg="4" xl="4" Class="align-self-center text-center">
                                     <MudImage Src="../images/Documents.png" Alt="Documento"></MudImage>
@@ -61,12 +61,12 @@
                                     @if (document!.ContentsHistory.Any())
                                     {
                                         <MudAvatarGroup Spacing="4" Max="4" MaxColor="Color.Primary" Class="justify-center">
-                                            @foreach (var documentContent in document!.ContentsHistory)
+                                            @foreach (var _ in document!.ContentsHistory)
                                             {
-                                                <MudAvatar Image="../images/Document.png" />
+                                                <MudAvatar Image="../images/document.png" />
                                             }
                                         </MudAvatarGroup>
-                                        <MudText Typo="Typo.body1" Color="Color.Secondary" Class="mt-1">Total de Versiones: @document!.ContentsHistory.Count()</MudText>
+                                        <MudText Typo="Typo.body1" Color="Color.Secondary" Class="mt-1">Total de Versiones: @document!.ContentsHistory.Count</MudText>
                                     }
                                     else
                                     {
@@ -76,17 +76,33 @@
                                 <MudItem xs="12" sm="12" md="4" lg="4" xl="4" Class="text-center">
                                     @if (document!.ProcessesHistory.Any())
                                     {
-                                        <MudAvatarGroup Spacing="4" Max="4" MaxColor="Color.Primary" Class="justify-center">
-                                            @foreach (var documentContent in document!.ProcessesHistory)
+                                        <MudAvatarGroup Spacing="4" Max="4" MaxColor="Color.Info" Class="justify-center">
+                                            @foreach (var _ in document!.ProcessesHistory)
                                             {
-                                                <MudAvatar Image="../images/Document.png" />
+                                                <MudAvatar Image="../images/document-action.png" />
                                             }
                                         </MudAvatarGroup>
-                                        <MudText Typo="Typo.body1" Color="Color.Secondary" Class="mt-1">Total de Acciones: @document!.ProcessesHistory.Count()</MudText>
+                                        <MudText Typo="Typo.body1" Color="Color.Secondary" Class="mt-1">Total de Acciones: @document!.ProcessesHistory.Count</MudText>
                                     }
                                     else
                                     {
                                         <MudAlert Severity="Severity.Info" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Center">No se ha realizado ninguna acción</MudAlert>
+                                    }
+                                </MudItem>
+                                <MudItem xs="12" sm="12" md="4" lg="4" xl="4" Class="text-center">
+                                    @if (document!.Evaluations.Any())
+                                    {
+                                        <MudAvatarGroup Spacing="4" Max="4" MaxColor="Color.Primary" Class="justify-center">
+                                            @foreach (var _ in document!.Evaluations)
+                                            {
+                                                <MudAvatar Image="../images/document-evaluation.png" />
+                                            }
+                                        </MudAvatarGroup>
+                                        <MudText Typo="Typo.body1" Color="Color.Secondary" Class="mt-1">Total de Evaluaciones: @document!.Evaluations.Count</MudText>
+                                    }
+                                    else
+                                    {
+                                        <MudAlert Severity="Severity.Info" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Center">No se ha realizado ninguna evaluación</MudAlert>
                                     }
                                 </MudItem>
                             </MudGrid>

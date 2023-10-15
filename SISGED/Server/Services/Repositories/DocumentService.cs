@@ -1365,7 +1365,38 @@ namespace SISGED.Server.Services.Repositories
 
             return projectAggregation;
         }
-        
+
+        private static BsonDocument GetSessionResolutionProjectPipeline()
+        {
+            var projectAggregation = MongoDBAggregationExtension.Project(new()
+            {
+                { "type", "$type"  },
+                { "contentsHistory", "$contentsHistory" },
+                { "processesHistory", "$processesHistory"  },
+                { "evaluations", "$evaluations" },
+                { "attachedUrls", "$attachedUrls"  },
+                { "state", "$state" },
+                { "content", new BsonDocument()
+                                    .Add("code", "$content.code")
+                                    .Add("title", "$content.title")
+                                    .Add("description", "$content.description")
+                                    .Add("solicitor", new BsonDocument()
+                                                            .Add("_id", "$solicitors._id")
+                                                            .Add("name", "$solicitors.name")
+                                                            .Add("lastName", "$solicitors.lastName")
+                                                            .Add("solicitorOfficeName", "$solicitors.solicitorOffice.name")
+                                                            .Add("email", "$solicitors.email")
+                                                            .Add("address", "$solicitors.address"))
+                                    .Add("client", "$dossiers.client")
+                                    .Add("previousDocument", new BsonDocument()
+                                                            .Add("code", "$previousDocuments.content.code")
+                                                            .Add("title", "$previousDocuments.content.title")) 
+                }
+            });
+
+            return projectAggregation;
+        }
+
         private static BsonDocument GetSolicitorDossierRequestProjectPipeline()
         {
             var projectAggregation = MongoDBAggregationExtension.Project(new()
@@ -1540,7 +1571,7 @@ namespace SISGED.Server.Services.Repositories
         
         private static BsonDocument[] GetDossierSearcherPipeline(string dossierType)
         {
-            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("dossiers.tipo", dossierType));
+            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("dossiers.type", MongoDBAggregationExtension.Regex(dossierType, "i")));
 
             return new[] { matchAggregation };
         }
@@ -1582,6 +1613,22 @@ namespace SISGED.Server.Services.Repositories
             };
 
             return MongoDBAggregationExtension.Lookup(new("expedientes", letPipeline, lookUpPipeline, "dossiers"));
+        }
+
+        private static BsonDocument GetDocumentLookUpPipeline()
+        {
+            var letPipeline = new Dictionary<string, BsonValue>()
+            {
+                { "documentId", MongoDBAggregationExtension.ObjectId("$content.previousDocumentId") }
+            };
+
+            var lookUpPipeline = new BsonArray()
+            {
+                MongoDBAggregationExtension.Match(
+                                       MongoDBAggregationExtension.Expr(MongoDBAggregationExtension.Eq(new() { "$$documentId", "$_id" })))
+            };
+
+            return MongoDBAggregationExtension.Lookup(new("documentos", letPipeline, lookUpPipeline, "previousDocuments"));
         }
 
         private static BsonDocument GetSanctionLookUpPipeline()
@@ -1632,7 +1679,7 @@ namespace SISGED.Server.Services.Repositories
 
                         string code = userDocumentPaginationQuery.Code!.Trim();
                         
-                        matchedElements.Add("content.code", code);
+                        matchedElements.Add("content.code", MongoDBAggregationExtension.Regex(code, "i"));
 
                         return matchedElements;
                     } 
@@ -1642,7 +1689,7 @@ namespace SISGED.Server.Services.Repositories
                     Condition = (userDocumentPaginationQuery) => !string.IsNullOrEmpty(userDocumentPaginationQuery.State),
                     Result = (matchedElements, userDocumentPaginationQuery) => {
 
-                        matchedElements.Add("state", userDocumentPaginationQuery.State);
+                        matchedElements.Add("state", MongoDBAggregationExtension.Regex(userDocumentPaginationQuery.State!, "i"));
 
                         return matchedElements;
                     }                 
@@ -1724,7 +1771,16 @@ namespace SISGED.Server.Services.Repositories
 
             var dossierUnwindAggregation = MongoDBAggregationExtension.UnWind(new("$dossiers"));
 
-            return new[] { matchAggregation, solicitorLookUpAggregation, solicitorUnwindAggregation, dossierLookUpPipelineAggregation, dossierUnwindAggregation };
+            var documentLookUpPipelineAggregation = GetDocumentLookUpPipeline();
+
+            var documentUnwindAggregation = MongoDBAggregationExtension.UnWind(new("$previousDocuments"));
+
+            var projectAggregation = GetSessionResolutionProjectPipeline();
+
+            return new[] { matchAggregation, solicitorLookUpAggregation, solicitorUnwindAggregation, 
+                            dossierLookUpPipelineAggregation, dossierUnwindAggregation, documentLookUpPipelineAggregation,
+                            documentUnwindAggregation, projectAggregation };
+            
         }
 
         private static BsonDocument[] GetSignConclusionPipeline(string documentId)
