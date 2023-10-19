@@ -24,7 +24,10 @@ namespace SISGED.Server.Controllers
             {
                 var documentsByUser = await _documentService.GetDocumentsByUserAsync(userId, userDocumentPaginationQuery);
 
-                var totalDocuments = await _documentService.CountDocumentsByUserAsync(userId, userDocumentPaginationQuery);
+                var totalDocuments = 0;
+                    
+                if(documentsByUser.Any())
+                    totalDocuments = await _documentService.CountDocumentsByUserAsync(userId, userDocumentPaginationQuery);
 
                 var paginatedDocumentsResponse = new PaginatedUserDocumentResponse(documentsByUser, totalDocuments);
 

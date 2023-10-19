@@ -40,6 +40,12 @@ namespace SISGED.Shared.Entities
         public string State { get; set; } = default!;
         [BsonElement("creationDate")]
         public DateTime CreationDate { get; set; } = DateTime.UtcNow.AddHours(-5);
+        [BsonElement("creationUserId")]
+        public string CreationUserId { get; set; } = default!;
+        [BsonElement("endDate")]
+        public DateTime? EndDate { get; set; }
+        [BsonElement("dueDate")]
+        public DateTime DueDate { get; set; }
 
         [BsonIgnore]
         private readonly IEnumerable<string> derivatedStates = new List<string> { "derivado" };

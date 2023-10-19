@@ -288,6 +288,24 @@ namespace SISGED.Server.Services.Repositories
             if (updatedDocument is null) throw new Exception($"No se pudo actualizar el historial del proceso del documento con identificador {documentId}");
         }
 
+        public async Task UpdateDocumentDueDateAsync(RegisteredDocumentDTO registeredDocument)
+        {
+            var updateDocumentDueDate = Builders<Document>.Update.Set(document => document.DueDate, registeredDocument.DueDate);
+
+            var updatedDocument = await _documentsCollection.UpdateOneAsync(document => document.Id == registeredDocument.Id, updateDocumentDueDate);
+
+            if (updatedDocument is null) throw new Exception($"No se pudo actualizar la fecha máxima de finalización del documento con identificador {registeredDocument.Id}");
+        }
+
+        public async Task UpdateDocumentEndDateAsync(string documentId, DateTime endDate)
+        {
+            var updateDocumentEndDate = Builders<Document>.Update.Set(document => document.EndDate, endDate);
+
+            var updatedDocument = await _documentsCollection.UpdateOneAsync(document => document.Id == documentId, updateDocumentEndDate);
+
+            if (updatedDocument is null) throw new Exception($"No se pudo actualizar la fecha de finalización del documento con identificador {documentId}");
+        }
+
         public async Task<SolicitorDesignationDocument> SolicitorDesignationOfficeRegisterAsync(DossierWrapper dossierwrapper, List<string> url2)
         {
             //Deserealizacion de Obcject a tipo OficioDesignacionNotarioDTO

@@ -46,12 +46,17 @@ namespace SISGED.Shared.Entities
 
         public DocumentStep GetCurrentDocumentStep()
         {
-            var currentDocumentStep = GetCurrentStep()!
-                                            .Steps
-                                            .ElementAt(Step);
-
+            var currentDocumentStep = GetCurrentDocumentSteps().ElementAt(Step);
 
             return currentDocumentStep;
+        }
+
+        public IEnumerable<DocumentStep> GetCurrentDocumentSteps()
+        {
+            var currentDocumentSteps = GetCurrentStep()!
+                                            .Steps;
+
+            return currentDocumentSteps;
         }
 
         public StepDocument GetCurrentStep()

@@ -78,16 +78,30 @@ else
     <MudCard Elevation="5" Class="mt-3 mb-3">
         <MudCardContent>
             <MudGrid>
-                @foreach (var document in paginatedUserDocuments.UserDocuments)
+                @if (paginatedUserDocuments.UserDocuments.Any())
                 {
-                    <DocumentInfo Document="document" @key="document" DocumentVersionHistoryInfo="ShowDocumentVersionHistoryAsync"
-                          DocumentProcessHistoryInfo="ShowDocumentProcessHistoryAsync" DocumentVisualization="ShowDocumentInfoAsync"
-                          DocumentAnnulment="AnnulDocumentAsync" DocumentEvaluation="ShowDocumentEvaluationAsync"></DocumentInfo>
+                    @foreach (var document in paginatedUserDocuments.UserDocuments)
+                    {
+                        <DocumentInfo Document="document" @key="document" DocumentVersionHistoryInfo="ShowDocumentVersionHistoryAsync"
+                                      DocumentProcessHistoryInfo="ShowDocumentProcessHistoryAsync" DocumentVisualization="ShowDocumentInfoAsync"
+                                      DocumentAnnulment="AnnulDocumentAsync" DocumentEvaluation="ShowDocumentEvaluationAsync"></DocumentInfo>
+                    }
+                }
+                else
+                {
+                    <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                        <MudPaper Elevation="0" Class="transparent-color">
+                            <MudText Typo="Typo.h6" Class="text-center">No se encontraron sus documentos registrados en el sistema</MudText>
+                        </MudPaper>
+                    </MudItem>
                 }
             </MudGrid>
-            <div class="text-end mt-6">
-                <MudPagination Count="TotalSolicitorDocuments" MiddleCount="5" SelectedChanged="ChangePage" Class="pa-3" />
-            </div>
+            @if (paginatedUserDocuments.UserDocuments.Any())
+            {
+                <div class="text-end mt-6">
+                    <MudPagination Count="TotalSolicitorDocuments" MiddleCount="5" SelectedChanged="ChangePage" Class="pa-3" />
+                </div>
+            }
         </MudCardContent>
     </MudCard>
 }

@@ -43,6 +43,7 @@ namespace SISGED.Client.Components.Documents.Registers
         private readonly List<MediaRegisterDTO> annexes = new();
         private string dossierId = default!;
         private string dossierType = "Denuncia";
+        private string previousDocumentId = default!;
 
         protected override async Task OnInitializedAsync()
         {
@@ -113,7 +114,7 @@ namespace SISGED.Client.Components.Documents.Registers
             var sessionResolutionContent = Mapper.Map<SessionResolutionResponseContent>(sessionResolution);
             var complaint = new SessionResolutionResponse(sessionResolutionContent, annexes);
 
-            var sessionResolutionRegister = new DossierWrapper(dossierId, complaint);
+            var sessionResolutionRegister = new DossierWrapper(dossierId, complaint, previousDocumentId);
 
             return sessionResolutionRegister;
         }
@@ -151,6 +152,7 @@ namespace SISGED.Client.Components.Documents.Registers
             })!;
 
             sessionResolution.PreviousDocumentId = dossierTray.Document!.Id;
+            previousDocumentId = sessionResolution.PreviousDocumentId;
         }
 
         private async Task<SessionResolution?> RegisterSessionResolutionAsync(DossierWrapper dossierWrapper)

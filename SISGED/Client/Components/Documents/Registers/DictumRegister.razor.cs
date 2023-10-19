@@ -42,6 +42,7 @@ namespace SISGED.Client.Components.Documents.Registers
         private MudStepper? dictumStepper;
         private readonly List<MediaRegisterDTO> annexes = new();
         private string dossierId = default!;
+        private string previousDocumentId = default!;
 
         private async Task RegisterDictumAsync()
         {
@@ -102,7 +103,7 @@ namespace SISGED.Client.Components.Documents.Registers
             var dictumContent = Mapper.Map<DictumResponseContent>(dictum);
             var complaint = new DictumResponse(dictumContent, annexes);
 
-            var dictumRegister = new DossierWrapper(dossierId, complaint);
+            var dictumRegister = new DossierWrapper(dossierId, complaint, previousDocumentId);
 
             return dictumRegister;
         }
@@ -141,6 +142,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
             dictum.Solicitor = await GetSolicitorAsync(complaintContent!.SolicitorId);
             dossierId = dossierTray.DossierId;
+            previousDocumentId = dossierTray.Document!.Id;
         }
 
         private async Task<Dictum?> RegisterDictumAsync(DossierWrapper dossierWrapper)

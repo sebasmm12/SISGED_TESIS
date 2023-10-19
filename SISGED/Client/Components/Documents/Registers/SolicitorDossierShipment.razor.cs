@@ -45,6 +45,7 @@ namespace SISGED.Client.Components.Documents.Registers
         private IEnumerable<int> years = default!;
         private string dossierId = default!;
         private readonly string typeDocument = "Denuncia";
+        private string previousDocumentId = default!;
 
         protected override async Task OnInitializedAsync()
         {
@@ -95,7 +96,7 @@ namespace SISGED.Client.Components.Documents.Registers
             var solicitorDossierShipmentContent = Mapper.Map<SolicitorDossierShipmentResponseContent>(solicitorDossierShipment);
             var solicitorDossierShipmentResponse = new SolicitorDossierShipmentResponse(solicitorDossierShipmentContent, annexes);
 
-            var solicitorDossierShipmentRegister = new DossierWrapper(dossierId, solicitorDossierShipmentResponse);
+            var solicitorDossierShipmentRegister = new DossierWrapper(dossierId, solicitorDossierShipmentResponse, previousDocumentId);
 
             return solicitorDossierShipmentRegister;
         }
@@ -143,6 +144,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
             solicitorDossierShipment.Solicitor = await GetSolicitorAsync(complaintContent!.SolicitorId);
             dossierId = dossierTray.DossierId;
+            previousDocumentId = dossierTray.Document!.Id;
         }
 
         private async Task GetSolicitorDossierInformationAsync(string solicitorId)

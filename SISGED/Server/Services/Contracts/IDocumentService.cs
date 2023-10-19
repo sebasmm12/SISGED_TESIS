@@ -18,7 +18,6 @@ using SISGED.Shared.Models.Responses.Document.SolicitorDossierShipment;
 using SISGED.Shared.Models.Responses.Document.UserRequest;
 using SISGED.Shared.Models.Responses.Statistic;
 using SISGED.Shared.Models.Responses.UserDocument;
-using System.Threading.Tasks;
 using SISGED.Shared.Models.Responses.Document.SessionResolutions;
 
 namespace SISGED.Server.Services.Contracts
@@ -81,5 +80,7 @@ namespace SISGED.Server.Services.Contracts
         Task<bool> VerifyDocumentAnnulmentAsync(string documentId);
         Task<Document> AnnulDocumentAsync(string documentId, User user);
         Task<SessionResolutionInfoResponse> GetSessionResolutionDocumentAsync(string documentId);
+        Task UpdateDocumentDueDateAsync(RegisteredDocumentDTO registeredDocument);
+        Task UpdateDocumentEndDateAsync(string documentId, DateTime endDate);
     }
 }

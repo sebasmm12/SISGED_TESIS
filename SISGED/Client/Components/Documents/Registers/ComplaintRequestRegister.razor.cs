@@ -47,6 +47,7 @@ namespace SISGED.Client.Components.Documents.Registers
         private readonly ComplaintRequestRegisterDTO complaintRequest = new();
         private readonly List<MediaRegisterDTO> annexes = new();
         private string dossierId = default!;
+        private string previousDocumentId = default!;
 
         protected override async Task OnInitializedAsync()
         {
@@ -82,7 +83,6 @@ namespace SISGED.Client.Components.Documents.Registers
             ProcessWorkItemInfo(inputItem!, complaintRequest);
 
             await WorkEnvironment.UpdateRegisteredDocumentAsync(inputItem!);
-
         }
 
         private void ProcessWorkItemInfo(Item item, ComplaintRequest complaintRequest)
@@ -132,6 +132,7 @@ namespace SISGED.Client.Components.Documents.Registers
             complaintRequest.Solicitor = string.IsNullOrEmpty(documentContent!.SolicitorId) ? new() : await GetSolicitorAsync(documentContent!.SolicitorId);
             complaintRequest.ComplaintType = GetComplaintType(complaintRequest.Client);
             dossierId = dossierTray.DossierId;
+            previousDocumentId = dossierTray.Document!.Id;
         }
 
         private DocumentTypeInfoResponse GetComplaintType(Entities.Client client)
@@ -187,7 +188,7 @@ namespace SISGED.Client.Components.Documents.Registers
             var complaintRequestContent = Mapper.Map<ComplaintRequestResponseContent>(complaintRequest);
             var complaint = new ComplaintRequestResponse(complaintRequestContent, annexes);
 
-            var documentRegister = new DossierWrapper(dossierId, complaint);
+            var documentRegister = new DossierWrapper(dossierId, complaint, previousDocumentId);
 
             return documentRegister;
         }

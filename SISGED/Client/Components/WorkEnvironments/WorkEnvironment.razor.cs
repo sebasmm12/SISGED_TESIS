@@ -135,18 +135,19 @@ namespace SISGED.Client.Components.WorkEnvironments
 
         public bool IsAssistantLastStep() => assistant.IsLastStep();
 
-        public async Task UpdateAssistantMessageAsync(AsistantMessageUpdate asistantMessageUpdate)
+        public async Task UpdateAssistantMessageAsync(AssistantMessageUpdate assistantMessageUpdate)
         {
             string assistantMessage;
 
-            if (assistant.Substep == asistantMessageUpdate.SubStep) return;
+            if (assistant.Substep == assistantMessageUpdate.SubStep) return;
 
-            assistant.Substep = asistantMessageUpdate.SubStep;
+            assistant.Substep = assistantMessageUpdate.SubStep;
 
             if (!assistant.IsLastSubStep()) assistantMessage = assistant.GetCurrentMessage();
             else
             {
-                assistant = await UpdateAssistantStepAsync(new(assistant.Id, asistantMessageUpdate.DossierType, asistantMessageUpdate.DocumentType));
+                assistant = await UpdateAssistantStepAsync(new(assistant.Id, assistantMessageUpdate.DossierType, 
+                                                            assistantMessageUpdate.DocumentType, assistantMessageUpdate.Document));
 
                 assistantMessage = this.assistantMessage;
             }
@@ -262,7 +263,10 @@ namespace SISGED.Client.Components.WorkEnvironments
         {
             if (item.Value is not DossierTrayResponse dossierTray) return;
 
-            await UpdateAssistantMessageAsync(new(dossierTray.Type!, dossierTray.Document!.Type, assistantSubStep));
+            var assistantSubStepUpdate = new AssistantMessageUpdate(dossierTray.Type!, dossierTray.Document!.Type, 
+                                                                    assistantSubStep, new(dossierTray.Document.Id, dossierTray.Document.CreationDate));
+
+            await UpdateAssistantMessageAsync(assistantSubStepUpdate);
         }
 
 
@@ -305,9 +309,7 @@ namespace SISGED.Client.Components.WorkEnvironments
 
         private readonly Func<Item, IEnumerable<Item>, bool> CanDropToWorkZone = (item, workPlaceItems) =>
         {
-            bool canDrop = true;
-
-            if (workPlaceItems.Any(workPlaceItem => workPlaceItem.OriginPlace == item.OriginPlace)) canDrop = false;
+            bool canDrop = workPlaceItems.All(workPlaceItem => workPlaceItem.OriginPlace != item.OriginPlace);
 
             return canDrop;
         };

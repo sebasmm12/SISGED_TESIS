@@ -44,6 +44,7 @@ namespace SISGED.Client.Components.Documents.Registers
         private readonly string typeDocument = "Denuncia";
         private List<MediaRegisterDTO> annexes = new();
         private string dossierId = default!;
+        private string previousDocumentId = default!;
 
         protected override async Task OnInitializedAsync()
         {
@@ -58,7 +59,7 @@ namespace SISGED.Client.Components.Documents.Registers
             var disciplinaryOpennessContent = Mapper.Map<DisciplinaryOpennessResponseContent>(disciplinaryOpennessRegister);
             var disciplinaryOpenness = new DisciplinaryOpennessResponse(disciplinaryOpennessContent, annexes);
 
-            var documentRegister = new DossierWrapper(dossierId, disciplinaryOpenness);
+            var documentRegister = new DossierWrapper(dossierId, disciplinaryOpenness, previousDocumentId);
 
             return documentRegister;
         }
@@ -167,6 +168,7 @@ namespace SISGED.Client.Components.Documents.Registers
             disciplinaryOpennessRegister.Solicitor = await GetSolicitorAsync(documentContent!.SolicitorId);
             
             dossierId = dossierTray!.DossierId;
+            previousDocumentId = dossierTray!.Document!.Id;
         }
 
         private void GetSolicitorResponse(AutocompletedSolicitorResponse AutocompletedSolicitorResponse)

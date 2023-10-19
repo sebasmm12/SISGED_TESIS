@@ -177,11 +177,18 @@ namespace SISGED.Server.Controllers
         {
             try
             {
+                var currentDate = DateTime
+                                    .UtcNow
+                                    .AddHours(-5)
+                                    .Date;
+
                 var document = DeserializeDocument<ComplaintRequestResponse>(dossierWrapper.Document);
 
                 var user = await GetUserAsync("userId");
 
                 var complaintRequest = await RegisterComplaintRequestAsync(document, user);
+
+                await _documentService.UpdateDocumentEndDateAsync(dossierWrapper.PreviousDocumentId, currentDate);
 
                 var dossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia", "En proceso"
                             , new(2, complaintRequest.Id, complaintRequest.Type, DateTime.UtcNow.AddHours(-5).AddDays(10))));
@@ -311,11 +318,18 @@ namespace SISGED.Server.Controllers
         {
             try
             {
+                var currentDate = DateTime
+                                    .UtcNow
+                                    .AddHours(-5)
+                                    .Date;
+
                 var document = DeserializeDocument<DisciplinaryOpennessResponse>(dossierWrapper.Document);
 
                 var user = await GetUserAsync("userId");
 
                 var disciplinaryOpenness = await RegisterDisciplinaryOpennessDocumentAsync(document, user);
+
+                await _documentService.UpdateDocumentEndDateAsync(dossierWrapper.PreviousDocumentId, currentDate);
 
                 var updatedDossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia", "En proceso",
                     new(3, disciplinaryOpenness.Id, disciplinaryOpenness.Type, DateTime.UtcNow.AddHours(-5).AddDays(5))));
@@ -337,11 +351,18 @@ namespace SISGED.Server.Controllers
         {
             try
             {
+                var currentDate = DateTime
+                                    .UtcNow
+                                    .AddHours(-5)
+                                    .Date;
+
                 var document = DeserializeDocument<SolicitorDossierRequestResponse>(dossierWrapper.Document);
 
                 var user = await GetUserAsync("userId");
 
                 var solicitorDossierRequest = await RegisterSolicitorDossierRequestDocumentAsync(document, user);
+
+                await _documentService.UpdateDocumentEndDateAsync(dossierWrapper.PreviousDocumentId, currentDate);
 
                 var updatedDossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia", "En proceso",
                     new(4, solicitorDossierRequest.Id, solicitorDossierRequest.Type, DateTime.UtcNow.AddHours(-5).AddDays(5))));
@@ -363,11 +384,18 @@ namespace SISGED.Server.Controllers
         {
             try
             {
+                var currentDate = DateTime
+                                    .UtcNow
+                                    .AddHours(-5)
+                                    .Date;
+
                 var document = DeserializeDocument<DictumResponse>(dossierWrapper.Document);
 
                 var user = await GetUserAsync("userId");
 
                 var dictum = await RegisterDictumAsync(document, user);
+
+                await _documentService.UpdateDocumentEndDateAsync(dossierWrapper.PreviousDocumentId, currentDate);
 
                 var dossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia", "En proceso",
                     new(6, dictum.Id, "Dictamen", DateTime.UtcNow.AddHours(-5).AddDays(5))));
@@ -388,11 +416,18 @@ namespace SISGED.Server.Controllers
         {
             try
             {
+                var currentDate = DateTime
+                                    .UtcNow
+                                    .AddHours(-5)
+                                    .Date;
+
                 var document = DeserializeDocument<ResolutionResponse>(dossierWrapper.Document);
 
                 var user = await GetUserAsync("userId");
 
                 var resolutionDocument = await RegisterResolutionDocumentAsync(document, user);
+
+                await _documentService.UpdateDocumentEndDateAsync(dossierWrapper.PreviousDocumentId, currentDate);
 
                 var updatedDossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia", "En proceso",
                     new(7, resolutionDocument.Id, resolutionDocument.Type, DateTime.UtcNow.AddHours(-5).AddDays(5))));
@@ -414,11 +449,18 @@ namespace SISGED.Server.Controllers
         {
             try
             {
+                var currentDate = DateTime
+                                    .UtcNow
+                                    .AddHours(-5)
+                                    .Date;
+
                 var document = DeserializeDocument<SessionResolutionResponse>(dossierWrapper.Document);
 
                 var user = await GetUserAsync("userId");
 
                 var sessionResolution = await RegisterSessionResolutionAsync(document, user);
+
+                await _documentService.UpdateDocumentEndDateAsync(dossierWrapper.PreviousDocumentId, currentDate);
 
                 var dossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia", "En proceso",
                     new(8, sessionResolution.Id, sessionResolution.Type, DateTime.UtcNow.AddHours(-5).AddDays(5))));
@@ -473,11 +515,18 @@ namespace SISGED.Server.Controllers
         {
             try
             {
+                var currentDate = DateTime
+                                    .UtcNow
+                                    .AddHours(-5)
+                                    .Date;
+
                 var document = DeserializeDocument<SolicitorDossierShipmentResponse>(dossierWrapper.Document);
 
                 var user = await GetUserAsync("userId");
 
                 var solicitorDossierShipment = await RegisterSolicitorDossierShipmentAsync(document, user);
+
+                await _documentService.UpdateDocumentEndDateAsync(dossierWrapper.PreviousDocumentId, currentDate);
 
                 var dossier = await UpdateDossierByDocumentAsync(new(dossierWrapper, "Denuncia", "En proceso",
                         new(5, solicitorDossierShipment.Id, "EntregaExpedienteNotario", DateTime.UtcNow.AddHours(-5).AddDays(5))));
@@ -1181,7 +1230,9 @@ namespace SISGED.Server.Controllers
 
             var initialRequestContent = _mapper.Map<InitialRequestContent>(document.Content);
             var initialRequest = new InitialRequest(initialRequestContent, "registrado", urls.ToList());
-            initialRequest.AddProcess(new Process(user.Id, user.Id, "registrado", user.Rol));
+            
+            initialRequest.AddProcess(new(user.Id, user.Id, "registrado", user.Rol));
+            initialRequest.CreationUserId = user.Id;
 
             return await _documentService.InitialRequestRegisterAsync(initialRequest);
         }
@@ -1208,7 +1259,9 @@ namespace SISGED.Server.Controllers
 
             var complaintRequestContent = _mapper.Map<ComplaintRequestContent>(document.Content);
             var complaintRequest = new ComplaintRequest(complaintRequestContent, "registrado", urls.ToList());
-            complaintRequest.AddProcess(new Process(user.Id, user.Id, "registrado", user.Rol));
+            
+            complaintRequest.AddProcess(new(user.Id, user.Id, "registrado", user.Rol));
+            complaintRequest.CreationUserId = user.Id;
 
             return await _documentService.RegisterComplaintRequestAsync(complaintRequest);
         }
@@ -1219,7 +1272,9 @@ namespace SISGED.Server.Controllers
 
             var dictumContent = _mapper.Map<DictumContent>(document.Content);
             var dictum = new Dictum(dictumContent, "registrado", urls.ToList());
-            dictum.AddProcess(new Process(user.Id, user.Id, "registrado", user.Rol));
+            
+            dictum.AddProcess(new(user.Id, user.Id, "registrado", user.Rol));
+            dictum.CreationUserId = user.Id;
 
             return await _documentService.RegisterDictumAsync(dictum);
         }
@@ -1230,7 +1285,9 @@ namespace SISGED.Server.Controllers
 
             var solicitorDossierShipmentContent = _mapper.Map<SolicitorDossierShipmentContent>(document.Content);
             var solicitorDossierShipment = new SolicitorDossierShipment(solicitorDossierShipmentContent, "registrado", urls.ToList());
-            solicitorDossierShipment.AddProcess(new Process(user.Id, user.Id, "registrado", user.Rol));
+            
+            solicitorDossierShipment.AddProcess(new(user.Id, user.Id, "registrado", user.Rol));
+            solicitorDossierShipment.CreationUserId = user.Id;
 
             return await _documentService.RegisterSolicitorDossierShipmentAsync(solicitorDossierShipment);
         }
@@ -1241,7 +1298,9 @@ namespace SISGED.Server.Controllers
 
             var sessionResolutionContent = _mapper.Map<SessionResolutionContent>(document.Content);
             var sessionResolution = new SessionResolution(sessionResolutionContent, "registrado", urls.ToList());
+            
             sessionResolution.AddProcess(new Process(user.Id, user.Id, "registrado", user.Rol));
+            sessionResolution.CreationUserId = user.Id;
 
             return await _documentService.RegisterSessionResolutionAsync(sessionResolution);
         }
@@ -1298,11 +1357,13 @@ namespace SISGED.Server.Controllers
         {
             var urls = await _mediaService.SaveFilesAsync(document.URLAnnex, _containerName);
 
-            var DisciplinaryOpennessContent = _mapper.Map<DisciplinaryOpennessContent>(document.Content);
-            var DisciplinaryOpenness = new DisciplinaryOpenness(DisciplinaryOpennessContent, "registrado", urls.ToList());
-            DisciplinaryOpenness.AddProcess(new Process(user.Id, user.Id, "registrado", user.Rol));
+            var disciplinaryOpennessContent = _mapper.Map<DisciplinaryOpennessContent>(document.Content);
+            var disciplinaryOpenness = new DisciplinaryOpenness(disciplinaryOpennessContent, "registrado", urls.ToList());
+            
+            disciplinaryOpenness.AddProcess(new(user.Id, user.Id, "registrado", user.Rol));
+            disciplinaryOpenness.CreationUserId = user.Id;
 
-            return await _documentService.DisciplinaryOpennessRegisterAsync(DisciplinaryOpenness);
+            return await _documentService.DisciplinaryOpennessRegisterAsync(disciplinaryOpenness);
         }
 
         private async Task<SolicitorDossierRequest> RegisterSolicitorDossierRequestDocumentAsync(SolicitorDossierRequestResponse document, User user)
@@ -1310,10 +1371,12 @@ namespace SISGED.Server.Controllers
             var urls = await _mediaService.SaveFilesAsync(document.URLAnnex, _containerName);
 
             var solicitorDossierRequestContent = _mapper.Map<SolicitorDossierRequestContent>(document.Content);
-            var SolicitorDossierRequest = new SolicitorDossierRequest(solicitorDossierRequestContent, "registrado", urls.ToList());
-            SolicitorDossierRequest.AddProcess(new Process(user.Id, user.Id, "registrado", user.Rol));
+            var solicitorDossierRequest = new SolicitorDossierRequest(solicitorDossierRequestContent, "registrado", urls.ToList());
+            
+            solicitorDossierRequest.AddProcess(new Process(user.Id, user.Id, "registrado", user.Rol));
+            solicitorDossierRequest.CreationUserId = user.Id;
 
-            return await _documentService.SolicitorDossierRequestRegisterAsync(SolicitorDossierRequest);
+            return await _documentService.SolicitorDossierRequestRegisterAsync(solicitorDossierRequest);
         }
 
         private async Task<Resolution> RegisterResolutionDocumentAsync(ResolutionResponse document, User user)
@@ -1322,7 +1385,9 @@ namespace SISGED.Server.Controllers
 
             var resolutionContent = _mapper.Map<ResolutionContent>(document.Content);
             var resolution = new Resolution(resolutionContent, "registrado", urls.ToList());
-            resolution.AddProcess(new Process(user.Id, user.Id, "registrado", user.Rol));
+            
+            resolution.AddProcess(new(user.Id, user.Id, "registrado", user.Rol));
+            resolution.CreationUserId = user.Id;
 
             return await _documentService.ResolutionRegisterAsync(resolution);
         }

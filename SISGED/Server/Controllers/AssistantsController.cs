@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using SISGED.Server.Services.Contracts;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
+using SISGED.Shared.Models.Generics.Step;
 using SISGED.Shared.Models.Requests.Assistants;
 using SISGED.Shared.Models.Requests.Step;
+using DocumentStep = SISGED.Shared.Entities.DocumentStep;
 
 namespace SISGED.Server.Controllers
 {
@@ -15,13 +17,22 @@ namespace SISGED.Server.Controllers
     {
         private readonly IAssistantService _assistantService;
         private readonly IStepService _stepService;
+        private readonly IDocumentService _documentService;
         private readonly IMapper _mapper;
+        private readonly IPermissionService _permissionService;
 
-        public AssistantsController(IAssistantService assistantService, IStepService stepService, IMapper mapper)
+        public AssistantsController(
+            IAssistantService assistantService, 
+            IStepService stepService, 
+            IMapper mapper, 
+            IDocumentService documentService, 
+            IPermissionService permissionService)
         {
             _assistantService = assistantService;
             _stepService = stepService;
             _mapper = mapper;
+            _documentService = documentService;
+            _permissionService = permissionService;
         }
 
         [HttpPost]
@@ -32,6 +43,8 @@ namespace SISGED.Server.Controllers
                 var assistant = new Assistant(assistantCreateRequest.DossierId, assistantCreateRequest.DossierName, new() { new(assistantCreateRequest.DossierName) });
 
                 await CreateAssistantAsync(assistant);
+
+                await UpdateDocumentDueDateAsync(assistant, assistantCreateRequest.Document);
 
                 return Ok(assistant);
             }
@@ -144,6 +157,32 @@ namespace SISGED.Server.Controllers
         }
 
         #region private methods
+
+        private async Task UpdateDocumentDueDateAsync(Assistant assistant, RegisteredDocumentDTO document)
+        {
+            var documentSteps = assistant.GetCurrentDocumentSteps();
+
+            var lastDocumentStep = documentSteps.Last(); 
+
+            var isDocumentRegisterLastStepAction = await IsDocumentRegisterLastStepAction(lastDocumentStep);
+
+            var totalDocumentProcessDays = documentSteps.Sum(documentStep => documentStep.Days);
+
+            if(isDocumentRegisterLastStepAction)
+                totalDocumentProcessDays -= lastDocumentStep.Days;
+
+            document.SetDueDate(totalDocumentProcessDays);
+
+            await _documentService.UpdateDocumentDueDateAsync(document);
+        }
+
+        private async Task<bool> IsDocumentRegisterLastStepAction(DocumentStep documentStep)
+        {
+            var permission = await _permissionService.GetPermissionByIdAsync(documentStep.ActionId);
+
+            return permission.Name.ToLower() == "registrardocumento";
+        }
+
         private async Task CreateAssistantAsync(Assistant assistant)
         {
             var steps = await _stepService.GetStepByDossierTypeAsync(assistant.DossierType);
@@ -158,8 +197,16 @@ namespace SISGED.Server.Controllers
         {
             var assistantStepUpdateDTO = new AssistantStepUpdateDTO(DateTime.UtcNow.AddHours(-5), new(assistant.Step, assistant.DocumentType, assistant.DossierType));
 
-            if (assistant.DossierType != assistantUpdateRequest.DossierType) return await UpdateAssistantDossierAsync(new(assistant, assistantUpdateRequest.DossierType,
-                                                                                                                           assistantUpdateRequest.DocumentType, assistantStepUpdateDTO.EndDate));
+            if (assistant.DossierType != assistantUpdateRequest.DossierType)
+            {
+                var updatedAssistant = await UpdateAssistantDossierAsync(new(assistant, assistantUpdateRequest.DossierType,
+                                                                             assistantUpdateRequest.DocumentType, assistantStepUpdateDTO.EndDate));
+
+                await UpdateDocumentDueDateAsync(updatedAssistant, assistantUpdateRequest.Document!);
+
+                return updatedAssistant;
+            }
+               
             await VerifyAssistantsStepsAndDocuments(assistant, assistantUpdateRequest, assistantStepUpdateDTO);
 
             _mapper.Map(assistant, assistantStepUpdateDTO);
@@ -176,18 +223,21 @@ namespace SISGED.Server.Controllers
                 return;
             }
 
-            if (!assistant.IsLastDocument())
-            {
-                await _assistantService.UpdateAssistantDocumentLastStepAsync(assistant.Id, assistantStepUpdateDTO.LastAssistantStep);
+            if (assistant.IsLastDocument())
+                return;
+            
 
-                assistant.UpdateNextDocument(assistantUpdateRequest.DocumentType);
+            await _assistantService.UpdateAssistantDocumentLastStepAsync(assistant.Id, assistantStepUpdateDTO.LastAssistantStep);
 
-                await MoveAssistantStepStartDatesAsync(assistant, assistantStepUpdateDTO.LastAssistantStep);
+            assistant.UpdateNextDocument(assistantUpdateRequest.DocumentType);
 
-                assistantStepUpdateDTO.LastAssistantStep = new AssistantStepDTO(assistant.Step, assistant.DocumentType, assistant.DossierType);
+            await MoveAssistantStepStartDatesAsync(assistant, assistantStepUpdateDTO.LastAssistantStep);
 
-                assistant.UpdateNextDocumentStep();
-            }
+            assistantStepUpdateDTO.LastAssistantStep = new(assistant.Step, assistant.DocumentType, assistant.DossierType);
+
+            assistant.UpdateNextDocumentStep();
+
+            await UpdateDocumentDueDateAsync(assistant, assistantUpdateRequest.Document!);
         }
 
         private async Task MoveAssistantStepStartDatesAsync(Assistant assistant, AssistantStepDTO currentAssistantStep)

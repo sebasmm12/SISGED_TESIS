@@ -72,7 +72,9 @@ namespace SISGED.Client.Components.Documents.Registers
 
             if (registeredInitialRequest is null) return;
 
-            await RegisterAssistantAsync(new(registeredInitialRequest.Dossier.Id, registeredInitialRequest.Dossier.Type));
+            await RegisterAssistantAsync(new(registeredInitialRequest.Dossier.Id, 
+                                             registeredInitialRequest.Dossier.Type,
+                                             new(registeredInitialRequest.InitialRequest.Id, registeredInitialRequest.InitialRequest.CreationDate)));
 
             await SwalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo registrar su solicitud de manera satisfactoria");
 

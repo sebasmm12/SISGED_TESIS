@@ -47,6 +47,7 @@ namespace SISGED.Client.Components.Documents.Registers
         private bool pageLoading = true;
         private string dossierId = default!;
         private readonly string typeDocument = "Denuncia";
+        private string previousDocumentId = default!;
 
         protected override async Task OnInitializedAsync()
         {
@@ -62,7 +63,7 @@ namespace SISGED.Client.Components.Documents.Registers
             var resolutionContent = Mapper.Map<ResolutionResponseContent>(resolutionRegister);
             var resolution = new ResolutionResponse(resolutionContent, annexes);
 
-            var documentRegister = new DossierWrapper(dossierId, resolution);
+            var documentRegister = new DossierWrapper(dossierId, resolution, previousDocumentId);
 
             return documentRegister;
         }
@@ -169,6 +170,7 @@ namespace SISGED.Client.Components.Documents.Registers
 
             resolutionRegister.Solicitor = await GetSolicitorAsync(documentContent!.SolicitorId);
             dossierId = dossierTray!.DossierId;
+            previousDocumentId = dossierTray.Document!.Id;
         }
 
         private async Task<AutocompletedSolicitorResponse> GetSolicitorAsync(string solicitorId)

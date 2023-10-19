@@ -26,5 +26,11 @@ namespace SISGED.Shared.Models.Responses.Document
         public DateTime CreationDate { get; set; } = default!;
         [BsonElement("attachedUrls")]
         public List<string> AttachedUrls { get; set; } = default!;
+        [BsonElement("creationUserId")]
+        public string CreationUserId { get; set; } = default!;
+        [BsonElement("endDate")]
+        public DateTime? EndDate { get; set; }
+        [BsonElement("dueDate")]
+        public DateTime DueDate { get; set; }
     }
 }
