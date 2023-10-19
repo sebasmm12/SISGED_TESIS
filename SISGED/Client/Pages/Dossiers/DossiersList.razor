@@ -1,6 +1,6 @@
 ﻿@page "/expedientes"
 
-<PageTitle>Documentos</PageTitle>
+<PageTitle>Expedientes</PageTitle>
 
 @if (documentsLoading)
 {
@@ -11,7 +11,7 @@ else
     <MudCard Elevation="5" Class="mt-3">
         <MudCardContent>
             <GenericFormHeader HeaderIcon="fa-box-archive" HeaderTitle="Expedientes"
-                           HeaderDescription="Visalice todos los expedientes en el sistema"></GenericFormHeader>
+                               HeaderDescription="Visalice todos los expedientes en el sistema"></GenericFormHeader>
         </MudCardContent>
     </MudCard>
     <MudCard Elevation="5" Class="mt-3">
@@ -20,17 +20,17 @@ else
                 <MudGrid>
                     <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
                         <MudTextField @bind-Value="userDossierFilter.Code" Label="Código del Expediente" Variant="Variant.Outlined"
-                                  Adornment="Adornment.End" AdornmentIcon="fas fa-key" AdornmentColor="Color.Primary" Immediate="true"
-                                  For="@(() => userDossierFilter.Code)"></MudTextField>
+                                      Adornment="Adornment.End" AdornmentIcon="fas fa-key" AdornmentColor="Color.Primary" Immediate="true"
+                                      For="@(() => userDossierFilter.Code)"></MudTextField>
                     </MudItem>
                     <MudItem xs="12" sm="12" md="8" lg="8" xl="8">
                         <MudTextField @bind-Value="userDossierFilter.ClientName" Label="Nombre del Cliente" Variant="Variant.Outlined"
-                                  Adornment="Adornment.End" AdornmentIcon="fas fa-user" AdornmentColor="Color.Primary" Immediate="true"
-                                  For="@(() => userDossierFilter.ClientName)"></MudTextField>
+                                      Adornment="Adornment.End" AdornmentIcon="fas fa-user" AdornmentColor="Color.Primary" Immediate="true"
+                                      For="@(() => userDossierFilter.ClientName)"></MudTextField>
                     </MudItem>
                     <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
                         <MudSelect AdornmentIcon="fas fa-file" AdornmentColor="Color.Primary" Label="Tipo de Expediente" Dense="true"
-                               Variant="Variant.Outlined" @bind-Value="userDossierFilter.Type" Clearable="true">
+                                   Variant="Variant.Outlined" @bind-Value="userDossierFilter.Type" Clearable="true">
                             @foreach (var dossierType in types)
                             {
                                 <MudSelectItem T="string" Value="@dossierType.Value">@dossierType.Label</MudSelectItem>
@@ -39,17 +39,17 @@ else
                     </MudItem>
                     <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
                         <MudDatePicker Label="Fecha de Inicio" @bind-Date="userDossierFilter.StartDate" DateFormat="dd/MM/yyyy" HelperText="Creado desde"
-                                   AutoClose="true" Editable="true" For="@(() => userDossierFilter.StartDate)" AdornmentColor="Color.Primary" Variant="Variant.Outlined">
+                                       AutoClose="true" Editable="true" For="@(() => userDossierFilter.StartDate)" AdornmentColor="Color.Primary" Variant="Variant.Outlined">
                         </MudDatePicker>
                     </MudItem>
                     <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
                         <MudDatePicker Label="Fecha Fin" @bind-Date="userDossierFilter.EndDate" DateFormat="dd/MM/yyyy" HelperText="Creado hasta"
-                                   AutoClose="true" Editable="true" For="@(() => userDossierFilter.EndDate)" AdornmentColor="Color.Primary" Variant="Variant.Outlined">
+                                       AutoClose="true" Editable="true" For="@(() => userDossierFilter.EndDate)" AdornmentColor="Color.Primary" Variant="Variant.Outlined">
                         </MudDatePicker>
                     </MudItem>
                     <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
                         <MudSelect AdornmentIcon="fas fa-file" AdornmentColor="Color.Primary" Label="Estado del Documento" Dense="true"
-                               Variant="Variant.Outlined" @bind-Value="userDossierFilter.State" Clearable="true">
+                                   Variant="Variant.Outlined" @bind-Value="userDossierFilter.State" Clearable="true">
                             @foreach (var dossierState in dossierStates)
                             {
                                 <MudSelectItem T="string" Value="@dossierState.Value">@dossierState.Label</MudSelectItem>
@@ -77,15 +77,29 @@ else
     </MudCard>
     <MudCard Elevation="5" Class="mt-3">
         <MudCardContent>
-            <MudGrid>
-                @foreach (var dossier in paginatedUserDossiers.UserDossiers)
-                {
-                    <SISGED.Client.Components.Documents.Histories.DossierInfo Dossier="dossier" DossierDerivationHistoryInfo="DossierDerivationHistoryInfo" DossierDocumentHistoryInfo="DossierDocumentHistoryInfo" @key="dossier"></SISGED.Client.Components.Documents.Histories.DossierInfo>
-                }
-            </MudGrid>
-            <div class="text-end mt-6">
-                <MudPagination Count="TotalDossiers" MiddleCount="5" SelectedChanged="ChangePage" Class="pa-3" />
-            </div>
+            @if (TotalDossiers != 0)
+            {
+                <MudGrid>
+                    @foreach (var dossier in paginatedUserDossiers.UserDossiers)
+                    {
+                        <SISGED.Client.Components.Documents.Histories.DossierInfo Dossier="dossier" DossierDerivationHistoryInfo="DossierDerivationHistoryInfo" DossierDocumentHistoryInfo="DossierDocumentHistoryInfo" @key="dossier"></SISGED.Client.Components.Documents.Histories.DossierInfo>
+                    }
+                </MudGrid>
+                <div class="text-end mt-6">
+                    <MudPagination Count="TotalDossiers" MiddleCount="4" SelectedChanged="ChangePage" Class="pa-3" />
+                </div>
+            }
+            else
+            {
+                <MudGrid Justify="Justify.Center">
+                    <MudItem xs="12">
+                        <MudPaper Elevation="0" Class="d-flex align-center justify-center mud-width-full py-8">
+                            <MudIcon Icon="fas fa-ghost" Size="Size.Large"></MudIcon>
+                            <MudText Align="Align.Center">Está un poco vacío por aquí...</MudText>
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+            }
         </MudCardContent>
     </MudCard>
 }

@@ -7,13 +7,13 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudContainer Style="max-height: 500px; overflow-y: scroll">
+        <MudContainer Style="max-height:100vh;height: auto;  overflow-y: scroll;">
             <MudTimeline TimelineOrientation="TimelineOrientation.Vertical" TimelinePosition="TimelinePosition.Alternate" Reverse="false">
                 @foreach (var document in Documents)
                 {
                     <MudTimelineItem Color="Color.Success" Variant="Variant.Filled">
                         <ItemContent>
-                            <DocumentInfo Document="document" @key="document" DocumentVersionHistoryInfo="ShowDocumentVersionHistoryAsync"
+                            <DocumentInfo Document="document" MdParam="12" LgParam="12" AnnulmentActivation="false" @key="document" DocumentVersionHistoryInfo="ShowDocumentVersionHistoryAsync"
                                       DocumentProcessHistoryInfo="ShowDocumentProcessHistoryAsync" DocumentVisualization="ShowDocumentInfoAsync"></DocumentInfo>
                         </ItemContent>
                         <ItemOpposite>
@@ -25,6 +25,6 @@
         </MudContainer>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Cerrar</MudButton>
+        <MudButton OnClick="Cancel" Style="display:none">Cerrar</MudButton>
     </DialogActions>
 </MudDialog>

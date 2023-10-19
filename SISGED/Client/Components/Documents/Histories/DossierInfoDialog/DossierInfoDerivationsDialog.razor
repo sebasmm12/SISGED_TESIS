@@ -7,7 +7,7 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudContainer Style="max-height: 500px; overflow-y: scroll">
+        <MudContainer Style="max-height:100vh;height: auto;  overflow-y: scroll;">
             @foreach (var item in Derivations)
             {
                 <MudListItem Icon="@Icons.Material.Filled.ArrowRightAlt" Text="@string.Concat("Derivación: ",item.Type)" InitiallyExpanded="false">
@@ -48,7 +48,7 @@
         </MudContainer>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Cerrar</MudButton>
+        <MudButton OnClick="Cancel" style="display:none">Cerrar</MudButton>
     </DialogActions>
 </MudDialog>
 
