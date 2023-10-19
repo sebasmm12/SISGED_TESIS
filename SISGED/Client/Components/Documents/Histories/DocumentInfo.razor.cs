@@ -13,6 +13,15 @@ namespace SISGED.Client.Components.Documents.Histories
     
         [Parameter]
         public UserDocumentDTO Document { get; set; } = default!;
+        public int _md { get; set; } = 6;
+        public int _lg { get; set; } = 4;
+        public bool _annulmentActivation { get; set; } = true;
+        [Parameter]
+        public int? MdParam { get; set; }
+        [Parameter]
+        public int? LgParam { get; set; }
+        [Parameter]
+        public bool? AnnulmentActivation { get; set; }
         [Parameter]
         public EventCallback<UserDocumentDTO> DocumentAnnulment { get; set; }
         [Parameter]
@@ -25,6 +34,18 @@ namespace SISGED.Client.Components.Documents.Histories
         public EventCallback<UserDocumentDTO> DocumentEvaluation { get; set; }
 
         private IEnumerable<string> annulmentInValidStates = new List<string>() { "evaluado", "anulado" };
+
+        protected override void OnParametersSet()
+        {
+            if (MdParam.HasValue)
+            {
+                _md = MdParam.Value;
+            }
+            if (LgParam.HasValue)
+            {
+                _lg = LgParam.Value;
+            }
+        }
 
         private Color GetDocumentStateColor(string documentState)
         {

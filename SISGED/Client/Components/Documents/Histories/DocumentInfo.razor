@@ -1,4 +1,4 @@
-﻿<MudItem xs="12" sm="12" md="6" lg="4" xl="4">
+﻿<MudItem xs="12" sm="12" md="@_md" lg="@_lg" xl="4">
     <MudCard Elevation="3">
         <MudCardContent Class="text-center">
             <MudImage Src="../images/Documents.png" Alt="Documento"></MudImage>
@@ -13,7 +13,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
                     <MudAvatarGroup Spacing="4" Max="4" MaxColor="Color.Primary" Class="justify-center">
-                        @foreach(var DocumentContent in Document.ContentsHistory)
+                        @foreach (var DocumentContent in Document.ContentsHistory)
                         {
                             <MudAvatar Image="../images/Document.png" />
                         }
@@ -23,11 +23,14 @@
             </MudGrid>
         </MudCardContent>
         <MudCardActions Class="justify-center gap-1">
-            @if (!annulmentInValidStates.Contains(Document.State))
+            @if (_annulmentActivation)
             {
-                <MudTooltip Text="Anular">
-                    <MudFab Color="Color.Error" StartIcon="fas fa-file-circle-xmark" OnClick="@(() => AnnulDocumentAsync())"></MudFab>
-                </MudTooltip>
+                @if (!annulmentInValidStates.Contains(Document.State))
+                {
+                    <MudTooltip Text="Anular">
+                        <MudFab Color="Color.Error" StartIcon="fas fa-file-circle-xmark" OnClick="@(() => AnnulDocumentAsync())"></MudFab>
+                    </MudTooltip>
+                }
             }
             <MudTooltip Text="Ver Historial de Versiones">
                 <MudFab Color="Color.Primary" StartIcon="fas fa-code-compare" OnClick="@(() => ShowDocumentVersionHistoryAsync())"></MudFab>
