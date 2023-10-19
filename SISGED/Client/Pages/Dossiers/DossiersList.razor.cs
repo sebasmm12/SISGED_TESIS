@@ -126,7 +126,6 @@ namespace SISGED.Client.Pages.Dossiers
                 var response = solicitorDossiersResponse.Response!;
                 var documents = Mapper.Map<PaginatedUserDossierDTO>(response);
 
-
                 return documents;
             }
             catch (Exception)
