@@ -11,7 +11,7 @@ namespace SISGED.Client.Services.Repositories
             {
                 new("Denuncia", "Denuncia"),
                 new("Expedicion de Firma", "Expedicion de Firma"),
-                //new("Solicitud", "Solicitud"),
+                new("Solicitud", "Solicitud"),
                 new("Busqueda de Protocolo Notarial", "Busqueda Protocolo Notarial")
             };
         }

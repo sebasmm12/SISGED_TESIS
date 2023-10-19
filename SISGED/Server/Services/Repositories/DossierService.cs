@@ -749,7 +749,7 @@ namespace SISGED.Server.Services.Repositories
                     Condition = (paginationQuery) => paginationQuery.EndDate.HasValue,
                     Result = (matchedElements, paginationQuery) => {
 
-                        matchedElements.Add("startDate", MongoDBAggregationExtension.LessThanEquals(new BsonDateTime(paginationQuery.EndDate!.Value)));
+                        matchedElements.Add("endDate", MongoDBAggregationExtension.LessThanEquals(new BsonDateTime(paginationQuery.EndDate!.Value)));
 
                         return matchedElements;
                     }
