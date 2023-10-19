@@ -137,7 +137,6 @@ namespace SISGED.Client.Pages.Dossiers
 
         private string GetQueriesForUserDossiers()
         {
-
             string userRequestQueries = "?";
             userRequestQueries += $"page={System.Web.HttpUtility.UrlEncode(currentPage.ToString())}";
             userRequestQueries += $"&pagesize={System.Web.HttpUtility.UrlEncode(PageSize.ToString())}";

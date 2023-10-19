@@ -100,7 +100,10 @@ namespace SISGED.Server.Controllers
             {
                 var dossiers = await _dossierService.GetDossiersListAsync(userDossierPaginationQuery);
 
-                var totalDossiers = await _dossierService.CountDossiersListAsync(userDossierPaginationQuery);
+                var totalDossiers = 0;
+
+                if (dossiers.Any())
+                    totalDossiers = await _dossierService.CountDossiersListAsync(userDossierPaginationQuery);
 
                 var paginatedDocumentsResponse = new PaginatedUserDossierResponse(dossiers, totalDossiers);
 
