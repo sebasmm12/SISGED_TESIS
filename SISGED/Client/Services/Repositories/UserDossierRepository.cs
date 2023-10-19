@@ -41,7 +41,7 @@ namespace SISGED.Client.Services.Repositories
                     Condition = (userDossierQuery) => userDossierQuery.StartDate.HasValue,
                     Result = (Dictionary<string, object> filters, UserDossierFilterDTO userDossierQuery) =>
                     {
-                        filters.Add("startDate", userDossierQuery.StartDate!.Value);
+                        filters.Add("startDate", userDossierQuery.StartDate!.Value.ToString("MM/dd/yyyy"));
 
                         return filters;
                     }
@@ -51,7 +51,7 @@ namespace SISGED.Client.Services.Repositories
                     Condition = (userDossierQuery) => userDossierQuery.EndDate.HasValue,
                     Result = (Dictionary<string, object> filters, UserDossierFilterDTO userDossierQuery) =>
                     {
-                        filters.Add("endDate", userDossierQuery.EndDate!.Value);
+                        filters.Add("endDate", userDossierQuery.EndDate!.Value.ToString("MM/dd/yyyy"));
 
                         return filters;
                     }

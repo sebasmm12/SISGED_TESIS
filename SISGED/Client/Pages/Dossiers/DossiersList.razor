@@ -11,7 +11,7 @@ else
     <MudCard Elevation="5" Class="mt-3">
         <MudCardContent>
             <GenericFormHeader HeaderIcon="fa-box-archive" HeaderTitle="Expedientes"
-                               HeaderDescription="Visalice todos los expedientes en el sistema"></GenericFormHeader>
+                               HeaderDescription="Visualice todos los expedientes en el sistema"></GenericFormHeader>
         </MudCardContent>
     </MudCard>
     <MudCard Elevation="5" Class="mt-3">
@@ -48,7 +48,7 @@ else
                         </MudDatePicker>
                     </MudItem>
                     <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
-                        <MudSelect AdornmentIcon="fas fa-file" AdornmentColor="Color.Primary" Label="Estado del Documento" Dense="true"
+                        <MudSelect AdornmentIcon="fas fa-file" AdornmentColor="Color.Primary" Label="Estado del Expediente" Dense="true"
                                    Variant="Variant.Outlined" @bind-Value="userDossierFilter.State" Clearable="true">
                             @foreach (var dossierState in dossierStates)
                             {

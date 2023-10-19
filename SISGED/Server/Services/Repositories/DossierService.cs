@@ -674,18 +674,6 @@ namespace SISGED.Server.Services.Repositories
                         return result.ToArray();
                     }
 
-                },
-                new()
-                {
-                    Condition = (paginationQuery) => ! string.IsNullOrEmpty(paginationQuery.Type),
-                    Result = (documentsByUserPipelines, paginationQuery) =>
-                    {
-                        var dossierPipelines = GetDossierSearcherPipeline(paginationQuery.Type!);
-
-                        var result = documentsByUserPipelines.Concat(dossierPipelines);
-
-                        return result.ToArray();
-                    }
                 }
             };
 
@@ -719,7 +707,7 @@ namespace SISGED.Server.Services.Repositories
 
                         string code = paginationQuery.Code!.Trim();
 
-                        matchedElements.Add("_id", code);
+                        matchedElements.Add("_id", new ObjectId(code));
 
                         return matchedElements;
                     }
@@ -729,7 +717,17 @@ namespace SISGED.Server.Services.Repositories
                     Condition = (paginationQuery) => !string.IsNullOrEmpty(paginationQuery.State),
                     Result = (matchedElements, paginationQuery) => {
 
-                        matchedElements.Add("state", paginationQuery.State);
+                        matchedElements.Add("state", MongoDBAggregationExtension.Regex(paginationQuery.State!,"i"));
+
+                        return matchedElements;
+                    }
+                },
+                new()
+                {
+                    Condition = (userDocumentPaginationQuery) => !string.IsNullOrEmpty(userDocumentPaginationQuery.Type),
+                    Result = (matchedElements, userDocumentPaginationQuery) => {
+
+                        matchedElements.Add("type", MongoDBAggregationExtension.Regex(userDocumentPaginationQuery.Type!, "i"));
 
                         return matchedElements;
                     }
