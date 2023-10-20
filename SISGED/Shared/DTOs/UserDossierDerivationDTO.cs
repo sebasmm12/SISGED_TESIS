@@ -12,9 +12,9 @@ namespace SISGED.Shared.DTOs
         public string OriginArea { get; set; } = default!;
         public string TargetArea { get; set; } = default!;
         public string SenderUser { get; set; } = default!;
-        public string SenderImage { get; set; } = default!;
+        public string SenderUserProfile { get; set; } = default!;
         public string ReceiverUser { get; set; } = default!;
-        public string ReceiverImage { get; set; } = default!;
+        public string ReceiverUserProfile { get; set; } = default!;
         public DateTime DerivationDate { get; set; }
         public string State { get; set; } = default!;
         public string Type { get; set; } = default!;
