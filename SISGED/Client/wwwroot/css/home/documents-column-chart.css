@@ -1,0 +1,4 @@
+﻿.documents-column-chart .documents-chart-header {
+    display: flex;
+    justify-content: space-between;
+}

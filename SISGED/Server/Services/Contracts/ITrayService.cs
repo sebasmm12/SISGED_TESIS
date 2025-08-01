@@ -1,5 +1,6 @@
 ﻿using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
+using SISGED.Shared.Models.Responses.Dashboards;
 using SISGED.Shared.Models.Responses.Tray;
 
 namespace SISGED.Server.Services.Contracts
@@ -20,5 +21,6 @@ namespace SISGED.Server.Services.Contracts
         Task<Tray> DeleteInputTrayDocumentAsync(string documentId);
         Task PushDocumentTrayAsync(UpdateDocumentTrayDTO updateDocumentTrayDTO);
         Task PullDocumentTrayAsync(UpdateDocumentTrayDTO updateDocumentTrayDTO);
+        Task<IEnumerable<ExpiredTrayDocuments>> GetNextExpiredTraysDocumentsAsync(string userId, string type);
     }
 }

@@ -4,6 +4,8 @@ using SISGED.Server.Helpers.Infrastructure;
 using SISGED.Server.Services.Contracts;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
+using SISGED.Shared.Models.Responses.Dashboards;
+using SISGED.Shared.Models.Responses.Statistic;
 using SISGED.Shared.Models.Responses.Tray;
 
 namespace SISGED.Server.Services.Repositories
@@ -179,7 +181,88 @@ namespace SISGED.Server.Services.Repositories
             if (updateTray is null) throw new Exception($"No se pudo actualizar la bandeja del usuario con identificador {updateDocumentTrayDTO.UserId}");
         }
 
+        public async Task<IEnumerable<ExpiredTrayDocuments>> GetNextExpiredTraysDocumentsAsync(string userId, string type)
+        {
+            var expiredDocuments = await _traysCollection.Aggregate<ExpiredTrayDocuments>(GetExpiredTrayDocumentsPipeline(userId, type)).ToListAsync();
+
+            if (expiredDocuments is null) throw new($"No se pudo encontrar los documentos próximos a expirar del usuario con identificador { userId } para el tipo de bandeja {type}");
+
+            return expiredDocuments;
+        }
+
         #region private methods
+
+        private static BsonDocument[] GetExpiredTrayDocumentsPipeline(string userId, string type)
+        {
+            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("user", userId));
+
+            var unWindAggregation = MongoDBAggregationExtension.UnWind(new($"${type}"));
+
+            var documentsLookUpAggregation = GetExpiredTrayDocumentsLookUpPipeline(type);
+
+            var documentsUnWindAggregation = MongoDBAggregationExtension.UnWind(new("$documents"));
+
+            var documentDueDateSortAggregation = MongoDBAggregationExtension.Sort(new BsonDocument("documents.dueDate", 1));
+
+            var limitAggregation = MongoDBAggregationExtension.Limit(10);
+
+            var dossiersLookUpAggregation = GetTrayDossiersLookUpPipeline(type);
+
+            var dossiersUnWindAggregation = MongoDBAggregationExtension.UnWind(new("$dossiers"));
+
+            var addFieldsAggregation = MongoDBAggregationExtension.AddFields(new()
+            {
+                { "currentDate", DateTime.UtcNow.AddHours(-5) }
+            });
+
+            var projectAggregation = MongoDBAggregationExtension.Project(new()
+            {
+                { "_id", 0 },
+                { "dossierId", $"${type}.dossierId" },
+                { "documentId", $"${type}.documentId" },
+                { "client", MongoDBAggregationExtension.Concat(new List<BsonValue> { "$dossiers.client.name", " ", "$dossiers.client.lastName" }) },
+                { "dossierType", "$dossiers.type" },
+                { "documentType", "$documents.type" },
+                { "expirationDays", MongoDBAggregationExtension.DateDiff("$currentDate", "$documents.dueDate", "day") }
+            });
+
+            return new[] { matchAggregation, unWindAggregation, documentsLookUpAggregation, documentsUnWindAggregation,
+                           documentDueDateSortAggregation, limitAggregation, dossiersLookUpAggregation, dossiersUnWindAggregation, 
+                           addFieldsAggregation, projectAggregation };
+        }
+
+        private static BsonDocument GetTrayDossiersLookUpPipeline(string type)
+        {
+            var letPipeline = new Dictionary<string, BsonValue>()
+            {
+                { "dossierId", MongoDBAggregationExtension.ObjectId($"${type}.dossierId") }
+            };
+
+            var lookUpPipeline = new BsonArray
+            {
+                MongoDBAggregationExtension.Match(MongoDBAggregationExtension.Expr(MongoDBAggregationExtension
+                                   .Eq(new() { "$_id", MongoDBAggregationExtension.ObjectId("$$dossierId") })))
+            };
+
+            return MongoDBAggregationExtension.Lookup(new("expedientes", letPipeline, lookUpPipeline, "dossiers"));
+        }
+
+        private static BsonDocument GetExpiredTrayDocumentsLookUpPipeline(string type)
+        {
+            var letPipeline = new Dictionary<string, BsonValue>()
+            {
+                { "documentId", MongoDBAggregationExtension.ObjectId($"${type}.documentId") }
+            };
+
+            var lookUpPipeline = new BsonArray
+            {
+                MongoDBAggregationExtension.Match(MongoDBAggregationExtension.Expr(MongoDBAggregationExtension
+                    .Eq(new() { "$_id", MongoDBAggregationExtension.ObjectId("$$documentId") })))
+            };
+
+            return MongoDBAggregationExtension.Lookup(new("documentos", letPipeline, lookUpPipeline, "documents"));
+        }
+
         private async Task<Tray> GetTrayByDocumentAsync(string documentId)
         {
             var trayDocumentBuilder = Builders<DocumentTray>.Filter.Eq(dosssierDocument => dosssierDocument.DocumentId, documentId);

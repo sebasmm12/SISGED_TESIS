@@ -18,6 +18,12 @@ namespace SISGED.Server.Helpers.Infrastructure
             return new BsonDocument("$eq", bsonArray);
         }
 
+        public static BsonDocument NotEq(BsonValue bsonValue)
+        {
+
+            return new BsonDocument("$ne", bsonValue);
+        }
+
         public static BsonDocument Filter(BsonValue bsonElements, BsonValue bsonFilter)
         {
 
@@ -276,6 +282,16 @@ namespace SISGED.Server.Helpers.Infrastructure
         public static ArrayFilterDefinition GetArrayFilterDefinition<T>(string name, BsonValue value)
         {
             return new BsonDocumentArrayFilterDefinition<T>(new BsonDocument(name, value));
+        }
+
+        public static BsonDocument DayOfMonth(BsonValue date)
+        {
+            return new BsonDocument("$dayOfMonth", date);
+        }
+
+        public static BsonDocument DateDiff(BsonValue startDate, BsonValue endDate, string timeUnit)
+        {
+            return new("$dateDiff", new BsonDocument().Add("startDate", startDate).Add("endDate", endDate).Add("unit", timeUnit));
         }
     }
 }

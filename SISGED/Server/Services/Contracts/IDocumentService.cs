@@ -82,5 +82,8 @@ namespace SISGED.Server.Services.Contracts
         Task<SessionResolutionInfoResponse> GetSessionResolutionDocumentAsync(string documentId);
         Task UpdateDocumentDueDateAsync(RegisteredDocumentDTO registeredDocument);
         Task UpdateDocumentEndDateAsync(string documentId, DateTime endDate);
+        Task<IEnumerable<RoleDocumentDTO>> GetRoleDocumentsYearlyAsync();
+        Task<IEnumerable<RoleDocumentDTO>> GetRoleDocumentsMonthlyAsync();
+        Task<IEnumerable<RoleDocumentDTO>> GetRoleDocumentsDailyAsync();
     }
 }

@@ -1,5 +1,9 @@
 ﻿using SISGED.Server.Services.Contracts;
+using SISGED.Server.Services.Factories;
+using SISGED.Server.Services.Factories.Contracts;
 using SISGED.Server.Services.Repositories;
+using SISGED.Server.Services.Strategies;
+using SISGED.Server.Services.Strategies.Contracts;
 
 namespace SISGED.Server.Helpers.Infrastructure
 {
@@ -30,6 +34,12 @@ namespace SISGED.Server.Helpers.Infrastructure
             services.AddScoped<IDocumentEvaluationService, DocumentEvaluationService>();
             services.AddScoped<ITemplateService, TemplateService>();
             services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IDashboardService, DashboardService>();
+
+            services.AddTransient<IRoleDocumentsFactory, RoleDocumentsFactory>();
+            services.AddTransient<IRoleDocumentsStrategy, RoleDocumentsDailyStrategy>();
+            services.AddTransient<IRoleDocumentsStrategy, RoleDocumentsMonthlyStrategy>();
+            services.AddTransient<IRoleDocumentsStrategy, RoleDocumentsYearlyStrategy>();
 
             return services;
         }

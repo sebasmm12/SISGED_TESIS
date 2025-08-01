@@ -278,6 +278,33 @@ namespace SISGED.Server.Services.Repositories
             return documentsByState;
         }
 
+        public async Task<IEnumerable<RoleDocumentDTO>> GetRoleDocumentsYearlyAsync()
+        {
+            var documents = await _documentsCollection.Aggregate<RoleDocumentDTO>(GetRoleDocumentsYearlyPipeline()).ToListAsync();
+
+            if (documents is null) throw new Exception($"No se pudo obtener los documentos por rol del presente año");
+
+            return documents;
+        }
+
+        public async Task<IEnumerable<RoleDocumentDTO>> GetRoleDocumentsMonthlyAsync()
+        {
+            var documents = await _documentsCollection.Aggregate<RoleDocumentDTO>(GetRoleDocumentsMonthlyPipeline()).ToListAsync();
+
+            if (documents is null) throw new Exception($"No se pudo obtener los documentos por rol del presente año");
+
+            return documents;
+        }
+
+        public async Task<IEnumerable<RoleDocumentDTO>> GetRoleDocumentsDailyAsync()
+        {
+            var documents = await _documentsCollection.Aggregate<RoleDocumentDTO>(GetRoleDocumentsDailyPipeline()).ToListAsync();
+
+            if (documents is null) throw new Exception($"No se pudo obtener los documentos por rol del presente año");
+
+            return documents;
+        }
+
         public async Task UpdateDocumentProcessAsync(Process proccess, string documentId)
         {
             var updateDocumentProccess = Builders<Document>.Update.Push(document => document.ProcessesHistory, proccess)
@@ -1175,7 +1202,100 @@ namespace SISGED.Server.Services.Repositories
                 .Set("state", DTO.State);
             await _documentsCollection.UpdateOneAsync(filter, update);
         }
+
         #region private methods
+        private static BsonDocument[] GetRoleDocumentsDailyPipeline()
+        {
+            var currentDate = DateTime.UtcNow.AddHours(-5);
+
+            var addFieldsAggregation = MongoDBAggregationExtension.AddFields(new()
+            {
+                { "creationDateYear", MongoDBAggregationExtension.Year("$creationDate") },
+                { "creationDateMonth", MongoDBAggregationExtension.Month("$creationDate") },
+                { "creationDateDay", MongoDBAggregationExtension.DayOfMonth("$creationDate")}
+            });
+
+            var matchAggregation = MongoDBAggregationExtension.Match(new Dictionary<string, BsonValue>
+            {
+                { "creationDateYear", currentDate.Year - 1 },
+                { "creationDateMonth", currentDate.Month },
+                { "creationDateDay", currentDate.Day }
+            });
+
+            var roleDocumentsPipeline = GetRoleDocumentsPipeline();
+
+            return new[] { addFieldsAggregation, matchAggregation }.Concat(roleDocumentsPipeline).ToArray();
+        }
+
+
+        private static BsonDocument[] GetRoleDocumentsMonthlyPipeline()
+        {
+            var currentDate = DateTime.UtcNow.AddHours(-5);
+
+            var addFieldsAggregation = MongoDBAggregationExtension.AddFields(new()
+            {
+                { "creationDateYear", MongoDBAggregationExtension.Year("$creationDate") },
+                { "creationDateMonth", MongoDBAggregationExtension.Month("$creationDate") }
+            });
+
+            var matchAggregation = MongoDBAggregationExtension.Match(new Dictionary<string, BsonValue>
+            {
+                { "creationDateYear", currentDate.Year - 1 },
+                { "creationDateMonth", currentDate.Month }
+            });
+
+            var roleDocumentsPipeline = GetRoleDocumentsPipeline();
+
+            return new[] { addFieldsAggregation, matchAggregation }.Concat(roleDocumentsPipeline).ToArray();
+        }
+
+        private static BsonDocument[] GetRoleDocumentsYearlyPipeline()
+        {
+            var addFieldsAggregation = MongoDBAggregationExtension.AddFields(new()
+            {
+                { "creationDateYear", MongoDBAggregationExtension.Year("$creationDate") }
+            });
+
+            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("creationDateYear", DateTime.UtcNow.AddHours(-5).Year - 1));
+
+            var roleDocumentsPipeline = GetRoleDocumentsPipeline();
+
+            return new[] { addFieldsAggregation, matchAggregation }.Concat(roleDocumentsPipeline).ToArray();
+        }
+
+        private static BsonDocument[] GetRoleDocumentsPipeline()
+        {
+            var userLookUpAggregation = GetUserLookUpPipeline();
+
+            var userUnwindAggregation = MongoDBAggregationExtension.UnWind(new("$users"));
+
+            var roleLookUpAggregation = GetRoleLookUpPipeline();
+
+            var roleUnwindAggregation = MongoDBAggregationExtension.UnWind(new("$roles"));
+
+            var roleMatchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("roles.name", MongoDBAggregationExtension.NotEq("cliente")));
+
+            var projectAggregation = GetRoleDocumentsProjectPipeline();
+
+            return new[] { userLookUpAggregation, userUnwindAggregation, roleLookUpAggregation, 
+                           roleUnwindAggregation, roleMatchAggregation, projectAggregation };
+        }
+
+        private static BsonDocument GetRoleDocumentsProjectPipeline()
+        {
+            var projectAggregation = MongoDBAggregationExtension.Project(new()
+            {
+                { "role", "$roles.label" },
+                { "state", 1 },
+                { "creationDate", 1 },
+                { "endDate", 1 },
+                { "dueDate", 1 }
+
+            });
+
+            return projectAggregation;
+        }
+
         private static BsonDocument[] GetDictumPipeline(string documentId)
         {
             var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("_id", new ObjectId(documentId)));
@@ -1631,6 +1751,38 @@ namespace SISGED.Server.Services.Repositories
             };
 
             return MongoDBAggregationExtension.Lookup(new("expedientes", letPipeline, lookUpPipeline, "dossiers"));
+        }
+
+        private static BsonDocument GetUserLookUpPipeline()
+        {
+            var letPipeline = new Dictionary<string, BsonValue>()
+            {
+                { "userId", MongoDBAggregationExtension.ObjectId("$creationUserId") }
+            };
+
+            var lookUpPipeline = new BsonArray()
+            {
+                MongoDBAggregationExtension.Match(
+                    MongoDBAggregationExtension.Expr(MongoDBAggregationExtension.Eq(new() { "$_id", "$$userId" })))
+            };
+
+            return MongoDBAggregationExtension.Lookup(new("usuarios", letPipeline, lookUpPipeline, "users"));
+        }
+
+        private static BsonDocument GetRoleLookUpPipeline()
+        {
+            var letPipeline = new Dictionary<string, BsonValue>()
+            {
+                { "roleId", MongoDBAggregationExtension.ObjectId("$users.rol") }
+            };
+
+            var lookUpPipeline = new BsonArray
+            {
+                MongoDBAggregationExtension.Match(
+                    MongoDBAggregationExtension.Expr(MongoDBAggregationExtension.Eq(new() { "$_id", "$$roleId" })))
+            };
+
+            return MongoDBAggregationExtension.Lookup(new("roles", letPipeline, lookUpPipeline, "roles"));
         }
 
         private static BsonDocument GetDocumentLookUpPipeline()
