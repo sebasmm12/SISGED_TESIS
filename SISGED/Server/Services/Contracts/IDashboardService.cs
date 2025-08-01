@@ -8,4 +8,7 @@ public interface IDashboardService
     Task<ExpiredTraysDocumentsResponse> GetExpiredTraysDocuments(string userId);
 
     Task<IEnumerable<RoleDocumentsResponse>> GetRolesDocumentsAsync(DateFilterDTO dateFilter);
+    Task<UserTraysSnapshotResponse> GetUserTraysSnapshot(string userId);
+    Task<IEnumerable<DossierSnapshotResponse>> GetDossiersSnapshot();
+
 }

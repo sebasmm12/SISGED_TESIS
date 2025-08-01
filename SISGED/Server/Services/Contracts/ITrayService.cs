@@ -22,5 +22,6 @@ namespace SISGED.Server.Services.Contracts
         Task PushDocumentTrayAsync(UpdateDocumentTrayDTO updateDocumentTrayDTO);
         Task PullDocumentTrayAsync(UpdateDocumentTrayDTO updateDocumentTrayDTO);
         Task<IEnumerable<ExpiredTrayDocuments>> GetNextExpiredTraysDocumentsAsync(string userId, string type);
+        Task<UserTraysSnapshotResponse> GetUserTraysSnapshotAsync(string userId);
     }
 }

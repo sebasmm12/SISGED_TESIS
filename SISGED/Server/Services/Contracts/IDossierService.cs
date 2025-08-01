@@ -5,6 +5,7 @@ using SISGED.Shared.Models.Queries.Document;
 using SISGED.Shared.Models.Queries.Dossier;
 using SISGED.Shared.Models.Queries.Statistic;
 using SISGED.Shared.Models.Requests.Dossier;
+using SISGED.Shared.Models.Responses.Dashboards;
 using SISGED.Shared.Models.Responses.Document.UserRequest;
 using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.Statistic;
@@ -30,5 +31,6 @@ namespace SISGED.Server.Services.Contracts
         Task<int> CountDossiersListAsync(UserDossierPaginationQuery paginationQuery);
         Task<Dossier> DeleteDossierDocumentAsync(string documentId);
         Task<Dossier> DenyDossierByDocumentAsync(string documentId);
+        Task<IEnumerable<DossierSnapshotResponse>> GetDossiersSnapshotAsync();
     }
 }

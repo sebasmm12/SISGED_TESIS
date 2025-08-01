@@ -8,6 +8,7 @@ using SISGED.Shared.Models.Queries.Document;
 using SISGED.Shared.Models.Queries.Dossier;
 using SISGED.Shared.Models.Queries.Statistic;
 using SISGED.Shared.Models.Requests.Dossier;
+using SISGED.Shared.Models.Responses.Dashboards;
 using SISGED.Shared.Models.Responses.Document.UserRequest;
 using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.Statistic;
@@ -24,8 +25,8 @@ namespace SISGED.Server.Services.Repositories
         public string DocumentsCollectionName => "documentos";
 
         public DossierService(
-            IMongoDatabase mongoDatabase, 
-            ITrayService trayService, 
+            IMongoDatabase mongoDatabase,
+            ITrayService trayService,
             IAssistantService assistantService)
         {
 
@@ -225,6 +226,17 @@ namespace SISGED.Server.Services.Repositories
             return updatedDossier;
         }
 
+        public async Task<IEnumerable<DossierSnapshotResponse>> GetDossiersSnapshotAsync()
+        {
+            var aggregateResult = await _dossiersCollection.AggregateAsync<DossierSnapshotResponse>(GetDossiersSnapshotPipeline());
+
+            var dossiersSnapshot = await aggregateResult.ToListAsync();
+
+            if (dossiersSnapshot is null) throw new Exception($"No se pudo obtener la información de los expedientes");
+
+            return dossiersSnapshot;
+        }
+
         #region private methods
 
         private async Task UpdateDossierGeneratedDocumentAsync(DossierLastDocumentRequest dossierLastDocumentRequest, Assistant assistant)
@@ -250,7 +262,7 @@ namespace SISGED.Server.Services.Repositories
                 ReturnDocument = ReturnDocument.After
             });
 
-            if (updatedDossier is null) 
+            if (updatedDossier is null)
                 throw new Exception($"No se pudo registrar la url del documento con expediente {dossierLastDocumentRequest.Id}");
         }
 
@@ -267,8 +279,8 @@ namespace SISGED.Server.Services.Repositories
         {
             if (assistant.IsLastStep())
             {
-                var updateDocumentTrayDTO = new UpdateDocumentTrayDTO(new(dossierLastDocumentRequest.Id, 
-                                                                          dossierLastDocumentRequest.DocumentId), 
+                var updateDocumentTrayDTO = new UpdateDocumentTrayDTO(new(dossierLastDocumentRequest.Id,
+                                                                          dossierLastDocumentRequest.DocumentId),
                                                                           dossierLastDocumentRequest.Derivation.SenderUser, "outputTray");
 
                 return _trayService.PullDocumentTrayAsync(updateDocumentTrayDTO);
@@ -311,7 +323,7 @@ namespace SISGED.Server.Services.Repositories
             var lookUpPipeline = GetUserRequestsWithPublicDeedLookUpPipeline();
 
             var documentsUnWindAggregation = MongoDBAggregationExtension.UnWind(new("$documents"));
-            
+
             var documentsProjectAggregation = MongoDBAggregationExtension.Project(new()
             {
                 { "_id", 0 },
@@ -1010,6 +1022,37 @@ namespace SISGED.Server.Services.Repositories
             };
 
             return MongoDBAggregationExtension.Lookup(new("expedientes", letPipeline, lookUpPipeline, "dossiers"));
+        }
+
+        private static BsonDocument[] GetDossiersSnapshotPipeline()
+        {
+            var today = DateTime.Now;
+            var firstDayOfMonth = new DateTime(today.Year, today.Month, 1, 0, 0, 0, DateTimeKind.Unspecified);
+            var firstDayOfNextMonth = firstDayOfMonth.AddMonths(1);
+
+            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("startDate",
+                new BsonDocument{
+                    { "$gte", new BsonDateTime(firstDayOfMonth) },
+                    { "$lt", new BsonDateTime(firstDayOfNextMonth) }
+                }));
+
+            var groupAggregation = MongoDBAggregationExtension.Group(new()
+            {
+                { "_id", "$type" },
+                { "count", MongoDBAggregationExtension.Sum(1) }
+            });
+
+            var projectAggregation = MongoDBAggregationExtension.Project(new()
+            {
+                { "_id", 0 },
+                { "type", "$_id" },
+                { "count", "$count" }
+            });
+
+            return new[]
+            {
+                matchAggregation, groupAggregation, projectAggregation
+            };
         }
         #endregion
     }

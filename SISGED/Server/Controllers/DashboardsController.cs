@@ -46,4 +46,34 @@ public class DashboardsController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
+
+    [HttpGet("user-trays-snapshot/{userId}")]
+    public async Task<IActionResult> GetUserTraysSnapshotAsync(string userId)
+    {
+        try
+        {
+            var userTraysSnapshot = await _dashboardService.GetUserTraysSnapshot(userId);
+
+            return Ok(userTraysSnapshot);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
+    
+    [HttpGet("dossiers-snapshot")]
+    public async Task<IActionResult> GetDossiersSnapshotAsync()
+    {
+        try
+        {
+            var dossiersSnapshot = await _dashboardService.GetDossiersSnapshot();
+
+            return Ok(dossiersSnapshot);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
 }

@@ -28,7 +28,7 @@ namespace SISGED.Server.Services.Repositories
             var newDocumentTray = new DocumentTray(userTrayAnnulmentDTO.DossierId, userTrayAnnulmentDTO.NewDocumentId);
 
             var outputTrayUpdate = PullDocumentTrayAsync(new(currentDocumentTray, userTrayAnnulmentDTO.CurrentUserId, "outputTray"));
-            
+
             var inputTrayUpdate = PushDocumentTrayAsync(new(newDocumentTray, userTrayAnnulmentDTO.CurrentUserId, "inputTray"));
 
             await Task.WhenAll(inputTrayUpdate, outputTrayUpdate);
@@ -124,8 +124,9 @@ namespace SISGED.Server.Services.Repositories
 
             await Task.WhenAll(inputTrayUpdate, outputTrayUpdate);
         }
-        
-        public async Task RegisterOutputTrayWithDocumentTrayAsync(DocumentTray document, User user) { 
+
+        public async Task RegisterOutputTrayWithDocumentTrayAsync(DocumentTray document, User user)
+        {
 
             var inputTrayUpdate = PullDocumentTrayAsync(new(document, user.Id, "inputTray"));
 
@@ -185,9 +186,18 @@ namespace SISGED.Server.Services.Repositories
         {
             var expiredDocuments = await _traysCollection.Aggregate<ExpiredTrayDocuments>(GetExpiredTrayDocumentsPipeline(userId, type)).ToListAsync();
 
-            if (expiredDocuments is null) throw new($"No se pudo encontrar los documentos próximos a expirar del usuario con identificador { userId } para el tipo de bandeja {type}");
+            if (expiredDocuments is null) throw new($"No se pudo encontrar los documentos próximos a expirar del usuario con identificador {userId} para el tipo de bandeja {type}");
 
             return expiredDocuments;
+        }
+
+        public async Task<UserTraysSnapshotResponse> GetUserTraysSnapshotAsync(string userId)
+        {
+            var traysSnapshot = await _traysCollection.Aggregate<UserTraysSnapshotResponse>(GetUserTraysSnapshotPipeline(userId)).FirstOrDefaultAsync();
+
+            if (traysSnapshot is null) throw new Exception("No se ha podido encontrar información de las bandejas.");
+
+            return traysSnapshot;
         }
 
         #region private methods
@@ -227,7 +237,7 @@ namespace SISGED.Server.Services.Repositories
             });
 
             return new[] { matchAggregation, unWindAggregation, documentsLookUpAggregation, documentsUnWindAggregation,
-                           documentDueDateSortAggregation, limitAggregation, dossiersLookUpAggregation, dossiersUnWindAggregation, 
+                           documentDueDateSortAggregation, limitAggregation, dossiersLookUpAggregation, dossiersUnWindAggregation,
                            addFieldsAggregation, projectAggregation };
         }
 
@@ -321,7 +331,7 @@ namespace SISGED.Server.Services.Repositories
                     {"documentId","$inputTray.documentId" }
                 });
 
-            return new BsonDocument[] { matchAggregation, unWindAggregation, matchAggregation2, projectAggregation};
+            return new BsonDocument[] { matchAggregation, unWindAggregation, matchAggregation2, projectAggregation };
         }
 
         private PipelineDefinition<Tray, InputTrayResponse> GetInputTrayPipeline(string user)
@@ -610,6 +620,20 @@ namespace SISGED.Server.Services.Repositories
 
             return MongoDBAggregationExtension.Lookup(new("usuarios", letPipeline, lookUpPipeline, "userInfo"));
 
+        }
+
+        private static BsonDocument[] GetUserTraysSnapshotPipeline(string userId)
+        {
+
+            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("user", userId));
+            var projectAggregation = MongoDBAggregationExtension.Project(new()
+                {
+                    { "_id", 0 },
+                    {"InputTray", MongoDBAggregationExtension.Size("$inputTray") },
+                    {"OutputTray",MongoDBAggregationExtension.Size("$outputTray") }
+                });
+
+            return new BsonDocument[] { matchAggregation, projectAggregation };
         }
         #endregion
     }

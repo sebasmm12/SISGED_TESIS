@@ -8,11 +8,13 @@ namespace SISGED.Server.Services.Repositories;
 public class DashboardService : IDashboardService
 {
     private readonly ITrayService _trayService;
+    private readonly IDossierService _dossierService;
     private readonly IRoleDocumentsFactory _roleDocumentsFactory;
 
-    public DashboardService(ITrayService trayService, IRoleDocumentsFactory roleDocumentsFactory)
+    public DashboardService(ITrayService trayService, IDossierService dossierService, IRoleDocumentsFactory roleDocumentsFactory)
     {
         _trayService = trayService;
+        _dossierService = dossierService;
         _roleDocumentsFactory = roleDocumentsFactory;
     }
 
@@ -39,5 +41,18 @@ public class DashboardService : IDashboardService
         var rolesDocuments = await _roleDocumentsFactory.GetRolesDocumentsAsync(dateFilter);
 
         return rolesDocuments;
+    }
+
+    public async Task<UserTraysSnapshotResponse> GetUserTraysSnapshot(string userId)
+    {
+        var userTraysSnapshot = await _trayService.GetUserTraysSnapshotAsync(userId);
+
+        return userTraysSnapshot;
+    }
+    public async Task<IEnumerable<DossierSnapshotResponse>> GetDossiersSnapshot()
+    {
+        var dossiersSnapshot = await _dossierService.GetDossiersSnapshotAsync();
+
+        return dossiersSnapshot;
     }
 }
