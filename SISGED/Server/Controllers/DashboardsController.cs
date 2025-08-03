@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SISGED.Server.Services.Contracts;
 using SISGED.Shared.DTOs;
+using SISGED.Shared.Models.Queries.Dashboard;
 
 namespace SISGED.Server.Controllers;
 
@@ -52,7 +53,7 @@ public class DashboardsController : ControllerBase
     {
         try
         {
-            var userTraysSnapshot = await _dashboardService.GetUserTraysSnapshot(userId);
+            var userTraysSnapshot = await _dashboardService.GetUserTraysSnapshotAsync(userId);
 
             return Ok(userTraysSnapshot);
         }
@@ -61,15 +62,45 @@ public class DashboardsController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
-    
+
+    [HttpGet("user-documents-snapshot/{userId}")]
+    public async Task<IActionResult> GetUserDocumentsSnapshotAsync(string userId)
+    {
+        try
+        {
+            var userDocumentsSnapshot = await _dashboardService.GetUserDocumentsSnapshotAsync(userId);
+
+            return Ok(userDocumentsSnapshot);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
+
     [HttpGet("dossiers-snapshot")]
     public async Task<IActionResult> GetDossiersSnapshotAsync()
     {
         try
         {
-            var dossiersSnapshot = await _dashboardService.GetDossiersSnapshot();
+            var dossiersSnapshot = await _dashboardService.GetDossiersSnapshotAsync();
 
             return Ok(dossiersSnapshot);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
+
+    [HttpGet("user-document-history-state")]
+    public async Task<IActionResult> GetUserDocumentHistoryStateAsync([FromQuery] UserDocumentTypeRequestQuery userDocumentTypeRequestQuery)
+    {
+        try
+        {
+            var userTypeDocuments = await _dashboardService.GetUserDocumentHistoryStateAsync(userDocumentTypeRequestQuery.ClientId,userDocumentTypeRequestQuery.DateFilter);
+
+            return Ok(userTypeDocuments);
         }
         catch (Exception ex)
         {

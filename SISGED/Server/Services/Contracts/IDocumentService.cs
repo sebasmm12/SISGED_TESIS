@@ -4,6 +4,7 @@ using SISGED.Shared.Models.Queries.Document;
 using SISGED.Shared.Models.Queries.Statistic;
 using SISGED.Shared.Models.Queries.UserDocument;
 using SISGED.Shared.Models.Requests.Documents;
+using SISGED.Shared.Models.Responses.Dashboards;
 using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.Document.BPNDocument;
 using SISGED.Shared.Models.Responses.Document.BPNResult;
@@ -11,6 +12,7 @@ using SISGED.Shared.Models.Responses.Document.ComplaintRequest;
 using SISGED.Shared.Models.Responses.Document.Dictum;
 using SISGED.Shared.Models.Responses.Document.DisciplinaryOpenness;
 using SISGED.Shared.Models.Responses.Document.Resolution;
+using SISGED.Shared.Models.Responses.Document.SessionResolutions;
 using SISGED.Shared.Models.Responses.Document.SignConclusion;
 using SISGED.Shared.Models.Responses.Document.SolicitorDesignationDocument;
 using SISGED.Shared.Models.Responses.Document.SolicitorDossierRequest;
@@ -18,7 +20,6 @@ using SISGED.Shared.Models.Responses.Document.SolicitorDossierShipment;
 using SISGED.Shared.Models.Responses.Document.UserRequest;
 using SISGED.Shared.Models.Responses.Statistic;
 using SISGED.Shared.Models.Responses.UserDocument;
-using SISGED.Shared.Models.Responses.Document.SessionResolutions;
 
 namespace SISGED.Server.Services.Contracts
 {
@@ -85,5 +86,9 @@ namespace SISGED.Server.Services.Contracts
         Task<IEnumerable<RoleDocumentDTO>> GetRoleDocumentsYearlyAsync();
         Task<IEnumerable<RoleDocumentDTO>> GetRoleDocumentsMonthlyAsync();
         Task<IEnumerable<RoleDocumentDTO>> GetRoleDocumentsDailyAsync();
+        Task<IEnumerable<UserDocumentHistoryStateDTO>> GetUserHistoryStateYearlyAsync(string userId);
+        Task<IEnumerable<UserDocumentHistoryStateDTO>> GetUserHistoryStateMonthlyAsync(string userId);
+        Task<IEnumerable<UserDocumentHistoryStateDTO>> GetUserHistoryStateDailyAsync(string userId);
+        Task<UserDocumentSnapshotResponse> GetUserDocumentsSnapshotAsync(string userId);
     }
 }

@@ -40,6 +40,10 @@ namespace SISGED.Server.Helpers.Infrastructure
             services.AddTransient<IRoleDocumentsStrategy, RoleDocumentsDailyStrategy>();
             services.AddTransient<IRoleDocumentsStrategy, RoleDocumentsMonthlyStrategy>();
             services.AddTransient<IRoleDocumentsStrategy, RoleDocumentsYearlyStrategy>();
+            services.AddTransient<IUserHistoryDocumentStateFactory, UserHistoryDocumentStateFactory>();
+            services.AddTransient<IUserHistoryDocumentStateStrategy, UserHistoryDocumentStateDailyStrategy>();
+            services.AddTransient<IUserHistoryDocumentStateStrategy, UserHistoryDocumentStateMonthlyStrategy>();
+            services.AddTransient<IUserHistoryDocumentStateStrategy, UserHistoryDocumentStateYearlyStrategy>();
 
             return services;
         }

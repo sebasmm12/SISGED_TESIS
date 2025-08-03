@@ -1026,7 +1026,7 @@ namespace SISGED.Server.Services.Repositories
 
         private static BsonDocument[] GetDossiersSnapshotPipeline()
         {
-            var today = DateTime.Now;
+            var today = DateTime.UtcNow.AddHours(-5);
             var firstDayOfMonth = new DateTime(today.Year, today.Month, 1, 0, 0, 0, DateTimeKind.Unspecified);
             var firstDayOfNextMonth = firstDayOfMonth.AddMonths(1);
 
