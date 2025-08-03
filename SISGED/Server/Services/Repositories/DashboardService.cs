@@ -56,7 +56,9 @@ public class DashboardService : IDashboardService
 
     public Task<UserDocumentSnapshotResponse> GetUserDocumentsSnapshotAsync(string userId)
     {
-        throw new NotImplementedException();
+        var userDocumentsSnapshot = _documentService.GetUserDocumentsSnapshotAsync(userId);
+
+        return userDocumentsSnapshot;
     }
     public async Task<IEnumerable<DossierSnapshotResponse>> GetDossiersSnapshotAsync()
     {

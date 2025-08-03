@@ -98,7 +98,7 @@ public class DashboardsController : ControllerBase
     {
         try
         {
-            var userTypeDocuments = await _dashboardService.GetUserDocumentHistoryStateAsync(userDocumentTypeRequestQuery.ClientId,userDocumentTypeRequestQuery.DateFilter);
+            var userTypeDocuments = await _dashboardService.GetUserDocumentHistoryStateAsync(userDocumentTypeRequestQuery.UserId,userDocumentTypeRequestQuery.DateFilter);
 
             return Ok(userTypeDocuments);
         }

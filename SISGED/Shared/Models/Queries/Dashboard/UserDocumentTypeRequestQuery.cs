@@ -9,7 +9,7 @@ namespace SISGED.Shared.Models.Queries.Dashboard
 {
     public class UserDocumentTypeRequestQuery
     {
-        public string ClientId { get; set; } = default!;
+        public string UserId { get; set; } = default!;
         public DateFilterDTO DateFilter { get; set; } = default!;
     }
 }
