@@ -19,3 +19,4 @@ namespace SISGED.Server.Services.Strategies
             return await _documentService.GetUserHistoryStateYearlyAsync(userId);
         }
     }
+}
