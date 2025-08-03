@@ -67,9 +67,9 @@ public class DashboardService : IDashboardService
         return dossiersSnapshot;
     }
 
-    public async Task<IEnumerable<UserDocumentHistoryStateResponse>> GetUserDocumentHistoryStateAsync(string clientId, DateFilterDTO dateFilter)
+    public async Task<IEnumerable<UserDocumentHistoryStateResponse>> GetUserDocumentHistoryStateAsync(string userId, DateFilterDTO dateFilter)
     {
-        var userDocumentHistoryState = await _userHistoryDocumentStateFactory.GetUserHistoryDocumentStateAsync(clientId, dateFilter);
+        var userDocumentHistoryState = await _userHistoryDocumentStateFactory.GetUserHistoryDocumentStateAsync(userId, dateFilter);
 
         return userDocumentHistoryState;
     }
