@@ -1,10 +1,11 @@
 ﻿@page "/"
+@inject NavigationManager navigationManager
 
 <PageTitle>Inicio</PageTitle>
 
 @if (SessionAccount.User.Type.Equals("cliente"))
 {
-    
+    navigationManager.NavigateTo("/solicitudes");
 }
 else {
     <Dashboard></Dashboard>
