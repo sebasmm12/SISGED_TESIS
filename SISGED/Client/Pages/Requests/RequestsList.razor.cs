@@ -20,13 +20,12 @@ namespace SISGED.Client.Pages.Requests
         public ISwalFireRepository SwalFireRepository { get; set; } = default!;
         [Inject]
         public IDialogService DialogService { get; set; } = default!;
-        
+
         [CascadingParameter(Name = "SessionAccount")]
         public SessionAccountResponse SessionAccount { get; set; } = default!;
 
         private bool requestsLoading = true;
         private MudTable<UserRequestResponse> requestsList = default!;
-
 
         private int TotalUserRequests => (requestsList.GetFilteredItemsCount() + requestsList.RowsPerPage - 1) / requestsList.RowsPerPage;
 
@@ -34,7 +33,8 @@ namespace SISGED.Client.Pages.Requests
         {
             var dialogParameters = GetDialogParameters(new()
             {
-                new("SessionAccount", SessionAccount)
+                new("SessionAccount", SessionAccount),
+                new ("TotalUserRequests", requestsList.GetFilteredItemsCount())
             });
 
             var dialog = DialogService.Show<UserRequestRegister>("Registro de Solicitud", dialogParameters,
@@ -70,8 +70,11 @@ namespace SISGED.Client.Pages.Requests
 
             await Task.Delay(100);
 
-            return new TableData<UserRequestResponse>() { Items = userRequests.UserRequests, 
-                TotalItems = (int)userRequests.TotalUserRequests };
+            return new TableData<UserRequestResponse>()
+            {
+                Items = userRequests.UserRequests,
+                TotalItems = (int)userRequests.TotalUserRequests
+            };
         }
 
 
@@ -83,7 +86,7 @@ namespace SISGED.Client.Pages.Requests
 
                 var userRequestsResponse = await HttpRepository.GetAsync<PaginatedUserRequest>($"api/documents/user-requests-public-deeds{userRequestQueries}");
 
-                if(userRequestsResponse.Error)
+                if (userRequestsResponse.Error)
                 {
                     await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener las solicitudes del sistema");
                 }

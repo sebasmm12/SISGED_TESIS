@@ -13,6 +13,7 @@ using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.Document.UserRequest;
 using SISGED.Shared.Models.Responses.DocumentType;
 using SISGED.Shared.Models.Responses.DossierDocument;
+using SISGED.Shared.Models.Responses.DossierTray;
 using SISGED.Shared.Models.Responses.Solicitor;
 using SISGED.Shared.Models.Responses.User;
 using SISGED.Shared.Validators;
@@ -36,6 +37,8 @@ namespace SISGED.Client.Components.Documents.Registers
         public MudDialogInstance MudDialog { get; set; } = default!;
         [Parameter]
         public SessionAccountResponse SessionAccount { get; set; } = default!;
+        [Parameter]
+        public int TotalUserRequests { get; set; } = default!;
 
         private MudForm? userRequestForm = default!;
         private IEnumerable<DocumentTypeInfoResponse> documentTypes = default!;
@@ -93,6 +96,7 @@ namespace SISGED.Client.Components.Documents.Registers
         private DossierWrapper GetDocumentRegister()
         {
             var initialRequestContent = Mapper.Map<InitialRequestResponseContent>(userRequest);
+            initialRequestContent.Code = GenerateCode(SessionAccount, initialRequestContent.RequestTypeId, TotalUserRequests);
             var initialRequest = new InitialRequestResponse(initialRequestContent, annexes, 
                SessionAccount.GetClient().Name, SessionAccount.GetClient().LastName,
                SessionAccount.GetDocumentType() ,SessionAccount.GetDocumentNumber(), SessionAccount.GetUser().Id);
@@ -100,6 +104,26 @@ namespace SISGED.Client.Components.Documents.Registers
             var documentRegister = new DossierWrapper(initialRequest);
 
             return documentRegister;
+        }
+
+        private static string GenerateCode(SessionAccountResponse session, string type, int totalUserRequests)
+        {
+            string lastDocumentType = type;
+            string user = session.GetDocumentNumber();
+            long unixTime = GetUnixTime(DateTime.UtcNow.AddHours(-5));
+            string serialization = string.Format("{0:000}", totalUserRequests + 1);
+
+            string code = lastDocumentType + "-" + user + "-" + unixTime + "-" + serialization;
+
+            Console.WriteLine(code);
+            return code;
+        }
+
+        private static long GetUnixTime(DateTime dateTime)
+        {
+            var totalSeconds = (dateTime - DateTime.UnixEpoch).TotalSeconds;
+
+            return (long)totalSeconds;
         }
 
         private async Task<DossierDocumentInitialRequestResponse?> RegisterUserRequestDocumentAsync(DossierWrapper documentRegister)

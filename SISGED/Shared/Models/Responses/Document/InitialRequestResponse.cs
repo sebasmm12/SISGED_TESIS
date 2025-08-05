@@ -31,6 +31,7 @@ namespace SISGED.Shared.Models.Responses.Document
     {
         public string Title { get; set; } = default!;
         public string Description { get; set; } = default!;
+        public string Code { get; set; } = default!;
         public string RequestTypeId { get; set; } = default!;
         public bool HasSolicitor { get; set; }
         public string SolicitorId { get; set; } = default!;

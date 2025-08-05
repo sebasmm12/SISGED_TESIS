@@ -528,6 +528,8 @@ namespace SISGED.Shared.Entities
     {
         [BsonElement("description")]
         public string Description { get; set; } = default!;
+        [BsonElement("code")]
+        public string Code { get; set; } = default!;
         [BsonElement("title")]
         public string Title { get; set; } = default!;
         [BsonElement("requestTypeId")]
