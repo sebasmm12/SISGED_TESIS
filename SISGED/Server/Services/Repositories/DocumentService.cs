@@ -1378,8 +1378,8 @@ namespace SISGED.Server.Services.Repositories
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
                 { "_id", 0 },
-                { "state", "$processesHistory.state" },
-                { "date", new BsonDocument(){
+                { "State", "$processesHistory.state" },
+                { "Date", new BsonDocument(){
                     { "$dateToString", new BsonDocument{
                         { "format", "%m" },
                         { "date", "$processesHistory.issuanceDate"   }
@@ -1407,9 +1407,9 @@ namespace SISGED.Server.Services.Repositories
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
                 { "_id", 0 },
-                { "state", MongoDBAggregationExtension.Cond(MongoDBAggregationExtension.Eq(new() { "$evaluations.isApproved", true }),"aprobado","rechazado")
+                { "State", MongoDBAggregationExtension.Cond(MongoDBAggregationExtension.Eq(new() { "$evaluations.isApproved", true }),"aprobado","rechazado")
                 },
-                { "date", new BsonDocument(){
+                { "Date", new BsonDocument(){
                     { "$dateToString", new BsonDocument{
                         { "format", "%m" },
                         { "date", "$evaluations.evaluationDate"   }
@@ -1439,8 +1439,8 @@ namespace SISGED.Server.Services.Repositories
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
                 { "_id", 0 },
-                { "state", "$processesHistory.state" },
-                { "date", new BsonDocument(){
+                { "State", "$processesHistory.state" },
+                { "Date", new BsonDocument(){
                     { "$dateToString", new BsonDocument{
                         { "format", "%d/%m/%Y" },
                         { "date", "$processesHistory.issuanceDate"   }
@@ -1468,9 +1468,9 @@ namespace SISGED.Server.Services.Repositories
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
                 { "_id", 0 },
-                { "state", MongoDBAggregationExtension.Cond(MongoDBAggregationExtension.Eq(new() { "$evaluations.isApproved", true }),"aprobado","rechazado")
+                { "State", MongoDBAggregationExtension.Cond(MongoDBAggregationExtension.Eq(new() { "$evaluations.isApproved", true }),"aprobado","rechazado")
                 },
-                { "date", new BsonDocument(){
+                { "Date", new BsonDocument(){
                     { "$dateToString", new BsonDocument{
                         { "format", "%d/%m/%Y" },
                         { "date", "$evaluations.evaluationDate"   }

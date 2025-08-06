@@ -1,0 +1,35 @@
+﻿<MudCard Elevation="5" Class="documents-column-chart">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <div class="documents-chart-header">
+                <MudText Typo="Typo.h6">Documentos por estado</MudText>
+                <MudMenu Label="@selectedDateFilterText" FullWidth="true" EndIcon="@Icons.Material.Filled.KeyboardArrowDown">
+                    @foreach (var dateFilter in dateFilterItems)
+                    {
+                        <MudMenuItem @onclick="() => SearchUserDocumentsByStateAsync(dateFilter)">@dateFilter.Name</MudMenuItem>
+                    }
+                </MudMenu>
+            </div>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <!-- Stacked Column Chart -->
+        @if (documentsLoading)
+        {
+            <GenericToolLoader Body="@string.Empty"></GenericToolLoader>
+        }
+        else if (userDocuments.Any())
+        {
+            <GenericStackedColumnChart Data="userDocuments" XAxisLabel="@xAxisLabel" YAxisLabel="@yAxisLabel"></GenericStackedColumnChart>
+        }
+        else
+        {
+            <MudGrid Justify="Justify.Center">
+                <MudItem>
+                    <MudAlert Severity="Severity.Info" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Center">No se ha obtenido ningun documento en el filtro seleccionado</MudAlert>
+                </MudItem>
+            </MudGrid>
+        }
+
+    </MudCardContent>
+</MudCard>
