@@ -1,1 +1,7 @@
-﻿<div class="stacked-column-chart" id="stacked-chart"></div>
+﻿@if (LegendType == "userDocumentsByState")
+{
+    <div class="stacked-column-chart" id="stacked-chart-user-documents-by-state"></div>
+} else
+{
+    <div class="stacked-column-chart" id="stacked-chart"></div>
+}

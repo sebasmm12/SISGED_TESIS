@@ -43,16 +43,6 @@ public partial class UserDocumentMultiColumnChart
         documentsLoading = false;
     }
 
-    protected override async Task OnParametersSetAsync()
-    {
-        if (SessionAccount != null && string.IsNullOrEmpty(SessionAccount.User.Id)) // Example condition
-        {
-            //userDocuments = await GetUserDocumentsByStateAsync(DateFilterDTO.Daily, SessionAccount.User.Id);
-            //documentsLoading = false;
-        }
-        await base.OnParametersSetAsync();
-    }
-
     private async Task SearchUserDocumentsByStateAsync(DateFilterItem dateFilterItem)
     {
         documentsLoading = true;

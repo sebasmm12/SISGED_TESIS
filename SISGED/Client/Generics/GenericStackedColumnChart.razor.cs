@@ -24,13 +24,16 @@ public partial class GenericStackedColumnChart
     [Parameter]
     public string YAxisLabel { get; set; } = default!;
 
+    [Parameter]
+    public string LegendType { get; set; } = default!;
+
     private bool chartLoading = true;
 
     protected override async Task OnInitializedAsync()
     {
         var columnChartModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "../js/charts/stacked-column-chart.js");
 
-        await columnChartModule.InvokeVoidAsync("drawStackedColumnChart", Data, XAxisLabel, YAxisLabel);
+        await columnChartModule.InvokeVoidAsync("drawStackedColumnChart", Data, XAxisLabel, YAxisLabel, LegendType);
 
         chartLoading = false;
     }
