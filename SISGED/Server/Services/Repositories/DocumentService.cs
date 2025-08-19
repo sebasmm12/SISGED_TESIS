@@ -171,6 +171,18 @@ namespace SISGED.Server.Services.Repositories
             return document;
         }
 
+        public async Task<IEnumerable<DocumentResponse>> GetDocumentsAsync(IEnumerable<string> documentIds)
+        {
+            var documents = await _documentsCollection
+                                        .Find(document => documentIds.Contains(document.Id))
+                                        .Project(Builders<Document>.Projection.As<DocumentResponse>()).ToListAsync();
+
+            if (documents is null)
+                throw new($"No se pudo obtener los documentos con los identificadores {string.Join(", ", documentIds)}");
+
+            return documents;
+        }
+
         public async Task<InitialRequest> GetInitialRequestDocumentAsync(string documentId)
         {
             var initialRequestDocument = await _documentsCollection.OfType<InitialRequest>().Find(document => document.Id == documentId).FirstAsync();
@@ -308,46 +320,31 @@ namespace SISGED.Server.Services.Repositories
         public async Task<IEnumerable<UserDocumentHistoryStateDTO>> GetUserHistoryStateYearlyAsync(string userId)
         {
             var documentsHistory = await _documentsCollection.Aggregate<UserDocumentHistoryStateDTO>(GetUserHistoryProcessStateYearlyPipeline(userId)).ToListAsync();
-            var evaluationsHistory = await _documentsCollection.Aggregate<UserDocumentHistoryStateDTO>(GetUserEvaluationHistoryStateYearlyPipeline(userId)).ToListAsync();
 
-            var documents = new List<UserDocumentHistoryStateDTO>();
+            if (documentsHistory is null) 
+                throw new("No se pudo obtener los documentos por estado de la presente semana");
 
-            if (documentsHistory is not null) documents.AddRange(documentsHistory);
-            if (evaluationsHistory is not null) documents.AddRange(evaluationsHistory);
-
-            if (documents is null || !documents.Any()) throw new Exception($"No se pudo obtener los documentos por estado de la presente semana");
-
-            return documents;
+            return documentsHistory;
         }
 
         public async Task<IEnumerable<UserDocumentHistoryStateDTO>> GetUserHistoryStateMonthlyAsync(string userId)
         {
             var documentsHistory = await _documentsCollection.Aggregate<UserDocumentHistoryStateDTO>(GetUserHistoryProcessStateMonthlyPipeline(userId)).ToListAsync();
-            var evaluationsHistory = await _documentsCollection.Aggregate<UserDocumentHistoryStateDTO>(GetUserEvaluationHistoryStateMonthlyPipeline(userId)).ToListAsync();
 
-            var documents = new List<UserDocumentHistoryStateDTO>();
+            if (documentsHistory is null) 
+                throw new("No se pudo obtener los documentos por estado de la presente semana");
 
-            if (documentsHistory is not null) documents.AddRange(documentsHistory);
-            if (evaluationsHistory is not null) documents.AddRange(evaluationsHistory);
-
-            if (documents is null || !documents.Any()) throw new Exception($"No se pudo obtener los documentos por estado de la presente semana");
-
-            return documents;
+            return documentsHistory;
         }
 
         public async Task<IEnumerable<UserDocumentHistoryStateDTO>> GetUserHistoryStateDailyAsync(string userId)
         {
             var documentsHistory = await _documentsCollection.Aggregate<UserDocumentHistoryStateDTO>(GetUserHistoryProcessStateDailyPipeline(userId)).ToListAsync();
-            var evaluationsHistory = await _documentsCollection.Aggregate<UserDocumentHistoryStateDTO>(GetUserEvaluationHistoryStateDailyPipeline(userId)).ToListAsync();
+            
+            if (documentsHistory is null) 
+                throw new("No se pudo obtener los documentos por estado de la presente semana");
 
-            var documents = new List<UserDocumentHistoryStateDTO>();
-
-            if (documentsHistory is not null) documents.AddRange(documentsHistory);
-            if (evaluationsHistory is not null) documents.AddRange(evaluationsHistory);
-
-            if (documents is null || !documents.Any()) throw new Exception($"No se pudo obtener los documentos por estado de la presente semana");
-
-            return documents;
+            return documentsHistory;
         }
 
         public async Task UpdateDocumentProcessAsync(Process proccess, string documentId)
@@ -1250,7 +1247,14 @@ namespace SISGED.Server.Services.Repositories
 
         public async Task<UserDocumentSnapshotResponse> GetUserDocumentsSnapshotAsync(string userId)
         {
-            var result = await _documentsCollection.AggregateAsync<UserDocumentSnapshotResponse>(GetUserDocumentsSnapshotPipeline(userId));
+            var userTrayDocuments = await _trayCollection.Find(tray => tray.User == userId).FirstOrDefaultAsync();
+
+            var userTrayDocumentIds = userTrayDocuments.InputTray
+                .Select(doc => doc.DocumentId)
+                .Union(userTrayDocuments.OutputTray.Select(doc => doc.DocumentId))
+                .ToList();
+
+            var result = await _documentsCollection.AggregateAsync<UserDocumentSnapshotResponse>(GetUserDocumentsSnapshotPipeline(userId, userTrayDocumentIds));
 
             var snapshot = result.FirstOrDefault();
 
@@ -1260,247 +1264,200 @@ namespace SISGED.Server.Services.Repositories
         }
 
         #region private methods
-        private static BsonDocument[] GetUserDocumentsSnapshotPipeline(string userId)
+        private static BsonDocument[] GetUserDocumentsSnapshotPipeline(string userId, IEnumerable<string> userTrayDocumentIds)
         {
+            var userTrayDocumentBsonIds = userTrayDocumentIds
+                .Select(userTrayDocumentId => new BsonObjectId(ObjectId.Parse(userTrayDocumentId)))
+                .ToList();
+
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
-                { "registrado", MongoDBAggregationExtension.Size(
-                    MongoDBAggregationExtension.Filter("$processesHistory", new BsonDocument()
+                { "registered", MongoDBAggregationExtension.Size(
+                    MongoDBAggregationExtension.Filter("$processesHistory", new BsonDocument
                     {
-                        { "$and", new BsonArray()
+                        { "$and", new BsonArray
                         {
-                            { MongoDBAggregationExtension.Eq(new() {"item.senderId", userId}) },
-                            { MongoDBAggregationExtension.Eq(new() {"item.state", "registrado"}) }
+                            MongoDBAggregationExtension.Eq(new() {"$$item.senderId", userId}),
+                            MongoDBAggregationExtension.Eq(new() {"$$item.state", "registrado"})
                         }
                         }
-                    })
+                    }, "item")
                 )},
-                { "derivado", MongoDBAggregationExtension.Size(
-                    MongoDBAggregationExtension.Filter("$processesHistory", new BsonDocument()
+                { "derived", MongoDBAggregationExtension.Size(
+                    MongoDBAggregationExtension.Filter("$processesHistory", new BsonDocument
                     {
-                        { "$and", new BsonArray()
+                        { "$and", new BsonArray
                         {
-                            { MongoDBAggregationExtension.Eq(new() {"item.senderId", userId}) },
-                            { MongoDBAggregationExtension.Eq(new() {"item.state", "derivado"}) }
+                            MongoDBAggregationExtension.Eq(new() {"$$item.senderId", userId}),
+                            MongoDBAggregationExtension.Eq(new() {"$$item.state", "derivado"})
                         }
                         }
-                    })
-                )}
+                    }, "item")
+                )},
+                { "expired", MongoDBAggregationExtension.Cond(
+                    MongoDBAggregationExtension.And(
+                    new List<BsonValue>
+                        { 
+                            MongoDBAggregationExtension.Eq(new() { "$endDate", BsonNull.Value }),
+                            MongoDBAggregationExtension.GreaterThan(new() { DateTime.UtcNow.AddHours(-5), "$dueDate" }),
+                            MongoDBAggregationExtension.In("$_id", new(userTrayDocumentBsonIds))
+                        }),
+                    1, 
+                    0)
+                },
+                { "user", userId }
+            });
+
+            var groupAggregation = MongoDBAggregationExtension.Group(new()
+            {
+                { "_id", "$user" },
+                { "registered", MongoDBAggregationExtension.Sum("$registered") } ,
+                { "derived",MongoDBAggregationExtension.Sum("$derived") },
+                { "expired", MongoDBAggregationExtension.Sum("$expired") }
             });
 
             var projectAggregation2 = MongoDBAggregationExtension.Project(new()
             {
-                { "registrado", "$registrado" },
-                { "derivado", "$derivado" }
+                { "_id", 0 },
+                { "Registered", "$registered" },
+                { "Derived", "$derived" },
+                { "Expired", "$expired" }
             });
 
-            return new[] { projectAggregation, projectAggregation2 };
+            return new[] { projectAggregation, groupAggregation, projectAggregation2 };
         }
         private static BsonDocument[] GetUserHistoryProcessStateYearlyPipeline(string userId)
         {
-            DateTime currentTime = DateTime.UtcNow.AddHours(-5);
-            DateTime startYear = new DateTime(currentTime.Year - 5, 1, 1, 0, 0, 0, DateTimeKind.Unspecified);
-            DateTime finalYear = new DateTime(currentTime.Year + 1, 1, 1, 0, 0, 0, DateTimeKind.Unspecified);
+            var currentDateYear = DateTime.UtcNow.AddHours(-5).Year;
 
             var unwindAggregation = MongoDBAggregationExtension.UnWind(new("$processesHistory"));
-            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument()
+
+            var addFieldAggregation = MongoDBAggregationExtension.AddFields(new()
+            {
+                { "issuanceDateYear", MongoDBAggregationExtension.Year("$processesHistory.issuanceDate") }
+            });
+
+            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument
             {
                 {"processesHistory.senderId", userId },
-                { "processesHistory.issuanceDate", new BsonDocument{
-                    { "$gte", new BsonDateTime(startYear) },
-                    { "$lt", new BsonDateTime(finalYear) }
-                } },
-                { "processesHistory.state", MongoDBAggregationExtension.NotEq("evaluado") }
+                { "issuanceDateYear", new BsonDocument().AddRange(new List<BsonElement>
+                {
+                    MongoDBAggregationExtension.GreaterThanEquals(currentDateYear - 5)
+                        .Elements
+                        .First(),
+                    MongoDBAggregationExtension.LessThanEquals(currentDateYear)
+                        .Elements
+                        .First()
+                })
+                }
             });
 
-            var projectAggregation = MongoDBAggregationExtension.Project(new()
-            {
-                { "_id", 0 },
-                { "State", "$processesHistory.state" },
-                { "Date", new BsonDocument(){
-                    { "$dateToString", new BsonDocument{
-                        { "format", "%Y" },
-                        { "date", "$processesHistory.issuanceDate"   }
-                    } }
-                }}
-            });
-
-            return new[] { unwindAggregation, matchAggregation, projectAggregation };
+            return new[] { unwindAggregation, addFieldAggregation, matchAggregation }
+                .Concat(GetUserHistoryProcessStatePipeline(MongoDBAggregationExtension.DateToString("$processesHistory.issuanceDate", "%Y")))
+                .ToArray();
         }
-        
-        private static BsonDocument[] GetUserEvaluationHistoryStateYearlyPipeline(string userId)
-        {
-            DateTime currentTime = DateTime.UtcNow.AddHours(-5);
-            DateTime startYear = new DateTime(currentTime.Year - 5, 1, 1, 0, 0, 0, DateTimeKind.Unspecified);
-            DateTime finalYear = new DateTime(currentTime.Year + 1, 1, 1, 0, 0, 0, DateTimeKind.Unspecified);
 
-            var unwindAggregation = MongoDBAggregationExtension.UnWind(new("$evaluations"));
-            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument()
-            {
-                {"evaluations.userEvaluator", userId },
-                { "evaluations.evaluationDate", new BsonDocument{
-                    { "$gte", new BsonDateTime(startYear) },
-                    { "$lt", new BsonDateTime(finalYear) }
-                } }
-            });
-            var projectAggregation = MongoDBAggregationExtension.Project(new()
-            {
-                { "_id", 0 },
-                { "State", MongoDBAggregationExtension.Cond(MongoDBAggregationExtension.Eq(new() { "$evaluations.isApproved", true }),"aprobado","rechazado")
-                },
-                { "Date", new BsonDocument(){
-                    { "$dateToString", new BsonDocument{
-                        { "format", "%Y" },
-                        { "date", "$evaluations.evaluationDate"   }
-                    } }
-                }}
-            });
-
-            return new[] { unwindAggregation, matchAggregation, projectAggregation };
-        }
         private static BsonDocument[] GetUserHistoryProcessStateMonthlyPipeline(string userId)
         {
-            DateTime currentTime = DateTime.UtcNow.AddHours(-5);
-            DateTime startMonth = new DateTime(currentTime.Year, 1, 1, 0, 0, 0, DateTimeKind.Unspecified);
-            DateTime finalMonth = new DateTime(currentTime.Year + 1, 1, 1, 0, 0, 0, DateTimeKind.Unspecified);
+            var currentDate = DateTime.UtcNow.AddHours(-5);
 
             var unwindAggregation = MongoDBAggregationExtension.UnWind(new("$processesHistory"));
-            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument()
+
+            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument
             {
                 {"processesHistory.senderId", userId },
-                { "processesHistory.issuanceDate", new BsonDocument{
-                    { "$gte", new BsonDateTime(startMonth) },
-                    { "$lt", new BsonDateTime(finalMonth) }
-                } },
-                { "processesHistory.state", MongoDBAggregationExtension.NotEq("evaluado") }
+                { "processesHistory.issuanceDate", new BsonDocument().AddRange(new List<BsonElement>
+                    {
+                        MongoDBAggregationExtension.GreaterThanEquals(currentDate.AddDays(-30))
+                            .Elements
+                            .First(),
+                        MongoDBAggregationExtension.LessThanEquals(currentDate)
+                            .Elements
+                            .First()
+                    })
+                }
             });
 
-            var projectAggregation = MongoDBAggregationExtension.Project(new()
-            {
-                { "_id", 0 },
-                { "State", "$processesHistory.state" },
-                { "Date", new BsonDocument(){
-                    { "$dateToString", new BsonDocument{
-                        { "format", "%m" },
-                        { "date", "$processesHistory.issuanceDate"   }
-                    } }
-                }}
-            });
-
-            return new[] { unwindAggregation, matchAggregation, projectAggregation };
+            return new[] { unwindAggregation, matchAggregation }
+                .Concat(GetUserHistoryProcessStatePipeline(MongoDBAggregationExtension.DateToString("$processesHistory.issuanceDate", "%m,%Y")))
+                .ToArray();
         }
-        private static BsonDocument[] GetUserEvaluationHistoryStateMonthlyPipeline(string userId)
-        {
-            DateTime currentTime = DateTime.UtcNow.AddHours(-5);
-            DateTime startMonth = new DateTime(currentTime.Year, 1, 1, 0, 0, 0, DateTimeKind.Unspecified);
-            DateTime finalMonth = new DateTime(currentTime.Year + 1, 1, 1, 0, 0, 0, DateTimeKind.Unspecified);
 
-            var unwindAggregation = MongoDBAggregationExtension.UnWind(new("$evaluations"));
-            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument()
-            {
-                {"evaluations.userEvaluator", userId },
-                { "evaluations.evaluationDate", new BsonDocument{
-                    { "$gte", new BsonDateTime(startMonth) },
-                    { "$lt", new BsonDateTime(finalMonth) }
-                } }
-            });
-            var projectAggregation = MongoDBAggregationExtension.Project(new()
-            {
-                { "_id", 0 },
-                { "State", MongoDBAggregationExtension.Cond(MongoDBAggregationExtension.Eq(new() { "$evaluations.isApproved", true }),"aprobado","rechazado")
-                },
-                { "Date", new BsonDocument(){
-                    { "$dateToString", new BsonDocument{
-                        { "format", "%m" },
-                        { "date", "$evaluations.evaluationDate"   }
-                    } }
-                }}
-            });
-
-            return new[] { unwindAggregation, matchAggregation, projectAggregation };
-        }
         private static BsonDocument[] GetUserHistoryProcessStateDailyPipeline(string userId)
         {
-            DateTime currentTime = DateTime.UtcNow.AddHours(-5);
-            DateTime startDay = currentTime.AddDays(-(int)currentTime.DayOfWeek);
-            DateTime finalDay = startDay.AddDays(5);
+            var currentDate = DateTime.UtcNow.AddHours(-5);
 
             var unwindAggregation = MongoDBAggregationExtension.UnWind(new("$processesHistory"));
-            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument()
+
+            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument
             {
                 {"processesHistory.senderId", userId },
-                { "processesHistory.issuanceDate", new BsonDocument{
-                    { "$gte", new BsonDateTime(startDay) },
-                    { "$lt", new BsonDateTime(finalDay) }
-                } },
-                { "processesHistory.state", MongoDBAggregationExtension.NotEq("evaluado") }
+                { "processesHistory.issuanceDate", new BsonDocument().AddRange(new List<BsonElement>
+                    {
+                        MongoDBAggregationExtension.GreaterThanEquals(currentDate.AddDays(-7))
+                            .Elements
+                            .First(),
+                        MongoDBAggregationExtension.LessThanEquals(currentDate)
+                            .Elements
+                            .First()
+                    })
+                }
             });
 
-            var projectAggregation = MongoDBAggregationExtension.Project(new()
-            {
-                { "_id", 0 },
-                { "State", "$processesHistory.state" },
-                { "Date", new BsonDocument(){
-                    { "$dateToString", new BsonDocument{
-                        { "format", "%d/%m/%Y" },
-                        { "date", "$processesHistory.issuanceDate"   }
-                    } }
-                }}
-            });
-
-            return new[] { unwindAggregation, matchAggregation, projectAggregation };
+            return new[] { unwindAggregation, matchAggregation }
+                .Concat(GetUserHistoryProcessStatePipeline(MongoDBAggregationExtension.DateToString("$processesHistory.issuanceDate", "%d/%m/%Y")))
+                .ToArray();
         }
-        private static BsonDocument[] GetUserEvaluationHistoryStateDailyPipeline(string userId)
-        {
-            DateTime currentTime = DateTime.UtcNow.AddHours(-5);
-            DateTime startDay = currentTime.AddDays(-(int)currentTime.DayOfWeek);
-            DateTime finalDay = startDay.AddDays(5);
 
-            var unwindAggregation = MongoDBAggregationExtension.UnWind(new("$evaluations"));
-            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument()
+        private static BsonDocument[] GetUserHistoryProcessStatePipeline(BsonDocument dateFilterOperation)
+        {
+            var lastEvaluationAggregation = MongoDBAggregationExtension.AddFields(new()
             {
-                {"evaluations.userEvaluator", userId },
-                { "evaluations.evaluationDate", new BsonDocument{
-                    { "$gte", new BsonDateTime(startDay) },
-                    { "$lt", new BsonDateTime(finalDay) }
-                } }
+                { "lastEvaluation", MongoDBAggregationExtension.Last("$evaluations") }
             });
+
+            var evaluationResultAggregation = MongoDBAggregationExtension.AddFields(new()
+            {
+                { "isApproved", MongoDBAggregationExtension.Cond(
+                    MongoDBAggregationExtension.Eq(new() { "$processesHistory.state", "evaluado" }),
+                    "$lastEvaluation.isApproved",
+                    BsonNull.Value)
+                }
+            });
+
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
-                { "_id", 0 },
-                { "State", MongoDBAggregationExtension.Cond(MongoDBAggregationExtension.Eq(new() { "$evaluations.isApproved", true }),"aprobado","rechazado")
-                },
-                { "Date", new BsonDocument(){
-                    { "$dateToString", new BsonDocument{
-                        { "format", "%d/%m/%Y" },
-                        { "date", "$evaluations.evaluationDate"   }
-                    } }
-                }}
+                { "_id", 1 },
+                { "State", "$processesHistory.state" },
+                { "EndDate", "$endDate" },
+                { "DueDate", "$dueDate" },
+                { "IsApproved", "$isApproved" },
+                { "DateFilter", dateFilterOperation }
             });
 
-            return new[] { unwindAggregation, matchAggregation, projectAggregation };
+            return new[] {
+                lastEvaluationAggregation,
+                evaluationResultAggregation,
+                projectAggregation };
         }
         private static BsonDocument[] GetRoleDocumentsDailyPipeline()
         {
             var currentDate = DateTime.UtcNow.AddHours(-5);
 
-            var addFieldsAggregation = MongoDBAggregationExtension.AddFields(new()
-            {
-                { "creationDateYear", MongoDBAggregationExtension.Year("$creationDate") },
-                { "creationDateMonth", MongoDBAggregationExtension.Month("$creationDate") },
-                { "creationDateDay", MongoDBAggregationExtension.DayOfMonth("$creationDate")}
-            });
-
-            var matchAggregation = MongoDBAggregationExtension.Match(new Dictionary<string, BsonValue>
-            {
-                { "creationDateYear", currentDate.Year - 1 },
-                { "creationDateMonth", currentDate.Month },
-                { "creationDateDay", currentDate.Day }
-            });
+            var matchAggregation = MongoDBAggregationExtension.Match(
+                new BsonDocument("creationDate", new BsonDocument().AddRange(new List<BsonElement>
+                {
+                    MongoDBAggregationExtension.GreaterThanEquals(currentDate.AddDays(-7))
+                        .Elements
+                        .First(),
+                    MongoDBAggregationExtension.LessThanEquals(currentDate)
+                        .Elements
+                        .First()
+                })));
 
             var roleDocumentsPipeline = GetRoleDocumentsPipeline();
 
-            return new[] { addFieldsAggregation, matchAggregation }.Concat(roleDocumentsPipeline).ToArray();
+            return new[] { matchAggregation }.Concat(roleDocumentsPipeline).ToArray();
         }
 
 
@@ -1508,39 +1465,58 @@ namespace SISGED.Server.Services.Repositories
         {
             var currentDate = DateTime.UtcNow.AddHours(-5);
 
-            var addFieldsAggregation = MongoDBAggregationExtension.AddFields(new()
-            {
-                { "creationDateYear", MongoDBAggregationExtension.Year("$creationDate") },
-                { "creationDateMonth", MongoDBAggregationExtension.Month("$creationDate") }
-            });
-
-            var matchAggregation = MongoDBAggregationExtension.Match(new Dictionary<string, BsonValue>
-            {
-                { "creationDateYear", currentDate.Year - 1 },
-                { "creationDateMonth", currentDate.Month }
-            });
+            var matchAggregation = MongoDBAggregationExtension.Match(
+                new BsonDocument("creationDate", new BsonDocument().AddRange(new List<BsonElement>
+                {
+                    MongoDBAggregationExtension.GreaterThanEquals(currentDate.AddDays(-30))
+                        .Elements
+                        .First(),
+                    MongoDBAggregationExtension.LessThanEquals(currentDate)
+                        .Elements
+                        .First()
+                })));
 
             var roleDocumentsPipeline = GetRoleDocumentsPipeline();
 
-            return new[] { addFieldsAggregation, matchAggregation }.Concat(roleDocumentsPipeline).ToArray();
+            return new[] { matchAggregation }.Concat(roleDocumentsPipeline).ToArray();
         }
 
         private static BsonDocument[] GetRoleDocumentsYearlyPipeline()
         {
-            var addFieldsAggregation = MongoDBAggregationExtension.AddFields(new()
-            {
-                { "creationDateYear", MongoDBAggregationExtension.Year("$creationDate") }
-            });
+            var currentDate = DateTime.UtcNow.AddHours(-5);
 
-            var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("creationDateYear", DateTime.UtcNow.AddHours(-5).Year - 1));
+            var matchAggregation = MongoDBAggregationExtension.Match(
+                new BsonDocument("creationDate", new BsonDocument().AddRange(new List<BsonElement>
+                {
+                    MongoDBAggregationExtension.GreaterThanEquals(currentDate.AddYears(-1))
+                        .Elements
+                        .First(),
+                    MongoDBAggregationExtension.LessThanEquals(currentDate)
+                        .Elements
+                        .First()
+                })));
 
             var roleDocumentsPipeline = GetRoleDocumentsPipeline();
 
-            return new[] { addFieldsAggregation, matchAggregation }.Concat(roleDocumentsPipeline).ToArray();
+            return new[] { matchAggregation }.Concat(roleDocumentsPipeline).ToArray();
         }
 
         private static BsonDocument[] GetRoleDocumentsPipeline()
         {
+            var addSenderFieldsAggregation = MongoDBAggregationExtension.AddFields(new()
+            {
+                { "lastSenderId", MongoDBAggregationExtension.Last("$processesHistory.senderId") },
+                { "lastReceiverId", MongoDBAggregationExtension.Last("$processesHistory.receiverId") }
+            });
+
+            var addUserFieldAggregation = MongoDBAggregationExtension.AddFields(new()
+            {
+                { "userId", MongoDBAggregationExtension.Cond(
+                    MongoDBAggregationExtension.Eq(new() { "$lastSenderId", "$lastReceiverId" }),
+                    "$lastSenderId",
+                    "$lastReceiverId") }
+            });
+
             var userLookUpAggregation = GetUserLookUpPipeline();
 
             var userUnwindAggregation = MongoDBAggregationExtension.UnWind(new("$users"));
@@ -1551,10 +1527,17 @@ namespace SISGED.Server.Services.Repositories
 
             var roleMatchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("roles.name", MongoDBAggregationExtension.NotEq("cliente")));
 
+            var addFieldsAggregation = MongoDBAggregationExtension.AddFields(new()
+            {
+                { "isApproved", MongoDBAggregationExtension.Last("$evaluations.isApproved") }
+            });
+
             var projectAggregation = GetRoleDocumentsProjectPipeline();
 
-            return new[] { userLookUpAggregation, userUnwindAggregation, roleLookUpAggregation,
-                           roleUnwindAggregation, roleMatchAggregation, projectAggregation };
+            return new[] { 
+                addSenderFieldsAggregation, addUserFieldAggregation, userLookUpAggregation, userUnwindAggregation, 
+                roleLookUpAggregation, roleUnwindAggregation, roleMatchAggregation, addFieldsAggregation, 
+                projectAggregation };
         }
 
         private static BsonDocument GetRoleDocumentsProjectPipeline()
@@ -1565,7 +1548,8 @@ namespace SISGED.Server.Services.Repositories
                 { "state", 1 },
                 { "creationDate", 1 },
                 { "endDate", 1 },
-                { "dueDate", 1 }
+                { "dueDate", 1 },
+                { "isApproved", 1 }
 
             });
 
@@ -2033,10 +2017,10 @@ namespace SISGED.Server.Services.Repositories
         {
             var letPipeline = new Dictionary<string, BsonValue>()
             {
-                { "userId", MongoDBAggregationExtension.ObjectId("$creationUserId") }
+                { "userId", MongoDBAggregationExtension.ObjectId("$userId") }
             };
 
-            var lookUpPipeline = new BsonArray()
+            var lookUpPipeline = new BsonArray
             {
                 MongoDBAggregationExtension.Match(
                     MongoDBAggregationExtension.Expr(MongoDBAggregationExtension.Eq(new() { "$_id", "$$userId" })))

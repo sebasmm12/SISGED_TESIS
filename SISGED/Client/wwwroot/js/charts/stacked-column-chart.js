@@ -9,7 +9,7 @@ export function drawStackedColumnChart(data, xAxisLabel, yAxisLabel, legendType)
         if (legendType === "userDocumentsByState") {
             root = am5.Root.new("stacked-chart-user-documents-by-state");
         } else {
-            root = am5.Root.new("stacked-chart")
+            root = am5.Root.new("stacked-chart");
         }
 
         root.setThemes([am5themes_Material.new(root)]);
@@ -141,32 +141,37 @@ function changeDataSeries(legendType) {
                     {
                         name: "registrado",
                         value: "Registrado",
-                        color: am5.color("#546E7A")
+                        color: am5.color("#2196F3")
+                    },
+                    {
+                        name: "modificado",
+                        value: "Modificado",
+                        color: am5.color("#FFCA28")
                     },
                     {
                         name: "generado",
                         value: "Generado",
-                        color: am5.color("#43A047")
+                        color: am5.color("#25393D")
                     },
                     {
                         name: "aprobado",
                         value: "Aprobado",
-                        color: am5.color("#25393D")
+                        color: am5.color("#43A047")
                     },
                     {
                         name: "rechazado",
                         value: "Rechazado",
-                        color: am5.color("#FDD835")
+                        color: am5.color("#E53935")
                     },
                     {
                         name: "derivado",
                         value: "Derivado",
-                        color: am5.color("#039BE5")
+                        color: am5.color("#9C27B0")
                     },
                     {
-                        name: "anulado",
-                        value: "Anulado",
-                        color: am5.color("#E6E6E6")
+                        name: "retrasado",
+                        value: "Retrasado",
+                        color: am5.color("#FF9800")
                     }
                 ]
             }
@@ -177,34 +182,39 @@ function changeDataSeries(legendType) {
                 name: "documents",
                 fields: [
                     {
-                        name: "creado",
-                        value: "Creado",
-                        color: am5.color("#546E7A")
+                        name: "registrado",
+                        value: "Registrado",
+                        color: am5.color("#2196F3")
                     },
                     {
                         name: "modificado",
                         value: "Modificado",
-                        color: am5.color("#FDD835")
+                        color: am5.color("#FFCA28")
                     },
                     {
                         name: "generado",
                         value: "Generado",
+                        color: am5.color("#25393D")
+                    },
+                    {
+                        name: "aprobado",
+                        value: "Aprobado",
                         color: am5.color("#43A047")
                     },
                     {
-                        name: "evaluado",
-                        value: "Evaluado",
-                        color: am5.color("#25393D")
+                        name: "rechazado",
+                        value: "Rechazado",
+                        color: am5.color("#E53935")
                     },
                     {
                         name: "derivado",
                         value: "Derivado",
-                        color: am5.color("#039BE5")
+                        color: am5.color("#9C27B0")
                     },
                     {
-                        name: "caducado",
-                        value: "Caducado",
-                        color: am5.color("#E53935")
+                        name: "retrasado",
+                        value: "Retrasado",
+                        color: am5.color("#FF9800")
                     }
                 ]
             }

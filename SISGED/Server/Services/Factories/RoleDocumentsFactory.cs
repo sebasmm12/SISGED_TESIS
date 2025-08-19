@@ -46,13 +46,28 @@ namespace SISGED.Server.Services.Factories
                                 .Where(IsDocumentExpired)
                                 .ToList();
 
-            var nonDueDocuments = documents.Except(dueDocuments);
+            var approvedDocuments = documents
+                .Where(document => document.IsApproved.HasValue && document.IsApproved.Value)
+                .ToList();
+
+            var rejectedDocuments = documents
+                .Where(document => document.IsApproved.HasValue && !document.IsApproved.Value)
+                .ToList();
+
+            var nonDueDocuments = documents
+                .Except(dueDocuments)
+                .Except(approvedDocuments)
+                .Except(rejectedDocuments);
 
             var documentsByState = documentStates
                                     .Select(state => GetDocumentsState(state, nonDueDocuments))
                                     .ToDictionary(documentState => documentState.State, documentState => documentState.Count);
 
-            documentsByState.Add("caducado", dueDocuments.Count);
+            SetAdditionalDocumentStates(
+                documentsByState, 
+                dueDocuments.Count, 
+                approvedDocuments.Count, 
+                rejectedDocuments.Count);
 
             return new(groupedDocuments.Key, documentsByState);
         }
@@ -68,7 +83,18 @@ namespace SISGED.Server.Services.Factories
         {
             var currentDate = DateTime.UtcNow.AddHours(-5);
 
-            return document.EndDate?.Date > document.DueDate.Date || (!document.EndDate.HasValue && document.DueDate.Date < currentDate.Date);
+            return !document.EndDate.HasValue && document.DueDate.Date < currentDate.Date;
+        }
+
+        private static void SetAdditionalDocumentStates(
+            Dictionary<string, int> documentsByState, 
+            int dueDocuments, 
+            int approvedDocuments, 
+            int rejectedDocuments)
+        {
+            documentsByState.Add("retrasado", dueDocuments);
+            documentsByState.Add("aprobado", approvedDocuments);
+            documentsByState.Add("rechazado", rejectedDocuments);
         }
     }
 }

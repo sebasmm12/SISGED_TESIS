@@ -15,7 +15,7 @@ public partial class Snapshot
     public string Icon { get; set; } = default!;
 
     [Parameter]
-    public Color Color { get; set; } = default!;
+    public string Color { get; set; } = default!;
 
     [Parameter]
     public string BackgroundColor { get; set; } = default!;

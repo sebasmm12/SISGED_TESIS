@@ -19,6 +19,9 @@ public class ExpiredTrayDocuments
     [BsonElement("documentType")] 
     public string DocumentType { get; set; } = default!;
 
+    [BsonElement("documentTitle")]
+    public string DocumentTitle { get; set; } = default!;
+
     [BsonElement("expirationDays")]
     public int ExpirationDays { get; set; }
 }

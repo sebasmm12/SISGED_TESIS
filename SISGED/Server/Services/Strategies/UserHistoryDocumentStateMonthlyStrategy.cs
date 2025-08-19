@@ -1,6 +1,7 @@
 ﻿using SISGED.Server.Services.Contracts;
 using SISGED.Server.Services.Strategies.Contracts;
 using SISGED.Shared.DTOs;
+using SISGED.Shared.Models.Responses.Document;
 
 namespace SISGED.Server.Services.Strategies
 {
@@ -14,33 +15,75 @@ namespace SISGED.Server.Services.Strategies
         }
         public DateFilterDTO DateFilter => DateFilterDTO.Monthly;
 
+        public IEnumerable<string> DateFilters
+        {
+            get
+            {
+                var lastDate = DateTime
+                    .UtcNow
+                    .AddHours(-5)
+                    .AddMonths(-11);
+
+                return Enumerable
+                    .Range(0, 12)
+                    .Select(i =>
+                    {
+                        var date = lastDate.AddMonths(i);
+
+                        return $"{MonthNames[date.Month]},{date.Year}";
+                    });
+            }
+        }
+
+        private readonly Dictionary<int, string> MonthNames = new()
+        {
+            { 1, "Enero" },
+            { 2, "Febrero" },
+            { 3, "Marzo" },
+            { 4, "Abril" },
+            { 5, "Mayo" },
+            { 6, "Junio" },
+            { 7, "Julio" },
+            { 8, "Agosto" },
+            { 9, "Septiembre" },
+            { 10, "Octubre" },
+            { 11, "Noviembre" },
+            { 12, "Diciembre" }
+        };
+
         public async Task<IEnumerable<UserDocumentHistoryStateDTO>> GetDocumentsAsync(string userId)
         {
             var result = await _documentService.GetUserHistoryStateMonthlyAsync(userId);
-            ReemplazarMeses(result);
+
+            ReplaceMonths(result);
+
             return result;
         }
 
-        private static void ReemplazarMeses(IEnumerable<UserDocumentHistoryStateDTO> lista)
+        public IEnumerable<UserDocumentHistoryStateDTO> MapToUserDocumentHistoryStates(IEnumerable<DocumentResponse> documents)
         {
-            // Array con nombres de meses en español (índice 0 = Enero, 11 = Diciembre)
-            string[] meses = {
-        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-    };
+            var documentHistoryStates = documents
+                .Select(document => new UserDocumentHistoryStateDTO
+                {
+                    Id = document.Id,
+                    State = document.State,
+                    EndDate = document.EndDate,
+                    DueDate = document.DueDate,
+                    DateFilter = $"{MonthNames[document.CreationDate.Month]},{document.CreationDate.Year}"
+                });
 
-            foreach (var item in lista)
+            return documentHistoryStates;
+        }
+
+        private void ReplaceMonths(IEnumerable<UserDocumentHistoryStateDTO> documents)
+        {
+            foreach (var document in documents)
             {
-                // Convertir el string a entero (maneja formatos "1", "01", "10", etc.)
-                if (int.TryParse(item.Date, out int mes) && mes >= 1 && mes <= 12)
-                {
-                    item.Date = meses[mes - 1];  // Acceder al índice del array
-                }
-                else
-                {
-                    // Manejar valores inválidos (opcional)
-                    item.Date = "Inválido";
-                }
+                int.TryParse(document.DateFilter.Split(',').First(), out var monthFilter);
+
+                var yearFilter = document.DateFilter.Split(',').Last();
+
+                document.DateFilter = $"{MonthNames[monthFilter]},{yearFilter}";
             }
         }
     }

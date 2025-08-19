@@ -23,4 +23,7 @@ public class RoleDocumentDTO
 
     [BsonElement("dueDate")]
     public DateTime DueDate { get; set; }
+
+    [BsonElement("isApproved")]
+    public bool? IsApproved { get; set; }
 }

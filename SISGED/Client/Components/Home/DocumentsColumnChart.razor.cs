@@ -23,12 +23,12 @@ public partial class DocumentsColumnChart
 
     private readonly IEnumerable<DateFilterItem> dateFilterItems = new List<DateFilterItem>
     {
-        new (DateFilterDTO.Daily, "Hoy"),
-        new (DateFilterDTO.Monthly, "Mes"),
-        new (DateFilterDTO.Yearly, "Año")
+        new (DateFilterDTO.Daily, "Últimos 7 días"),
+        new (DateFilterDTO.Monthly, "Últimos 30 días"),
+        new (DateFilterDTO.Yearly, "Últimos 12 meses")
     };
 
-    private string selectedDateFilterText = "Hoy";
+    private string selectedDateFilterText = "Últimos 7 días";
 
     protected override async Task OnInitializedAsync()
     {

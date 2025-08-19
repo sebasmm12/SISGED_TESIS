@@ -88,7 +88,7 @@ namespace SISGED.Server.Services.Repositories
 
         public async Task<Tray> GetTrayDocumentAsync(string user)
         {
-            return await _traysCollection.FindAsync(t => t.User == user).Result.FirstAsync();
+            return await _traysCollection.Find(t => t.User == user).FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<UserTrayResponse>> GetWorkloadByRoleAsync(string role)
@@ -182,11 +182,11 @@ namespace SISGED.Server.Services.Repositories
             if (updateTray is null) throw new Exception($"No se pudo actualizar la bandeja del usuario con identificador {updateDocumentTrayDTO.UserId}");
         }
 
-        public async Task<IEnumerable<ExpiredTrayDocuments>> GetNextExpiredTraysDocumentsAsync(string userId, string type)
+        public async Task<IEnumerable<ExpiredTrayDocuments>> GetNextExpiredTraysDocumentsAsync(string userId)
         {
-            var expiredDocuments = await _traysCollection.Aggregate<ExpiredTrayDocuments>(GetExpiredTrayDocumentsPipeline(userId, type)).ToListAsync();
+            var expiredDocuments = await _traysCollection.Aggregate<ExpiredTrayDocuments>(GetExpiredTrayDocumentsPipeline(userId)).ToListAsync();
 
-            if (expiredDocuments is null) throw new($"No se pudo encontrar los documentos próximos a expirar del usuario con identificador {userId} para el tipo de bandeja {type}");
+            if (expiredDocuments is null) throw new($"No se pudo encontrar los documentos próximos a expirar del usuario con identificador {userId}");
 
             return expiredDocuments;
         }
@@ -202,13 +202,18 @@ namespace SISGED.Server.Services.Repositories
 
         #region private methods
 
-        private static BsonDocument[] GetExpiredTrayDocumentsPipeline(string userId, string type)
+        private static BsonDocument[] GetExpiredTrayDocumentsPipeline(string userId)
         {
             var matchAggregation = MongoDBAggregationExtension.Match(new BsonDocument("user", userId));
 
-            var unWindAggregation = MongoDBAggregationExtension.UnWind(new($"${type}"));
+            var setAggregation = MongoDBAggregationExtension.Set(new()
+            {
+                { "trayDocuments", MongoDBAggregationExtension.ConcatArrays(new List<BsonValue> {"$inputTray", "$outputTray"}) }
+            });
 
-            var documentsLookUpAggregation = GetExpiredTrayDocumentsLookUpPipeline(type);
+            var unWindAggregation = MongoDBAggregationExtension.UnWind(new("$trayDocuments"));
+
+            var documentsLookUpAggregation = GetExpiredTrayDocumentsLookUpPipeline("trayDocuments");
 
             var documentsUnWindAggregation = MongoDBAggregationExtension.UnWind(new("$documents"));
 
@@ -216,7 +221,7 @@ namespace SISGED.Server.Services.Repositories
 
             var limitAggregation = MongoDBAggregationExtension.Limit(10);
 
-            var dossiersLookUpAggregation = GetTrayDossiersLookUpPipeline(type);
+            var dossiersLookUpAggregation = GetTrayDossiersLookUpPipeline("trayDocuments");
 
             var dossiersUnWindAggregation = MongoDBAggregationExtension.UnWind(new("$dossiers"));
 
@@ -228,15 +233,16 @@ namespace SISGED.Server.Services.Repositories
             var projectAggregation = MongoDBAggregationExtension.Project(new()
             {
                 { "_id", 0 },
-                { "dossierId", $"${type}.dossierId" },
-                { "documentId", $"${type}.documentId" },
+                { "dossierId", "$trayDocuments.dossierId" },
+                { "documentId", "$trayDocuments.documentId" },
                 { "client", MongoDBAggregationExtension.Concat(new List<BsonValue> { "$dossiers.client.name", " ", "$dossiers.client.lastName" }) },
                 { "dossierType", "$dossiers.type" },
                 { "documentType", "$documents.type" },
+                { "documentTitle", "$documents.content.title" },
                 { "expirationDays", MongoDBAggregationExtension.DateDiff("$currentDate", "$documents.dueDate", "day") }
             });
 
-            return new[] { matchAggregation, unWindAggregation, documentsLookUpAggregation, documentsUnWindAggregation,
+            return new[] { matchAggregation, setAggregation, unWindAggregation, documentsLookUpAggregation, documentsUnWindAggregation,
                            documentDueDateSortAggregation, limitAggregation, dossiersLookUpAggregation, dossiersUnWindAggregation,
                            addFieldsAggregation, projectAggregation };
         }

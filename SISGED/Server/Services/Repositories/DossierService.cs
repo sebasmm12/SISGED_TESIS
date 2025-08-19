@@ -37,6 +37,7 @@ namespace SISGED.Server.Services.Repositories
         }
 
         public string CollectionName => "expedientes";
+        private string[] excludedDossiers => new string[] { "Solicitud" };
 
         public async Task<Dossier> DeleteDossierDocumentAsync(string documentId)
         {
@@ -231,6 +232,10 @@ namespace SISGED.Server.Services.Repositories
             var aggregateResult = await _dossiersCollection.AggregateAsync<DossierSnapshotResponse>(GetDossiersSnapshotPipeline());
 
             var dossiersSnapshot = await aggregateResult.ToListAsync();
+
+            dossiersSnapshot = dossiersSnapshot
+                .ExceptBy(excludedDossiers, dossierSnapshot => dossierSnapshot.type)
+                .ToList();
 
             if (dossiersSnapshot is null) throw new Exception($"No se pudo obtener la información de los expedientes");
 

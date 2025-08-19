@@ -6,14 +6,23 @@
         <MudItem xs="12" sm="12" md="6" lg="8" xl="8">
             <DocumentsSnapshot></DocumentsSnapshot>
         </MudItem>
-        <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
-            <DossiersSnapshot></DossiersSnapshot>
-        </MudItem>
+        @if (managerRoles.Contains(userRole))
+        {
+            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                <DossiersSnapshot></DossiersSnapshot>
+            </MudItem>
+        }
         <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
             <UserDocumentMultiColumnChart></UserDocumentMultiColumnChart>
         </MudItem>
+        @if (managerRoles.Contains(userRole))
+        {
+            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                <DocumentsColumnChart></DocumentsColumnChart>
+            </MudItem>
+        }
         <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
-            <DocumentsColumnChart></DocumentsColumnChart>
+            <DelayedTrayDocuments></DelayedTrayDocuments>
         </MudItem>
     </MudGrid>
 

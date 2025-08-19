@@ -1,20 +1,23 @@
 ﻿<MudCard Elevation="5" Class="documents-snapshot">
     <MudCardHeader>
         <CardHeaderContent>
-            <MudText Typo="Typo.h6">Documentos</MudText>
+            <MudText Typo="Typo.h6">Proceso de documentos</MudText>
         </CardHeaderContent>
     </MudCardHeader>
     <MudCardContent>
-        <MudGrid>
-            <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
-                <Snapshot Title="Registrados" Quantity="4" Icon="fa-file-circle-plus" Color="Color.Success" BackgroundColor="@Colors.Green.Lighten4"></Snapshot>
-            </MudItem>
-            <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
-                <Snapshot Title="Derivados" Quantity="3" Icon="fa-file-import" Color="Color.Warning" BackgroundColor="@Colors.Yellow.Lighten4"></Snapshot>
-            </MudItem>
-            <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
-                <Snapshot Title="Caducados" Quantity="2" Icon="fa-file-circle-exclamation" Color="Color.Error" BackgroundColor="@Colors.Red.Lighten4"></Snapshot>
-            </MudItem>
-        </MudGrid>
+        @if (isRendered)
+        {
+            <MudGrid>
+                <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
+                    <Snapshot Title="Registrados" Quantity="@documentSnapshotResponse!.Registered" Icon="fa-file-circle-plus" Color="@Colors.Blue.Default" BackgroundColor="@Colors.Blue.Lighten4"></Snapshot>
+                </MudItem>
+                <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
+                    <Snapshot Title="Derivados" Quantity="@documentSnapshotResponse!.Derived" Icon="fa-file-import" Color="@Colors.Amber.Lighten1" BackgroundColor="@Colors.Yellow.Lighten4"></Snapshot>
+                </MudItem>
+                <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
+                    <Snapshot Title="Retrasados" Quantity="@documentSnapshotResponse!.Expired" Icon="fa-file-circle-exclamation" Color="@Colors.Orange.Default" BackgroundColor="@Colors.Orange.Lighten4"></Snapshot>
+                </MudItem>
+            </MudGrid>
+        }
     </MudCardContent>
 </MudCard>

@@ -87,8 +87,13 @@ namespace SISGED.Server.Services.Contracts
         Task<IEnumerable<RoleDocumentDTO>> GetRoleDocumentsMonthlyAsync();
         Task<IEnumerable<RoleDocumentDTO>> GetRoleDocumentsDailyAsync();
         Task<IEnumerable<UserDocumentHistoryStateDTO>> GetUserHistoryStateYearlyAsync(string userId);
+
         Task<IEnumerable<UserDocumentHistoryStateDTO>> GetUserHistoryStateMonthlyAsync(string userId);
+
         Task<IEnumerable<UserDocumentHistoryStateDTO>> GetUserHistoryStateDailyAsync(string userId);
+
         Task<UserDocumentSnapshotResponse> GetUserDocumentsSnapshotAsync(string userId);
+
+        Task<IEnumerable<DocumentResponse>> GetDocumentsAsync(IEnumerable<string> documentIds);
     }
 }

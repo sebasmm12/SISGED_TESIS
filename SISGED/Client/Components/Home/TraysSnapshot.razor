@@ -5,13 +5,16 @@
         </CardHeaderContent>
     </MudCardHeader>
     <MudCardContent>
-        <MudGrid>
-            <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
-                <Snapshot Title="Entrada" Quantity="5" Icon="fa-arrow-trend-up" Color="Color.Success" BackgroundColor="@Colors.Green.Lighten4"></Snapshot>
-            </MudItem>
-            <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
-                <Snapshot Title="Salida" Quantity="6" Icon="fa-arrow-trend-down" Color="Color.Error" BackgroundColor="@Colors.Red.Lighten4"></Snapshot>
-            </MudItem>
-        </MudGrid>
+        @if (isRendered)
+        {
+            <MudGrid>
+                <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
+                    <Snapshot Title="Entrada" Quantity="@userTraysSnapshot!.InputTray" Icon="fa-arrow-trend-up" Color="@Colors.Green.Accent4" BackgroundColor="@Colors.Green.Lighten4"></Snapshot>
+                </MudItem>
+                <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
+                    <Snapshot Title="Salida" Quantity="@userTraysSnapshot!.OutputTray" Icon="fa-arrow-trend-down" Color="@Colors.Red.Default" BackgroundColor="@Colors.Red.Lighten4"></Snapshot>
+                </MudItem>
+            </MudGrid>
+        }
     </MudCardContent>
 </MudCard>

@@ -6,7 +6,6 @@ using SISGED.Client.Helpers;
 using SISGED.Client.Services.Contracts;
 using SISGED.Shared.Models.Responses.Account;
 using SISGED.Shared.Models.Responses.Document.UserRequest;
-using SISGED.Shared.Models.Responses.User;
 
 namespace SISGED.Client.Pages.Requests
 {

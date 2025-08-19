@@ -259,6 +259,11 @@ namespace SISGED.Server.Helpers.Infrastructure
             return new BsonDocument("$gt", value);
         }
 
+        public static BsonDocument GreaterThan(BsonArray values)
+        {
+            return new BsonDocument("$gt", values);
+        }
+
         public static BsonDocument LessThanEquals(BsonValue value)
         {
             return new BsonDocument("$lte", value);
@@ -292,6 +297,26 @@ namespace SISGED.Server.Helpers.Infrastructure
         public static BsonDocument DateDiff(BsonValue startDate, BsonValue endDate, string timeUnit)
         {
             return new("$dateDiff", new BsonDocument().Add("startDate", startDate).Add("endDate", endDate).Add("unit", timeUnit));
+        }
+
+        public static BsonDocument DateToString(BsonValue date, string format)
+        {
+            return new BsonDocument("$dateToString", new BsonDocument().Add("format", format).Add("date", date));
+        }
+
+        public static BsonDocument And(IEnumerable<BsonValue> values)
+        {
+            return new BsonDocument("$and", new BsonArray().AddRange(values));
+        }
+
+        public static BsonDocument Last(BsonValue value)
+        {
+            return new BsonDocument("$last", value);
+        }
+
+        public static BsonDocument ConcatArrays(IEnumerable<BsonValue> values)
+        {
+            return new BsonDocument("$concatArrays", new BsonArray().AddRange(values));
         }
     }
 }

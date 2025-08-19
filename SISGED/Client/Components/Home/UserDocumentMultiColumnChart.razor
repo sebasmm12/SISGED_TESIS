@@ -2,7 +2,7 @@
     <MudCardHeader>
         <CardHeaderContent>
             <div class="documents-chart-header">
-                <MudText Typo="Typo.h6">Documentos por estado</MudText>
+                <MudText Typo="Typo.h6">Proceso de documentos por estado</MudText>
                 <MudMenu Label="@selectedDateFilterText" FullWidth="true" EndIcon="@Icons.Material.Filled.KeyboardArrowDown">
                     @foreach (var dateFilter in dateFilterItems)
                     {
@@ -18,7 +18,9 @@
         {
             <GenericToolLoader Body="@string.Empty"></GenericToolLoader>
         }
-        else if (userDocuments.Any())
+        else if (userDocuments
+                 .SelectMany(userDocument => userDocument.Documents)
+                 .Any(document => document.Value != 0))
         {
             <GenericStackedColumnChart Data="userDocuments" XAxisLabel="@xAxisLabel" YAxisLabel="@yAxisLabel" LegendType="userDocumentsByState"></GenericStackedColumnChart>
         }

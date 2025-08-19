@@ -5,16 +5,19 @@
         </CardHeaderContent>
     </MudCardHeader>
     <MudCardContent>
-        <MudGrid>
-            <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
-                <Snapshot Title="Procedimientos Disciplinarios" Quantity="4" Icon="fa-file-circle-check" Color="Color.Secondary" BackgroundColor="@Colors.Grey.Lighten2"></Snapshot>
-            </MudItem>
-            <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
-                <Snapshot Title="Expedición de Firmas" Quantity="3" Icon="fa-signature" Color="Color.Warning" BackgroundColor="@Colors.Yellow.Lighten4"></Snapshot>
-            </MudItem>
-            <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
-                <Snapshot Title="Búsquedas de Protocolos Notariales" Quantity="2" Icon="fa-magnifying-glass" Color="Color.Info" BackgroundColor="@Colors.Blue.Lighten4"></Snapshot>
-            </MudItem>
-        </MudGrid>
+        @if (isRendered)
+        {
+            <MudGrid>
+                <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
+                    <Snapshot Title="Procedimientos Disciplinarios" Quantity="@GetTotal("Denuncia")" Icon="fa-file-circle-check" Color="@Colors.Grey.Darken3" BackgroundColor="@Colors.Grey.Lighten2"></Snapshot>
+                </MudItem>
+                <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
+                    <Snapshot Title="Expedición de Firmas" Quantity="@GetTotal("Expedicion-Firmas")" Icon="fa-signature" Color="@Colors.Orange.Default" BackgroundColor="@Colors.Yellow.Lighten4"></Snapshot>
+                </MudItem>
+                <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
+                    <Snapshot Title="Búsquedas de Protocolos Notariales" Quantity="@GetTotal("Busqueda-Protocolos")" Icon="fa-magnifying-glass" Color="@Colors.Blue.Default" BackgroundColor="@Colors.Blue.Lighten4"></Snapshot>
+                </MudItem>
+            </MudGrid>
+        }
     </MudCardContent>
 </MudCard>

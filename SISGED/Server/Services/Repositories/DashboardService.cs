@@ -24,20 +24,9 @@ public class DashboardService : IDashboardService
 
     public async Task<ExpiredTraysDocumentsResponse> GetExpiredTraysDocuments(string userId)
     {
-        var expiredInputTrayDocumentsTask =  _trayService.GetNextExpiredTraysDocumentsAsync(userId, "inputTray");
+        var expiredTrayDocuments =  await _trayService.GetNextExpiredTraysDocumentsAsync(userId);
 
-        var expiredOutputTrayDocumentsTask = _trayService.GetNextExpiredTraysDocumentsAsync(userId, "outputTray");
-
-        await Task.WhenAll(expiredInputTrayDocumentsTask, expiredOutputTrayDocumentsTask);
-
-        var expiredInputTrayDocuments = await expiredInputTrayDocumentsTask;
-        var expiredOutputTrayDocuments = await expiredOutputTrayDocumentsTask;
-
-        return new()
-        {
-            ExpiredInputTrayDocuments = expiredInputTrayDocuments,
-            ExpiredOutputTrayDocuments = expiredOutputTrayDocuments
-        };
+        return new(expiredTrayDocuments);
     }
 
     public async Task<IEnumerable<RoleDocumentsResponse>> GetRolesDocumentsAsync(DateFilterDTO dateFilter)

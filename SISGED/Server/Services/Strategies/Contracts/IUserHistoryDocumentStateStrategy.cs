@@ -1,11 +1,15 @@
 ﻿using SISGED.Shared.DTOs;
+using SISGED.Shared.Models.Responses.Document;
 
-namespace SISGED.Server.Services.Strategies.Contracts
+namespace SISGED.Server.Services.Strategies.Contracts;
+
+public interface IUserHistoryDocumentStateStrategy
 {
-    public interface IUserHistoryDocumentStateStrategy
-    {
-        DateFilterDTO DateFilter { get; }
+    DateFilterDTO DateFilter { get; }
 
-        Task<IEnumerable<UserDocumentHistoryStateDTO>> GetDocumentsAsync(string userId);
-    }
+    IEnumerable<string> DateFilters { get; }
+
+    Task<IEnumerable<UserDocumentHistoryStateDTO>> GetDocumentsAsync(string userId);
+
+    IEnumerable<UserDocumentHistoryStateDTO> MapToUserDocumentHistoryStates(IEnumerable<DocumentResponse> documents);
 }

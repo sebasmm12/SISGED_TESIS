@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components;
-using MudBlazor;
 using SISGED.Client.Helpers;
 using SISGED.Client.Services.Contracts;
 using SISGED.Shared.DTOs;
@@ -26,12 +25,12 @@ public partial class UserDocumentMultiColumnChart
 
     private readonly IEnumerable<DateFilterItem> dateFilterItems = new List<DateFilterItem>
     {
-        new (DateFilterDTO.Daily, "Hoy"),
-        new (DateFilterDTO.Monthly, "Mes"),
-        new (DateFilterDTO.Yearly, "Año")
+        new (DateFilterDTO.Daily, "Últimos 7 días"),
+        new (DateFilterDTO.Monthly, "Últimos 12 meses"),
+        new (DateFilterDTO.Yearly, "Últimos 5 años")
     };
 
-    private string selectedDateFilterText = "Hoy";
+    private string selectedDateFilterText = "Últimos 7 días";
 
     protected override async Task OnInitializedAsync()
     {

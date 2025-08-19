@@ -1,0 +1,45 @@
+﻿@using SISGED.Shared.Models.Responses.Dashboards
+<MudCard Elevation="5">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">Documentos próximos a finalizar</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent Class="pt-0">
+        <MudTable ServerData="@(new Func<TableState, Task<TableData<ExpiredTrayDocuments>>>(LoadTableAsync))" Hover="true"
+                  Loading="requestsLoading" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Primary">
+            <HeaderContent>
+                <MudTh class="header-table">Cliente</MudTh>
+                <MudTh class="header-table">Expediente</MudTh>
+                <MudTh class="header-table">Documento</MudTh>
+                <MudTh class="header-table">Tipo de Documento</MudTh>
+                <MudTh class="header-table">Días para ser finalizado</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Cliente">@context.Client</MudTd>
+                <MudTd DataLabel="Expediente">@DossierTypeMapper.Map(context.DossierType)</MudTd>
+                <MudTd DataLabel="Documento">@context.DocumentTitle</MudTd>
+                <MudTd DataLabel="Tipo de Documento">@DocumentTypeMapper.Map(context.DocumentType)</MudTd>
+                <MudTd DataLabel="Días para ser finalizado">
+                    @if (context.ExpirationDays > 0)
+                    {
+                        <text>@context.ExpirationDays días para su finalización</text>
+                    }
+                    else if(context.ExpirationDays == 0)
+                    {
+                        <text>Hoy es el último día</text>
+                    }
+                    else
+                    {
+                        <text>@Math.Abs(context.ExpirationDays) días retrasados</text>
+                    }
+                </MudTd>
+            </RowTemplate>
+            <NoRecordsContent>
+                <MudPaper Elevation="0" Class="transparent-color">
+                    <MudText Typo="Typo.h6" Class="text-center">No se tiene ningún documento registrado en sus bandejas</MudText>
+                </MudPaper>
+            </NoRecordsContent>
+        </MudTable>
+    </MudCardContent>
+</MudCard>

@@ -2,7 +2,15 @@
 
 public class ExpiredTraysDocumentsResponse
 {
-    public IEnumerable<ExpiredTrayDocuments> ExpiredInputTrayDocuments { get; set; } = default!;
+    public ExpiredTraysDocumentsResponse()
+    {
+        
+    }
 
-    public IEnumerable<ExpiredTrayDocuments> ExpiredOutputTrayDocuments { get; set; } = default!;
+    public ExpiredTraysDocumentsResponse(IEnumerable<ExpiredTrayDocuments> expiredTrayDocuments)
+    {
+        ExpiredTrayDocuments = expiredTrayDocuments;
+    }
+
+    public IEnumerable<ExpiredTrayDocuments> ExpiredTrayDocuments { get; set; } = default!;
 }
