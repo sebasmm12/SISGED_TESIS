@@ -20,11 +20,11 @@ else
 
                         <div class="input-div one">
                                     <MudTextField @bind-Value="@userLogin.Username" Class="text-field-style" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentIcon="fas fa-id-card" AdornmentColor="Color.Primary"
-                                              Label="Nombre de usuario" For="@(()=>userLogin.Username)"></MudTextField>
+                                              Label="Nombre de usuario" For="@(()=>userLogin.Username)" OnKeyDown="async (e) => await HandleKeyDown(e)"></MudTextField>
                         </div>
                         <div class="input-div pass">
                                 <MudTextField @bind-Value="@userLogin.Password" InputType="InputType.Password" Class="text-field-style" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentIcon="fas fa-key" AdornmentColor="Color.Primary"
-                                          Label="Contraseña" For="@(()=>userLogin.Password)"></MudTextField>
+                                          Label="Contraseña" For="@(() => userLogin.Password)" OnKeyDown="async (e) => await HandleKeyDown(e)"></MudTextField>
                         </div>
 
                         <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Size="Size.Large" Style="background-color: yellowgreen; color: white; width: 200px; height: 60px;"  OnClick="async () => await LoginAsync()">Ingresar</MudButton>

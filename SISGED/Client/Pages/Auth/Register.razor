@@ -39,7 +39,7 @@ else
                             </MudItem>
 
                             <MudItem xs="12" sm="12" md="6" lg="6" xl="12">
-                                <MudDatePicker Label="Fecha de Nacimiento" AllowInput="false" @bind-Date="@userSelfRegister.BornDate" For="@(()=>userSelfRegister.BornDate)" Variant="Variant.Outlined"
+                                <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Fecha de Nacimiento" AllowInput="false" @bind-Date="@userSelfRegister.BornDate" For="@(() => userSelfRegister.BornDate)" Variant="Variant.Outlined"
                                            Adornment="Adornment.End" AdornmentIcon="fas fa-calendar" AdornmentColor="Color.Primary" MaxDate="DateTime.UtcNow.AddHours(-5)"></MudDatePicker>
                             </MudItem>
 

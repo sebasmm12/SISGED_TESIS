@@ -8,7 +8,7 @@
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Si, ' + swalFireInfo.action + '!',
+        confirmButtonText: '¡Sí, ' + swalFireInfo.action + '!',
         cancelButtonText: "Cancelar"
     }).then((result) => {
         if (result.value) {

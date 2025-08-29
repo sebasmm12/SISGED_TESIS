@@ -26,6 +26,7 @@
     display: block;
     margin: 0px 0px 0px 7px;
     color: #25393D;
+    overflow-wrap: anywhere;
 }
 
 .li-tool {

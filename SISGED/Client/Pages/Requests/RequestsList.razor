@@ -43,8 +43,7 @@
                     @if (!string.IsNullOrEmpty(context.DocumentUrl))
                     {
                         <MudTooltip Text="Ver Documento" Arrow="true" Placement="Placement.Top">
-                            <MudIconButton Icon="fas fa-file-pdf" Color="Color.Error" Href="@context.DocumentUrl"
-                                           Class="rounded-circle"></MudIconButton>
+                            <MudIconButton Icon="fas fa-file-pdf" Color="Color.Error" Href="@context.DocumentUrl" Target="_blank" Class="rounded-circle"></MudIconButton>
                         </MudTooltip>
                     }
                 </MudPaper>    

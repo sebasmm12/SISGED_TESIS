@@ -9,5 +9,7 @@ namespace SISGED.Shared.DTOs
 
         [BsonElement("code")]
         public string Code { get; set; } = default!;
+        [BsonElement("generatedUrl")]
+        public string GeneratedUrl { get; set; }
     }
 }

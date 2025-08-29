@@ -1,4 +1,4 @@
-﻿@if(pageLoading)
+﻿@if (pageLoading)
 {
     <GenericToolLoader Body="Cargando los elementos para la evaluación del documento, por favor espere..."></GenericToolLoader>
 }
@@ -45,6 +45,18 @@ else
                                 <MudText Typo="Typo.body1">@userRole!.Label</MudText>
                             </div>
                         </MudItem>
+                        @if (!string.IsNullOrEmpty(documentContent.GeneratedUrl))
+                        {
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <div class="text-start text-sm-center mb-2">
+                                    <MudText Typo="Typo.h6">Ver documento generado</MudText>
+                                    <MudTooltip Text="Ver Documento" Arrow="true" Placement="Placement.Top">
+                                        <MudIconButton Icon="fas fa-file-pdf" Color="Color.Error" Href="@documentContent.GeneratedUrl" Target="_blank"
+                                                       Class="rounded-circle"></MudIconButton>
+                                    </MudTooltip>
+                                </div>
+                            </MudItem>
+                        }
                         <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
                             <MudButton Color="Color.Primary" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AprroveDocumentAsync())">Aprobar</MudButton>
                         </MudItem>
@@ -61,7 +73,7 @@ else
                                     <div class="speech">
                                         <label for="comment">Comentario</label>
                                         <MudTextField Class="evaluator-comment" Variant="Variant.Text" Lines="3" @bind-Value="documentEvaluation.EvaluatorComment"
-                                              id="comment" For="@(() => documentEvaluation.EvaluatorComment)" Immediate="true" AutoFocus="true"></MudTextField>
+                                                      id="comment" For="@(() => documentEvaluation.EvaluatorComment)" Immediate="true" AutoFocus="true"></MudTextField>
                                     </div>
                                 </div>
                             </MudItem>

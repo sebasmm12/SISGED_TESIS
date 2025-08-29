@@ -121,5 +121,13 @@ namespace SISGED.Client.Pages.Auth
                 return null;
             }
         }
+
+        protected async Task HandleKeyDown(KeyboardEventArgs e)
+        {
+            if (e.Key == "Enter" || e.Code == "NumpadEnter")
+            {
+                await LoginAsync();
+            }
+        }
     }
 }

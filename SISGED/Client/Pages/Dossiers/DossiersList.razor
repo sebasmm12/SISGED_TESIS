@@ -38,12 +38,12 @@ else
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
-                        <MudDatePicker Label="Fecha de Inicio" @bind-Date="userDossierFilter.StartDate" DateFormat="dd/MM/yyyy" HelperText="Creado desde"
+                        <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Fecha de Inicio" @bind-Date="userDossierFilter.StartDate" DateFormat="dd/MM/yyyy" HelperText="Creado desde"
                                        AutoClose="true" Editable="true" For="@(() => userDossierFilter.StartDate)" AdornmentColor="Color.Primary" Variant="Variant.Outlined">
                         </MudDatePicker>
                     </MudItem>
                     <MudItem xs="12" sm="12" md="4" lg="4" xl="4">
-                        <MudDatePicker Label="Fecha Fin" @bind-Date="userDossierFilter.EndDate" DateFormat="dd/MM/yyyy" HelperText="Creado hasta"
+                        <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Fecha Fin" @bind-Date="userDossierFilter.EndDate" DateFormat="dd/MM/yyyy" HelperText="Creado hasta"
                                        AutoClose="true" Editable="true" For="@(() => userDossierFilter.EndDate)" AdornmentColor="Color.Primary" Variant="Variant.Outlined">
                         </MudDatePicker>
                     </MudItem>
