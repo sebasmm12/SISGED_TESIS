@@ -561,7 +561,7 @@ namespace SISGED.Server.Controllers
 
                 await _trayService.DeleteInputTrayDocumentAsync(document.Id);
                 
-               // await RegisterOutputTrayWithDocumentTrayAsync(document, user);
+                await RegisterOutputTrayWithDocumentTrayAsync(document, user);
 
                 return Ok(document);
             }
