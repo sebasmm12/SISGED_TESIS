@@ -26,7 +26,7 @@ else {
                         </div>
                         <div class="workspace common-box-style mud-grid-item-sm-12 mud-grid-item-md-8 mud-grid-item-lg-8">
                             <MudDropZone T="Item" Identifier="workplace" Class="h-100 border-2 border-solid mud-border-lines-default d-column"
-                                 CanDrop="@((item) => CanDropToWorkZone(item, workPlaceItems))" AllowReorder="CanReorder">
+                                 CanDrop="@((item) => CanDropToWorkZone(item, workPlaceItems, assistant))" AllowReorder="CanReorder">
                                 <ChildContent>
                                     @if(workPlaceItems.Count == 0) {
                                         <div class="window h-100">

@@ -5,7 +5,6 @@ using SISGED.Server.Services.Contracts;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Responses.Dashboards;
-using SISGED.Shared.Models.Responses.Statistic;
 using SISGED.Shared.Models.Responses.Tray;
 
 namespace SISGED.Server.Services.Repositories
@@ -125,12 +124,12 @@ namespace SISGED.Server.Services.Repositories
             await Task.WhenAll(inputTrayUpdate, outputTrayUpdate);
         }
 
-        public async Task RegisterOutputTrayWithDocumentTrayAsync(DocumentTray document, User user)
+        public async Task RegisterOutputTrayWithDocumentTrayAsync(DocumentTray document, string evaluatorUserId, string senderUserId)
         {
 
-            var inputTrayUpdate = PullDocumentTrayAsync(new(document, user.Id, "inputTray"));
+            var inputTrayUpdate = PullDocumentTrayAsync(new(document, evaluatorUserId, "inputTray"));
 
-            var outputTrayUpdate = PushDocumentTrayAsync(new(document, user.Id, "outputTray"));
+            var outputTrayUpdate = PushDocumentTrayAsync(new(document, senderUserId, "outputTray"));
 
             await Task.WhenAll(inputTrayUpdate, outputTrayUpdate);
         }

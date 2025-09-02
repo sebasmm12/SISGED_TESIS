@@ -557,11 +557,21 @@ namespace SISGED.Server.Controllers
 
                 if (documentEvaluationRequest.IsApproved) return Ok(document);
 
-                if(document.IsTypeOf("SolicitudInicial")) await _dossierService.DenyDossierByDocumentAsync(document.Id);
+                if (document.IsTypeOf("SolicitudInicial"))
+                {
+                    await _dossierService.DenyDossierByDocumentAsync(document.Id);
 
-                await _trayService.DeleteInputTrayDocumentAsync(document.Id);
-                
-                await RegisterOutputTrayWithDocumentTrayAsync(document, user);
+                    await _trayService.DeleteInputTrayDocumentAsync(document.Id);
+
+                    return Ok(document);
+                }
+
+                var senderUserId = document
+                    .ProcessesHistory
+                    .Last(process => process.State == "derivado")
+                    .SenderId;
+
+                await RegisterOutputTrayWithDocumentTrayAsync(document, user, senderUserId);
 
                 return Ok(document);
             }
@@ -1246,11 +1256,11 @@ namespace SISGED.Server.Controllers
             await _trayService.RegisterOutputTrayAsync(outputTrayDTO);
         }
 
-        private async Task RegisterOutputTrayWithDocumentTrayAsync(Document document, User user)
+        private async Task RegisterOutputTrayWithDocumentTrayAsync(Document document, User evaluatorUser, string senderUserId)
         {
-            var documentTray = await _trayService.GetDocumentTrayByUserIdDocumentIdAsync(user.Id, document.Id);
+            var documentTray = await _trayService.GetDocumentTrayByUserIdDocumentIdAsync(evaluatorUser.Id, document.Id);
 
-            await _trayService.RegisterOutputTrayWithDocumentTrayAsync(documentTray, user);
+            await _trayService.RegisterOutputTrayWithDocumentTrayAsync(documentTray, evaluatorUser.Id, senderUserId);
         }
 
         private async Task<ComplaintRequest> RegisterComplaintRequestAsync(ComplaintRequestResponse document, User user)

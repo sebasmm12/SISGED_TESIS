@@ -307,9 +307,14 @@ namespace SISGED.Client.Components.WorkEnvironments
             return item.CurrentPlace == dropzone;
         };
 
-        private readonly Func<Item, IEnumerable<Item>, bool> CanDropToWorkZone = (item, workPlaceItems) =>
+        private readonly Func<Item, IEnumerable<Item>, Assistant?, bool> CanDropToWorkZone = (item, workPlaceItems, assistant) =>
         {
-            bool canDrop = workPlaceItems.All(workPlaceItem => workPlaceItem.OriginPlace != item.OriginPlace);
+            if (item.OriginPlace == "tools" &&  assistant is null) return false;
+
+            if (item.OriginPlace == "tools" && assistant!.GetCurrentDocumentStep().ActionId != (string)item.Value)
+                return false;
+
+            var canDrop = workPlaceItems.All(workPlaceItem => workPlaceItem.OriginPlace != item.OriginPlace);
 
             return canDrop;
         };
