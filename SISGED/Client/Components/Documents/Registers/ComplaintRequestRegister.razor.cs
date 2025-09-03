@@ -102,7 +102,7 @@ namespace SISGED.Client.Components.Documents.Registers
         {
             if (complaintRequestStepper!.GetActiveIndex() != complaintRequestStepper!.Steps.Count - 1) return false;
 
-            complaintRequestForm!.Validate().GetAwaiter().GetResult();
+            complaintRequestForm!.Validate();
 
             if (!complaintRequestForm!.IsValid)
             {

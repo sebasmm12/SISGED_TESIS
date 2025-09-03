@@ -1,4 +1,5 @@
-﻿using SISGED.Client.Services.Contracts;
+﻿using SISGED.Client.Components.Documents;
+using SISGED.Client.Services.Contracts;
 
 namespace SISGED.Client.Services.Repositories
 {
@@ -9,7 +10,8 @@ namespace SISGED.Client.Services.Repositories
             new DocumentRegisterRender(),
             new DocumentSendRender(),
             new DocumentGenerationRender(),
-            new DocumentEvaluationRender()
+            new DocumentEvaluationRender(),
+            new DocumentUpdateRender()
         };
 
         public IToolWindowRender GetToolWindow(string toolName)

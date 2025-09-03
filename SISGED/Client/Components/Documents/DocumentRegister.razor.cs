@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using SISGED.Client.Components.WorkEnvironments;
 using SISGED.Client.Helpers;
 using SISGED.Client.Services.Contracts;
 using SISGED.Client.Services.Repositories;
-using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Responses.Account;
 using SISGED.Shared.Models.Responses.DossierTray;
 

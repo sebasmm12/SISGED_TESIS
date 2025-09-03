@@ -309,7 +309,7 @@ namespace SISGED.Client.Components.WorkEnvironments
 
         private readonly Func<Item, IEnumerable<Item>, Assistant?, bool> CanDropToWorkZone = (item, workPlaceItems, assistant) =>
         {
-            if (item.OriginPlace == "tools" &&  assistant is null) return false;
+            if (item.OriginPlace == "tools" && assistant is null) return false;
 
             if (item.OriginPlace == "tools" && assistant!.GetCurrentDocumentStep().ActionId != (string)item.Value)
                 return false;

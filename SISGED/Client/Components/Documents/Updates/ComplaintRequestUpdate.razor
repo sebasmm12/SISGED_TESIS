@@ -1,6 +1,6 @@
-﻿@if(pageLoading)
+﻿@if (pageLoading)
 {
-    <GenericToolLoader Body="Cargando los elementos para el registro de la solicitud, por favor espere..."></GenericToolLoader>
+    <GenericToolLoader Body="Cargando los elementos para la actualización de la solicitud, por favor espere..."></GenericToolLoader>
 }
 else
 {
@@ -9,7 +9,7 @@ else
             <MudCardContent>
                 <MudStepper @ref="complaintRequestStepper" LocalizedStrings="GetRegisterLocalizedStrings()"
                             Color="Color.Secondary" Variant="Variant.Filled" HeaderTextView="HeaderTextView.NewLine"
-                            PreventStepChange="@(() => CheckComplaintRegisterAsync())" >
+                            PreventStepChange="@(() => CheckComplaintRegisterAsync())">
                     <MudStep Title="Datos Generales">
                         <MudGrid>
                             <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
@@ -68,5 +68,3 @@ else
         </MudForm>
     </MudCard>
 }
-
-

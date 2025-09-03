@@ -48,7 +48,9 @@ public class SolicitorDossierShipmentValidator : AbstractValidator<SolicitorDoss
 
     private async Task<bool> ValidateTitleAsync(string title)
     {
-        var isTitleUnique = await _httpClient.GetFromJsonAsync<bool>($"api/documents/validations?title={title}");
+        var isTitleUnique = await _httpClient
+            .GetFromJsonAsync<bool>($"api/documents/validations?title={title}")
+            .ConfigureAwait(false);
 
         return isTitleUnique;
     }
