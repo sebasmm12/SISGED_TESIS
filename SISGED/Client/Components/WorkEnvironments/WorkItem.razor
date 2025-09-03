@@ -40,10 +40,31 @@
                 {
                     <p class="registro">Escritura Pública escogida: @Item.PublicDeed!.Title</p>
                 }
-                if (acceptedStatusToInfo.Contains(Item.ItemStatus) && Item.OriginPlace.Equals("inputs"))
+                if (acceptedStatusToInfo.Contains(dossierTray.Document!.State) && Item.CurrentPlace.Equals("workplace"))
                 {
                     <div class="field-container">
-                        <MudButton Class="mud-info-c">Ver Información</MudButton>
+                        @if (!string.IsNullOrEmpty(GetDocumentGeneratedUrl(dossierTray)))
+                        {
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <div class="text-start text-sm-center mb-2">
+                                    <MudTooltip Text="Ver Documento" Arrow="true" Placement="Placement.Top">
+                                        <MudIconButton Icon="fas fa-file-pdf" Color="Color.Error" Href="@DocumentGeneratedUrl" Target="_blank"
+                                                       Class="rounded-circle"></MudIconButton>
+                                    </MudTooltip>
+                                </div>
+                            </MudItem>
+                        }
+                        else
+                        {
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <div class="text-start text-sm-center mb-2">
+                                    <MudTooltip Text="Ver Información del documento" Arrow="true" Placement="Placement.Top">
+                                        <MudIconButton Icon="fas fa-info" Color="Color.Info" OnClick="@(() => ShowDocumentInfoAsync(dossierTray))"
+                                                       Class="rounded-circle"></MudIconButton>
+                                    </MudTooltip>
+                                </div>
+                            </MudItem>
+                        }
                         @if (Item.ItemStatus.Equals("evaluated"))
                         {
                             <MudButton Class="mud-info-c">Ver Evaluación</MudButton>

@@ -93,7 +93,7 @@
     color: #25393D;
 }
 
-::deep .tool-container .mud-icon-root {
+::deep .tool-container > .mud-icon-root {
     color: #1FA270 !important;
 }
 
