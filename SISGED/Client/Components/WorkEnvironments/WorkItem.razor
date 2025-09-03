@@ -3,6 +3,11 @@
         <MudIcon Icon="@Item.Icon" Size="Size.Medium"></MudIcon>
         <div class="tool-sub-container">
             <p class="tool-name">@Item.Name</p>
+            @if (Item.Client is not null)
+            {
+                var dossierTray = (DossierTrayResponse)Item.Value;
+                <p class="tool-title">@GetDocumentTitle(dossierTray)</p>
+            }
             <p class="tool-description">@Item.Description</p>
             @if(Item.Client is not null) {
                 <p class="tool-client-name">@Item.Client.GetShortName() - @Item.Client.DocumentNumber</p>
