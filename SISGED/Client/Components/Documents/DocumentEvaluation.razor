@@ -57,6 +57,18 @@ else
                                 </div>
                             </MudItem>
                         }
+                        else
+                        {
+                            <MudItem xs="12" sm="12" md="12" lg="12" xl="12">
+                                <div class="text-start text-sm-center mb-2">
+                                    <MudText Typo="Typo.h6">Mayor información</MudText>
+                                    <MudTooltip Text="Ver Información del documento" Arrow="true" Placement="Placement.Top">
+                                        <MudIconButton Icon="fas fa-info" Color="Color.Info" OnClick="@(() => ShowDocumentInfoAsync())"
+                                                       Class="rounded-circle"></MudIconButton>
+                                    </MudTooltip>
+                                </div>
+                            </MudItem>
+                        }
                         <MudItem xs="12" sm="12" md="6" lg="6" xl="6">
                             <MudButton Color="Color.Primary" Variant="Variant.Filled" FullWidth="true" OnClick="@(() => AprroveDocumentAsync())">Aprobar</MudButton>
                         </MudItem>

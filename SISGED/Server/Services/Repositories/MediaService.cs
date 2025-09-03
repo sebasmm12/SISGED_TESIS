@@ -17,8 +17,8 @@ namespace SISGED.Server.Services.Repositories
             if (string.IsNullOrWhiteSpace(file.Content)) throw new Exception($"El archivo a registrar debe tener contenido");
 
             var fileBytes = Convert.FromBase64String(file.Content);
-
-            var fileRegister = new FileRegisterDTO(fileBytes, file.Extension, containerName);
+            
+            var fileRegister = new FileRegisterDTO(fileBytes, file.Extension, containerName, file.Name);
 
             string fileUrl = await _fileStorageApplication.SaveFileAsync(fileRegister);
 
@@ -33,6 +33,15 @@ namespace SISGED.Server.Services.Repositories
             var urls = await Task.WhenAll(urlTasks);
 
             return urls;
+        }
+
+        public async Task<Tuple<string, string>[]> GetFilesAsync(IEnumerable<string> annexUrls, string containerName)
+        {
+            var annexFileTasks = annexUrls.Select(url => _fileStorageApplication.GetFileAsync(url, containerName));
+
+            var annexFiles = await Task.WhenAll(annexFileTasks);
+
+            return annexFiles;
         }
     }
 }

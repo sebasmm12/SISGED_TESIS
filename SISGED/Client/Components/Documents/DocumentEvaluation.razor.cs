@@ -1,16 +1,16 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using MudBlazor;
+using SISGED.Client.Components.Documents.Histories;
 using SISGED.Client.Components.WorkEnvironments;
 using SISGED.Client.Helpers;
 using SISGED.Client.Services.Contracts;
+using SISGED.Client.Services.Repositories;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Requests.Documents;
 using SISGED.Shared.Models.Responses.Account;
 using SISGED.Shared.Models.Responses.Document;
-using SISGED.Shared.Models.Responses.Dossier;
 using SISGED.Shared.Models.Responses.DossierTray;
 using SISGED.Shared.Models.Responses.User;
 using SISGED.Shared.Validators;
@@ -32,11 +32,14 @@ namespace SISGED.Client.Components.Documents
         public IMapper Mapper { get; set; } = default!;
         [Inject]
         public DocumentEvaluationValidator DocumentEvaluationValidator { get; set; } = default!;
+        [Inject]
+        public IDocumentRepository DocumentRepository { get; set; } = default!;
 
         [CascadingParameter(Name = "WorkEnvironment")]
         public WorkEnvironment WorkEnvironment { get; set; } = default!;
         [CascadingParameter(Name = "SessionAccount")]
         public SessionAccountResponse SessionAccount { get; set; } = default!;
+
 
         private bool pageLoading = true;
         private DossierTrayResponse dossierTray = default!;
@@ -47,7 +50,7 @@ namespace SISGED.Client.Components.Documents
         private MudForm? documentEvaluationForm = default!;
         private DocumentEvaluationDTO documentEvaluation = new();
 
-        protected async override Task OnInitializedAsync()
+        protected override async Task OnInitializedAsync()
         {
             await GetDocumentEvaluationInfoAsync();
 
@@ -230,6 +233,15 @@ namespace SISGED.Client.Components.Documents
                 await SwalFireRepository.ShowErrorSwalFireAsync($"No se pudo obtener información sobre el usuario creado del documento");
                 return null;
             }
+        }
+
+        private async Task ShowDocumentInfoAsync()
+        {
+            var dialogParameters = new List<DialogParameter>() { new("DocumentId", dossierTray.Document!.Id) };
+
+            var documentInfoType = DocumentRepository.GetDocumentInfoType(dossierTray.Document.Type);
+
+            await DialogContentRepository.ShowDialogAsync(documentInfoType, dialogParameters, "Información del Documento");
         }
 
     }

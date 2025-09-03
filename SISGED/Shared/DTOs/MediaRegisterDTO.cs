@@ -9,6 +9,11 @@
             Name = name;
         }
 
+        public MediaRegisterDTO()
+        {
+
+        }
+
         public string Content { get; set; } = default!;
         public string Extension { get; set; } = default!;
         public string Name { get; set; } = default!;

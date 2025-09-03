@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using SISGED.Client.Helpers;
 using SISGED.Client.Services.Contracts;
-using SISGED.Client.Services.Repositories;
 using SISGED.Shared.Models.Responses.Document.ComplaintRequest;
 
 namespace SISGED.Client.Components.Documents.Informations

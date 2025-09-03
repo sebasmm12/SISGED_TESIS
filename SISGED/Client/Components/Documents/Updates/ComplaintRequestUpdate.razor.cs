@@ -43,8 +43,8 @@ public partial class ComplaintRequestUpdate
     private MudStepper? complaintRequestStepper;
     private IEnumerable<DocumentTypeInfoResponse> documentTypes = default!;
     private MudForm? complaintRequestForm = default!;
-    private readonly ComplaintRequestRegisterDTO complaintRequest = new();
-    private readonly List<MediaRegisterDTO> annexes = new();
+    private readonly ComplainRequestUpdateDTO complaintRequest = new();
+    private List<MediaRegisterDTO> annexes = new();
     private string dossierId = default!;
     private string previousDocumentId = default!;
 
@@ -54,7 +54,37 @@ public partial class ComplaintRequestUpdate
 
         await GetUserRequestInformationAsync();
 
+        annexes = await GetAnnexFilesAsync();
+
         pageLoading = false;
+    }
+
+    private async Task<List<MediaRegisterDTO>> GetAnnexFilesAsync()
+    {
+        try
+        {
+            var documentTypesResponse = await HttpRepository.GetAsync<IEnumerable<Tuple<string, string>>>($"api/documents/{complaintRequest.Id}/annexes");
+
+            if (documentTypesResponse.Error)
+            {
+                await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los anexos de la solicitud");
+            }
+
+            var annexesResponse = documentTypesResponse.Response!.Select(annex => new MediaRegisterDTO
+            {
+                Content = annex.Item1,
+                Extension = Path.GetExtension(annex.Item2),
+                Name = annex.Item2
+            })
+            .ToList();
+
+            return annexesResponse;
+        }
+        catch (Exception)
+        {
+            await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los anexos de la solicitud");
+            return new();
+        }
     }
 
     private async Task GetUserRequestInformationAsync()
@@ -65,15 +95,12 @@ public partial class ComplaintRequestUpdate
 
         var dossierTray = (DossierTrayResponse)userTray.Value;
 
-        await JsRuntime.InvokeVoidAsync("console.log", dossierTray);
-
         var documentContent = JsonSerializer.Deserialize<InitialRequestContentDTO>(JsonSerializer.Serialize(dossierTray!.Document!.Content), new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         });
 
-        await JsRuntime.InvokeVoidAsync("console.log", documentContent);
-
+        complaintRequest.Id = dossierTray.Document!.Id;
         complaintRequest.Title = documentContent!.Title;
         complaintRequest.Description = documentContent.Description;
         complaintRequest.Solicitor = string.IsNullOrEmpty(documentContent!.SolicitorId) ? new() : await GetSolicitorAsync(documentContent!.SolicitorId);

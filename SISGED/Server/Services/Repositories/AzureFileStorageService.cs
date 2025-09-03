@@ -22,7 +22,7 @@ namespace SISGED.Server.Services.Repositories
             var fileName = Path.GetFileName(fileEliminationDTO.Url);
 
             var blob = client.GetBlobClient(fileName);
-
+            
             await blob.DeleteIfExistsAsync();
 
         }
@@ -33,7 +33,11 @@ namespace SISGED.Server.Services.Repositories
 
             client.SetAccessPolicy(Azure.Storage.Blobs.Models.PublicAccessType.BlobContainer);
 
-            string fileName = $"{Guid.NewGuid()}{fileRegisterDTO.Extension}";
+            var fileName = $"{Guid.NewGuid()}";
+
+            fileName += string.IsNullOrEmpty(fileRegisterDTO.Name) ? 
+                $"{fileRegisterDTO.Extension}" : 
+                $"_{fileRegisterDTO.Name}{fileRegisterDTO.Extension}";
 
             var blob = client.GetBlobClient(fileName);
 
@@ -43,6 +47,29 @@ namespace SISGED.Server.Services.Repositories
 
             return blob.Uri.ToString();
 
+        }
+
+        public async Task<Tuple<string, string>> GetFileAsync(string url, string containerName)
+        {
+            using var memoryStream = new MemoryStream();
+
+            var client = await VerifyFileAsync(containerName);
+
+            var encryptedFileName = Path.GetFileName(url);
+
+            var fileName = encryptedFileName.Contains("_") ? 
+                encryptedFileName[(encryptedFileName.IndexOf("_") + 1)..] : 
+                encryptedFileName;
+
+            var blob = client.GetBlobClient(encryptedFileName);
+
+            await blob.DownloadToAsync(memoryStream);
+
+            memoryStream.Position = 0;
+
+            var content = Convert.ToBase64String(memoryStream.ToArray());
+
+            return new(content, fileName);
         }
 
         public async Task<string> UpdateFileAsync(FileUpdateDTO fileUpdateDTO)

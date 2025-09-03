@@ -1,22 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace SISGED.Shared.DTOs;
 
-namespace SISGED.Shared.DTOs
+public class FileRegisterDTO
 {
-    public class FileRegisterDTO
+    public FileRegisterDTO(byte[] content, string extension, string containerName, string name = "")
     {
-        public FileRegisterDTO(byte[] content, string extension, string containerName)
-        {
-            Content = content;
-            Extension = extension;
-            ContainerName = containerName;
-        }
-
-        public byte[] Content { get; set; } = default!;
-        public string Extension { get; set; } = default!;
-        public string ContainerName { get; set; } = default!;
+        Content = content;
+        Extension = extension;
+        ContainerName = containerName;
+        Name = name;
     }
+
+    public byte[] Content { get; set; }
+
+    public string Extension { get; set; }
+
+    public string ContainerName { get; set; }
+
+    public string Name { get; set; }
 }

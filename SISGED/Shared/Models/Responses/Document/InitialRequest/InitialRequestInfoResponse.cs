@@ -8,6 +8,9 @@
     public class InitialRequestContentInfo
     {
         public string Description { get; set; } = default!;
+        
         public string Title { get; set; } = default!;
+
+        public string? Code { get; set; } = default!;
     }
 }

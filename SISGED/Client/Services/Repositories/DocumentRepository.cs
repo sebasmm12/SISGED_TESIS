@@ -14,7 +14,8 @@ namespace SISGED.Client.Services.Repositories
             { "Dictamen", typeof(DictumInfo) },
             { "Resolucion", typeof(ResolutionInfo) },
             { "EntregaExpedienteNotario", typeof(SolicitorDossierShipmentInfo) },
-            { "ResolucionSesion", typeof(SessionResolutionInfo) }
+            { "ResolucionSesion", typeof(SessionResolutionInfo) },
+            { "SolicitudInicial", typeof(UserRequestInfo) }
         };
 
         public IEnumerable<DocumentOption> GetDocumentTypesWithDossier()
