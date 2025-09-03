@@ -1,15 +1,29 @@
-﻿using FluentValidation;
+﻿using System.Net.Http.Json;
+using FluentValidation;
 using SISGED.Shared.DTOs;
 
 namespace SISGED.Shared.Validators
 {
     public class ComplaintRequestValidator : AbstractValidator<ComplaintRequestRegisterDTO>
     {
-        public ComplaintRequestValidator()
+        private readonly HttpClient _httpClient;
+
+        public ComplaintRequestValidator(HttpClient httpClient)
         {
+            _httpClient = httpClient;
             RuleFor(x => x.Title)
                 .NotEmpty()
-                .WithMessage("Debe ingresar el título de la denuncia");
+                .WithMessage("Debe ingresar el título de la denuncia")
+                .MustAsync(async (title, _) =>
+                {
+                    if (string.IsNullOrEmpty(title))
+                        return false;
+
+                    var isTitleUnique = await ValidateTitleAsync(title);
+
+                    return isTitleUnique;
+                })
+                .WithMessage("El título de la denuncia ya se encuentra registrado");
 
             RuleFor(x => x.Description)
                 .NotEmpty()
@@ -30,5 +44,12 @@ namespace SISGED.Shared.Validators
 
             return result.Errors.Select(error => error.ErrorMessage);
         };
+
+        private async Task<bool> ValidateTitleAsync(string title)
+        {
+            var isTitleUnique = await _httpClient.GetFromJsonAsync<bool>($"api/documents/validations?title={title}");
+
+            return isTitleUnique;
+        }
     }
 }

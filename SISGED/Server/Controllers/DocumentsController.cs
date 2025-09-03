@@ -919,6 +919,23 @@ namespace SISGED.Server.Controllers
         #endregion
 
         #region GET Services
+        [HttpGet("validations")]
+        public async Task<ActionResult<bool>> ValidateUserRequestTitleAsync([FromQuery] string title)
+        {
+            try
+            {
+                var userId = GetUserClaimValue("userId");
+
+                var isTitleUnique = await _documentService.ValidateUserDocumentAsync(title, userId);
+
+                return Ok(isTitleUnique);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
         [HttpGet("user-requests/{documentNumber}")]
         public async Task<ActionResult<IEnumerable<UserRequestDocumentResponse>>> GetUserRequestDocumentsAsync([FromRoute] string documentNumber)
         {

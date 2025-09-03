@@ -1,16 +1,30 @@
-﻿using FluentValidation;
+﻿using System.Net.Http.Json;
+using FluentValidation;
 using SISGED.Shared.DTOs;
-using SISGED.Shared.Models.Responses.Document;
 
 namespace SISGED.Shared.Validators
 {
     public class DisciplinaryOpennessRegisterValidator : AbstractValidator<DisciplinaryOpennessRegisterDTO>
     {
-        public DisciplinaryOpennessRegisterValidator()
+        private readonly HttpClient _httpClient;
+
+        public DisciplinaryOpennessRegisterValidator(HttpClient httpClient)
         {
+            _httpClient = httpClient;
+
             RuleFor(x => x.Title)
                 .NotEmpty()
-                .WithMessage("Debe ingresar el título de la solicitud");
+                .WithMessage("Debe ingresar el título de la solicitud")
+                .MustAsync(async (title, _) =>
+                {
+                    if (string.IsNullOrEmpty(title))
+                        return false;
+
+                    var isTitleUnique = await ValidateTitleAsync(title);
+
+                    return isTitleUnique;
+                })
+                .WithMessage("El título de la solicitud ya se encuentra registrado");
 
             RuleFor(x => x.Description)
                 .NotEmpty()
@@ -44,5 +58,12 @@ namespace SISGED.Shared.Validators
 
             return result.Errors.Select(error => error.ErrorMessage);
         };
+
+        private async Task<bool> ValidateTitleAsync(string title)
+        {
+            var isTitleUnique = await _httpClient.GetFromJsonAsync<bool>($"api/documents/validations?title={title}");
+
+            return isTitleUnique;
+        }
     }
 }

@@ -9,6 +9,7 @@ using SISGED.Shared.Models.Queries.Document;
 using SISGED.Shared.Models.Queries.Statistic;
 using SISGED.Shared.Models.Queries.UserDocument;
 using SISGED.Shared.Models.Requests.Documents;
+using SISGED.Shared.Models.Requests.User;
 using SISGED.Shared.Models.Responses.Dashboards;
 using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.Document.BPNDocument;
@@ -169,6 +170,15 @@ namespace SISGED.Server.Services.Repositories
             if (document is null) throw new Exception($"No se pudo obtener el documento con identificador {documentId}");
 
             return document;
+        }
+
+        public async Task<bool> ValidateUserDocumentAsync(string title, string userId)
+        {
+            var document = await _documentsCollection
+                .Aggregate<Document>(ValidateUserDocumentPipeline(title, userId))
+                .FirstOrDefaultAsync();
+
+            return document is null;
         }
 
         public async Task<IEnumerable<DocumentResponse>> GetDocumentsAsync(IEnumerable<string> documentIds)
@@ -1264,6 +1274,18 @@ namespace SISGED.Server.Services.Repositories
         }
 
         #region private methods
+
+        private static BsonDocument[] ValidateUserDocumentPipeline(string title, string user)
+        {
+            var matchAggregation = MongoDBAggregationExtension.Match(new Dictionary<string, BsonValue>
+            {
+                { "content.title", MongoDBAggregationExtension.Regex($"^{title}$", "i") },
+                { "creationUserId", user }
+            });
+
+            return new[] { matchAggregation };
+        }
+
         private static BsonDocument[] GetUserDocumentsSnapshotPipeline(string userId, IEnumerable<string> userTrayDocumentIds)
         {
             var userTrayDocumentBsonIds = userTrayDocumentIds

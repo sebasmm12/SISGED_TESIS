@@ -95,5 +95,7 @@ namespace SISGED.Server.Services.Contracts
         Task<UserDocumentSnapshotResponse> GetUserDocumentsSnapshotAsync(string userId);
 
         Task<IEnumerable<DocumentResponse>> GetDocumentsAsync(IEnumerable<string> documentIds);
+
+        Task<bool> ValidateUserDocumentAsync(string title, string userId);
     }
 }
