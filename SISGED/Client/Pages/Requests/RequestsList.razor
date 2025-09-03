@@ -21,7 +21,7 @@
             <MudTd DataLabel="Título">@context.InitialDocument.Content.Title</MudTd>
             <MudTd DataLabel="Tipo">@context.Type</MudTd>
             <MudTd DataLabel="Estado">
-                <MudChip Variant="Variant.Text" Color="Color.Success">
+                <MudChip Variant="Variant.Text" Color="DossierStateRepository.GetDossierStateColor(context.State)">
                     @context.State.First().ToString().ToUpper()@context.State.Substring(1)
                 </MudChip>
             </MudTd>

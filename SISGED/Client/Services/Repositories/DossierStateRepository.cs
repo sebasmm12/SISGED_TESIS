@@ -8,9 +8,11 @@ namespace SISGED.Client.Services.Repositories
     {
         private readonly IDictionary<string, Color> _dossierStateColors = new Dictionary<string, Color>
         {
+            { "registrado", Color.Info },
             { "solicitado", Color.Primary },
             { "en proceso", Color.Warning },
             { "finalizado", Color.Success },
+            { "rechazado", Color.Error }
         };
             
         public Color GetDossierStateColor(string dossierState)

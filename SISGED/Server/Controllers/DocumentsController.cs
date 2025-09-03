@@ -261,11 +261,11 @@ namespace SISGED.Server.Controllers
 
                 var dossier = await RegisterInitialDossierAsync(document, initialRequest);
 
-                string receiveUserId = await _trayService.RegisterUserInputTrayAsync(dossier.Id, initialRequest.Id, "MesaPartes");
+                var receiveUserId = await _trayService.RegisterUserInputTrayAsync(dossier.Id, initialRequest.Id, "MesaPartes");
 
                 await _documentService.UpdateDocumentProcessAsync(new(user.Id, receiveUserId, "derivado", user.Rol), initialRequest.Id);
 
-                var dossierDocumentResponse = new DossierDocumentInitialRequestResponse(dossier, initialRequest);
+                var dossierDocumentResponse = new DossierDocumentInitialRequestResponse(dossier, initialRequest, receiveUserId);
 
                 return Ok(dossierDocumentResponse);
             }

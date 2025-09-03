@@ -17,14 +17,14 @@ namespace SISGED.Server.Helpers.Middlewares
         private readonly ILogger<HttpLoggerMiddleware> _httpLogger;
         private readonly RequestDelegate _requestDelegate;
 
-        private List<string> httpBodyMethods = new()
+        private readonly List<string> httpBodyMethods = new()
         {
             "POST",
             "PUT",
             "PATCH"
         };
 
-        private List<string> httpResponseUrls = new()
+        private readonly List<string> httpResponseUrls = new()
         {
             "html",
             "js",
@@ -49,11 +49,11 @@ namespace SISGED.Server.Helpers.Middlewares
             var originalResponseBody = context.Response.Body;
             context.Response.Body = memoryStream;
 
-            if (httpBodyMethods.Contains(context.Request.Method)) await WriteHtttpRequestBodyAsync(context);
+            //if (httpBodyMethods.Contains(context.Request.Method)) await WriteHttpRequestBodyAsync(context);
 
             await _requestDelegate(context);
 
-            if (memoryStream.Length > 0) await WriteHttpResponseBodyAsync(new HttpResponseWriterDTO(originalResponseBody, context, memoryStream));
+            if (memoryStream.Length > 0) await WriteHttpResponseBodyAsync(new(originalResponseBody, context, memoryStream));
 
         }
 
@@ -62,7 +62,7 @@ namespace SISGED.Server.Helpers.Middlewares
         /// </summary>
         /// <param name="context">Http Context for any request</param>
         /// <returns>A task that specifies if the http request body could be written successfully</returns>
-        private async Task WriteHtttpRequestBodyAsync(HttpContext context)
+        private async Task WriteHttpRequestBodyAsync(HttpContext context)
         {
             var request = context.Request;
 
@@ -76,11 +76,14 @@ namespace SISGED.Server.Helpers.Middlewares
 
             request.Body.Position = 0;
 
-            _httpLogger.LogInformation("Http Request Body: {requestBody}", requestBody);
+            if (string.IsNullOrEmpty(requestBody))
+                return;
+
+            _httpLogger.LogInformation("Http ReqBody: {requestBody}", requestBody);
 
         }
 
-        /// <summary>
+        /// <summary> 
         /// Gets and Writes the http response body 
         /// </summary>
         /// <param name="httpResponseWriterDTO">Contains all information related to the httpContext for the response</param>

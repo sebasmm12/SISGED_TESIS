@@ -7,12 +7,14 @@ using SISGED.Shared.DTOs;
 using SISGED.Shared.Entities;
 using SISGED.Shared.Models.Requests.Assistants;
 using SISGED.Shared.Models.Requests.Documents;
+using SISGED.Shared.Models.Requests.Notifications;
 using SISGED.Shared.Models.Responses.Account;
 using SISGED.Shared.Models.Responses.Document;
 using SISGED.Shared.Models.Responses.DocumentType;
 using SISGED.Shared.Models.Responses.DossierDocument;
 using SISGED.Shared.Models.Responses.Solicitor;
 using SISGED.Shared.Validators;
+using static MudBlazor.CategoryTypes;
 
 namespace SISGED.Client.Components.Documents.Registers
 {
@@ -77,7 +79,19 @@ namespace SISGED.Client.Components.Documents.Registers
 
             await SwalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo registrar su solicitud de manera satisfactoria");
 
+            await SendNotificationAsync(registeredInitialRequest);
+
             MudDialog.Close(DialogResult.Ok(true));
+        }
+
+        private async Task SendNotificationAsync(DossierDocumentInitialRequestResponse registeredInitialRequest)
+        {
+            var notificationDocument = new NotificationDocument(registeredInitialRequest.InitialRequest.Id, registeredInitialRequest.InitialRequest.Content.Title);
+
+            var notificationRegisterRequest = new NotificationRegisterRequest(SessionAccount.User.Id, registeredInitialRequest.ReceiverUserId,
+                notificationDocument, string.Empty, "notificacion");
+
+            await RegisterNotificationAsync(notificationRegisterRequest);
         }
 
         private async Task<DossierDocumentInitialRequestResponse?> ShowLoadingDialogAsync(DossierWrapper documentRegister)
@@ -178,6 +192,24 @@ namespace SISGED.Client.Components.Documents.Registers
             {
                 await SwalFireRepository.ShowErrorSwalFireAsync("No se pudo obtener los tipos de solicitudes del sistema");
                 return new List<DocumentTypeInfoResponse>();
+            }
+        }
+
+        private async Task RegisterNotificationAsync(NotificationRegisterRequest notificationRegisterRequest)
+        {
+            try
+            {
+                var notificationRegisterResponse = await HttpRepository.PostAsync<NotificationRegisterRequest>($"api/notifications/users", notificationRegisterRequest);
+
+                if (notificationRegisterResponse.Error)
+                {
+                    await SwalFireRepository.ShowErrorSwalFireAsync($"No se pudo enviar la notificación de la derivación del documento");
+                }
+            }
+            catch (Exception)
+            {
+
+                await SwalFireRepository.ShowErrorSwalFireAsync($"No se pudo enviar la notificación de la derivación del documento");
             }
         }
 

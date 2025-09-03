@@ -135,10 +135,12 @@ namespace SISGED.Client.Components.Documents
             await SwalFireRepository.ShowSuccessfulSwalFireAsync($"Se pudo derivar el documento de manera satisfactoria");
 
             // TODO: Implement email notifications in the last derivation of the process
-            if (!WorkEnvironment.IsAssistantLastStep())
-            {
-                await SendNotificationAsync();
-            }
+            //if (!WorkEnvironment.IsAssistantLastStep())
+            //{
+            //    await SendNotificationAsync();
+            //}
+
+            await SendNotificationAsync();
 
 
             await UpdateSentDocumentAsync(dossierDocument);

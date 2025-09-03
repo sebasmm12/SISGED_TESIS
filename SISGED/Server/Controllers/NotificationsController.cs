@@ -87,7 +87,6 @@ namespace SISGED.Server.Controllers
                 var templateFilterDto = new TemplateFilterDTO(notificationUsers.SenderUser.Type, notificationUsers.ReceiverUser.Type,
                                                  notificationRegisterRequest.ActionId, notificationRegisterRequest.Type);
 
-
                 var insertedNotification = await RegisterNotificationAsync(userNotification, templateFilterDto, notification);
 
 

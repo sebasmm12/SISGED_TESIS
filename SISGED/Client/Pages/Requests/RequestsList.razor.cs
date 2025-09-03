@@ -4,6 +4,7 @@ using MudBlazor;
 using SISGED.Client.Components.Documents.Registers;
 using SISGED.Client.Helpers;
 using SISGED.Client.Services.Contracts;
+using SISGED.Shared.Models.Requests.Notifications;
 using SISGED.Shared.Models.Responses.Account;
 using SISGED.Shared.Models.Responses.Document.UserRequest;
 
@@ -19,6 +20,9 @@ namespace SISGED.Client.Pages.Requests
         public ISwalFireRepository SwalFireRepository { get; set; } = default!;
         [Inject]
         public IDialogService DialogService { get; set; } = default!;
+
+        [Inject]
+        public IDossierStateRepository DossierStateRepository { get; set; } = default!;
 
         [CascadingParameter(Name = "SessionAccount")]
         public SessionAccountResponse SessionAccount { get; set; } = default!;
@@ -112,6 +116,5 @@ namespace SISGED.Client.Pages.Requests
 
             return userRequestQueries;
         }
-
     }
 }
