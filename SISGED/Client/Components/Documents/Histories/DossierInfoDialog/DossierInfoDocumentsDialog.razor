@@ -13,8 +13,11 @@
                 {
                     <MudTimelineItem Color="Color.Success" Variant="Variant.Filled">
                         <ItemContent>
-                            <DocumentInfo Document="document" MdParam="12" LgParam="12" AnnulmentActivation="false" @key="document" DocumentVersionHistoryInfo="ShowDocumentVersionHistoryAsync"
-                                      DocumentProcessHistoryInfo="ShowDocumentProcessHistoryAsync" DocumentVisualization="ShowDocumentInfoAsync"></DocumentInfo>
+                            <DocumentInfo Document="document" MdParam="12" LgParam="12" AnnulmentActivation="false" @key="document" 
+                                          DocumentVersionHistoryInfo="ShowDocumentVersionHistoryAsync"
+                                          DocumentProcessHistoryInfo="ShowDocumentProcessHistoryAsync" 
+                                          DocumentVisualization="ShowDocumentInfoAsync"
+                                          DocumentEvaluation="ShowDocumentEvaluationAsync"></DocumentInfo>
                         </ItemContent>
                         <ItemOpposite>
                             <MudText Color="Color.Success">@document.CreationDate</MudText>

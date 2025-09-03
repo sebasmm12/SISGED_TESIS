@@ -74,5 +74,13 @@ namespace SISGED.Client.Components.Documents.Histories.DossierInfoDialog
 
             await DialogContentRepository.ShowDialogAsync(documentInfoType, dialogParameters, "Información del Documento");
         }
+
+        private async Task ShowDocumentEvaluationAsync(UserDocumentDTO document)
+        {
+            var dialogParameters = new List<DialogParameter>() { new("DocumentId", document.Id), new("PageSize", 5) };
+
+            await DialogContentRepository.ShowDialogAsync<DocumentsEvaluation>(dialogParameters, "Evaluaciones");
+
+        }
     }
 }

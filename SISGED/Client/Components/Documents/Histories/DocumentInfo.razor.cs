@@ -35,6 +35,11 @@ namespace SISGED.Client.Components.Documents.Histories
 
         private IEnumerable<string> annulmentInValidStates = new List<string>() { "evaluado", "anulado" };
 
+        protected override void OnInitialized()
+        {
+            _annulmentActivation = AnnulmentActivation.GetValueOrDefault();
+        }
+
         protected override void OnParametersSet()
         {
             if (MdParam.HasValue)
