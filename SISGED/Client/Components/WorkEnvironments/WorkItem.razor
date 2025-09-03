@@ -1,4 +1,5 @@
-﻿<li class="li-tool li-drag-style @ToolColor">
+﻿
+<li class="li-tool li-drag-style @ToolColor">
     <div class="tool-container">
         <MudIcon Icon="@Item.Icon" Size="Size.Medium"></MudIcon>
         <div class="tool-sub-container">
@@ -6,10 +7,29 @@
             @if (Item.Client is not null)
             {
                 var dossierTray = (DossierTrayResponse)Item.Value;
-                <p class="tool-title">@GetDocumentTitle(dossierTray)</p>
+                @if (IsToolTipVisible())
+                {
+                    <MudTooltip Arrow="true" Delay="200" Placement="@GetPlacement()" RootClass="tool-tooltip">
+                        <ChildContent>
+                            <p class="tool-title">@GetDocumentTitle(dossierTray)</p>
+                        </ChildContent>
+                        <TooltipContent>
+                            <MudText Typo="Typo.body2">
+                                @DocumentTitle
+                            </MudText>
+                        </TooltipContent>
+                    </MudTooltip>
+                }
+                else
+                {
+                    <p class="tool-title">@GetDocumentTitle(dossierTray)</p>
+                }
+
+                <p class="tool-description">@DocumentTypeMapper.Map(Item.Description)</p>
             }
-            <p class="tool-description">@Item.Description</p>
-            @if(Item.Client is not null) {
+            
+            @if (Item.Client is not null)
+            {
                 <p class="tool-client-name">@Item.Client.GetShortName() - @Item.Client.DocumentNumber</p>
                 var dossierTray = (DossierTrayResponse)Item.Value;
                 if (accepetedStatusToDocument.Contains(Item.ItemStatus) && Item.OriginPlace.Equals("inputs"))
@@ -24,14 +44,17 @@
                 {
                     <div class="field-container">
                         <MudButton Class="mud-info-c">Ver Información</MudButton>
-                        @if(Item.ItemStatus.Equals("evaluated")) {
+                        @if (Item.ItemStatus.Equals("evaluated"))
+                        {
                             <MudButton Class="mud-info-c">Ver Evaluación</MudButton>
                         }
                     </div>
                 }
 
-                if (PublicDeed is not null) {
-                    if(acceptedDocumentTypes.Contains(dossierTray.Document!.Type)) {
+                if (PublicDeed is not null)
+                {
+                    if (acceptedDocumentTypes.Contains(dossierTray.Document!.Type))
+                    {
                         <div class="field-container">
                             <a class="mud-info-c p-2" href="@PublicDeed.Url" target="_blank">Ver Escritura Pública</a>
                         </div>

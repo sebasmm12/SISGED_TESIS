@@ -12,6 +12,7 @@
 .tool-sub-container {
     display: flex;
     flex-direction: column;
+    width: calc(100% - 24px);
 }
 
 .tool-name {
@@ -20,6 +21,15 @@
     display: block;
     margin: 0px 0px 0px 7px;
     color: #25393D;
+}
+
+.tool-title {
+    color: #25393D;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin: 0px 0px 0px 7px;
+    font-weight: bold;
 }
 
 .tool-description {
@@ -85,4 +95,8 @@
 
 ::deep .tool-container .mud-icon-root {
     color: #1FA270 !important;
+}
+
+::deep .tool-tooltip {
+    width: auto !important;
 }

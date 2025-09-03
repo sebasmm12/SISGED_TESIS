@@ -1,6 +1,6 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
+using MudBlazor;
 using SISGED.Client.Helpers;
 using SISGED.Shared.DTOs;
 using SISGED.Shared.Models.Responses.DossierTray;
@@ -42,6 +42,7 @@ public partial class WorkItem
     [Parameter] public PublicDeedFilterResponse PublicDeed { get; set; } = default!;
 
     private string? ToolColor => Item.OriginPlace == "tools" ? "color-tool" : null;
+    private string DocumentTitle = string.Empty;
 
 
     private string GetDocumentTitle(DossierTrayResponse dossierTray)
@@ -52,6 +53,19 @@ public partial class WorkItem
                 PropertyNameCaseInsensitive = true
             });
 
-        return currentDocumentTitle!.Title;
+
+        DocumentTitle = currentDocumentTitle!.Title;
+
+        return DocumentTitle;
+    }
+
+    private Placement GetPlacement()
+    {
+        return Item.OriginPlace == "inputs" ? Placement.Right : Placement.Left;
+    }
+
+    private bool IsToolTipVisible()
+    {
+        return Item.CurrentPlace != "workplace";
     }
 }

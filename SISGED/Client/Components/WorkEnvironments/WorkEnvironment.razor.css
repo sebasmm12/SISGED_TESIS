@@ -42,6 +42,11 @@ div.tools {
     max-height: 100%;
 }
 
+.container-ot .tools {
+    width: 100%;
+    overflow-y: hidden !important;
+}
+
 div.workspace {
     border-left: 0px;
     border-right: 0px;
