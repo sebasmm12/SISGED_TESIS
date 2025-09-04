@@ -57,7 +57,7 @@ namespace SISGED.Client.Components.Documents.Registers
             if (sessionResolutionStepper!.GetActiveIndex() != sessionResolutionStepper!.Steps.Count - 1) 
                 return false;
 
-            sessionResolutionForm!.Validate().GetAwaiter().GetResult();
+            sessionResolutionForm!.Validate();
 
             if (!sessionResolutionForm.IsValid)
             {

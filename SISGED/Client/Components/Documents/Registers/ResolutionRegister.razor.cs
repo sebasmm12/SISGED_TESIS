@@ -203,7 +203,7 @@ namespace SISGED.Client.Components.Documents.Registers
         {
             if (requestStepper!.GetActiveIndex() != requestStepper!.Steps.Count - 1) return false;
 
-            requestForm!.Validate().GetAwaiter().GetResult();
+            requestForm!.Validate();
 
             if (!requestForm!.IsValid)
             {

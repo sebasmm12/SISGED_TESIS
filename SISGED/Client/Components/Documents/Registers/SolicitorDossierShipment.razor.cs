@@ -115,7 +115,7 @@ namespace SISGED.Client.Components.Documents.Registers
         {
             if (solicitorDossierShipmentStepper!.GetActiveIndex() != solicitorDossierShipmentStepper!.Steps.Count - 1) return false;
 
-            solicitorDossierShipmentForm!.Validate().GetAwaiter().GetResult();
+            solicitorDossierShipmentForm!.Validate();
 
             if (!solicitorDossierShipmentForm.IsValid)
             {

@@ -84,7 +84,7 @@ namespace SISGED.Client.Components.Documents.Registers
         {
             if (dictumStepper!.GetActiveIndex() != dictumStepper!.Steps.Count - 1) return false;
 
-            dictumForm!.Validate().GetAwaiter().GetResult();
+            dictumForm!.Validate();
 
             if (!dictumForm.IsValid)
             {
